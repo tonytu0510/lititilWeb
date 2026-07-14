@@ -1,0 +1,6 @@
+lititil/
+├── index.html          # 网站首页
+├── dino-game.js        # 小恐龙游戏组件
+├── demo-crypto.html    # 汉字加密解密Demo
+├── demo-pinyin.html    # 拼音转Unicode Demo（如果有）
+└── demo-tools.html     # 文本工具集（如果有）
