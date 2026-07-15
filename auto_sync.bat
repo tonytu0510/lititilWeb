@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 echo [自动同步] 正在监听 GitHub 仓库更新...
 
 :loop
