@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 cd /d E:\lititil\lititilWeb
 
 :check_github
@@ -11,8 +12,14 @@ if %errorlevel% neq 0 (
 )
 echo GitHub 连接正常，开始发布更新...
 
+:retry_push
 git pull origin main --no-edit
 git add .
 git commit -m "自动发布更新"
 git push origin main
+if %errorlevel% neq 0 (
+    echo 推送失败，等待 10 秒后重试...
+    timeout /t 10 /nobreak >nul
+    goto retry_push
+)
 echo 发布完成！
