@@ -68,12 +68,12 @@ def uninstall():
 def watch_file():
     """持续监听 trigger.txt 文件的变化"""
     print("=" * 60)
-    print("  🚀 李家桥全自动发布监听器 v1.0")
+    print("  ?? 李家桥全自动发布监听器 v1.0")
     print("=" * 60)
-    print(f"  📁 监听文件: {TRIGGER_FILE}")
-    print(f"  📜 发布脚本: {PUBLISH_BAT}")
-    print(f"  🔑 触发关键词: '发布'")
-    print(f"  ⏰ 启动时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  ?? 监听文件: {TRIGGER_FILE}")
+    print(f"  ?? 发布脚本: {PUBLISH_BAT}")
+    print(f"  ?? 触发关键词: '发布'")
+    print(f"  ?? 启动时间: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
     print("[监听] 监听器已启动，等待发布指令...")
     print("[监听] 每2秒检查一次触发器文件...")
@@ -88,7 +88,7 @@ def watch_file():
                 current_content = f.read().strip()
 
             if current_content == "发布" and current_content != last_content:
-                print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} 🔔 检测到发布指令！")
+                print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ?? 检测到发布指令！")
                 print(f"[监听] 开始执行发布脚本: {PUBLISH_BAT}")
                 print("-" * 40)
 
@@ -99,7 +99,7 @@ def watch_file():
                     print(f"[监听] 错误输出: {result.stderr}")
 
                 print("-" * 40)
-                print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ✅ 发布脚本执行完毕！")
+                print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ?? 发布脚本执行完毕！")
 
                 # 重置触发器文件
                 with open(TRIGGER_FILE, "w", encoding="utf-8") as f:
@@ -112,7 +112,7 @@ def watch_file():
             # 心跳日志（每60秒打印一次，确认监听器还在运行）
             heartbeat += 2
             if heartbeat >= 60:
-                print(f"[监听] 💓 心跳: {time.strftime('%Y-%m-%d %H:%M:%S')} - 监听器运行中...")
+                print(f"[监听] ?? 心跳: {time.strftime('%Y-%m-%d %H:%M:%S')} - 监听器运行中...")
                 heartbeat = 0
 
             time.sleep(2)
@@ -121,7 +121,7 @@ def watch_file():
             print("\n[监听] 收到关闭信号，正在退出...")
             break
         except Exception as e:
-            print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ❌ 发生错误: {e}")
+            print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ?? 发生错误: {e}")
             time.sleep(5)
 
 
