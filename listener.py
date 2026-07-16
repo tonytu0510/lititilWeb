@@ -38,7 +38,7 @@ def install():
 
     # 创建新任务
     cmd = f'schtasks /Create /TN {TASK_NAME} /TR "{python_exe} {script_path}" /SC ONLOGON /DELAY 0001:00 /F'
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    result = subprocess.run(PUBLISH_BAT, shell=True, capture_output=True, text=True, encoding='utf-8')
 
     if result.returncode == 0:
         print(f"[安装] 开机自启任务 '{TASK_NAME}' 创建成功！")
@@ -52,7 +52,7 @@ def uninstall():
     run_as_admin()
 
     cmd = f'schtasks /Delete /TN {TASK_NAME} /F'
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    result = subprocess.run(PUBLISH_BAT, shell=True, capture_output=True, text=True, encoding='utf-8')
     if result.returncode == 0:
         print(f"[卸载] 开机自启任务 '{TASK_NAME}' 已删除。")
     else:
@@ -86,7 +86,7 @@ def watch_file():
                 print(f"[监听] 开始执行发布脚本: {PUBLISH_BAT}")
                 print("-" * 40)
 
-                result = subprocess.run(PUBLISH_BAT, shell=True, capture_output=True, text=True)
+                result = subprocess.run(PUBLISH_BAT, shell=True, capture_output=True, text=True, encoding='utf-8')
                 if result.stdout:
                     print(result.stdout)
                 if result.stderr:
