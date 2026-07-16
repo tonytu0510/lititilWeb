@@ -34,8 +34,8 @@ def install():
     script_path = os.path.abspath(__file__)
 
     # 先删除旧任务（如果存在）
-    subprocess.run(f'schtasks /Delete /TN {TASK_NAME} /F', shell=True, capture_output=True)
-    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True)
+    subprocess.run(f'schtasks /Delete /TN {TASK_NAME} /F', shell=True, capture_output=True,encoding='gb18030', timeout=60)
+    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True,encoding='gb18030', timeout=60)
 
     # 创建开机自启任务
     cmd_boot = f'schtasks /Create /TN {TASK_NAME} /TR "{python_exe} {script_path}" /SC ONLOGON /DELAY 0001:00 /F'
@@ -44,8 +44,8 @@ def install():
     # 创建立即运行任务（运行一次后自动删除）
     cmd_now = f'schtasks /Create /TN {TASK_NAME}_Immediate /TR "{python_exe} {script_path}" /SC ONCE /ST 00:00 /F'
     subprocess.run(cmd_now, shell=True, capture_output=True)
-    subprocess.run(f'schtasks /Run /TN {TASK_NAME}_Immediate', shell=True, capture_output=True)
-    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True)
+    subprocess.run(f'schtasks /Run /TN {TASK_NAME}_Immediate', shell=True, capture_output=True,encoding='gb18030', timeout=60)
+    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True,encoding='gb18030', timeout=60)
 
     if result_boot.returncode == 0:
         print(f"[安装] 开机自启任务 '{TASK_NAME}' 创建成功！")
@@ -58,7 +58,7 @@ def uninstall():
     run_as_admin()
 
     cmd = f'schtasks /Delete /TN {TASK_NAME} /F'
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True,encoding='gb18030', timeout=60)
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True,encoding='utf-8', timeout=60)
     if result.returncode == 0:
         print(f"[卸载] 开机自启任务 '{TASK_NAME}' 已删除。")
     else:
