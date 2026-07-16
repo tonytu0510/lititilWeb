@@ -78,7 +78,7 @@ def watch_file():
 
     while True:
         try:
-            with open(TRIGGER_FILE, "r", encoding="gb18030") as f:
+            with open(TRIGGER_FILE, "r", encoding="utf-8") as f:
                 current_content = f.read().strip()
 
             if current_content == "发布" and current_content != last_content:
@@ -96,7 +96,7 @@ def watch_file():
                 print(f"[监听] {time.strftime('%Y-%m-%d %H:%M:%S')} ✅ 发布脚本执行完毕！")
 
                 # 重置触发器文件
-                with open(TRIGGER_FILE, "w", encoding="gb18030") as f:
+                with open(TRIGGER_FILE, "w", encoding="utf-8") as f:
                     f.write("")
                 print("[监听] 触发器已重置，等待下一次发布指令...")
                 print()
