@@ -27,7 +27,7 @@ def run_as_admin():
 
 
 def install():
-    """安装开机自启任务"""
+    """安装开机自启任务，并立即启动监听器"""
     run_as_admin()
 
     python_exe = sys.executable
@@ -35,17 +35,23 @@ def install():
 
     # 先删除旧任务（如果存在）
     subprocess.run(f'schtasks /Delete /TN {TASK_NAME} /F', shell=True, capture_output=True)
+    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True)
 
-    # 创建新任务
-    cmd = f'schtasks /Create /TN {TASK_NAME} /TR "{python_exe} {script_path}" /SC ONLOGON /DELAY 0001:00 /F'
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='gb18030',timeout=60)
+    # 创建开机自启任务
+    cmd_boot = f'schtasks /Create /TN {TASK_NAME} /TR "{python_exe} {script_path}" /SC ONLOGON /DELAY 0001:00 /F'
+    result_boot = subprocess.run(cmd_boot, shell=True, capture_output=True, text=True, encoding='gb18030', timeout=60)
 
-    if result.returncode == 0:
+    # 创建立即运行任务（运行一次后自动删除）
+    cmd_now = f'schtasks /Create /TN {TASK_NAME}_Immediate /TR "{python_exe} {script_path}" /SC ONCE /ST 00:00 /F'
+    subprocess.run(cmd_now, shell=True, capture_output=True)
+    subprocess.run(f'schtasks /Run /TN {TASK_NAME}_Immediate', shell=True, capture_output=True)
+    subprocess.run(f'schtasks /Delete /TN {TASK_NAME}_Immediate /F', shell=True, capture_output=True)
+
+    if result_boot.returncode == 0:
         print(f"[安装] 开机自启任务 '{TASK_NAME}' 创建成功！")
-        print(f"[安装] 你的监听器已设置为开机自动启动。")
+        print(f"[安装] 监听器已立即启动，并在每次开机时自动运行。")
     else:
-        print(f"[安装] 创建任务失败: {result.stderr}")
-
+        print(f"[安装] 创建任务失败: {result_boot.stderr}")
 
 def uninstall():
     """卸载开机自启任务"""
