@@ -51,9 +51,8 @@ body {
     position: fixed;
     top: 60px;
     right: 10px;
-    display: flex;
     z-index: 1000;
-    width:100px
+    width:120px
 }
 
 /* 小恐龙关闭时，图标组移到距离上部10px */
