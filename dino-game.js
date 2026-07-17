@@ -129,7 +129,7 @@ class DinoGame extends HTMLElement {
             const obstacleY = Math.random() * (this.canvas.height/10 - 5);
             this.obstacles.push({
                 x: this.canvas.width,
-                y: 0
+                y: obstacleY,
                 width: 5 + Math.random() * 5,
                 height:Math.random() * 5
             });
