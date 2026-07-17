@@ -57,7 +57,7 @@
         ctx.clearRect(0, 0, 50, 50);
         
         // 背景圆
-        ctx.fillStyle = '#c4334c';
+        ctx.fillStyle = '#871F78';
         ctx.beginPath();
         ctx.arc(25, 25, 25, 0, Math.PI * 2);
         ctx.fill();
