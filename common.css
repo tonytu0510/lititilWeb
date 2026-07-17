@@ -98,7 +98,8 @@ body {
 /* 二级导航（作为菜单图标的子元素，相对定位） */
 #subNav {
     display: none;
-    position: absolute;
+    position: relative;
+    width：100px;
     top: 3px;
     right: 0;
     background: var(--bg);
