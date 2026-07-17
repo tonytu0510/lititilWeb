@@ -62,7 +62,7 @@ this.startGamePublic = function() {
     this.gameSpeed = 3;
     this.spawnInterval = 80;
 };
-// 公开方法：外部调用重置游戏
+// 公开方法：重置游戏到初始状态
 this.resetGamePublic = function() {
     this.gameStarted = false;
     this.gameOver = false;
@@ -70,15 +70,8 @@ this.resetGamePublic = function() {
     this.obstacles = [];
     this.gameSpeed = 3;
     this.spawnInterval = 80;
-};
-// 公开方法：外部调用重置游戏
-this.againGamePublic = function() {
-    this.gameStarted = false;
-    this.gameOver = true;
-    this.score = 0;
-    this.obstacles = [];
-    this.gameSpeed = 3;
-    this.spawnInterval = 80;
+    this.player.y = this.groundY - this.player.height;
+    this.player.vy = 0;
 };
     }
     
