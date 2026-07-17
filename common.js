@@ -2,18 +2,25 @@
 (function() {
     // HTML 模板
     const html = `
-        <div id="topBar">
-            <button id="menuBtn">菜单</button>
-            <nav id="subNav">
-                <a href="tools.html">工具</a>
-                <a href="aboutMe.html">关于我</a>
-            </nav>
-            <canvas id="dinoIcon" width="50" height="50"></canvas>
-        </div>
+        <!-- Canvas 菜单图标 -->
+        <canvas id="menuIcon" width="50" height="50"></canvas>
+        
+        <!-- Canvas 小恐龙图标 -->
+        <canvas id="dinoIcon" width="50" height="50"></canvas>
+        
+        <!-- 二级导航 -->
+        <nav id="subNav">
+            <a href="tools.html">工具</a>
+            <a href="aboutMe.html">关于我</a>
+        </nav>
+        
+        <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar">
             <dino-game width="100%" height="30" speed="3"></dino-game>
             <button class="close-btn" onclick="toggleDino()">✕</button>
         </div>
+        
+        <!-- 占位高度 -->
         <div id="topPlaceholder"></div>
     `;
 
@@ -23,61 +30,91 @@
         container.innerHTML = html;
     }
 
-    // 菜单交互
-    document.addEventListener('click', function(e) {
-        const menuBtn = document.getElementById('menuBtn');
-        const subNav = document.getElementById('subNav');
-        if (!menuBtn || !subNav) return;
+    // ==================== 画菜单图标（Canvas） ====================
+    function drawMenuIcon() {
+        const canvas = document.getElementById('menuIcon');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 50, 50);
         
-        if (e.target === menuBtn) {
-            subNav.classList.toggle('show');
-        } else if (!e.target.closest('#topBar')) {
-            subNav.classList.remove('show');
-        }
-    });
-
-    // 小恐龙显示/隐藏
-    window.toggleDino = function() {
-        const bar = document.getElementById('dinoBar');
-        const icon = document.getElementById('dinoIcon');
-        const placeholder = document.getElementById('topPlaceholder');
+        // 背景圆
+        ctx.fillStyle = '#c4334c';
+        ctx.beginPath();
+        ctx.arc(25, 25, 25, 0, Math.PI * 2);
+        ctx.fill();
         
-        if (bar.style.display === 'none') {
-            bar.style.display = 'block';
-            icon.classList.remove('show');
-            placeholder.style.height = '80px';
-        } else {
-            bar.style.display = 'none';
-            icon.classList.add('show');
-            placeholder.style.height = '50px';
-        }
-    };
-
-    // 小恐龙图标点击
-    const dinoIcon = document.getElementById('dinoIcon');
-    if (dinoIcon) {
-        dinoIcon.addEventListener('click', toggleDino);
+        // 三条横线
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(12, 16, 26, 3);
+        ctx.fillRect(12, 23, 26, 3);
+        ctx.fillRect(12, 30, 26, 3);
     }
+    drawMenuIcon();
 
-    // 画小恐龙图标
+    // ==================== 画小恐龙图标（Canvas） ====================
     function drawDinoIcon() {
         const canvas = document.getElementById('dinoIcon');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, 50, 50);
         
-        // 身体
+        // 背景圆
+        ctx.fillStyle = '#c4334c';
+        ctx.beginPath();
+        ctx.arc(25, 25, 25, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 小恐龙（白色）
         ctx.fillStyle = '#fff';
-        ctx.fillRect(10, 15, 20, 25);
+        // 身体
+        ctx.fillRect(12, 18, 16, 18);
         // 头
-        ctx.fillRect(25, 5, 15, 15);
+        ctx.fillRect(24, 8, 12, 12);
         // 眼睛
         ctx.fillStyle = '#c4334c';
-        ctx.fillRect(35, 8, 4, 4);
+        ctx.fillRect(32, 10, 3, 3);
         // 腿
         ctx.fillStyle = '#fff';
-        ctx.fillRect(12, 38, 6, 10);
-        ctx.fillRect(22, 38, 6, 10);
+        ctx.fillRect(14, 34, 5, 8);
+        ctx.fillRect(21, 34, 5, 8);
     }
     drawDinoIcon();
+
+    // ==================== 菜单交互 ====================
+    document.addEventListener('click', function(e) {
+        const menuIcon = document.getElementById('menuIcon');
+        const subNav = document.getElementById('subNav');
+        if (!menuIcon || !subNav) return;
+        
+        if (e.target === menuIcon) {
+            subNav.classList.toggle('show');
+        } else if (!e.target.closest('#menuIcon') && !e.target.closest('#subNav')) {
+            subNav.classList.remove('show');
+        }
+    });
+
+    // ==================== 小恐龙显示/隐藏 ====================
+    window.toggleDino = function() {
+        const bar = document.getElementById('dinoBar');
+        const icon = document.getElementById('dinoIcon');
+        const placeholder = document.getElementById('topPlaceholder');
+        
+        if (bar.style.display === 'none') {
+            // 显示跑酷条
+            bar.style.display = 'block';
+            icon.classList.remove('show');
+            placeholder.style.height = '30px';
+        } else {
+            // 隐藏跑酷条，显示图标
+            bar.style.display = 'none';
+            icon.classList.add('show');
+            placeholder.style.height = '0px';
+        }
+    };
+
+    // 小恐龙图标点击
+    const dinoIconEl = document.getElementById('dinoIcon');
+    if (dinoIconEl) {
+        dinoIconEl.addEventListener('click', toggleDino);
+    }
 })();

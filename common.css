@@ -46,44 +46,54 @@ body {
     padding: 0 20px;
 }
 
-/* ========== 公共组件样式 ========== */
-/* 顶部固定区域 */
-#topBar {
+/* ========== 固定图标（右上角） ========== */
+/* 菜单图标（左侧） */
+#menuIcon {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: var(--bg);
-    border-bottom: 1px solid var(--light-gray);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    top: 100px;
+    right: 170px;
+    width: 50px;
     height: 50px;
-    padding: 0 20px;
-}
-
-/* 菜单（左侧） */
-#menuBtn {
-    background: none;
-    border: none;
-    font-size: 16px;
+    border-radius: 50%;
     cursor: pointer;
-    color: var(--primary);
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: background 0.3s;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
 }
 
-#menuBtn:hover {
-    background: var(--light-gray);
+#menuIcon:hover {
+    transform: scale(1.1);
 }
 
+/* 小恐龙图标（右侧） */
+#dinoIcon {
+    display: none;
+    position: fixed;
+    top: 100px;
+    right: 100px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+
+#dinoIcon.show {
+    display: block;
+}
+
+#dinoIcon:hover {
+    transform: scale(1.1);
+}
+
+/* 二级导航（菜单图标下方） */
 #subNav {
     display: none;
-    position: absolute;
-    top: 50px;
-    left: 20px;
+    position: fixed;
+    top: 160px;
+    right: 170px;
     background: var(--bg);
     border: 1px solid var(--light-gray);
     border-radius: 4px;
@@ -108,13 +118,13 @@ body {
     color: #fff;
 }
 
-/* 小恐龙跑酷条（全宽，在菜单下方） */
+/* 小恐龙跑酷条（全宽） */
 #dinoBar {
     width: 100%;
     height: 30px;
     background: linear-gradient(90deg, var(--primary), var(--secondary));
     position: fixed;
-    top: 50px;
+    top: 0;
     left: 0;
     z-index: 999;
     overflow: hidden;
@@ -133,26 +143,7 @@ body {
     z-index: 10;
 }
 
-/* 小恐龙悬浮图标（右侧） */
-#dinoIcon {
-    display: none;
-    position: fixed;
-    right: 20px;
-    top: 55px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary);
-    cursor: pointer;
-    z-index: 1002;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-#dinoIcon.show {
-    display: block;
-}
-
 /* 占位高度 */
 #topPlaceholder {
-    height: 80px;
+    height: 30px;
 }
