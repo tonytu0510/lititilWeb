@@ -21,8 +21,8 @@ class DinoGame extends HTMLElement {
         
         // 玩家（上下移动）
         this.player = {
-            x: 50,
-            y: 25,
+            x: 20,
+            y: 5,
             width: 16,
             height: 8,
             vy: 0,
