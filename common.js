@@ -17,10 +17,31 @@
         </div>
         
         <!-- 小恐龙跑酷组件 -->
-        <div id="dinoBar">
-            <dino-game width="100%" height="50" speed="3" style="position:absolute;left:0;top:0;"></dino-game>
-            <button class="close-btn" onclick="toggleDino()">✕</button>
-        </div>
+        <div id="dinoBar" style="position:relative;">
+    <dino-game width="100%" height="50" speed="3" style="position:absolute;left:0;top:0;"></dino-game>
+    
+    <!-- 关闭按钮（最左边） -->
+    <button class="close-btn" onclick="toggleDino()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:10;background:none;border:none;color:#fff;cursor:pointer;font-size:14px;">✕</button>
+    
+    <!-- 开始游戏按钮（最右边） -->
+    <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;">开始游戏</button>
+    
+    <!-- 问号图标 -->
+    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;">?</button>
+</div>
+
+<!-- 游戏说明弹窗 -->
+<div id="helpModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;background:#fff;padding:20px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:400px;width:90%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+        <h3 style="margin:0;color:#c4334c;">游戏说明</h3>
+        <button onclick="closeHelp()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+    </div>
+    <div style="line-height:1.8;color:#333;font-size:14px;">
+        <p>🎮 <b>操作方式：</b>点击游戏区域、按空格键或上箭头键，控制小方块跳跃。</p>
+        <p>🎯 <b>目标：</b>躲避从右边飞来的障碍物，坚持越久分数越高。</p>
+        <p>💡 <b>提示：</b>障碍物速度会越来越快，挑战你的反应极限！</p>
+    </div>
+</div>
         
         <!-- 占位高度 -->
         <div id="topPlaceholder"></div>
@@ -122,4 +143,43 @@
     if (dinoIconEl) {
         dinoIconEl.addEventListener('click', toggleDino);
     }
+// 开始游戏（触发小恐龙的点击事件）
+function startDinoGame() {
+    const dinoGame = document.querySelector('dino-game');
+    if (dinoGame) {
+        // 获取 Shadow DOM 内部的 canvas
+        const shadowRoot = dinoGame.shadowRoot;
+        if (shadowRoot) {
+            const canvas = shadowRoot.querySelector('canvas');
+            if (canvas) {
+                canvas.dispatchEvent(new MouseEvent('click', {
+                    bubbles: true,
+                    composed: true
+                }));
+            }
+        }
+    }
+    // 隐藏开始按钮
+    document.getElementById('startGameBtn').style.display = 'none';
+}
+
+// 显示游戏说明
+function showHelp() {
+    document.getElementById('helpModal').style.display = 'block';
+}
+
+// 关闭游戏说明
+function closeHelp() {
+    document.getElementById('helpModal').style.display = 'none';
+}
+
+// 点击弹窗外部关闭
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('helpModal');
+    if (modal && modal.style.display === 'block') {
+        if (!e.target.closest('#helpModal') && !e.target.closest('#helpBtn')) {
+            modal.style.display = 'none';
+        }
+    }
+});
 })();
