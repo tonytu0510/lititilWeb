@@ -5,15 +5,13 @@
         <!-- 图标组 -->
         <div id="iconGroup">
             <canvas id="menuIcon" width="50" height="50"></canvas>
+            <nav id="subNav">
+                <a href="index.html">首页</a>
+                <a href="tools.html">工具</a>
+                <a href="aboutMe.html">关于我</a>
+            </nav>
             <canvas id="dinoIcon" width="50" height="50"></canvas>
         </div>
-        
-        <!-- 二级导航 -->
-        <nav id="subNav">
-            <a href="index.html">首页</a>
-            <a href="tools.html">工具</a>
-            <a href="aboutMe.html">关于我</a>
-        </nav>
         
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar">

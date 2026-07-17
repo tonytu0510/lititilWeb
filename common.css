@@ -52,7 +52,8 @@ body {
     top: 60px;
     right: 10px;
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-end;
     z-index: 1000;
 }
 
@@ -94,12 +95,12 @@ body {
     transform: scale(1.1);
 }
 
-/* 二级导航（图标组下方） */
+/* 二级导航（作为菜单图标的子元素，相对定位） */
 #subNav {
     display: none;
-    position: fixed;
-    top: 120px;
-    right: 10px;
+    position: absolute;
+    top: 52px;
+    right: 0;
     background: var(--bg);
     border: 1px solid var(--light-gray);
     border-radius: 4px;
