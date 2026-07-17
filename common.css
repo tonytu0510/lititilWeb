@@ -52,7 +52,7 @@ body {
     top: 60px;
     right: 10px;
     z-index: 1000;
-    width:120px
+    width:140px
 }
 
 /* 小恐龙关闭时，图标组移到距离上部10px */
@@ -94,6 +94,7 @@ float:right
 
 #dinoIcon.show {
     display: block;
+    margin-right:10px
 }
 
 #dinoIcon:hover {
