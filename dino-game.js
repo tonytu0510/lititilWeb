@@ -192,20 +192,21 @@ class DinoGame extends HTMLElement {
         ctx.fillText('分数: ' + Math.floor(this.score / 10), 10, 15);
         
         // 开始按钮（最右边）
-        if (!this.gameStarted) {
-            const btnWidth = 120;
-            const btnHeight = 30;
-            const btnX = cw - btnWidth - 10;
-            const btnY = ch / 2 - btnHeight / 2;
+        
+        //if (!this.gameStarted) {
+        //    const btnWidth = 120;
+        //    const btnHeight = 30;
+        //    const btnX = cw - btnWidth - 10;
+        //    const btnY = ch / 2 - btnHeight / 2;
             
-            ctx.fillStyle = '#c4334c';
-            ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
-            ctx.fillStyle = '#fff';
-            ctx.font = '14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('开始游戏', btnX + btnWidth / 2, btnY + 20);
-            ctx.textAlign = 'start';
-        }
+        //    ctx.fillStyle = '#c4334c';
+        //    ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
+        //    ctx.fillStyle = '#fff';
+        //    ctx.font = '14px sans-serif';
+        //    ctx.textAlign = 'center';
+        //    ctx.fillText('开始游戏', btnX + btnWidth / 2, btnY + 20);
+        //    ctx.textAlign = 'start';
+        //}
         
         // 游戏结束提示
         if (this.gameOver) {
