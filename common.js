@@ -157,7 +157,7 @@ window.startDinoGame =  function () {
     }
     // 隐藏开始按钮
     document.getElementById('startGameBtn').style.display = 'none';
-    document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 130px)';
+    document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 120px)';
 }
 
 // 显示游戏说明
