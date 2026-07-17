@@ -24,10 +24,10 @@ class DinoGame extends HTMLElement {
             x: 50,
             y: 25,
             width: 30,
-            height: 13,
+            height: 10,
             vy: 0,
             gravity: 0.5,
-            jumpPower: -3
+            jumpPower: -10
         };
         
         // 障碍物（从右向左移动）
