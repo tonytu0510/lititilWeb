@@ -155,7 +155,7 @@
         const shadowRoot = dinoGame.shadowRoot;
         if (shadowRoot) {
             const canvas = shadowRoot.querySelector('canvas');
-            	canvas.resetGame()
+            	console.log(canvas)
             }
         }
    }
