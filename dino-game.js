@@ -21,13 +21,13 @@ class DinoGame extends HTMLElement {
         
         // 玩家（上下移动）
         this.player = {
-            x: 20,
-            y: 5,
-            width: 8,
-            height: 5,
+            x: 6,
+            y: 3,
+            width: 6,
+            height: 2,
             vy: 0,
             gravity: 0.5,
-            jumpPower: -8
+            jumpPower: -2
         };
         
         // 障碍物（从右向左移动）
@@ -130,7 +130,7 @@ class DinoGame extends HTMLElement {
             this.obstacles.push({
                 x: this.canvas.width,
                 y: obstacleY,
-                width: 15 + Math.random() * 15,
+                width: 5 + Math.random() * 5,
                 height: 5 + Math.random() * 5
             });
             this.spawnInterval = Math.max(40, this.spawnInterval - 1);
