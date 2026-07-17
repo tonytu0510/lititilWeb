@@ -99,7 +99,7 @@ body {
 #subNav {
     display: none;
     position: absolute;
-    top: 52px;
+    top: 3px;
     right: 0;
     background: var(--bg);
     border: 1px solid var(--light-gray);
