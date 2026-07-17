@@ -161,12 +161,12 @@ window.startDinoGame =  function () {
 }
 
 // 显示游戏说明
-function showHelp() {
+window. showHelp = function() {
     document.getElementById('helpModal').style.display = 'block';
 }
 
 // 关闭游戏说明
-function closeHelp() {
+window.closeHelp = function() {
     document.getElementById('helpModal').style.display = 'none';
 }
 
