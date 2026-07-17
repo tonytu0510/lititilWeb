@@ -23,8 +23,8 @@ class DinoGame extends HTMLElement {
         this.player = {
             x: 50,
             y: 25,
-            width: 30,
-            height: 20,
+            width: 16,
+            height: 8,
             vy: 0,
             gravity: 0.5,
             jumpPower: -8
