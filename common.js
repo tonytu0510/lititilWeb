@@ -98,17 +98,20 @@
     window.toggleDino = function() {
         const bar = document.getElementById('dinoBar');
         const icon = document.getElementById('dinoIcon');
+        const menuIcon = document.getElementById('menuIcon');
         const placeholder = document.getElementById('topPlaceholder');
         
         if (bar.style.display === 'none') {
-            // 显示跑酷条
+            // 显示跑酷条，隐藏小恐龙图标，菜单回到原位
             bar.style.display = 'block';
             icon.classList.remove('show');
+            menuIcon.classList.remove('move-right');
             placeholder.style.height = '50px';
         } else {
-            // 隐藏跑酷条，显示图标
+            // 隐藏跑酷条，显示小恐龙图标，菜单移到右侧10px
             bar.style.display = 'none';
             icon.classList.add('show');
+            menuIcon.classList.add('move-right');
             placeholder.style.height = '0px';
         }
     };

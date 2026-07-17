@@ -58,11 +58,16 @@ body {
     cursor: pointer;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
+    transition: right 0.3s, transform 0.3s;
 }
 
 #menuIcon:hover {
     transform: scale(1.1);
+}
+
+/* 小恐龙关闭时，菜单图标移到右侧10px位置 */
+#menuIcon.move-right {
+    right: 10px;
 }
 
 /* 小恐龙图标（右侧） */
