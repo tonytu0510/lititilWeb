@@ -24,7 +24,7 @@ class DinoGame extends HTMLElement {
             x: 50,
             y: 25,
             width: 30,
-            height: 5,
+            height: 7,
             vy: 10,
             gravity: 0.5,
             jumpPower: -10
