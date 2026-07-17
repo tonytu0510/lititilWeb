@@ -55,7 +55,7 @@
         const canvas = document.getElementById('menuIcon');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, 50, 50);startDinoGame
+        ctx.clearRect(0, 0, 50, 50);
         
         // 背景圆
         ctx.fillStyle = '#c4334c';
