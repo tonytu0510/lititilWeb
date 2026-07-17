@@ -22,13 +22,13 @@
 
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative;">
-    <dino-game width="100%" height="50" speed="3" style="position: absolute;left: 0;top: 0;height: 100%;width: calc(94% - 50px);"></dino-game>
+    <dino-game speed="3" style="position: absolute;left: 0;top: 0;height: 100%;width: calc(100% - 230px)"></dino-game>
     
     <!-- 开始游戏按钮（最右边） -->
-    <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;">开始游戏</button>
+    <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
     
     <!-- 问号图标 -->
-    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;">?</button>
+    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;width:30px">?</button>
 </div>
 
 <!-- 游戏说明弹窗 -->
