@@ -64,10 +64,6 @@ body {
 
 /* 菜单包装器（relative 定位） */
 #menuWrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
 }
 
 /* 菜单图标 */
