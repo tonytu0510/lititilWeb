@@ -17,7 +17,7 @@
         </div>
 
         <!-- 小恐龙跑酷组件 -->
-        <div id="dinoBar" style="position:relative;">
+        <div id="dinoBar" style="position:relative">
        <!-- 关闭按钮（最左边） -->
        <button class="close-btn" id="topPlaceholder" onclick="toggleDino()">✕</button>
     <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 220px)"></dino-game>
