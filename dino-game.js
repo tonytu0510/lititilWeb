@@ -22,12 +22,12 @@ class DinoGame extends HTMLElement {
         // 玩家（上下移动）
         this.player = {
             x: 6,
-            y: 3,
-            width: 6,
-            height: 2,
+            y: 5,
+            width: 10,
+            height: 6,
             vy: 0,
             gravity: 0.5,
-            jumpPower: -2
+            jumpPower: -6
         };
         
         // 障碍物（从右向左移动）
