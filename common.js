@@ -113,13 +113,13 @@
     });
 
     // ==================== 小恐龙显示/隐藏 ====================
-    // ==================== 小恐龙显示/隐藏 ====================
 window.toggleDino = function() {
     const bar = document.getElementById('dinoBar');
     const icon = document.getElementById('dinoIcon');
     const iconGroup = document.getElementById('iconGroup');
     const placeholder = document.getElementById('topPlaceholder');
     const startBtn = document.getElementById('startGameBtn');
+    const dinoGameChangeWidth=document.getElementById('dinoGameChangeWidth')
     
     if (bar.style.display === 'none') {
         // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
@@ -140,10 +140,10 @@ window.toggleDino = function() {
             dinoGame.resetGamePublic();
         }
         // 显示开始按钮
-        if (startBtn) ｛
-	 document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 230px)';
+        if (startBtn) {
+	 dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
 	startBtn.style.display = 'block';
-        ｝
+        }
     }
 };
 
