@@ -125,40 +125,30 @@
             icon.classList.remove('show');
             iconGroup.classList.remove('move-up');
             placeholder.style.height = '50px';
-           startGame()
+           startDinoGame()
         } else {
             // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
             bar.style.display = 'none';
             icon.classList.add('show');
             iconGroup.classList.add('move-up');
             placeholder.style.height = '0px';
-            resetGame()
+            resetDinoGame()
         }
     };
 
-    window.startGame = function(){
-	    const dinoGame = document.querySelector('dino-game');
-    if (dinoGame) {
-        // 获取 Shadow DOM 内部的 canvas
-        const shadowRoot = dinoGame.shadowRoot;
-        if (shadowRoot) {
-            const canvas = shadowRoot.querySelector('canvas');
-           	canvas.startGame()
-            }
-        }
-   }
+   window.startDinoGame = function() {
+    const dinoGame = document.querySelector('dino-game');
+    if (dinoGame && dinoGame.startGamePublic) {
+        dinoGame.startGamePublic();
+    }
+}
 
-    window.resetGame = function(){
-	    const dinoGame = document.querySelector('dino-game');
-    if (dinoGame) {
-        // 获取 Shadow DOM 内部的 canvas
-        const shadowRoot = dinoGame.shadowRoot;
-        if (shadowRoot) {
-            const canvas = shadowRoot.querySelector('canvas');
-            	this.resize()
-            }
-        }
-   }
+window.resetDinoGame = function() {
+    const dinoGame = document.querySelector('dino-game');
+    if (dinoGame && dinoGame.resetGamePublic) {
+        dinoGame.resetGamePublic();
+    }
+}
 
     // 小恐龙图标点击
     const dinoIconEl = document.getElementById('dinoIcon');
