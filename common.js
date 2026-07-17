@@ -22,7 +22,7 @@
 
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative;">
-    <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 220px);transform:translateX(-50%)"></dino-game>
+    <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 220px);transform:translateY(-50%)"></dino-game>
     
     <!-- 开始游戏按钮（最右边） -->
     <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
