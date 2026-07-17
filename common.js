@@ -113,42 +113,36 @@
     });
 
     // ==================== 小恐龙显示/隐藏 ====================
-    window.toggleDino = function() {
-        const bar = document.getElementById('dinoBar');
-        const icon = document.getElementById('dinoIcon');
-        const iconGroup = document.getElementById('iconGroup');
-        const placeholder = document.getElementById('topPlaceholder');
+    // ==================== 小恐龙显示/隐藏 ====================
+window.toggleDino = function() {
+    const bar = document.getElementById('dinoBar');
+    const icon = document.getElementById('dinoIcon');
+    const iconGroup = document.getElementById('iconGroup');
+    const placeholder = document.getElementById('topPlaceholder');
+    const startBtn = document.getElementById('startGameBtn');
+    
+    if (bar.style.display === 'none') {
+        // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
+        bar.style.display = 'block';
+        icon.classList.remove('show');
+        iconGroup.classList.remove('move-up');
+        placeholder.style.height = '50px';
+    } else {
+        // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
+        bar.style.display = 'none';
+        icon.classList.add('show');
+        iconGroup.classList.add('move-up');
+        placeholder.style.height = '0px';
         
-        if (bar.style.display === 'none') {
-            // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
-            bar.style.display = 'block';
-            icon.classList.remove('show');
-            iconGroup.classList.remove('move-up');
-            placeholder.style.height = '50px';
-           startDinoGame()
-        } else {
-            // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
-            bar.style.display = 'none';
-            icon.classList.add('show');
-            iconGroup.classList.add('move-up');
-            placeholder.style.height = '0px';
-            resetDinoGame()
+        // 重置游戏到初始状态
+        const dinoGame = document.querySelector('dino-game');
+        if (dinoGame && dinoGame.resetGamePublic) {
+            dinoGame.resetGamePublic();
         }
-    };
-
-   window.startDinoGame = function() {
-    const dinoGame = document.querySelector('dino-game');
-    if (dinoGame && dinoGame.startGamePublic) {
-        dinoGame.startGamePublic();
+        // 显示开始按钮
+        if (startBtn) startBtn.style.display = 'block';
     }
-}
-
-window.resetDinoGame = function() {
-    const dinoGame = document.querySelector('dino-game');
-    if (dinoGame && dinoGame.resetGamePublic) {
-        dinoGame.resetGamePublic();
-    }
-}
+};
 
     // 小恐龙图标点击
     const dinoIconEl = document.getElementById('dinoIcon');
