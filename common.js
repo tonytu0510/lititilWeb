@@ -140,7 +140,10 @@ window.toggleDino = function() {
             dinoGame.resetGamePublic();
         }
         // 显示开始按钮
-        if (startBtn) startBtn.style.display = 'block';
+        if (startBtn) ｛
+	 document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 230px)';
+	startBtn.style.display = 'block';
+        ｝
     }
 };
 
