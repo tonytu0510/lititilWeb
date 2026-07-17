@@ -67,7 +67,8 @@ class DinoGame extends HTMLElement {
         const x = e.clientX - rect.left;
         //const btnWidth = 120;
         const btnWidth = 0;
-        const btnHeight = 30;
+        //const btnHeight = 30;
+        const btnHeight = 0;
         const btnX = this.canvas.width - btnWidth - 10;
         const btnY = this.canvas.height / 2 - btnHeight / 2;
         
