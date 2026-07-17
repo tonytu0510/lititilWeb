@@ -2,11 +2,11 @@
 (function() {
     // HTML 模板
     const html = `
-        <!-- Canvas 菜单图标 -->
-        <canvas id="menuIcon" width="50" height="50"></canvas>
-        
-        <!-- Canvas 小恐龙图标 -->
-        <canvas id="dinoIcon" width="50" height="50"></canvas>
+        <!-- 图标组 -->
+        <div id="iconGroup">
+            <canvas id="menuIcon" width="50" height="50"></canvas>
+            <canvas id="dinoIcon" width="50" height="50"></canvas>
+        </div>
         
         <!-- 二级导航 -->
         <nav id="subNav">
@@ -98,20 +98,20 @@
     window.toggleDino = function() {
         const bar = document.getElementById('dinoBar');
         const icon = document.getElementById('dinoIcon');
-        const menuIcon = document.getElementById('menuIcon');
+        const iconGroup = document.getElementById('iconGroup');
         const placeholder = document.getElementById('topPlaceholder');
         
         if (bar.style.display === 'none') {
-            // 显示跑酷条，隐藏小恐龙图标，菜单回到原位
+            // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
             bar.style.display = 'block';
             icon.classList.remove('show');
-            menuIcon.classList.remove('move-right');
+            iconGroup.classList.remove('move-up');
             placeholder.style.height = '50px';
         } else {
-            // 隐藏跑酷条，显示小恐龙图标，菜单移到右侧10px
+            // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
             bar.style.display = 'none';
             icon.classList.add('show');
-            menuIcon.classList.add('move-right');
+            iconGroup.classList.add('move-up');
             placeholder.style.height = '0px';
         }
     };

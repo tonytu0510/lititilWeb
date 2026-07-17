@@ -46,41 +46,42 @@ body {
     padding: 0 20px;
 }
 
-/* ========== 固定图标（右上角） ========== */
-/* 菜单图标（左侧） */
-#menuIcon {
+/* ========== 图标组（右上角固定） ========== */
+#iconGroup {
     position: fixed;
     top: 60px;
-    right: 70px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+/* 小恐龙关闭时，图标组移到距离上部10px */
+#iconGroup.move-up {
+    top: 10px;
+}
+
+/* 菜单图标 */
+#menuIcon {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     cursor: pointer;
-    z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    transition: right 0.3s, transform 0.3s;
+    transition: transform 0.3s;
 }
 
 #menuIcon:hover {
     transform: scale(1.1);
 }
 
-/* 小恐龙关闭时，菜单图标移到右侧10px位置 */
-#menuIcon.move-right {
-    right: 10px;
-}
-
-/* 小恐龙图标（右侧） */
+/* 小恐龙图标 */
 #dinoIcon {
     display: none;
-    position: fixed;
-    top: 60px;
-    right: 10px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     cursor: pointer;
-    z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: transform 0.3s;
 }
@@ -93,12 +94,12 @@ body {
     transform: scale(1.1);
 }
 
-/* 二级导航（菜单图标下方） */
+/* 二级导航（图标组下方） */
 #subNav {
     display: none;
     position: fixed;
     top: 120px;
-    right: 70px;
+    right: 10px;
     background: var(--bg);
     border: 1px solid var(--light-gray);
     border-radius: 4px;
