@@ -2,6 +2,7 @@
 :root {
     --primary: #c4334c;
     --secondary: #871F78;
+    --menuHorver: #871F78;
     --bg: #ffffff;
     --text: #333333;
     --gray: #888888;
@@ -130,7 +131,7 @@ body {
 }
 
 #subNav a:hover {
-    background: var(--primary);
+    background: var(--menuHorver: 
     color: #fff;
 }
 
