@@ -74,6 +74,7 @@ float:right
     csubNavursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     transition: transform 0.3s;
+    position:relative;
 }
 
 #menuIcon:hover {
@@ -103,7 +104,7 @@ float:right
 /* 二级导航（absolute 定位在菜单图标下方） */
 #subNav {
     display: none;
-    position: relative;
+    position: absolute;
     top: 0;
     right: 0;
     background: var(--bg);
@@ -111,6 +112,8 @@ float:right
     border-radius: 4px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     z-index: 1001;
+   width: 120px;
+    right: 0;
 }
 
 #subNav.show {
