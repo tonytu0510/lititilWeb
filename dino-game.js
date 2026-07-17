@@ -5,10 +5,10 @@ class DinoGame extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'open' });
         
         const container = document.createElement('div');
-        container.style.cssText = 'width:100%;height:100%;position:relative;';
+        container.style.cssText = 'position:relative;';
         
         this.canvas = document.createElement('canvas');
-        this.canvas.style.cssText = 'width:100%;height:100%;display:block;';
+        this.canvas.style.cssText = 'display:block;';
         
         container.appendChild(this.canvas);
         shadow.appendChild(container);
