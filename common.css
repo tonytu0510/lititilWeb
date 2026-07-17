@@ -57,7 +57,7 @@ body {
 
 /* 小恐龙关闭时，图标组移到距离上部10px */
 #iconGroup.move-up {
-    
+    top:10px
 }
 
 /* 菜单包装器（relative 定位） */
