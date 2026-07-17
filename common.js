@@ -10,6 +10,7 @@
         
         <!-- 二级导航 -->
         <nav id="subNav">
+            <a href="index.html">首页</a>
             <a href="tools.html">工具</a>
             <a href="aboutMe.html">关于我</a>
         </nav>
