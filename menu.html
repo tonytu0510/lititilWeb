@@ -1,0 +1,23 @@
+<!-- 顶部公共区域 -->
+<div id="topBar">
+    <div class="inner">
+        <!-- 菜单 -->
+        <button id="menuBtn">菜单</button>
+        <nav id="subNav">
+            <a href="tools.html">工具</a>
+            <a href="aboutMe.html">关于我</a>
+        </nav>
+        
+        <!-- 小恐龙图标 -->
+        <canvas id="dinoIconCanvas" width="50" height="50" style="display:none;"></canvas>
+    </div>
+    
+    <!-- 小恐龙跑酷组件 -->
+    <div id="dinoBar">
+        <dino-game width="100%" height="30" speed="3"></dino-game>
+        <button class="close-btn" onclick="toggleDino()">✕</button>
+    </div>
+</div>
+
+<!-- 占位高度 -->
+<div id="topPlaceholder" style="height:80px;"></div>

@@ -2,292 +2,277 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>全自动发布系统</title>
-    <!-- 引入外部CSS或书写内部样式 -->
+    <title>首页 - 李家桥</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
     <style>
-        /* 重置默认边距，让布局更干净 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
-            background: #f5f7fa;
-            color: #1e293b;
-            line-height: 1.6;
-            padding: 2rem 1rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 960px;
+        /* 轮播容器 */
+        #slider {
             width: 100%;
-            background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
-            padding: 2.5rem 2rem;
-            transition: all 0.2s ease;
+            height: calc(100vh - 80px);
+            position: relative;
+            overflow: hidden;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 2.5rem;
+        #slider.full {
+            height: calc(100vh - 50px);
         }
-
-        header h1 {
-            font-size: 2.6rem;
-            font-weight: 600;
-            background: linear-gradient(145deg, #0f172a, #334155);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.25rem;
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s;
         }
-
-        header p {
-            font-size: 1.1rem;
-            color: #64748b;
-            border-bottom: 2px dashed #e2e8f0;
-            padding-bottom: 1rem;
+        .slide.active {
+            opacity: 1;
         }
-
-        /* 主内容区卡片布局 */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.8rem;
-            margin: 2.5rem 0 1.8rem;
+        .slide canvas {
+            width: 100%;
+            height: 100%;
         }
-
-        .card {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 1.6rem 1.2rem;
-            border: 1px solid #eef2f6;
-            transition: all 0.15s ease;
-        }
-
-        .card:hover {
-            background: #ffffff;
-            border-color: #cbd5e1;
-            box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .card h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #0f172a;
-        }
-
-        .card p {
-            color: #475569;
-            font-size: 0.98rem;
-        }
-
-        .card .badge {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            margin-top: 0.6rem;
-        }
-
-        .feature-section {
-            background: #f1f5f9;
-            border-radius: 24px;
-            padding: 1.8rem 1.8rem;
-            margin: 2.2rem 0 1.2rem;
-        }
-
-        .feature-section h2 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-section ul {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem 2rem;
-            margin-top: 0.8rem;
-        }
-
-        .feature-section li {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.98rem;
-            background: #ffffff;
-            padding: 0.3rem 1rem 0.3rem 0.8rem;
-            border-radius: 40px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        }
-
-        .feature-section li::before {
-            content: "✦";
-            color: #2563eb;
-            font-weight: 300;
-        }
-
-        /* 页脚与按钮 */
-        .action {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 2.2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .btn {
-            display: inline-block;
-            background: #0f172a;
-            color: white;
-            padding: 0.6rem 1.8rem;
-            border-radius: 60px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.15s, transform 0.1s;
+        /* 左右箭头 */
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
             border: none;
+            font-size: 30px;
+            padding: 10px 15px;
             cursor: pointer;
-            font-size: 0.95rem;
+            z-index: 10;
+            border-radius: 4px;
         }
-
-        .btn:hover {
-            background: #1e293b;
-            transform: scale(0.97);
+        .arrow:hover {
+            background: rgba(0,0,0,0.5);
         }
-
-        .btn-outline {
-            background: transparent;
-            color: #0f172a;
-            border: 1px solid #cbd5e1;
+        .arrow.left {
+            left: 20px;
         }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
-            border-color: #94a3b8;
+        .arrow.right {
+            right: 20px;
         }
-
-        footer {
-            text-align: center;
-            margin-top: 1.8rem;
-            font-size: 0.9rem;
-            color: #94a3b8;
+        /* 小圆点 */
+        #dots {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
         }
-
-        /* 简单响应式微调 */
-        @media (max-width: 600px) {
-            .container { padding: 1.5rem 1rem; }
-            header h1 { font-size: 2rem; }
-            .grid { grid-template-columns: 1fr; }
-            .action { flex-direction: column; gap: 1rem; align-items: stretch; }
-            .btn { text-align: center; }
+        #dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #dots span.active {
+            background: #c4334c;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 头部 -->
-        <header>
-            <h1>全自动发布系统流程测试v1</h1>
-            <p>结构清晰 · 语义化 · 响应式 · 可直接使用</p>
-        </header>
 
-        <!-- 内容卡片区 -->
-        <section class="grid" aria-label="功能卡片">
-            <div class="card">
-                <h3>🌐 语义化标签</h3>
-                <p>使用 <code>&lt;header&gt;</code>、<code>&lt;section&gt;</code>、<code>&lt;article&gt;</code>、<code>&lt;footer&gt;</code> 构建清晰结构。</p>
-                <span class="badge">HTML5</span>
-            </div>
-            <div class="card">
-                <h3>🎨 现代 CSS</h3>
-                <p>flex / grid 布局、渐变、圆角、悬停反馈，无需额外框架即可呈现干净界面。</p>
-                <span class="badge">CSS3</span>
-            </div>
-            <div class="card">
-                <h3>📱 移动优先</h3>
-                <p>通过 viewport 与媒体查询适配手机、平板与桌面，内容自动重排。</p>
-                <span class="badge">响应式</span>
-            </div>
-        </section>
+    <div id="topBarContainer"></div>
 
-        <!-- 特性列表区（可由你自由增删） -->
-        <div class="feature-section">
-            <h2>✨ 页面特性</h2>
-            <ul>
-                <li>零外部依赖</li>
-                <li>快速加载</li>
-                <li>可访问性基础</li>
-                <li>暗色模式友好</li>
-                <li>轻松扩展</li>
-            </ul>
+    <!-- 轮播区 -->
+    <div id="slider">
+        <div class="slide active"><canvas id="canvas1"></canvas></div>
+        <div class="slide"><canvas id="canvas2"></canvas></div>
+        <div class="slide"><canvas id="canvas3"></canvas></div>
+        <div class="slide"><canvas id="canvas4"></canvas></div>
+        <div class="slide"><canvas id="canvas5"></canvas></div>
+        <div class="slide"><canvas id="canvas6"></canvas></div>
+        <div class="slide"><canvas id="canvas7"></canvas></div>
+
+        <button class="arrow left" onclick="prevSlide()">&#10094;</button>
+        <button class="arrow right" onclick="nextSlide()">&#10095;</button>
+        <div id="dots">
+            <span class="active" onclick="goTo(0)"></span>
+            <span onclick="goTo(1)"></span>
+            <span onclick="goTo(2)"></span>
+            <span onclick="goTo(3)"></span>
+            <span onclick="goTo(4)"></span>
+            <span onclick="goTo(5)"></span>
+            <span onclick="goTo(6)"></span>
         </div>
-
-        <!-- 交互与底部操作 -->
-        <div class="action">
-            <span style="color: #475569; font-size: 0.95rem;">👋 点击按钮体验交互</span>
-            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                <button class="btn" id="greetBtn">打个招呼</button>
-                <button class="btn btn-outline" id="resetBtn">重置</button>
-            </div>
-        </div>
-
-        <footer>
-            &copy; 2026 · 纯 HTML5 + CSS · 你可以自由修改
-        </footer>
     </div>
 
-    <!-- 简单交互脚本（演示，非必须） -->
+    <script src="common.js"></script>
     <script>
-        (function() {
-            const greetBtn = document.getElementById('greetBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const headerP = document.querySelector('header p');
+        // ==================== 轮播逻辑 ====================
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('#dots span');
 
-            // 修改下方段落文字
-            function setGreeting(text) {
-                if (headerP) {
-                    headerP.textContent = text;
-                }
-            }
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            slides[n].classList.add('active');
+            dots[n].classList.add('active');
+            current = n;
+        }
 
-            greetBtn.addEventListener('click', function() {
-                setGreeting('🎉 你好！这是一个简单的交互反馈，你可以替换成自己的逻辑。');
-                // 也可增加一个临时样式提醒
-                greetBtn.style.background = '#2563eb';
-                setTimeout(() => {
-                    greetBtn.style.background = '#0f172a';
-                }, 300);
-            });
+        function nextSlide() {
+            showSlide((current + 1) % 7);
+        }
 
-            resetBtn.addEventListener('click', function() {
-                setGreeting('结构清晰 · 语义化 · 响应式 · 可直接使用');
-                resetBtn.style.borderColor = '#94a3b8';
-                // 触发个轻微视觉反馈
-                resetBtn.style.background = '#f1f5f9';
-                setTimeout(() => {
-                    resetBtn.style.background = 'transparent';
-                }, 200);
-            });
-        })();
+        function prevSlide() {
+            showSlide((current - 1 + 7) % 7);
+        }
+
+        function goTo(n) {
+            showSlide(n);
+        }
+
+        // ==================== 7 张 Canvas 主题画 ====================
+        function drawLove(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            // 粉色渐变背景
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#ff6b81');
+            grad.addColorStop(1, '#ff4757');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 画心形
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('❤️', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('爱情', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawFamily(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#ffa502');
+            grad.addColorStop(1, '#ff6348');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🏠', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('亲情', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawFriendship(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#1e90ff');
+            grad.addColorStop(1, '#00bfff');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🤝', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('友情', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawArt(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#7b2d8b');
+            grad.addColorStop(1, '#e056a0');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🎨', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('艺术', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawComputer(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#2c3e50');
+            grad.addColorStop(1, '#3498db');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('💻', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('计算机', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawMath(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#16a085');
+            grad.addColorStop(1, '#2ecc71');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('📐', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('数学', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        function drawEnglish(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            grad.addColorStop(0, '#e67e22');
+            grad.addColorStop(1, '#f1c40f');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = `${canvas.height * 0.3}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('📖', canvas.width / 2, canvas.height / 2 + canvas.height * 0.1);
+            ctx.font = `${canvas.height * 0.06}px 'Microsoft YaHei'`;
+            ctx.fillText('英语', canvas.width / 2, canvas.height * 0.8);
+        }
+
+        // 初始化所有 Canvas
+        drawLove(document.getElementById('canvas1'));
+        drawFamily(document.getElementById('canvas2'));
+        drawFriendship(document.getElementById('canvas3'));
+        drawArt(document.getElementById('canvas4'));
+        drawComputer(document.getElementById('canvas5'));
+        drawMath(document.getElementById('canvas6'));
+        drawEnglish(document.getElementById('canvas7'));
+
+        // 窗口缩放时重绘
+        window.addEventListener('resize', function() {
+            drawLove(document.getElementById('canvas1'));
+            drawFamily(document.getElementById('canvas2'));
+            drawFriendship(document.getElementById('canvas3'));
+            drawArt(document.getElementById('canvas4'));
+            drawComputer(document.getElementById('canvas5'));
+            drawMath(document.getElementById('canvas6'));
+            drawEnglish(document.getElementById('canvas7'));
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>工具 - 李家桥</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
+    <style>
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            color: var(--primary);
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            min-height: 40px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="topBarContainer"></div>
+
+    <div class="container" style="margin-top:100px;">
+        <h1>🛠️ 工具箱</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('crypto')">🔐 加密解密</button>
+            <button class="tab" onclick="switchTab('compress')">📦 压缩工具</button>
+            <button class="tab" onclick="switchTab('format')">📝 文本格式化</button>
+        </div>
+
+        <!-- 加密解密 -->
+        <div id="crypto" class="tab-content active">
+            <h3>汉字加密解密</h3>
+            <textarea id="cryptoInput" placeholder="输入汉字，如：无锡"></textarea>
+            <button onclick="crypto('encrypt')">🔒 加密</button>
+            <button onclick="crypto('decrypt')">🔓 解密</button>
+            <div class="result" id="cryptoResult"></div>
+        </div>
+
+        <!-- 压缩工具 -->
+        <div id="compress" class="tab-content">
+            <h3>字母/汉字压缩</h3>
+            <textarea id="compressInput" placeholder="输入文本，如：Zhaotong 或 无锡"></textarea>
+            <button onclick="compress('letters')">🔤 字母压缩</button>
+            <button onclick="compress('chinese')">🀄 汉字压缩</button>
+            <div class="result" id="compressResult"></div>
+        </div>
+
+        <!-- 文本格式化 -->
+        <div id="format" class="tab-content">
+            <h3>大小写转换 / 驼峰命名</h3>
+            <textarea id="formatInput" placeholder="输入文本"></textarea>
+            <button onclick="formatText('upper')">全大写</button>
+            <button onclick="formatText('lower')">全小写</button>
+            <button onclick="formatText('camel')">大驼峰</button>
+            <button onclick="formatText('pascal')">小驼峰</button>
+            <button onclick="formatText('reverse')">反转大小写</button>
+            <div class="result" id="formatResult"></div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function crypto(action) {
+            const text = document.getElementById('cryptoInput').value;
+            const shift = 6931, start = 19968, count = 20992;
+            let result = '';
+            for (let char of text) {
+                const code = char.charCodeAt(0);
+                if (code >= start && code <= start + count) {
+                    let newCode = action === 'encrypt' ? code + shift : code - shift;
+                    if (newCode > start + count) newCode -= count;
+                    if (newCode < start) newCode += count;
+                    result += String.fromCharCode(newCode);
+                } else {
+                    result += char;
+                }
+            }
+            document.getElementById('cryptoResult').innerText = result;
+        }
+
+        function compress(type) {
+            const text = document.getElementById('compressInput').value;
+            let result = '';
+            if (type === 'letters') {
+                for (let i = 0; i < text.length; i += 2) {
+                    if (i + 1 < text.length) {
+                        const a = text.charCodeAt(i) - 65, b = text.charCodeAt(i + 1) - 65;
+                        const base = (a % 2 === 0 && b % 2 === 0) ? 2 : 3;
+                        result += String.fromCharCode((a * base + b) % 26 + 65);
+                    } else {
+                        result += text[i];
+                    }
+                }
+            } else {
+                const start = 19968, count = 20992;
+                for (let i = 0; i < text.length; i += 2) {
+                    if (i + 1 < text.length) {
+                        const a = text.charCodeAt(i) - start, b = text.charCodeAt(i + 1) - start;
+                        const base = (a % 2 === 0 && b % 2 === 0) ? 2 : 3;
+                        result += String.fromCharCode((a * base + b) % count + start);
+                    } else {
+                        result += text[i];
+                    }
+                }
+            }
+            document.getElementById('compressResult').innerText = result;
+        }
+
+        function formatText(type) {
+            const text = document.getElementById('formatInput').value;
+            let result = '';
+            switch(type) {
+                case 'upper': result = text.toUpperCase(); break;
+                case 'lower': result = text.toLowerCase(); break;
+                case 'camel':
+                    result = text.split(/[\s-_]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+                    break;
+                case 'pascal':
+                    const words = text.split(/[\s-_]+/);
+                    result = words[0].toLowerCase() + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
+                    break;
+                case 'reverse':
+                    result = text.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('');
+                    break;
+            }
+            document.getElementById('formatResult').innerText = result;
+        }
+    </script>
+</body>
+</html>
