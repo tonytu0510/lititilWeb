@@ -16,7 +16,7 @@
         
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar">
-            <dino-game width="100%" height="30" speed="3"></dino-game>
+            <dino-game width="100%" height="50" speed="3"></dino-game>
             <button class="close-btn" onclick="toggleDino()">✕</button>
         </div>
         
@@ -103,7 +103,7 @@
             // 显示跑酷条
             bar.style.display = 'block';
             icon.classList.remove('show');
-            placeholder.style.height = '30px';
+            placeholder.style.height = '50px';
         } else {
             // 隐藏跑酷条，显示图标
             bar.style.display = 'none';

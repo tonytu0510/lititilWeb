@@ -50,8 +50,8 @@ body {
 /* 菜单图标（左侧） */
 #menuIcon {
     position: fixed;
-    top: 100px;
-    right: 170px;
+    top: 50px;
+    right: 70px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -69,8 +69,8 @@ body {
 #dinoIcon {
     display: none;
     position: fixed;
-    top: 100px;
-    right: 100px;
+    top: 50px;
+    right: 10px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -92,8 +92,8 @@ body {
 #subNav {
     display: none;
     position: fixed;
-    top: 160px;
-    right: 170px;
+    top: 110px;
+    right: 70px;
     background: var(--bg);
     border: 1px solid var(--light-gray);
     border-radius: 4px;
@@ -121,7 +121,7 @@ body {
 /* 小恐龙跑酷条（全宽） */
 #dinoBar {
     width: 100%;
-    height: 30px;
+    height: 50px;
     background: linear-gradient(90deg, var(--primary), var(--secondary));
     position: fixed;
     top: 0;
@@ -145,5 +145,5 @@ body {
 
 /* 占位高度 */
 #topPlaceholder {
-    height: 30px;
+    height: 50px;
 }
