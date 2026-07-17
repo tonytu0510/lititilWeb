@@ -3,18 +3,16 @@
     // HTML 模板
     const html = `
         <div id="topBar">
-            <div class="inner">
-                <button id="menuBtn">菜单</button>
-                <nav id="subNav">
-                    <a href="tools.html">工具</a>
-                    <a href="aboutMe.html">关于我</a>
-                </nav>
-                <canvas id="dinoIcon" width="50" height="50"></canvas>
-            </div>
-            <div id="dinoBar">
-                <dino-game width="100%" height="30" speed="3"></dino-game>
-                <button class="close-btn" onclick="toggleDino()">✕</button>
-            </div>
+            <button id="menuBtn">菜单</button>
+            <nav id="subNav">
+                <a href="tools.html">工具</a>
+                <a href="aboutMe.html">关于我</a>
+            </nav>
+            <canvas id="dinoIcon" width="50" height="50"></canvas>
+        </div>
+        <div id="dinoBar">
+            <dino-game width="100%" height="30" speed="3"></dino-game>
+            <button class="close-btn" onclick="toggleDino()">✕</button>
         </div>
         <div id="topPlaceholder"></div>
     `;

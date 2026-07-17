@@ -47,6 +47,7 @@ body {
 }
 
 /* ========== 公共组件样式 ========== */
+/* 顶部固定区域 */
 #topBar {
     position: fixed;
     top: 0;
@@ -55,11 +56,6 @@ body {
     z-index: 1000;
     background: var(--bg);
     border-bottom: 1px solid var(--light-gray);
-}
-
-#topBar .inner {
-    max-width: 1200px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -67,6 +63,7 @@ body {
     padding: 0 20px;
 }
 
+/* 菜单（左侧） */
 #menuBtn {
     background: none;
     border: none;
@@ -111,12 +108,15 @@ body {
     color: #fff;
 }
 
-/* 小恐龙跑酷条 */
+/* 小恐龙跑酷条（全宽，在菜单下方） */
 #dinoBar {
     width: 100%;
     height: 30px;
     background: linear-gradient(90deg, var(--primary), var(--secondary));
-    position: relative;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    z-index: 999;
     overflow: hidden;
 }
 
@@ -133,18 +133,18 @@ body {
     z-index: 10;
 }
 
-/* 小恐龙悬浮图标 */
+/* 小恐龙悬浮图标（右侧） */
 #dinoIcon {
     display: none;
     position: fixed;
     right: 20px;
-    bottom: 60px;
+    top: 55px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     background: var(--primary);
     cursor: pointer;
-    z-index: 999;
+    z-index: 1002;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
