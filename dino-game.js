@@ -61,6 +61,8 @@ this.startGamePublic = function() {
     this.obstacles = [];
     this.gameSpeed = 3;
     this.spawnInterval = 80;
+    this.player.y = this.groundY - this.player.height;
+    this.player.vy = 0;
 };
 // 公开方法：重置游戏到初始状态
 this.resetGamePublic = function() {
