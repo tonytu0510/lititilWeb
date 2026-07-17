@@ -16,12 +16,10 @@
             <canvas id="dinoIcon" width="50" height="50"></canvas>
         </div>
 
-            <!-- 关闭按钮（最左边） -->
-    <button class="close-btn" id="topPlaceholder" onclick="toggleDino()" style="position: absolute;left: 0;top: 0;z-index: 99999;background: none;border: none; color: #fff;
-    cursor: pointer;font-size: 14px;height: 50px;width: 50px;">✕</button>
-
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative;">
+       <!-- 关闭按钮（最左边） -->
+       <button class="close-btn" id="topPlaceholder" onclick="toggleDino()" style="position: absolute;left: 0;top: 0;z-index: 99999;background: none;border: none; color: #fff;cursor: pointer;font-size: 14px;height: 50px;width: 50px;">✕</button>
     <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 220px)"></dino-game>
     
     <!-- 开始游戏按钮（最右边） -->
