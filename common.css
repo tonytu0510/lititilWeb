@@ -62,6 +62,14 @@ body {
     top: 10px;
 }
 
+/* 菜单包装器（relative 定位） */
+#menuWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
 /* 菜单图标 */
 #menuIcon {
     width: 50px;
@@ -95,12 +103,11 @@ body {
     transform: scale(1.1);
 }
 
-/* 二级导航（作为菜单图标的子元素，相对定位） */
+/* 二级导航（absolute 定位在菜单图标下方） */
 #subNav {
     display: none;
-    position: relative;
-    width：100px;
-    top: 3px;
+    position: absolute;
+    top: 100%;
     right: 0;
     background: var(--bg);
     border: 1px solid var(--light-gray);

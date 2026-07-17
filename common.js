@@ -4,12 +4,15 @@
     const html = `
         <!-- 图标组 -->
         <div id="iconGroup">
-            <canvas id="menuIcon" width="50" height="50"></canvas>
-            <nav id="subNav">
-                <a href="index.html">首页</a>
-                <a href="tools.html">工具</a>
-                <a href="aboutMe.html">关于我</a>
-            </nav>
+            <!-- 菜单包装器（relative 定位，包含菜单图标和二级导航） -->
+            <div id="menuWrapper">
+                <canvas id="menuIcon" width="50" height="50"></canvas>
+                <nav id="subNav">
+                    <a href="index.html">首页</a>
+                    <a href="tools.html">工具</a>
+                    <a href="aboutMe.html">关于我</a>
+                </nav>
+            </div>
             <canvas id="dinoIcon" width="50" height="50"></canvas>
         </div>
         
@@ -87,7 +90,7 @@
         
         if (e.target === menuIcon) {
             subNav.classList.toggle('show');
-        } else if (!e.target.closest('#menuIcon') && !e.target.closest('#subNav')) {
+        } else if (!e.target.closest('#menuWrapper') && !e.target.closest('#subNav')) {
             subNav.classList.remove('show');
         }
     });
