@@ -5,10 +5,10 @@ class DinoGame extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'open' });
         
         const container = document.createElement('div');
-        container.style.cssText = 'position:relative;';
+        container.style.cssText = 'width:100%;height:100%;position:relative;';
         
         this.canvas = document.createElement('canvas');
-        this.canvas.style.cssText = 'display:block;';
+        this.canvas.style.cssText = 'width:100%;height:100%;display:block;';
         
         container.appendChild(this.canvas);
         shadow.appendChild(container);
@@ -58,15 +58,15 @@ class DinoGame extends HTMLElement {
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = 50;//rect.height
-        this.groundY = 50 - 5;
+        this.groundY = this.canvas.height - 5;
         this.player.y = this.groundY - this.player.height;
     }
     
     handleInput(e) {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
-        const btnWidth = 0;
-        const btnHeight = 0;
+        const btnWidth = 120;
+        const btnHeight = 30;
         const btnX = this.canvas.width - btnWidth - 10;
         const btnY = this.canvas.height / 2 - btnHeight / 2;
         
@@ -192,21 +192,20 @@ class DinoGame extends HTMLElement {
         ctx.fillText('分数: ' + Math.floor(this.score / 10), 10, 15);
         
         // 开始按钮（最右边）
-        
-        //if (!this.gameStarted) {
-        //    const btnWidth = 120;
-        //    const btnHeight = 30;
-        //    const btnX = cw - btnWidth - 10;
-        //    const btnY = ch / 2 - btnHeight / 2;
+        if (!this.gameStarted) {
+            const btnWidth = 120;
+            const btnHeight = 30;
+            const btnX = cw - btnWidth - 10;
+            const btnY = ch / 2 - btnHeight / 2;
             
-        //    ctx.fillStyle = '#c4334c';
-        //    ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
-        //    ctx.fillStyle = '#fff';
-        //    ctx.font = '14px sans-serif';
-        //    ctx.textAlign = 'center';
-        //    ctx.fillText('开始游戏', btnX + btnWidth / 2, btnY + 20);
-        //    ctx.textAlign = 'start';
-        //}
+            ctx.fillStyle = '#c4334c';
+            ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('开始游戏', btnX + btnWidth / 2, btnY + 20);
+            ctx.textAlign = 'start';
+        }
         
         // 游戏结束提示
         if (this.gameOver) {
