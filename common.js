@@ -20,13 +20,13 @@
         <div id="dinoBar" style="position:relative">
        <!-- 关闭按钮（最左边） -->
        <button class="close-btn" id="topPlaceholder" onclick="toggleDino()">✕</button>
-    <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 220px)" id='dinoGameChangeWidth'></dino-game>
+    <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 230px)" id='dinoGameChangeWidth'></dino-game>
     
     <!-- 开始游戏按钮（最右边） -->
-    <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
+    <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
     
     <!-- 问号图标 -->
-    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:50%;z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;width:30px">?</button>
+    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;width:30px">?</button>
 </div>
 
 <!-- 游戏说明弹窗 -->
@@ -157,7 +157,7 @@ window.startDinoGame =  function () {
     }
     // 隐藏开始按钮
     document.getElementById('startGameBtn').style.display = 'none';
-    document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 140px)';
+    document.getElementById('dinoGameChangeWidth').style.width = 'calc(100% - 150px)';
 }
 
 // 显示游戏说明
