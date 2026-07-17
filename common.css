@@ -102,8 +102,8 @@ body {
 /* 二级导航（absolute 定位在菜单图标下方） */
 #subNav {
     display: none;
-    position: absolute;
-    top: 100%;
+    position: relative;
+    top: 0;
     right: 0;
     background: var(--bg);
     border: 1px solid var(--light-gray);
