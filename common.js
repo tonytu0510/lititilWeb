@@ -132,7 +132,7 @@
             icon.classList.add('show');
             iconGroup.classList.add('move-up');
             placeholder.style.height = '0px';
-            resetDinoGame()
+            resizeObserver()
         }
     };
 
@@ -143,10 +143,10 @@
     }
 }
 
-window.resetDinoGame = function() {
+window.resizeObserver = function() {
     const dinoGame = document.querySelector('dino-game');
-    if (dinoGame && dinoGame.resetGamePublic) {
-        dinoGame.resetGamePublic();
+    if (dinoGame && dinoGame.resizeObserver) {
+        dinoGame.resizeObserver();
     }
 }
 
