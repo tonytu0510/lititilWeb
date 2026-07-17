@@ -128,11 +128,12 @@ class DinoGame extends HTMLElement {
             this.frameCount = 0;
             const obstacleY = Math.random() * (this.canvas.height - 5);
             this.obstacles.push({
-                x: this.canvas.width,
+                x: 10,
                 y: obstacleY,
                 width: 5 + Math.random() * 5,
                 height: 5 + Math.random() * 5
             });
+	//this.canvas.width
             this.spawnInterval = Math.max(40, this.spawnInterval - 1);
         }
         
