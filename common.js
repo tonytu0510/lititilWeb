@@ -18,10 +18,10 @@
         
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative;">
-    <dino-game width="100%" height="50" speed="3" style="position:absolute;left:0;top:0;"></dino-game>
+    <dino-game width="100%" height="50" speed="3" style="position:absolute;left:0;top:0;width:96vw"></dino-game>
     
     <!-- 关闭按钮（最左边） -->
-    <button class="close-btn" onclick="toggleDino()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:10;background:none;border:none;color:#fff;cursor:pointer;font-size:14px;">✕</button>
+    <button class="close-btn" onclick="toggleDino()" style="position:absolute;left: 15px;top: calc(50% - 3px);transform:translateY(-50%);z-index:10;background:none;border:none;color:#fff;cursor:pointer;font-size:14px;">✕</button>
     
     <!-- 开始游戏按钮（最右边） -->
     <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;">开始游戏</button>
