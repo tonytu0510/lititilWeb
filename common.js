@@ -141,7 +141,7 @@
         dinoIconEl.addEventListener('click', toggleDino);
     }
 // 开始游戏（触发小恐龙的点击事件）
-function startDinoGame() {
+window.startDinoGame =  function () {
     const dinoGame = document.querySelector('dino-game');
     if (dinoGame) {
         // 获取 Shadow DOM 内部的 canvas
