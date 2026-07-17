@@ -24,7 +24,9 @@
     <button class="close-btn" onclick="toggleDino()" style="position:absolute;left: 15px;top: calc(50% - 3px);transform:translateY(-50%);z-index:10;background:none;border:none;color:#fff;cursor:pointer;font-size:14px;">✕</button>
     
     <!-- 开始游戏按钮（最右边） -->
+<!--
     <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;">开始游戏</button>
+-->
     
     <!-- 问号图标 -->
     <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;">?</button>
@@ -55,7 +57,7 @@
         const canvas = document.getElementById('menuIcon');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, 50, 50);
+        ctx.clearRect(0, 0, 50, 50);startDinoGame
         
         // 背景圆
         ctx.fillStyle = '#c4334c';
