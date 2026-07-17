@@ -125,16 +125,40 @@
             icon.classList.remove('show');
             iconGroup.classList.remove('move-up');
             placeholder.style.height = '50px';
-           window.startGame()
+           startGame()
         } else {
             // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
             bar.style.display = 'none';
             icon.classList.add('show');
             iconGroup.classList.add('move-up');
             placeholder.style.height = '0px';
-            window.resetGame()
+            resetGame()
         }
     };
+
+    window.startGame = function(){
+	    const dinoGame = document.querySelector('dino-game');
+    if (dinoGame) {
+        // 获取 Shadow DOM 内部的 canvas
+        const shadowRoot = dinoGame.shadowRoot;
+        if (shadowRoot) {
+            const canvas = shadowRoot.querySelector('canvas');
+           	canvas.startGame()
+            }
+        }
+   }
+
+    window.resetGame = function(){
+	    const dinoGame = document.querySelector('dino-game');
+    if (dinoGame) {
+        // 获取 Shadow DOM 内部的 canvas
+        const shadowRoot = dinoGame.shadowRoot;
+        if (shadowRoot) {
+            const canvas = shadowRoot.querySelector('canvas');
+            	canvas.resetGame()
+            }
+        }
+   }
 
     // 小恐龙图标点击
     const dinoIconEl = document.getElementById('dinoIcon');
