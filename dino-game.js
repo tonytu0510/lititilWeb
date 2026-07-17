@@ -24,7 +24,7 @@ class DinoGame extends HTMLElement {
             x: 50,
             y: 25,
             width: 30,
-            height: 10,
+            height: 5,
             vy: 10,
             gravity: 0.5,
             jumpPower: -10
@@ -131,7 +131,7 @@ class DinoGame extends HTMLElement {
                 x: this.canvas.width,
                 y: obstacleY,
                 width: 15 + Math.random() * 15,
-                height: 15 + Math.random() * 15
+                height: 5 + Math.random() * 15
             });
             this.spawnInterval = Math.max(40, this.spawnInterval - 1);
         }
