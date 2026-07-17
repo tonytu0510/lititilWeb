@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>首页 - 李家桥</title>
     <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
     <style>
-        /* 轮播容器 */
         #slider {
             width: 100%;
             height: calc(100vh - 50px);
@@ -13,7 +13,6 @@
             overflow: hidden;
             transition: height 0.3s;
         }
-        /* 小恐龙关闭时，轮播满屏 */
         #slider.full {
             height: 100vh;
         }
@@ -33,12 +32,11 @@
             width: 100%;
             height: 100%;
         }
-        /* 左右箭头 */
         .arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.2);
             color: #fff;
             border: none;
             font-size: 30px;
@@ -48,7 +46,7 @@
             border-radius: 4px;
         }
         .arrow:hover {
-            background: rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.4);
         }
         .arrow.left {
             left: 20px;
@@ -56,7 +54,6 @@
         .arrow.right {
             right: 20px;
         }
-        /* 小圆点 */
         #dots {
             position: absolute;
             bottom: 30px;
@@ -78,13 +75,11 @@
             background: #c4334c;
         }
     </style>
-    <script src="dino-game.js"></script>
 </head>
 <body>
 
     <div id="topBarContainer"></div>
 
-    <!-- 轮播区 -->
     <div id="slider">
         <div class="slide active"><canvas id="canvas1"></canvas></div>
         <div class="slide"><canvas id="canvas2"></canvas></div>
@@ -94,8 +89,8 @@
         <div class="slide"><canvas id="canvas6"></canvas></div>
         <div class="slide"><canvas id="canvas7"></canvas></div>
 
-        <button class="arrow left" onclick="prevSlide()">&#10094;</button>
-        <button class="arrow right" onclick="nextSlide()">&#10095;</button>
+        <button class="arrow left" onclick="prevSlide()">❮</button>
+        <button class="arrow right" onclick="nextSlide()">❯</button>
         <div id="dots">
             <span class="active" onclick="goTo(0)"></span>
             <span onclick="goTo(1)"></span>
@@ -134,11 +129,9 @@
             showSlide(n);
         }
 
-        // ==================== 小恐龙切换时，同步调整轮播高度 ====================
         function updateSliderHeight() {
             const dinoBar = document.getElementById('dinoBar');
             const slider = document.getElementById('slider');
-            
             if (dinoBar && slider) {
                 if (dinoBar.style.display === 'none') {
                     slider.classList.add('full');
@@ -148,7 +141,6 @@
             }
         }
 
-        // 监听小恐龙组件的变化（使用 MutationObserver 监听 style 属性）
         const dinoBar = document.getElementById('dinoBar');
         if (dinoBar) {
             const observer = new MutationObserver(function(mutations) {
@@ -161,19 +153,14 @@
             observer.observe(dinoBar, { attributes: true });
         }
 
-        // 页面加载时初始化一次
         window.addEventListener('load', function() {
             updateSliderHeight();
-            // 同时监听小恐龙图标的点击（因为 toggleDino 在 common.js 里定义）
             const dinoIcon = document.getElementById('dinoIcon');
             if (dinoIcon) {
                 dinoIcon.addEventListener('click', function() {
-                    // 等 toggleDino 执行完再更新高度
                     setTimeout(updateSliderHeight, 100);
                 });
             }
-            
-            // 监听关闭按钮
             const closeBtn = document.querySelector('#dinoBar .close-btn');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function() {
@@ -182,207 +169,220 @@
             }
         });
 
-        // ==================== 7 张 Canvas 主题画 ====================
-        function drawLove(canvas) {
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
-    
-    const W = canvas.width;
-    const H = canvas.height;
-    
-    // 星空背景（深蓝到深紫渐变）
-    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-    bgGrad.addColorStop(0, '#0a0a2e');
-    bgGrad.addColorStop(0.5, '#1a1a4e');
-    bgGrad.addColorStop(1, '#2a1a3e');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-    
-    // 星星（随机生成，存储位置以便闪烁）
-    if (!canvas._stars) {
-        canvas._stars = [];
-        for (let i = 0; i < 200; i++) {
-            canvas._stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H * 0.7,
-                r: Math.random() * 2 + 0.5,
-                alpha: Math.random(),
-                twinkleSpeed: Math.random() * 0.02 + 0.005,
-                twinkleDir: 1
+        // ==================== Canvas 1: 星空爱情 ====================
+        function drawCanvas1(canvas) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = canvas.parentElement.clientWidth;
+            const H = canvas.height = canvas.parentElement.clientHeight;
+
+            // 星空背景
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+            bgGrad.addColorStop(0, '#0a0a2e');
+            bgGrad.addColorStop(0.5, '#1a1a4e');
+            bgGrad.addColorStop(1, '#2a1a3e');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 闪烁星星
+            if (!canvas._stars) {
+                canvas._stars = [];
+                for (let i = 0; i < 200; i++) {
+                    canvas._stars.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H * 0.7,
+                        r: Math.random() * 2 + 0.5,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.02 + 0.005,
+                        twinkleDir: 1
+                    });
+                }
+            }
+            canvas._stars.forEach(star => {
+                star.alpha += star.twinkleSpeed * star.twinkleDir;
+                if (star.alpha >= 1) star.twinkleDir = -1;
+                if (star.alpha <= 0.2) star.twinkleDir = 1;
+                ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+                ctx.fill();
             });
-        }
-    }
-    
-    canvas._stars.forEach(star => {
-        star.alpha += star.twinkleSpeed * star.twinkleDir;
-        if (star.alpha >= 1) star.twinkleDir = -1;
-        if (star.alpha <= 0.2) star.twinkleDir = 1;
-        ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    
-    // 月亮
-    ctx.fillStyle = '#fffde7';
-    ctx.beginPath();
-    ctx.arc(W * 0.8, H * 0.15, 60, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#0a0a2e';
-    ctx.beginPath();
-    ctx.arc(W * 0.82, H * 0.13, 55, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // 地面
-    const groundGrad = ctx.createLinearGradient(0, H * 0.85, 0, H);
-    groundGrad.addColorStop(0, '#1a3a1a');
-    groundGrad.addColorStop(1, '#0a1a0a');
-    ctx.fillStyle = groundGrad;
-    ctx.fillRect(0, H * 0.85, W, H * 0.15);
-    
-        // 长椅
-    const benchX = W * 0.35;
-    const benchY = H * 0.78;
-    const benchWidth = 200;
-    const benchHeight = 60;
-    
-    // 椅背
-    ctx.fillStyle = '#5d3a1a';
-    ctx.fillRect(benchX, benchY - 40, benchWidth, 20);
-    ctx.fillRect(benchX, benchY - 45, benchWidth, 10);
-    
-    // 椅座
-    ctx.fillStyle = '#6b4226';
-    ctx.fillRect(benchX, benchY - 20, benchWidth, 15);
-    
-    // 椅腿
-    ctx.fillStyle = '#3e2515';
-    ctx.fillRect(benchX + 20, benchY, 15, 30);
-    ctx.fillRect(benchX + benchWidth - 35, benchY, 15, 30);
-    
-    // 扶手
-    ctx.fillStyle = '#4a2c14';
-    ctx.fillRect(benchX, benchY - 35, 20, 55);
-    ctx.fillRect(benchX + benchWidth - 20, benchY - 35, 20, 55);
-}
 
-        function drawFamily(canvas) {
+            // 月亮
+            ctx.fillStyle = '#fffde7';
+            ctx.beginPath();
+            ctx.arc(W * 0.8, H * 0.15, 60, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0a0a2e';
+            ctx.beginPath();
+            ctx.arc(W * 0.82, H * 0.13, 55, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 地面
+            const groundGrad = ctx.createLinearGradient(0, H * 0.82, 0, H);
+            groundGrad.addColorStop(0, '#1a3a1a');
+            groundGrad.addColorStop(1, '#0a1a0a');
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, H * 0.82, W, H * 0.18);
+
+            // 长椅
+            const benchX = W * 0.3;
+            const benchY = H * 0.75;
+            const bw = 220;
+            // 椅背
+            ctx.fillStyle = '#4a2c14';
+            ctx.fillRect(benchX, benchY - 30, bw, 18);
+            ctx.fillRect(benchX, benchY - 36, bw, 8);
+            // 椅座
+            ctx.fillStyle = '#5d3a1a';
+            ctx.fillRect(benchX, benchY - 12, bw, 14);
+            // 椅腿
+            ctx.fillStyle = '#3e2515';
+            ctx.fillRect(benchX + 20, benchY + 2, 14, 30);
+            ctx.fillRect(benchX + bw - 34, benchY + 2, 14, 30);
+            // 扶手
+            ctx.fillStyle = '#4a2c14';
+            ctx.fillRect(benchX, benchY - 28, 18, 60);
+            ctx.fillRect(benchX + bw - 18, benchY - 28, 18, 60);
+
+            // 情侣剪影（左侧女性，右侧男性）
+            const cx = benchX + bw / 2;
+            const cy = benchY - 30;
+            // 女性
+            ctx.fillStyle = '#1a1a2e';
+            ctx.beginPath();
+            ctx.arc(cx - 25, cy - 30, 14, 0, Math.PI * 2); // 头
+            ctx.fill();
+            ctx.fillRect(cx - 35, cy - 16, 20, 30); // 身体
+            ctx.fillStyle = '#2a2a4e';
+            ctx.beginPath();
+            ctx.arc(cx - 25, cy - 50, 18, Math.PI, 0); // 长发
+            ctx.fill();
+            // 男性
+            ctx.fillStyle = '#1a1a2e';
+            ctx.beginPath();
+            ctx.arc(cx + 25, cy - 35, 16, 0, Math.PI * 2); // 头
+            ctx.fill();
+            ctx.fillRect(cx + 15, cy - 19, 22, 34); // 身体
+            // 手臂（相拥）
+            ctx.strokeStyle = '#1a1a2e';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(cx - 25, cy - 10);
+            ctx.quadraticCurveTo(cx, cy - 5, cx + 25, cy - 12);
+            ctx.stroke();
+
+            // 土狗
+            const dogX = benchX + bw + 40;
+            const dogY = benchY + 5;
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.ellipse(dogX, dogY - 10, 22, 14, 0, 0, Math.PI * 2); // 身体
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(dogX + 18, dogY - 22, 10, 0, Math.PI * 2); // 头
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(dogX + 26, dogY - 26, 4, 0, Math.PI * 2); // 鼻子
+            ctx.fill();
+            ctx.fillRect(dogX + 5, dogY, 6, 10); // 前腿
+            ctx.fillRect(dogX - 12, dogY, 6, 10); // 后腿
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(dogX + 20, dogY - 30, 6, 8); // 耳朵
+
+            // 孩子玩耍
+            const childX = W * 0.15;
+            const childY = benchY - 5;
+            ctx.fillStyle = '#2a1a3e';
+            ctx.beginPath();
+            ctx.arc(childX, childY - 18, 10, 0, Math.PI * 2); // 头
+            ctx.fill();
+            ctx.fillRect(childX - 8, childY - 8, 16, 20); // 身体
+            ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
+            ctx.fillRect(childX + 4, childY + 10, 6, 12);
+            // 气球
+            ctx.fillStyle = '#c4334c';
+            ctx.beginPath();
+            ctx.arc(childX + 25, childY - 25, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(childX + 15, childY - 15);
+            ctx.lineTo(childX + 25, childY - 25);
+            ctx.stroke();
+
+            // "I LOVE LJ" 打字机效果
+            const text = 'I LOVE LJ';
+            if (!canvas._textIndex) canvas._textIndex = 0;
+            if (!canvas._textTimer) canvas._textTimer = 0;
+            canvas._textTimer++;
+            if (canvas._textTimer % 10 === 0 && canvas._textIndex < text.length) {
+                canvas._textIndex++;
+            }
+            const displayText = text.substring(0, canvas._textIndex);
+            ctx.fillStyle = '#c4334c';
+            ctx.font = `bold ${Math.min(W * 0.04, 40)}px 'Georgia', serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(displayText, W / 2, H * 0.25);
+            // 光标
+            if (canvas._textTimer % 20 < 10 && canvas._textIndex < text.length) {
+                const textWidth = ctx.measureText(displayText).width;
+                ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 3, Math.min(W * 0.05, 45));
+            }
+        }
+
+        // ==================== Canvas 2-7: 简化版 ====================
+        function drawSimpleCanvas(canvas, emoji, label, color1, color2) {
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#ffa502');
-            grad.addColorStop(1, '#ff6348');
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
             ctx.textAlign = 'center';
-            ctx.fillText('🏠', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
+            ctx.fillText(emoji, canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
             ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('亲情', canvas.width / 2, canvas.height * 0.8);
+            ctx.fillText(label, canvas.width / 2, canvas.height * 0.8);
         }
 
-        function drawFriendship(canvas) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#1e90ff');
-            grad.addColorStop(1, '#00bfff');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText('🤝', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
-            ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('友情', canvas.width / 2, canvas.height * 0.8);
-        }
+        function drawCanvas2(c) { drawSimpleCanvas(c, '🏠', '亲情', '#ffa502', '#ff6348'); }
+        function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
+        function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
+        function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
+        function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
+        function drawCanvas7(c) { drawSimpleCanvas(c, '📖', '英语', '#e67e22', '#f1c40f'); }
 
-        function drawArt(canvas) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#7b2d8b');
-            grad.addColorStop(1, '#e056a0');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText('🎨', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
-            ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('艺术', canvas.width / 2, canvas.height * 0.8);
+        // ==================== 初始化和动画循环 ====================
+        function animate() {
+            drawCanvas1(document.getElementById('canvas1'));
+            requestAnimationFrame(animate);
         }
+        animate();
 
-        function drawComputer(canvas) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#2c3e50');
-            grad.addColorStop(1, '#3498db');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText('💻', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
-            ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('计算机', canvas.width / 2, canvas.height * 0.8);
+        function initOtherCanvas() {
+            drawCanvas2(document.getElementById('canvas2'));
+            drawCanvas3(document.getElementById('canvas3'));
+            drawCanvas4(document.getElementById('canvas4'));
+            drawCanvas5(document.getElementById('canvas5'));
+            drawCanvas6(document.getElementById('canvas6'));
+            drawCanvas7(document.getElementById('canvas7'));
         }
+        initOtherCanvas();
+        window.addEventListener('resize', initOtherCanvas);
 
-        function drawMath(canvas) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#16a085');
-            grad.addColorStop(1, '#2ecc71');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText('📐', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
-            ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('数学', canvas.width / 2, canvas.height * 0.8);
-        }
-
-        function drawEnglish(canvas) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#e67e22');
-            grad.addColorStop(1, '#f1c40f');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(canvas.height * 0.3, 150)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillText('📖', canvas.width / 2, canvas.height / 2 + Math.min(canvas.height * 0.1, 50));
-            ctx.font = `${Math.min(canvas.height * 0.06, 30)}px 'Microsoft YaHei'`;
-            ctx.fillText('英语', canvas.width / 2, canvas.height * 0.8);
-        }
-
-        // 初始化所有 Canvas
-        function initAllCanvas() {
-            drawLove(document.getElementById('canvas1'));
-            drawFamily(document.getElementById('canvas2'));
-            drawFriendship(document.getElementById('canvas3'));
-            drawArt(document.getElementById('canvas4'));
-            drawComputer(document.getElementById('canvas5'));
-            drawMath(document.getElementById('canvas6'));
-            drawEnglish(document.getElementById('canvas7'));
-        }
-        initAllCanvas();
-
-        // 窗口缩放时重绘
-        window.addEventListener('resize', initAllCanvas);
+        // 窗口缩放时重绘 Canvas 2-7
+        window.addEventListener('resize', function() {
+            drawCanvas2(document.getElementById('canvas2'));
+            drawCanvas3(document.getElementById('canvas3'));
+            drawCanvas4(document.getElementById('canvas4'));
+            drawCanvas5(document.getElementById('canvas5'));
+            drawCanvas6(document.getElementById('canvas6'));
+            drawCanvas7(document.getElementById('canvas7'));
+        });
     </script>
 </body>
 </html>
