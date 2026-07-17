@@ -154,6 +154,7 @@
         // 获取 Shadow DOM 内部的 canvas
         const shadowRoot = dinoGame.shadowRoot;
         if (shadowRoot) {
+
             const canvas = shadowRoot.querySelector('canvas');
             	console.log(canvas)
             }
