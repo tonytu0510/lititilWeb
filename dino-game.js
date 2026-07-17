@@ -57,8 +57,8 @@ class DinoGame extends HTMLElement {
     resize() {
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
-        this.groundY = this.canvas.height - 5;
+        this.canvas.height = 50;//rect.height
+        this.groundY = 50 - 5;
         this.player.y = this.groundY - this.player.height;
     }
     
