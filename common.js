@@ -17,7 +17,8 @@
         </div>
 
             <!-- 关闭按钮（最左边） -->
-    <button class="close-btn" id="topPlaceholder" onclick="toggleDino()" style="position:absolute;left: 1%;top: 15px;z-index:99999;background:none;border:none;color:#fff;cursor:pointer;font-size:14px;height:50px">✕</button>
+    <button class="close-btn" id="topPlaceholder" onclick="toggleDino()" style="position: absolute;left: 0;top: 0;z-index: 99999;background: none;border: none; color: #fff;
+    cursor: pointer;font-size: 14px;height: 50px;width: 6%;">✕</button>
 
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative;">
