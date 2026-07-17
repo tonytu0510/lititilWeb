@@ -26,7 +26,7 @@
     <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
     
     <!-- 问号图标 -->
-    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;width:30px">?</button>
+    <button id="helpBtn" onclick="showHelp()" style="position:absolute;right:40px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;height:22px;border-radius:50%;cursor:pointer;font-size:14px;font-weight:bold;width:30px;padding:0">?</button>
 </div>
 
 <!-- 游戏说明弹窗 -->
