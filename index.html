@@ -241,7 +241,30 @@
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, H * 0.85, W, H * 0.15);
     
-    // 继续画后续元素...
+        // 长椅
+    const benchX = W * 0.35;
+    const benchY = H * 0.78;
+    const benchWidth = 200;
+    const benchHeight = 60;
+    
+    // 椅背
+    ctx.fillStyle = '#5d3a1a';
+    ctx.fillRect(benchX, benchY - 40, benchWidth, 20);
+    ctx.fillRect(benchX, benchY - 45, benchWidth, 10);
+    
+    // 椅座
+    ctx.fillStyle = '#6b4226';
+    ctx.fillRect(benchX, benchY - 20, benchWidth, 15);
+    
+    // 椅腿
+    ctx.fillStyle = '#3e2515';
+    ctx.fillRect(benchX + 20, benchY, 15, 30);
+    ctx.fillRect(benchX + benchWidth - 35, benchY, 15, 30);
+    
+    // 扶手
+    ctx.fillStyle = '#4a2c14';
+    ctx.fillRect(benchX, benchY - 35, 20, 55);
+    ctx.fillRect(benchX + benchWidth - 20, benchY - 35, 20, 55);
 }
 
         function drawFamily(canvas) {
