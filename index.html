@@ -329,20 +329,18 @@
             const text = 'I LOVE LJ,爱LI没有惧怕！';
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
-            const displayText = text.substring(0, canvas._textIndex);
             ctx.fillStyle = '#fff';
             ctx.font = `bold ${Math.min(W * 0.03, 40)}px 'Georgia', serif`;
             ctx.textAlign = 'Center';
             ctx.fillText(displayText, W / 2, H * 0.25);
-            // 光标{
-           if(canvas._textIndex % text.length  == 0){
-	    canvas._textIndex++;
-	    const displayCText = text.substring(0, canvas._textIndex);
-	    const textWidth = ctx.measureText(displayCText).width;
-                    ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 7, Math.min(W * 0.07, 45))
-            	}else{
-	    canvas._textTimer = 0
-	}
+            // 光标
+            canvas._textIndex++;
+            if(canvas._textIndex%text.length == 0){
+	canvas._textIndex = 0
+            }
+            const displayCText = text.substring(0, canvas._textIndex);
+            const textWidth = ctx.measureText(displayCText).width;
+            ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 7, Math.min(W * 0.07, 45))
         }
 
         // ==================== Canvas 2-7: 简化版 ====================
