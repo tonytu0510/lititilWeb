@@ -332,7 +332,7 @@
             if (!canvas._textTimer) canvas._textTimer = count;
             //待添加
             //const displayText = text.substring(0,canvas._textIndex);
-            const displayText = text.substring(0,text.length);
+            const displayText = text.substring(0,text.length-1);
             const textWidth = ctx.measureText(displayText).width;	
             ctx.fillStyle = '#fff';
             ctx.font = `bold ${Math.min(W * 0.03, 40)}px 'Georgia', serif`;
