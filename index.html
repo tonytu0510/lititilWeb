@@ -327,7 +327,7 @@
 
             // "I LOVE LJ" 打字机效果
             const text = 'I LOVE LJ,爱LI没有惧怕！';
-            const count = Math.round(2/1000)
+            const count = Number(num.toFixed(2/1000))
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = count;
             // 光标
