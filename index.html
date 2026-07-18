@@ -331,8 +331,8 @@
             if (!canvas._textTimer) canvas._textTimer = 2;
             // 光标
            if((canvas._textTimer % canvas._textIndex) == 0){
+	canvas._textTimer = canvas._textIndex*canvas._textTimer
               canvas._textIndex++
-              canvas._textTimer = canvas._textIndex*canvas._textTimer  
            }
             const displayText = text.substring(0,canvas._textIndex);
             const textWidth = ctx.measureText(displayText).width;	
