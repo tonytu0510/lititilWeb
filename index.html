@@ -331,6 +331,8 @@
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = count;
             // 光标
+	console.log('canvas._textTimer=>',canvas._textTimer)
+	console.log('canvas._textIndex=>',canvas._textIndex)
            if((canvas._textTimer % count) == 0){
 	canvas._textTimer++
             }
