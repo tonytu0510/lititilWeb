@@ -230,7 +230,7 @@
 
             // 长椅
             const benchX = W * 0.3;
-            const benchY = H * 0.75;
+            const benchY = H * 0.85;
             const bw = 220;
             // 椅背
             ctx.fillStyle = '#4a2c14';
@@ -303,17 +303,6 @@
             ctx.fillRect(childX - 8, childY - 8, 16, 20); // 身体
             ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
-            // 气球
-            ctx.fillStyle = '#c4334c';
-            ctx.beginPath();
-            ctx.arc(childX + 25, childY - 25, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(childX + 15, childY - 15);
-            ctx.lineTo(childX + 25, childY - 25);
-            ctx.stroke();
 
             // "I LOVE LJ" 打字机效果
             const text = 'I LOVE LJ';
