@@ -250,24 +250,24 @@
 
 
             // 长椅
-            const benchX = W * 0.6;
-            const benchY = H * 0.9;
-            const bw = 220;
+            const benchX2 = W * 0.6;
+            const benchY2 = H * 0.9;
+            const bw2 = 220;
             // 椅背
             ctx.fillStyle = '#4a2c14';
-            ctx.fillRect(benchX, benchY - 30, bw, 18);
-            ctx.fillRect(benchX, benchY - 36, bw, 8);
+            ctx.fillRect(benchX2, benchY2 - 30, bw2, 18);
+            ctx.fillRect(benchX2, benchY2 - 36, bw2, 8);
             // 椅座
             ctx.fillStyle = '#5d3a1a';
-            ctx.fillRect(benchX, benchY - 12, bw, 14);
+            ctx.fillRect(benchX2, benchY2 - 12, bw2, 14);
             // 椅腿
             ctx.fillStyle = '#3e2515';
-            ctx.fillRect(benchX + 20, benchY + 2, 14, 30);
-            ctx.fillRect(benchX + bw - 34, benchY + 2, 14, 30);
+            ctx.fillRect(benchX2 + 20, benchY2 + 2, 14, 30);
+            ctx.fillRect(benchX2 + bw2 - 34, benchY2 + 2, 14, 30);
             // 扶手
             ctx.fillStyle = '#4a2c14';
-            ctx.fillRect(benchX, benchY - 28, 18, 70);
-            ctx.fillRect(benchX + bw - 18, benchY - 28, 18, 70);
+            ctx.fillRect(benchX2, benchY2 - 28, 18, 70);
+            ctx.fillRect(benchX2 + bw2 - 18, benchY2 - 28, 18, 70);
 
             // 情侣剪影（左侧女性，右侧男性）
             const cx = benchX + bw / 2;
