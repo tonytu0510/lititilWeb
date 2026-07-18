@@ -326,7 +326,7 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             // "I LOVE LJ" 打字机效果
-            const text = 'I LOVE LJ';
+            const text = 'I LOVE LJ,爱李没有惧怕！';
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
             canvas._textTimer++;
@@ -341,7 +341,7 @@
             // 光标
             if (canvas._textTimer % 20 < 10 && canvas._textIndex < text.length) {
                 const textWidth = ctx.measureText(displayText).width;
-                ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 4, Math.min(W * 0.05, 45));
+                ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 3, Math.min(W * 0.05, 45));
             }
         }
 
