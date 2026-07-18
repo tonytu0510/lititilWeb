@@ -222,9 +222,9 @@
             ctx.fill();
 
             // 地面
-            const groundGrad = ctx.createLinearGradient(0, H * 0.92, 0, H * 0.94);
-            groundGrad.addColorStop(0, '#871F78');
-            groundGrad.addColorStop(1, '#0a0a2e');
+            const groundGrad = ctx.createLinearGradient(0, H * 0.52, 0, H * 1);
+            groundGrad.addColorStop(0, '#0a0a2e');
+            groundGrad.addColorStop(1, '#871F78');
             ctx.fillStyle = groundGrad;
             ctx.fillRect(0, H * 0.92, W, H * 0.94);
 
