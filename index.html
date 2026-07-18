@@ -340,6 +340,8 @@
             ctx.textAlign = 'Center';
             ctx.fillText(displayText, W / 2, H * 0.25);
             ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 7, Math.min(W * 0.07, 45))
+	console.log("canvas._textIndex=>",canvas._textIndex)
+	console.log('text.length=>',text.length)
             if(canvas._textIndex == text.length){
 	canvas._textIndex = 0
             }
