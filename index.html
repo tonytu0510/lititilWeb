@@ -336,7 +336,7 @@
             if((canvas._textIndex % text.length) == 0){
 	canvas._textIndex = 0
             }
-            const displayText = text.substring(0, canvas._textIndex);
+            const displayText = canvas._textIndex;
             const textWidth = ctx.measureText(displayText).width;	
             ctx.fillStyle = '#fff';
             ctx.font = `bold ${Math.min(W * 0.03, 40)}px 'Georgia', serif`;
