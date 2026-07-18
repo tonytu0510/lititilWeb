@@ -328,12 +328,12 @@
             // "I LOVE LJ" 打字机效果
             const text = 'I LOVE LJ,爱LI没有惧怕！';
             if (!canvas._textIndex) canvas._textIndex = 0;
-            if (!canvas._textTimer) canvas._textTimer = 20;
+            if (!canvas._textTimer) canvas._textTimer = 5;
             // 光标
-           if(canvas._textIndex % canvas._textTimer == 0){
+           if((canvas._textIndex % canvas._textTimer) == 0){
               canvas._textIndex++;
            }
-            if(canvas._textIndex%text.length == 0){
+            if((canvas._textIndex % text.length) == 0){
 	canvas._textIndex = 0
             }
             const displayText = text.substring(0, canvas._textIndex);
