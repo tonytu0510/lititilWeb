@@ -336,7 +336,7 @@
            if((canvas._textTimer % count) == 0){
 	canvas._textTimer++
             }
-           if((canvas._textIndex % canvas._textTimer) == 0){
+           if(canvas._textIndex % text.length) == 0){
               canvas._textIndex++
               canvas._textTimer+=count
            }
