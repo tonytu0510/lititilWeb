@@ -335,8 +335,8 @@
             }
             const displayText = text.substring(0, canvas._textIndex);
             ctx.fillStyle = '#fff';
-            ctx.font = `bold ${Math.min(W * 0.04, 40)}px 'Georgia', serif`;
-            ctx.textAlign = 'left';
+            ctx.font = `bold ${Math.min(W * 0.04, 30)}px 'Georgia', serif`;
+            ctx.textAlign = 'Center';
             ctx.fillText(displayText, W / 2, H * 0.25);
             // 光标
             if (canvas._textTimer % 20 < 10 && canvas._textIndex < text.length) {
