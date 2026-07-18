@@ -338,7 +338,7 @@
            if(canvas._textIndex % text.length  == 0){
 	    const textWidth = ctx.measureText(displayText).width;
                     ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 7, Math.min(W * 0.07, 45));
-	    canvas._textTimer++;
+	    canvas._textIndex++;
             	}else{
 	    canvas._textTimer = 0
 	}
