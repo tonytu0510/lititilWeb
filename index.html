@@ -222,11 +222,11 @@
             ctx.fill();
 
             // 地面
-            const groundGrad = ctx.createLinearGradient(0, H * 0.82, 0, H);
+            const groundGrad = ctx.createLinearGradient(0, H * 0.82, 0, H * 0.82);
             groundGrad.addColorStop(0, '#871F78');
             groundGrad.addColorStop(1, '#c4334c');
             ctx.fillStyle = groundGrad;
-            ctx.fillRect(0, H * 0.6, W, H * 0.07);
+            ctx.fillRect(0, H * 0.7, W, H * 0.3);
 
             // 长椅
             const benchX = W * 0.3;
