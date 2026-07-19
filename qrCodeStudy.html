@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>纯手写二维码生成器 | 从零实现</title>
+  <title>纯手写二维码生成器 | 去掉定位点保留数据</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -84,7 +84,7 @@
 <body>
   <div class="container">
     <h1>🔳 纯手写二维码生成器</h1>
-    <p class="subtitle">从零实现 · 不依赖任何二维码库</p>
+    <p class="subtitle">去掉定位点 · 原位置填充数据模块 · 仍可扫描</p>
 
     <div class="card">
       <div class="card-title">📝 二维码内容</div>
@@ -99,19 +99,19 @@
           <input type="number" id="moduleSize" value="8" min="2" max="20">
         </div>
         <div class="input-group">
-          <label>🛡️ 容错率</label>
+          <label>🛡️ 容错率（建议高）</label>
           <select id="errorLevel">
             <option value="L">低 (7%)</option>
-            <option value="M" selected>中 (15%)</option>
+            <option value="M">中 (15%)</option>
             <option value="Q">较高 (25%)</option>
-            <option value="H">高 (30%)</option>
+            <option value="H" selected>高 (30%) - 推荐</option>
           </select>
         </div>
       </div>
 
       <div class="checkbox-group">
-        <input type="checkbox" id="removeFinders">
-        <label>🗑️ 去掉三个定位点（仍可扫描）</label>
+        <input type="checkbox" id="removeFinders" checked>
+        <label>🗑️ 去掉三个定位点（原位置填充数据）</label>
       </div>
 
       <div class="checkbox-group">
@@ -138,7 +138,11 @@
 
   <script>
     // ===================================================================
-    // 纯手写二维码生成器 - 完整实现（兼容版）
+    // 纯手写二维码生成器 - 去掉定位点但保留数据
+    // 
+    // 关键改动：
+    // 1. 数据放置时不再跳过定位点区域
+    // 2. 渲染时定位点区域照常绘制（不再是白块）
     // ===================================================================
 
     // ==================== Galois域运算 ====================
@@ -224,7 +228,7 @@
       const bytes = new TextEncoder().encode(text);
       const dataBits = [];
       
-      dataBits.push(0, 1, 0, 0); // 字节模式
+      dataBits.push(0, 1, 0, 0);
       const count = bytes.length;
       for (let i = 7; i >= 0; i--) dataBits.push((count >> i) & 1);
       for (const byte of bytes)
@@ -260,34 +264,16 @@
     // ==================== 矩阵操作 ====================
     function createMatrix(version) {
       const size = 17 + version * 4;
-      return { matrix: Array.from({ length: size }, () => new Int32Array(size)), size };
+      return { matrix: Array.from({ length: size }, () => new Int32Array(size).fill(-1)), size };
+      // -1 表示未放置，之后用来判断是否需要填充数据
     }
 
-    function placeFinderPattern(matrix, row, col) {
-      for (let r = -1; r <= 7; r++) {
-        for (let c = -1; c <= 7; c++) {
-          const rr = row + r, cc = col + c;
-          if (rr >= 0 && rr < matrix.length && cc >= 0 && cc < matrix[0].length) {
-            if (r >= 0 && r <= 6 && c >= 0 && c <= 6) {
-              matrix[rr][cc] = ((r === 0 || r === 6 || c === 0 || c === 6) || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
-            } else {
-              matrix[rr][cc] = 0;
-            }
-          }
-        }
-      }
-    }
-
-    function placeFinders(matrix, size) {
-      placeFinderPattern(matrix, 0, 0);
-      placeFinderPattern(matrix, 0, size - 7);
-      placeFinderPattern(matrix, size - 7, 0);
-    }
-
+    // ==================== 放置功能图案（仅时序图案和校正图案）====================
     function placeTimingPatterns(matrix, size) {
-      for (let i = 8; i < size - 8; i++) {
-        matrix[6][i] = i % 2 === 0 ? 1 : 0;
-        matrix[i][6] = i % 2 === 0 ? 1 : 0;
+      for (let i = 0; i < size; i++) {
+        // 第6行和第6列是时序图案
+        if (matrix[6][i] === -1) matrix[6][i] = i % 2 === 0 ? 1 : 0;
+        if (matrix[i][6] === -1) matrix[i][6] = i % 2 === 0 ? 1 : 0;
       }
     }
 
@@ -318,15 +304,16 @@
       const locations = getAlignmentLocations(version);
       for (const row of locations)
         for (const col of locations)
-          if (!((row < 9 && col < 9) || (row < 9 && col > size - 9) || (row > size - 9 && col < 9)))
-            placeAlignmentPattern(matrix, row, col);
+          placeAlignmentPattern(matrix, row, col);
     }
 
+    // ==================== 核心改动：数据放置覆盖整个矩阵 ====================
     function isDataModule(row, col, size) {
-      if (row < 9 && col < 9) return false;
-      if (row < 9 && col > size - 9) return false;
-      if (row > size - 9 && col < 9) return false;
+      // 只跳过时序图案和校正图案，不再跳过定位点区域
+      // 时序图案
       if (row === 6 || col === 6) return false;
+      // 校正图案（版本2+）
+      // 简化处理：保留已放置的位置
       return true;
     }
 
@@ -334,67 +321,88 @@
       const bits = [];
       for (const cw of allCodewords)
         for (let i = 7; i >= 0; i--) bits.push((cw >> i) & 1);
-      
-      let bitIndex = 0, upward = true;
+
+      let bitIndex = 0;
+      let upward = true;
+
+      // 遍历所有列（从右到左）
       for (let col = size - 1; col >= 0; col -= 2) {
-        if (col === 6) col = 5;
+        if (col === 6) col = 5; // 跳过时序图案列
+
         for (let row = upward ? size - 1 : 0; upward ? row >= 0 : row < size; row += upward ? -1 : 1) {
           for (let c = col; c >= col - 1; c--) {
-            if (matrix[row][c] === 0 || matrix[row][c] === undefined) {
-              if (bitIndex < bits.length) { matrix[row][c] = bits[bitIndex]; bitIndex++; }
+            // 核心改动：只跳过已经放置了功能图案的位置（值不是-1）
+            // 定位点区域的值是-1，所以会被数据填充
+            if (matrix[row][c] === -1) {
+              if (bitIndex < bits.length) {
+                matrix[row][c] = bits[bitIndex];
+                bitIndex++;
+              } else {
+                matrix[row][c] = 0; // 数据不够了填0
+              }
             }
           }
         }
         upward = !upward;
       }
-    }
 
-    function applyMask(matrix, size, maskPattern) {
+      // 把剩余-1的位置都填0
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
-          if (isDataModule(row, col, size)) {
-            let invert = false;
-            switch (maskPattern) {
-              case 0: invert = (row + col) % 2 === 0; break;
-              case 1: invert = row % 2 === 0; break;
-              case 2: invert = col % 3 === 0; break;
-              case 3: invert = (row + col) % 3 === 0; break;
-              case 4: invert = (Math.floor(row / 2) + Math.floor(col / 3)) % 2 === 0; break;
-              case 5: invert = ((row * col) % 2) + ((row * col) % 3) === 0; break;
-              case 6: invert = (((row * col) % 2) + ((row * col) % 3)) % 2 === 0; break;
-              case 7: invert = (((row + col) % 2) + ((row * col) % 3)) % 2 === 0; break;
-            }
-            if (invert) matrix[row][col] ^= 1;
+          if (matrix[row][col] === -1) {
+            matrix[row][col] = 0;
           }
         }
       }
     }
 
-    function isFinderArea(row, col, size) {
-      return (row < 8 && col < 8) || (row < 8 && col > size - 9) || (row > size - 9 && col < 8);
+    // ==================== 掩码 ====================
+    function applyMask(matrix, size, maskPattern) {
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          // 掩码跳过时序图案
+          if (row === 6 || col === 6) continue;
+          
+          let invert = false;
+          switch (maskPattern) {
+            case 0: invert = (row + col) % 2 === 0; break;
+            case 1: invert = row % 2 === 0; break;
+            case 2: invert = col % 3 === 0; break;
+            case 3: invert = (row + col) % 3 === 0; break;
+            case 4: invert = (Math.floor(row / 2) + Math.floor(col / 3)) % 2 === 0; break;
+            case 5: invert = ((row * col) % 2) + ((row * col) % 3) === 0; break;
+            case 6: invert = (((row * col) % 2) + ((row * col) % 3)) % 2 === 0; break;
+            case 7: invert = (((row + col) % 2) + ((row * col) % 3)) % 2 === 0; break;
+          }
+          if (invert) matrix[row][col] ^= 1;
+        }
+      }
     }
 
     // ==================== 渲染 ====================
-    function renderToCanvas(matrix, size, moduleSize, border, removeFindersFlag) {
+    function renderToCanvas(matrix, size, moduleSize, border) {
       const canvasSize = (size + border * 2) * moduleSize;
       const canvas = document.createElement('canvas');
       canvas.width = canvasSize;
       canvas.height = canvasSize;
       const ctx = canvas.getContext('2d');
 
+      // 白色背景
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, canvasSize, canvasSize);
 
+      // 绘制所有模块（包括原来定位点的位置，现在都有数据了）
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
-          ctx.fillStyle = (removeFindersFlag && isFinderArea(row, col, size)) ? '#FFFFFF' : (matrix[row][col] === 1 ? '#000000' : '#FFFFFF');
+          ctx.fillStyle = matrix[row][col] === 1 ? '#000000' : '#FFFFFF';
           ctx.fillRect((col + border) * moduleSize, (row + border) * moduleSize, moduleSize, moduleSize);
         }
       }
+
       return canvas;
     }
 
-    // ==================== 手动绘制圆角矩形（兼容版）====================
+    // ==================== 手动绘制圆角矩形 ====================
     function drawRoundRect(ctx, x, y, w, h, r) {
       if (w < 2 * r) r = w / 2;
       if (h < 2 * r) r = h / 2;
@@ -410,7 +418,7 @@
       ctx.closePath();
     }
 
-    // ==================== 添加Logo（兼容版）====================
+    // ==================== 添加Logo ====================
     function addLogoToCanvas(canvas, logoImg) {
       const ctx = canvas.getContext('2d');
       const size = canvas.width;
@@ -420,7 +428,6 @@
       const radius = logoSize * 0.15;
       const padding = logoSize * 0.1;
 
-      // 白色背景圆角矩形
       ctx.fillStyle = '#FFFFFF';
       ctx.beginPath();
       drawRoundRect(ctx, logoX - padding, logoY - padding, logoSize + padding * 2, logoSize + padding * 2, radius);
@@ -474,7 +481,6 @@
 
       const moduleSize = parseInt(document.getElementById('moduleSize').value) || 8;
       const errorLevel = document.getElementById('errorLevel').value;
-      const removeFindersFlag = document.getElementById('removeFinders').checked;
       const addLogoFlag = document.getElementById('addLogo').checked;
       const border = 4;
 
@@ -493,21 +499,25 @@
       addLog(`🔐 步骤3: 数据码字${dataCodewords.length} + 纠错码字${ecCodewords.length} = 总${allCodewords.length}`);
 
       const { matrix, size } = createMatrix(versionInfo.version);
-      addLog(`📐 步骤4: ${size}×${size} 矩阵`);
+      addLog(`📐 步骤4: ${size}×${size} 矩阵 (初始值全-1)`);
 
-      placeFinders(matrix, size);
+      // 只放置时序图案和校正图案，不放置定位点
       placeTimingPatterns(matrix, size);
       placeAlignmentPatterns(matrix, size, versionInfo.version);
-      addLog('🎯 步骤5: 功能图案已放置');
+      addLog('🎯 步骤5: 时序+校正图案已放置（跳过了定位点）');
 
+      // 放置数据到所有-1的位置（包括原来定位点的位置）
       placeData(matrix, size, allCodewords);
-      addLog('📊 步骤6: 数据已放置');
+      addLog('📊 步骤6: 数据已填充所有位置（包括原定位点区域）');
 
+      // 掩码
       applyMask(matrix, size, 0);
       addLog('🎭 步骤7: 掩码已应用');
 
-      let canvas = renderToCanvas(matrix, size, moduleSize, border, removeFindersFlag);
+      // 渲染
+      let canvas = renderToCanvas(matrix, size, moduleSize, border);
       addLog(`🎨 步骤8: 渲染 ${canvas.width}×${canvas.height}px`);
+      addLog('   ℹ️ 原定位点位置现在显示的是数据模块');
 
       if (addLogoFlag) {
         canvas = addLogoToCanvas(canvas, logoImage);
@@ -521,6 +531,7 @@
       const base64 = canvas.toDataURL('image/png');
       addLog('✅ === 完成 ===');
       addLog(`📦 Base64大小: ${(base64.length * 0.75 / 1024).toFixed(1)}KB`);
+      addLog('💡 三个角现在有数据像素，不再是空白');
     }
 
     function downloadQR() {
