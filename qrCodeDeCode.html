@@ -246,7 +246,7 @@
         if (bits.length < 12) continue;
         console.log('1')
         let mode = 0;
-        for (let i=0;i<4;i++){ mode=(mode<<1)|bits[i]};
+        for (let i=0;i<4;i++){ mode = ((mode<<1)|bits[i]) }
         if (mode !== 4) continue;
         console.log('2')
         let count = 0;
