@@ -260,6 +260,8 @@
         }
         try {
           const text = new TextDecoder().decode(new Uint8Array(bytes));
+          console.log('text.length=>',text.length)
+          console.log('/^[\x20-\x7E\u4e00-\u9fff]+/.test(text)=>',/^[\x20-\x7E\u4e00-\u9fff]+/.test(text))
           if (text.length>0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) return {text, mask};
         } catch(e) {}
       }
