@@ -253,6 +253,9 @@
         for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
         if (count<=0||count>300) continue;
         console.log('3')
+        console.log('count=>',count)
+        console.log('12+count*8=>',12+count*8)
+        console.log('its.length=>',bits.length)
         if ((12+count*8) > bits.length) continue;
         console.log('4')
         const bytes = [];
