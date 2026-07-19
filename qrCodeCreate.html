@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二维码生成器</title>
+  <!-- 使用 qrcodejs 库，简单好用 -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* 输入区域 */
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group textarea,
+    .input-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 0.8rem;
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .input-group textarea {
+      min-height: 80px;
+    }
+
+    .input-group textarea:focus,
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* 设置行 */
+    .settings-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .settings-row .input-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    /* 颜色选择器 */
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .color-picker-wrapper input[type="color"] {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #e0e0e0;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .color-picker-wrapper input[type="text"] {
+      flex: 1;
+    }
+
+    /* 按钮 */
+    .btn {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 0.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin-bottom: 0.8rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.download {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      color: #333;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+    }
+
+    /* 二维码展示区 */
+    .qrcode-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      background: #f8f9fa;
+      border-radius: 1rem;
+      border: 2px dashed #e0e0e0;
+      min-height: 250px;
+    }
+
+    .qrcode-wrapper .placeholder {
+      color: #bbb;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* 提示信息 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* 响应式 */
+    @media (max-width: 400px) {
+      .container {
+        padding: 1.5rem;
+      }
+      .settings-row {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔳 二维码生成器</h1>
+    <p class="subtitle">输入内容，即时生成二维码</p>
+
+    <!-- 内容输入 -->
+    <div class="input-group">
+      <label>📝 输入内容（文字或链接）</label>
+      <textarea id="contentInput" placeholder="在此输入文字或粘贴链接...">https://www.example.com</textarea>
+    </div>
+
+    <!-- 尺寸和容错率 -->
+    <div class="settings-row">
+      <div class="input-group">
+        <label>📐 尺寸 (px)</label>
+        <input type="number" id="sizeInput" value="200" min="100" max="600" step="10">
+      </div>
+      <div class="input-group">
+        <label>🛡️ 容错率</label>
+        <select id="errorCorrection">
+          <option value="L">低 (7%)</option>
+          <option value="M" selected>中 (15%)</option>
+          <option value="Q">较高 (25%)</option>
+          <option value="H">高 (30%)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 颜色设置 -->
+    <div class="settings-row">
+      <div class="input-group">
+        <label>🎨 前景色</label>
+        <div class="color-picker-wrapper">
+          <input type="color" id="fgColor" value="#000000">
+          <input type="text" id="fgColorText" value="#000000" placeholder="#000000">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>🖼️ 背景色</label>
+        <div class="color-picker-wrapper">
+          <input type="color" id="bgColor" value="#ffffff">
+          <input type="text" id="bgColorText" value="#ffffff" placeholder="#ffffff">
+        </div>
+      </div>
+    </div>
+
+    <!-- 生成按钮 -->
+    <button class="btn" id="generateBtn">✨ 生成二维码</button>
+
+    <!-- 二维码展示 -->
+    <div class="qrcode-wrapper">
+      <div id="qrcode">
+        <span class="placeholder">二维码将显示在这里</span>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="btn-row">
+      <button class="btn download" id="downloadBtn">💾 下载图片</button>
+      <button class="btn" id="clearBtn">🔄 清空重置</button>
+    </div>
+  </div>
+
+  <!-- 提示信息 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== DOM 元素 ==========
+    const contentInput = document.getElementById('contentInput');
+    const sizeInput = document.getElementById('sizeInput');
+    const errorCorrection = document.getElementById('errorCorrection');
+    const fgColor = document.getElementById('fgColor');
+    const fgColorText = document.getElementById('fgColorText');
+    const bgColor = document.getElementById('bgColor');
+    const bgColorText = document.getElementById('bgColorText');
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const qrcodeDiv = document.getElementById('qrcode');
+    const toast = document.getElementById('toast');
+
+    let currentQR = null;
+
+    // ========== Toast提示 ==========
+    function showToast(message, duration = 2000) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
+    // ========== 颜色同步 ==========
+    fgColor.addEventListener('input', () => {
+      fgColorText.value = fgColor.value;
+    });
+
+    fgColorText.addEventListener('input', () => {
+      const value = fgColorText.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        fgColor.value = value;
+      }
+    });
+
+    bgColor.addEventListener('input', () => {
+      bgColorText.value = bgColor.value;
+    });
+
+    bgColorText.addEventListener('input', () => {
+      const value = bgColorText.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        bgColor.value = value;
+      }
+    });
+
+    // 失焦时自动补全颜色格式
+    fgColorText.addEventListener('blur', () => {
+      let value = fgColorText.value;
+      if (value && !value.startsWith('#')) {
+        value = '#' + value;
+      }
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        fgColorText.value = value;
+        fgColor.value = value;
+      } else {
+        fgColorText.value = fgColor.value;
+      }
+    });
+
+    bgColorText.addEventListener('blur', () => {
+      let value = bgColorText.value;
+      if (value && !value.startsWith('#')) {
+        value = '#' + value;
+      }
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        bgColorText.value = value;
+        bgColor.value = value;
+      } else {
+        bgColorText.value = bgColor.value;
+      }
+    });
+
+    // ========== 生成二维码 ==========
+    function generateQR() {
+      const content = contentInput.value.trim();
+      
+      if (!content) {
+        showToast('⚠️ 请输入内容');
+        return;
+      }
+
+      const size = parseInt(sizeInput.value) || 200;
+      const correctedSize = Math.min(Math.max(size, 100), 600);
+
+      // 清空旧二维码
+      qrcodeDiv.innerHTML = '';
+
+      // 创建新二维码
+      currentQR = new QRCode(qrcodeDiv, {
+        text: content,
+        width: correctedSize,
+        height: correctedSize,
+        colorDark: fgColor.value,
+        colorLight: bgColor.value,
+        correctLevel: QRCode.CorrectLevel[errorCorrection.value],
+      });
+
+      showToast('✅ 二维码已生成');
+    }
+
+    // ========== 下载二维码 ==========
+    function downloadQR() {
+      if (!currentQR) {
+        showToast('⚠️ 请先生成二维码');
+        return;
+      }
+
+      // 获取二维码中的 canvas 或 img
+      const qrElement = qrcodeDiv.querySelector('canvas') || qrcodeDiv.querySelector('img');
+      
+      if (!qrElement) {
+        showToast('⚠️ 无法获取二维码图像');
+        return;
+      }
+
+      // 创建下载链接
+      let url;
+      if (qrElement.tagName === 'CANVAS') {
+        url = qrElement.toDataURL('image/png');
+      } else if (qrElement.tagName === 'IMG') {
+        url = qrElement.src;
+      }
+
+      if (!url) {
+        showToast('⚠️ 下载失败');
+        return;
+      }
+
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = url;
+      link.click();
+
+      showToast('💾 二维码已下载');
+    }
+
+    // ========== 清空重置 ==========
+    function resetAll() {
+      contentInput.value = '';
+      sizeInput.value = '200';
+      errorCorrection.value = 'M';
+      fgColor.value = '#000000';
+      fgColorText.value = '#000000';
+      bgColor.value = '#ffffff';
+      bgColorText.value = '#ffffff';
+      qrcodeDiv.innerHTML = '<span class="placeholder">二维码将显示在这里</span>';
+      currentQR = null;
+      showToast('🔄 已清空重置');
+    }
+
+    // ========== 事件绑定 ==========
+    generateBtn.addEventListener('click', generateQR);
+    downloadBtn.addEventListener('click', downloadQR);
+    clearBtn.addEventListener('click', resetAll);
+
+    // 按 Enter 键生成（Ctrl+Enter 换行）
+    contentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+        e.preventDefault();
+        generateQR();
+      }
+    });
+
+    // ========== 初始生成示例二维码 ==========
+    generateQR();
+  </script>
+</body>
+</html>
