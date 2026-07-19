@@ -325,7 +325,7 @@
         for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
           const size = 17 + v*4;
           const matrix = extractMatrix(bin, width, height, tl, tr, bl, size);
-          
+          console.log('matrix=>',matrix)
           let r = tryDecode(matrix, size);
           console.log('r=>',r)
           if (r) {
