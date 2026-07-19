@@ -256,7 +256,7 @@
         console.log('count=>',count)
         console.log('12+count*8=>',12+count*8)
         console.log('its.length=>',bits.length)
-        if ((12+count*8) > bits.length) continue;
+        if (Number(12+count*8) > Number(bits.length)) continue;
         console.log('4')
         const bytes = [];
         for (let i=0;i<count;i++) {
