@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>纯手写二维码解析器 | 排列组合版</title>
+  <title>纯手写二维码解析器 | 完整版</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -20,38 +20,61 @@
     .result-content { font-size: 1.2rem; font-weight: 600; color: #43e97b; word-break: break-all; min-height: 1.5rem; }
     .result-content.empty { color: #666; }
     .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #43e97b; max-height: 350px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; }
-    .preview-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 1rem; background: white; border-radius: 1rem; margin: 1rem 0; }
+    .preview-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 1rem; background: white; border-radius: 1rem; margin: 1rem 0; min-height: 100px; align-items: center; }
     .preview-area canvas { border: 1px solid #ddd; }
+    .video-container { width: 100%; max-width: 300px; margin: 0 auto 1rem; border-radius: 1rem; overflow: hidden; background: #000; aspect-ratio: 1; display: none; }
+    .video-container.active { display: block; }
+    #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .btn-camera { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #1a1a2e; }
+    .btn-stop { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    .btn-copy { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; }
+    .btn-open { background: linear-gradient(135deg, #f093fb, #f5576c); }
   </style>
 </head>
 <body>
-
   <div class="container">
     <h1>📷 纯手写二维码解析器</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">排列组合版 · 尝试所有排序</p>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">排列组合版 · 图片上传 + 摄像头扫描</p>
+    
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
         <div>点击上传 或 拖拽二维码图片</div>
+        <div style="font-size:0.8rem;color:#888;margin-top:0.3rem;">支持 PNG、JPG、GIF、WEBP</div>
       </div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
-      <div class="preview-area" id="previewArea"><span style="color:#bbb;">原始图片 + 矩阵预览</span></div>
+      
+      <div class="video-container" id="videoContainer">
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn btn-camera" id="cameraBtn">📸 打开相机扫描</button>
+        <button class="btn btn-stop" id="stopBtn" style="display:none;">⏹️ 关闭相机</button>
+      </div>
+      
+      <div class="preview-area" id="previewArea">
+        <span style="color:#bbb;">原始图片 + 矩阵预览</span>
+      </div>
     </div>
+    
     <div class="card">
       <div class="result-box">
         <div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
         <div class="result-content empty" id="scanResult">等待解析...</div>
       </div>
       <div class="btn-row">
-        <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
-        <button class="btn" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#1a1a2e;" id="openBtn">🔗 打开</button>
+        <button class="btn btn-copy" id="copyBtn">📋 复制结果</button>
+        <button class="btn btn-open" id="openBtn">🔗 打开链接</button>
       </div>
       <div class="log-box" id="logBox"></div>
     </div>
   </div>
+  
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
 
   <script>
+    // ==================== 图像处理 ====================
     function toGray(imageData) {
       const { data, width, height } = imageData;
       const gray = new Uint8Array(width * height);
@@ -73,6 +96,7 @@
       return bin;
     }
 
+    // ==================== 定位点扫描 ====================
     function scanRow(bin, width, y) {
       const candidates = [];
       const segments = [];
@@ -83,6 +107,7 @@
         else { segments.push({ color: curColor, len: curLen, startX: x - curLen }); curColor = color; curLen = 1; }
       }
       segments.push({ color: curColor, len: curLen, startX: width - curLen });
+      
       for (let i = 0; i < segments.length - 4; i++) {
         const s = segments.slice(i, i + 5);
         if (s[0].color===0 && s[1].color===1 && s[2].color===0 && s[3].color===1 && s[4].color===0) {
@@ -105,7 +130,6 @@
     function findAllCandidates(bin, width, height) {
       const all = [];
       for (let y = 0; y < height; y += 4) all.push(...scanRow(bin, width, y));
-      addLog('   扫描' + Math.ceil(height/4) + '行, ' + all.length + '候选');
       return all;
     }
 
@@ -142,7 +166,7 @@
       return merged.filter(m => m.count >= 5).sort((a,b) => b.count - a.count);
     }
 
-    // 生成所有3! = 6种排列
+    // ==================== 排列组合 ====================
     function permutations(arr) {
       if (arr.length <= 1) return [arr];
       const result = [];
@@ -155,6 +179,7 @@
       return result;
     }
 
+    // ==================== 矩阵提取与解码 ====================
     function extractMatrix(bin, width, height, tl, tr, bl, size) {
       const matrix = Array.from({ length: size }, () => new Uint32Array(size));
       const dx1 = (tr.x - tl.x) / (size - 1);
@@ -259,30 +284,38 @@
       return c;
     }
 
-    function decodeQR(imageData) {
+    // ==================== 主解析函数 ====================
+    function decodeQR(imageData, silent) {
       const { gray, width, height } = toGray(imageData);
-      addLog('📊 ' + width + '×' + height);
+      if (!silent) addLog('📊 ' + width + '×' + height);
       const bin = toBinary(gray, width, height);
       const candidates = findAllCandidates(bin, width, height);
-      if (candidates.length < 5) { addLog('❌ 候选太少'); return null; }
+      
+      if (candidates.length < 5) {
+        if (!silent) addLog('❌ 候选太少: ' + candidates.length);
+        return null;
+      }
       
       const clusters = clusterCandidates(candidates, Math.floor(width/15));
-      addLog('   簇: ' + clusters.length);
-      if (clusters.length < 3) { addLog('❌ 簇不足'); return null; }
+      if (!silent) addLog('   簇: ' + clusters.length);
+      
+      if (clusters.length < 3) {
+        if (!silent) addLog('❌ 簇不足: ' + clusters.length);
+        return null;
+      }
       
       const pts = clusters.slice(0, 3);
-      addLog('   (' + pts[0].x + ',' + pts[0].y + ') (' + pts[1].x + ',' + pts[1].y + ') (' + pts[2].x + ',' + pts[2].y + ')');
+      if (!silent) addLog('   (' + pts[0].x + ',' + pts[0].y + ') (' + pts[1].x + ',' + pts[1].y + ') (' + pts[2].x + ',' + pts[2].y + ')');
       
       const perms = permutations(pts);
-      addLog('   尝试' + perms.length + '种排序...');
       
       const previewArea = document.getElementById('previewArea');
-      previewArea.innerHTML = '';
+      if (!silent && previewArea.querySelector('canvas') === null) {
+        // 只在非silent模式显示调试图
+      }
       
       for (let pi = 0; pi < perms.length; pi++) {
         const [tl, tr, bl] = perms[pi];
-        
-        // 计算版本
         const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
         const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
         const avgDist = (d1+d2)/2;
@@ -293,30 +326,33 @@
           const size = 17 + v*4;
           const matrix = extractMatrix(bin, width, height, tl, tr, bl, size);
           
-          // 显示调试图
-          if (pi < 3 && v === Math.max(1,ev)) {
-            previewArea.appendChild(drawMatrixToCanvas(matrix, size, 'P'+(pi+1)+'v'+v));
+          let r = tryDecode(matrix, size);
+          if (r) {
+            if (!silent) addLog('✅ P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40));
+            return r.text;
           }
           
-          // 正常解码
-          let r = tryDecode(matrix, size);
-          if (r) { addLog('✅ P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40)); return r.text; }
-          
-          // 反转颜色
           const inv = matrix.map(row => new Uint32Array(row));
           for (let rr=0;rr<size;rr++) for (let cc=0;cc<size;cc++) inv[rr][cc]^=1;
           r = tryDecode(inv, size);
-          if (r) { addLog('✅ 反转 P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40)); return r.text; }
+          if (r) {
+            if (!silent) addLog('✅ 反转P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40));
+            return r.text;
+          }
         }
       }
       
-      addLog('❌ 所有组合均失败');
+      if (!silent) addLog('❌ 所有组合均失败');
       return null;
     }
 
-    // ==================== UI ====================
+    // ==================== UI 元素 ====================
     const uploadBox = document.getElementById('uploadBox');
     const fileInput = document.getElementById('fileInput');
+    const video = document.getElementById('video');
+    const videoContainer = document.getElementById('videoContainer');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const stopBtn = document.getElementById('stopBtn');
     const scanResult = document.getElementById('scanResult');
     const copyBtn = document.getElementById('copyBtn');
     const openBtn = document.getElementById('openBtn');
@@ -324,52 +360,210 @@
     const logBox = document.getElementById('logBox');
     const hiddenCanvas = document.getElementById('hiddenCanvas');
     const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
+    
+    let cameraStream = null;
     let lastResult = '';
+    let scanTimer = null;
 
     function addLog(msg) {
       logBox.textContent += '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg + '\n';
       logBox.scrollTop = logBox.scrollHeight;
     }
 
+    // ==================== 图片上传处理 ====================
     function processImage(img) {
       logBox.textContent = '';
-      addLog('🚀 开始解析');
-      hiddenCanvas.width = img.width; hiddenCanvas.height = img.height;
+      addLog('🚀 开始解析（图片上传）');
+      
+      hiddenCanvas.width = img.width;
+      hiddenCanvas.height = img.height;
       hiddenCtx.drawImage(img, 0, 0);
       
       // 显示原图
       previewArea.innerHTML = '';
       const origImg = document.createElement('img');
       origImg.src = hiddenCanvas.toDataURL();
-      origImg.style.maxWidth = '200px'; origImg.style.maxHeight = '200px';
+      origImg.style.maxWidth = '200px';
+      origImg.style.maxHeight = '200px';
       previewArea.appendChild(origImg);
       
-      const result = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height));
-      if (result) { scanResult.textContent = result; scanResult.classList.remove('empty'); lastResult = result; }
-      else { scanResult.textContent = '解析失败'; scanResult.classList.add('empty'); lastResult = ''; }
+      const imageData = hiddenCtx.getImageData(0, 0, img.width, img.height);
+      const result = decodeQR(imageData, false);
+      
+      if (result) {
+        scanResult.textContent = result;
+        scanResult.classList.remove('empty');
+        lastResult = result;
+      } else {
+        scanResult.textContent = '解析失败';
+        scanResult.classList.add('empty');
+        lastResult = '';
+      }
     }
 
+    // ==================== 上传：点击 ====================
     uploadBox.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => {
-      const f = e.target.files[0]; if (!f) return;
+    
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
-      reader.readAsDataURL(f); fileInput.value = '';
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => processImage(img);
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      fileInput.value = '';
     });
-    uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragging'); });
-    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragging'));
-    uploadBox.addEventListener('drop', e => {
-      e.preventDefault(); uploadBox.classList.remove('dragging');
-      const f = e.dataTransfer.files[0]; if (!f) return;
+
+    // ==================== 上传：拖拽 ====================
+    uploadBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadBox.classList.add('dragging');
+    });
+    
+    uploadBox.addEventListener('dragleave', () => {
+      uploadBox.classList.remove('dragging');
+    });
+    
+    uploadBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadBox.classList.remove('dragging');
+      
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
-      reader.readAsDataURL(f);
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => processImage(img);
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     });
-    copyBtn.addEventListener('click', () => { if (lastResult) navigator.clipboard.writeText(lastResult); });
+
+    // ==================== 摄像头扫描 ====================
+    cameraBtn.addEventListener('click', async () => {
+      try {
+        // 请求摄像头
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } },
+          audio: false
+        });
+        
+        video.srcObject = cameraStream;
+        videoContainer.classList.add('active');
+        cameraBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        
+        logBox.textContent = '';
+        addLog('📸 摄像头已开启，持续扫描中...');
+        addLog('   将二维码对准镜头');
+        
+        // 开始持续扫描
+        function scanLoop() {
+          if (!cameraStream) return;
+          
+          if (video.readyState >= 2 && video.videoWidth > 0) {
+            hiddenCanvas.width = video.videoWidth;
+            hiddenCanvas.height = video.videoHeight;
+            hiddenCtx.drawImage(video, 0, 0);
+            
+            const imageData = hiddenCtx.getImageData(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+            const result = decodeQR(imageData, true); // silent模式，不输出日志
+            
+            if (result && result !== lastResult) {
+              lastResult = result;
+              scanResult.textContent = result;
+              scanResult.classList.remove('empty');
+              addLog('✅ 扫描成功: ' + result.substring(0, 40));
+            }
+          }
+          
+          scanTimer = setTimeout(scanLoop, 300);
+        }
+        
+        scanLoop();
+        
+      } catch (err) {
+        addLog('❌ 摄像头错误: ' + (err.message || '未知错误'));
+        if (err.name === 'NotAllowedError') {
+          alert('摄像头权限被拒绝，请在浏览器设置中允许访问摄像头。');
+        } else if (err.name === 'NotFoundError') {
+          alert('未找到摄像头设备。');
+        }
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      // 停止扫描
+      if (scanTimer) {
+        clearTimeout(scanTimer);
+        scanTimer = null;
+      }
+      
+      // 关闭摄像头
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      
+      video.srcObject = null;
+      videoContainer.classList.remove('active');
+      cameraBtn.style.display = 'block';
+      stopBtn.style.display = 'none';
+      
+      addLog('⏹️ 摄像头已关闭');
+    });
+
+    // ==================== 结果操作 ====================
+    copyBtn.addEventListener('click', () => {
+      if (!lastResult) {
+        alert('没有可复制的结果');
+        return;
+      }
+      navigator.clipboard.writeText(lastResult).then(() => {
+        addLog('📋 已复制到剪贴板');
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = lastResult;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        addLog('📋 已复制');
+      });
+    });
+
     openBtn.addEventListener('click', () => {
-      if (!lastResult) return;
-      try { new URL(lastResult); window.open(lastResult, '_blank'); }
-      catch(e) { if (/^[\w.-]+\.[a-z]{2,}/i.test(lastResult)) window.open('https://'+lastResult, '_blank'); }
+      if (!lastResult) {
+        alert('没有可打开的内容');
+        return;
+      }
+      
+      try {
+        const url = new URL(lastResult);
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          window.open(lastResult, '_blank', 'noopener,noreferrer');
+          return;
+        }
+      } catch (e) {}
+      
+      if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(lastResult)) {
+        window.open('https://' + lastResult, '_blank', 'noopener,noreferrer');
+      } else {
+        alert('内容不是有效网址');
+      }
+    });
+
+    // ==================== 页面卸载清理 ====================
+    window.addEventListener('beforeunload', () => {
+      if (scanTimer) clearTimeout(scanTimer);
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
     });
   </script>
 </body>
