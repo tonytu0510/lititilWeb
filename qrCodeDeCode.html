@@ -341,11 +341,9 @@
           }
         }
       }
-      
       if (!silent) addLog('❌ 所有组合均失败');
       return null;
     }
-
     // ==================== UI 元素 ====================
     const uploadBox = document.getElementById('uploadBox');
     const fileInput = document.getElementById('fileInput');
@@ -388,7 +386,7 @@
       previewArea.appendChild(origImg);
       
       const imageData = hiddenCtx.getImageData(0, 0, img.width, img.height);
-      const result = decodeQR(imageData, false);
+      const result = decodeQR(imageData, true);
       
       if (result) {
         scanResult.textContent = result;
