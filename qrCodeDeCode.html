@@ -159,12 +159,10 @@
     // ==================== 矩阵提取（修复偏移）====================
     function extractMatrix(bin, width, height, tl, tr, bl, size) {
       const matrix = Array.from({ length: size }, () => new Uint32Array(size));
-      // 修复：从定位图案中心到符号边界的变换
       const dx1 = (tr.x - tl.x) / (size - 7);
       const dy1 = (tr.y - tl.y) / (size - 7);
       const dx2 = (bl.x - tl.x) / (size - 7);
       const dy2 = (bl.y - tl.y) / (size - 7);
-      // 从定位图案中心到符号左上角的偏移 = 3.5 模块（到定位图案边界）+ 4 模块（静区）= 7.5 模块
       const offsetX = tl.x - dx1 * 3.5 - dx2 * 3.5;
       const offsetY = tl.y - dy1 * 3.5 - dy2 * 3.5;
       const sampleR = Math.max(1, Math.floor((tl.moduleSize + tr.moduleSize + bl.moduleSize) / 9));
@@ -188,6 +186,33 @@
       return matrix;
     }
 
+    // ==================== 检测定位点图案 ====================
+    function hasFinderPattern(matrix, size, corner) {
+      // corner: 'tl', 'tr', 'bl'
+      let startR, startC;
+      if (corner === 'tl') { startR = 0; startC = 0; }
+      else if (corner === 'tr') { startR = 0; startC = size - 7; }
+      else if (corner === 'bl') { startR = size - 7; startC = 0; }
+      else return false;
+
+      if (startR < 0 || startC < 0 || startR + 7 > size || startC + 7 > size) return false;
+
+      // 检查外边界是否为黑色（1）
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          const expected = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
+          if (matrix[startR + r][startC + c] !== expected) return false;
+        }
+      }
+      return true;
+    }
+
+    function checkAnyFinderPattern(matrix, size) {
+      return hasFinderPattern(matrix, size, 'tl') || 
+             hasFinderPattern(matrix, size, 'tr') || 
+             hasFinderPattern(matrix, size, 'bl');
+    }
+
     // ==================== 解码（支持 LSB 和 MSB）====================
     function readBitsStandard(matrix, size) {
       const bits = [];
@@ -209,9 +234,25 @@
       return bits;
     }
 
+    function readBitsNoFinder(matrix, size) {
+      const bits = [];
+      let up = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        const rc = col === 6 ? 5 : col;
+        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
+          for (let c = rc; c >= rc - 1; c--) {
+            if (c < 0 || c >= size) continue;
+            if (row === 6 || c === 6) continue;
+            bits.push(matrix[row][c]);
+          }
+        }
+        up = !up;
+      }
+      return bits;
+    }
+
     function decodeBits(bits, msbFirst) {
       if (bits.length < 12) return null;
-      // Mode
       let mode = 0;
       if (msbFirst) {
         for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
@@ -223,7 +264,6 @@
       const countBits = { 1: 10, 2: 9, 4: 8, 8: 8 };
       const cb = countBits[mode];
       if (bits.length < 4 + cb) return null;
-      // Count
       let count = 0;
       if (msbFirst) {
         for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i];
@@ -234,7 +274,6 @@
       const dataStart = 4 + cb;
       const requiredBits = dataStart + count * 8;
       if (requiredBits > bits.length) return null;
-      // Data
       const bytes = [];
       for (let i = 0; i < count; i++) {
         let b = 0;
@@ -254,7 +293,7 @@
       return null;
     }
 
-    function tryDecode(matrix, size) {
+    function tryDecode(matrix, size, readBitsFn) {
       for (let mask = 0; mask < 8; mask++) {
         const work = matrix.map(r => new Uint32Array(r));
         for (let r = 0; r < size; r++) {
@@ -272,8 +311,7 @@
             if (inv) work[r][c] ^= 1;
           }
         }
-        const bits = readBitsStandard(work, size);
-        // 尝试 LSB 和 MSB
+        const bits = readBitsFn(work, size);
         for (const msb of [false, true]) {
           const result = decodeBits(bits, msb);
           if (result) return { text: result.text, mask, msb };
@@ -310,7 +348,6 @@
       const bestRow = rowCandidates.sort((a,b) => b.transitions - a.transitions)[0];
       const bestCol = colCandidates.sort((a,b) => b.transitions - a.transitions)[0];
 
-      // 测量时序图案的间距，用中位数
       const y = bestRow.y;
       const spacings = [];
       let lastColor = bin[y * width], lastX = 0;
@@ -353,23 +390,6 @@
       return matrix;
     }
 
-    function readBitsNoFinder(matrix, size) {
-      const bits = [];
-      let up = true;
-      for (let col = size - 1; col >= 0; col -= 2) {
-        const rc = col === 6 ? 5 : col;
-        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
-          for (let c = rc; c >= rc - 1; c--) {
-            if (c < 0 || c >= size) continue;
-            if (row === 6 || c === 6) continue;
-            bits.push(matrix[row][c]);
-          }
-        }
-        up = !up;
-      }
-      return bits;
-    }
-
     // ==================== 主解析 ====================
     function decodeQR(imageData, silent) {
       const { gray, width, height } = toGray(imageData);
@@ -386,14 +406,13 @@
           const perms = permutations(pts);
           for (let pi = 0; pi < perms.length; pi++) {
             const [tl, tr, bl] = perms[pi];
-            // 几何验证
             const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
             const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
             const dot = v1x * v2x + v1y * v2y;
             const len1 = Math.sqrt(v1x*v1x + v1y*v1y);
             const len2 = Math.sqrt(v2x*v2x + v2y*v2y);
             const cosAngle = dot / (len1 * len2);
-            if (Math.abs(cosAngle) > 0.3) continue; // 不是直角，跳过
+            if (Math.abs(cosAngle) > 0.3) continue;
 
             const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
             const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
@@ -402,14 +421,13 @@
             for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
               const sz = 17+v*4;
               const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
-              let r = tryDecode(m, sz);
+              let r = tryDecode(m, sz, readBitsStandard);
               if (r) { 
                 if (!silent) addLog('✅ 标准解码: mask='+r.mask+' msb='+r.msb+' '+r.text.substring(0,40)); 
                 return r.text; 
               }
-              // 尝试反转颜色
               const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
-              r = tryDecode(inv, sz);
+              r = tryDecode(inv, sz, readBitsStandard);
               if (r) { 
                 if (!silent) addLog('✅ 标准解码(反转): mask='+r.mask+' msb='+r.msb+' '+r.text.substring(0,40)); 
                 return r.text; 
@@ -419,8 +437,8 @@
         }
       }
 
-      // 方式2：无定位点二维码
-      if (!silent) addLog('🔍 尝试无定位点解码...');
+      // 方式2：无定位点二维码（或标准二维码定位点检测失败）
+      if (!silent) addLog('🔍 尝试时序图案解码...');
       const grid = inferGrid(bin, width, height);
       if (!grid) { if (!silent) addLog('❌ 无法检测时序图案'); return null; }
       if (!silent) addLog('📐 模块:'+grid.moduleSize+' 偏移:('+grid.offsetX+','+grid.offsetY+') 大小:'+grid.qrSize+' v'+grid.version);
@@ -432,30 +450,18 @@
         const sub = matrix2.slice(0, sz).map(r => r.slice(0, sz));
         for (const inv of [false, true]) {
           const m = inv ? sub.map(r => new Uint32Array(r.map(v=>v^1))) : sub;
-          for (let mask = 0; mask < 8; mask++) {
-            const work = m.map(r => new Uint32Array(r));
-            for (let r=0;r<sz;r++) for (let c=0;c<sz;c++) {
-              if (r===6||c===6) continue;
-              let iv = false;
-              switch(mask){
-                case 0:iv=(r+c)%2===0;break;case 1:iv=r%2===0;break;
-                case 2:iv=c%3===0;break;case 3:iv=(r+c)%3===0;break;
-                case 4:iv=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;
-                case 5:iv=((r*c)%2)+((r*c)%3)===0;break;
-                case 6:iv=(((r*c)%2)+((r*c)%3))%2===0;break;
-                case 7:iv=(((r+c)%2)+((r*c)%3))%2===0;break;
-              }
-              if(iv) work[r][c]^=1;
-            }
-            const bits = readBitsNoFinder(work, sz);
-            // 尝试 MSB 和 LSB
-            for (const msb of [true, false]) {
-              const result = decodeBits(bits, msb);
-              if (result) {
-                if (!silent) addLog('✅ 无定位点解码: v'+v+' mask'+mask+' msb='+msb+' '+result.text.substring(0,40));
-                return result.text;
-              }
-            }
+
+          // 自动检测矩阵中是否有定位点图案
+          const hasFinder = checkAnyFinderPattern(m, sz);
+          const readFn = hasFinder ? readBitsStandard : readBitsNoFinder;
+
+          if (!silent && hasFinder) addLog('   检测到定位点图案，跳过定位点区域');
+          if (!silent && !hasFinder) addLog('   未检测到定位点图案，读取所有数据');
+
+          let r = tryDecode(m, sz, readFn);
+          if (r) {
+            if (!silent) addLog('✅ 时序解码: v'+v+' mask='+r.mask+' msb='+r.msb+' '+r.text.substring(0,40));
+            return r.text;
           }
         }
       }
