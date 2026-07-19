@@ -251,6 +251,11 @@
         console.log('2')
         let count = 0;
         for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
+        console.log('bits.length:', bits.length);
+        console.log('mode:', mode);
+        console.log('count:', count);
+        console.log('count<=0:', count<=0);
+        console.log('count>300:', count>300);
         if (count<=0||count>300) continue;
         console.log('3')
         console.log('count=>',count)
