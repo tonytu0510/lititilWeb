@@ -12,7 +12,6 @@
     .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 1.5rem; padding: 1.8rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; }
     .upload-box { border: 2px dashed rgba(255,255,255,0.3); border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); margin-bottom: 1rem; }
     .upload-box:hover { border-color: #43e97b; }
-    .upload-box.dragging { border-color: #43e97b; background: rgba(0,0,0,0.45); }
     .btn { width: 100%; padding: 0.8rem; border: none; border-radius: 0.7rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: white; margin-bottom: 0.6rem; }
     .btn-row { display: flex; gap: 0.8rem; }
     .btn-row .btn { flex: 1; }
@@ -25,54 +24,39 @@
     .video-container { width: 100%; max-width: 300px; margin: 0 auto 1rem; border-radius: 1rem; overflow: hidden; background: #000; aspect-ratio: 1; display: none; }
     .video-container.active { display: block; }
     #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-    .btn-camera { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #1a1a2e; }
-    .btn-stop { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
-    .btn-copy { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; }
-    .btn-open { background: linear-gradient(135deg, #f093fb, #f5576c); }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1>📷 纯手写二维码解析器</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">排列组合版 · 图片上传 + 摄像头扫描</p>
-    
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">标准二维码 + 无定位点二维码</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
         <div>点击上传 或 拖拽二维码图片</div>
-        <div style="font-size:0.8rem;color:#888;margin-top:0.3rem;">支持 PNG、JPG、GIF、WEBP</div>
       </div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
-      
-      <div class="video-container" id="videoContainer">
-        <video id="video" autoplay playsinline muted></video>
-      </div>
-      
+      <div class="video-container" id="videoContainer"><video id="video" autoplay playsinline muted></video></div>
       <div class="btn-row">
-        <button class="btn btn-camera" id="cameraBtn">📸 打开相机扫描</button>
-        <button class="btn btn-stop" id="stopBtn" style="display:none;">⏹️ 关闭相机</button>
+        <button class="btn" style="background:linear-gradient(135deg,#4facfe,#00f2fe);" id="cameraBtn">📸 打开相机</button>
+        <button class="btn" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);display:none;" id="stopBtn">⏹️ 关闭</button>
       </div>
-      
-      <div class="preview-area" id="previewArea">
-        <span style="color:#bbb;">原始图片 + 矩阵预览</span>
-      </div>
+      <div class="preview-area" id="previewArea"><span style="color:#bbb;">预览</span></div>
     </div>
-    
     <div class="card">
       <div class="result-box">
         <div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
         <div class="result-content empty" id="scanResult">等待解析...</div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-copy" id="copyBtn">📋 复制结果</button>
-        <button class="btn btn-open" id="openBtn">🔗 打开链接</button>
+        <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
+        <button class="btn" style="background:linear-gradient(135deg,#f093fb,#f5576c);" id="openBtn">🔗 打开</button>
       </div>
       <div class="log-box" id="logBox"></div>
     </div>
   </div>
-  
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
+
   <script>
     // ==================== 图像处理 ====================
     function toGray(imageData) {
@@ -96,7 +80,7 @@
       return bin;
     }
 
-    // ==================== 定位点扫描 ====================
+    // ==================== 定位点扫描（标准二维码）====================
     function scanRow(bin, width, y) {
       const candidates = [];
       const segments = [];
@@ -107,7 +91,6 @@
         else { segments.push({ color: curColor, len: curLen, startX: x - curLen }); curColor = color; curLen = 1; }
       }
       segments.push({ color: curColor, len: curLen, startX: width - curLen });
-      
       for (let i = 0; i < segments.length - 4; i++) {
         const s = segments.slice(i, i + 5);
         if (s[0].color===0 && s[1].color===1 && s[2].color===0 && s[3].color===1 && s[4].color===0) {
@@ -115,9 +98,7 @@
           const modSize = total / 7;
           const ratios = s.map(seg => seg.len / modSize);
           let ok = true;
-          for (let j = 0; j < 5; j++) {
-            if (ratios[j] < 0.3 || ratios[j] > 4.0) { ok = false; break; }
-          }
+          for (let j = 0; j < 5; j++) { if (ratios[j] < 0.3 || ratios[j] > 4.0) { ok = false; break; } }
           if (ok && modSize > 1.0) {
             const cx = s[0].startX + s[0].len + s[1].len + Math.floor(s[2].len / 2);
             candidates.push({ x: cx, y, modSize });
@@ -155,9 +136,7 @@
               cx = (cx*count + jx*cells[j].pts.length)/(count + cells[j].pts.length);
               cy = (cy*count + jy*cells[j].pts.length)/(count + cells[j].pts.length);
               cm = (cm*count + (cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count + cells[j].pts.length);
-              count += cells[j].pts.length;
-              cells[j]._used = true;
-              changed = true;
+              count += cells[j].pts.length; cells[j]._used = true; changed = true;
             }
           }
         }
@@ -166,20 +145,17 @@
       return merged.filter(m => m.count >= 5).sort((a,b) => b.count - a.count);
     }
 
-    // ==================== 排列组合 ====================
     function permutations(arr) {
       if (arr.length <= 1) return [arr];
       const result = [];
       for (let i = 0; i < arr.length; i++) {
         const rest = [...arr.slice(0,i), ...arr.slice(i+1)];
-        for (const perm of permutations(rest)) {
-          result.push([arr[i], ...perm]);
-        }
+        for (const perm of permutations(rest)) result.push([arr[i], ...perm]);
       }
       return result;
     }
 
-    // ==================== 矩阵提取与解码 ====================
+    // ==================== 矩阵提取 ====================
     function extractMatrix(bin, width, height, tl, tr, bl, size) {
       const matrix = Array.from({ length: size }, () => new Uint32Array(size));
       const dx1 = (tr.x - tl.x) / (size - 1);
@@ -187,7 +163,6 @@
       const dx2 = (bl.x - tl.x) / (size - 1);
       const dy2 = (bl.y - tl.y) / (size - 1);
       const sampleR = Math.max(1, Math.floor((tl.moduleSize + tr.moduleSize + bl.moduleSize) / 9));
-
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
           const sx = tl.x + col * dx1 + row * dx2;
@@ -208,6 +183,27 @@
       return matrix;
     }
 
+    // ==================== 解码 ====================
+    function readBits(matrix, size) {
+      const bits = [];
+      let up = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        const rc = col === 6 ? 5 : col;
+        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
+          for (let c = rc; c >= rc - 1; c--) {
+            if (c < 0 || c >= size) continue;
+            if (row < 9 && c < 9) continue;
+            if (row < 9 && c > size - 9) continue;
+            if (row > size - 9 && c < 9) continue;
+            if (row === 6 || c === 6) continue;
+            bits.push(matrix[row][c]);
+          }
+        }
+        up = !up;
+      }
+      return bits;
+    }
+
     function tryDecode(matrix, size) {
       for (let mask = 0; mask < 8; mask++) {
         const work = matrix.map(r => new Uint32Array(r));
@@ -226,142 +222,208 @@
             if (inv) work[r][c] ^= 1;
           }
         }
-        
-        const bits = [];
-        let up = true;
-        for (let col = size-1; col >= 0; col -= 2) {
-          const rc = col===6?5:col;
-          for (let row = up?size-1:0; up?row>=0:row<size; row+=up?-1:1) {
-            for (let c = rc; c >= rc-1; c--) {
-              if (row<9&&c<9) continue;
-              if (row<9&&c>size-9) continue;
-              if (row>size-9&&c<9) continue;
-              if (row===6||c===6) continue;
-              bits.push(work[row][c]);
-            }
-          }
-          up = !up;
-        }
-        console.log('bits.length=>',bits.length)
+        const bits = readBits(work, size);
         if (bits.length < 12) continue;
-        console.log('1')
         let mode = 0;
-        for (let i=0;i<4;i++){ mode = ((mode<<1)|bits[i]) }
+        for (let i=0;i<4;i++) mode=(mode<<1)|bits[i];
         if (mode !== 4) continue;
-        console.log('2')
         let count = 0;
-        for (let i=0;i<8;i++) {count=(count<<1)|bits[4+i]}
-        console.log('bits.length:', bits.length);
-        console.log('mode:', mode);
-        console.log('count:', count);
-        console.log('count<=0:', count<=0);
-        console.log('count>300:', count>300);
+        for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
         if (count<=0||count>300) continue;
-        console.log('3')
-        console.log('count=>',count)
-        console.log('12+count*8=>',12+count*8)
-        console.log('its.length=>',bits.length)
-        console.log('Number(12+count*8) > Number(bits.length)=>',Number(12+count*8) > Number(bits.length))
-        console.log('Number(12+count*8) > Number(bits.length)=>',Number(bits.length) < Number(12+count*8))
-        if(bits.length < (12+count*8)) continue;
-        console.log('4=>',4)
+        if (12+count*8 > bits.length) continue;
         const bytes = [];
         for (let i=0;i<count;i++) {
-          let b = 0;
+          let b=0;
           for (let j=0;j<8;j++) b=(b<<1)|bits[12+i*8+j];
           bytes.push(b);
         }
-        console.log('5')
         try {
           const text = new TextDecoder().decode(new Uint8Array(bytes));
-          console.log('text.length=>',text.length)
-          console.log('/^[\x20-\x7E\u4e00-\u9fff]+/.test(text)=>',/^[\x20-\x7E\u4e00-\u9fff]+/.test(text))
           if (text.length>0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) return {text, mask};
         } catch(e) {}
       }
       return null;
     }
 
-    function drawMatrixToCanvas(matrix, size, label) {
-      const c = document.createElement('canvas');
-      const s = Math.max(2, Math.floor(200/size));
-      c.width = size*s + 30;
-      c.height = size*s + 30;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
-      for (let r=0;r<size;r++) {
-        for (let col=0;col<size;col++) {
-          ctx.fillStyle = matrix[r][col] ? '#000' : '#fff';
-          ctx.fillRect(15+col*s, 15+r*s, s, s);
+    // ==================== 时序图案检测（无定位点）====================
+    function detectTimingPattern(bin, width, height) {
+      const rowCandidates = [];
+      const colCandidates = [];
+      for (let y = 0; y < height; y++) {
+        let transitions = 0, last = bin[y * width];
+        for (let x = 1; x < width; x++) {
+          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
         }
+        if (transitions >= 15 && transitions <= 60) rowCandidates.push({ y, transitions });
       }
-      ctx.fillStyle = '#333'; ctx.font = '10px Arial';
-      ctx.fillText(label, 5, 10);
-      return c;
+      for (let x = 0; x < width; x++) {
+        let transitions = 0, last = bin[x];
+        for (let y = 1; y < height; y++) {
+          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
+        }
+        if (transitions >= 15 && transitions <= 60) colCandidates.push({ x, transitions });
+      }
+      return { rowCandidates, colCandidates };
     }
 
-    // ==================== 主解析函数 ====================
+    function inferGrid(bin, width, height) {
+      const { rowCandidates, colCandidates } = detectTimingPattern(bin, width, height);
+      if (rowCandidates.length === 0 || colCandidates.length === 0) return null;
+      
+      const bestRow = rowCandidates.sort((a,b) => b.transitions - a.transitions)[0];
+      const bestCol = colCandidates.sort((a,b) => b.transitions - a.transitions)[0];
+      
+      // 测量时序图案的间距，用中位数
+      const y = bestRow.y;
+      const spacings = [];
+      let lastColor = bin[y * width], lastX = 0;
+      for (let x = 1; x < width; x++) {
+        if (bin[y * width + x] !== lastColor) {
+          spacings.push(x - lastX);
+          lastX = x;
+          lastColor = bin[y * width + x];
+        }
+      }
+      spacings.sort((a,b) => a-b);
+      const moduleSize = spacings[Math.floor(spacings.length/2)] || 8;
+      
+      const offsetX = bestCol.x - 6 * moduleSize;
+      const offsetY = bestRow.y - 6 * moduleSize;
+      const qrSize = Math.round((width - offsetX) / moduleSize);
+      const version = Math.round((qrSize - 17) / 4);
+      
+      return {
+        moduleSize,
+        offsetX: Math.max(0, Math.round(offsetX)),
+        offsetY: Math.max(0, Math.round(offsetY)),
+        qrSize: Math.min(qrSize, Math.round((height - offsetY) / moduleSize)),
+        version: Math.max(1, Math.min(10, version))
+      };
+    }
+
+    function extractMatrixFromGrid(bin, width, height, grid) {
+      const { moduleSize, offsetX, offsetY, qrSize } = grid;
+      const matrix = Array.from({ length: qrSize }, () => new Uint32Array(qrSize));
+      for (let row = 0; row < qrSize; row++) {
+        for (let col = 0; col < qrSize; col++) {
+          const px = Math.round(offsetX + col * moduleSize + moduleSize/2);
+          const py = Math.round(offsetY + row * moduleSize + moduleSize/2);
+          if (px >= 0 && px < width && py >= 0 && py < height) {
+            matrix[row][col] = bin[py * width + px] === 0 ? 1 : 0;
+          }
+        }
+      }
+      return matrix;
+    }
+
+    function readBitsNoFinder(matrix, size) {
+      const bits = [];
+      let up = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        const rc = col === 6 ? 5 : col;
+        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
+          for (let c = rc; c >= rc - 1; c--) {
+            if (c < 0 || c >= size) continue;
+            if (row === 6 || c === 6) continue;
+            bits.push(matrix[row][c]);
+          }
+        }
+        up = !up;
+      }
+      return bits;
+    }
+
+    // ==================== 主解析 ====================
     function decodeQR(imageData, silent) {
       const { gray, width, height } = toGray(imageData);
       if (!silent) addLog('📊 ' + width + '×' + height);
       const bin = toBinary(gray, width, height);
+
+      // 方式1：标准二维码（有定位点）
       const candidates = findAllCandidates(bin, width, height);
-      
-      if (candidates.length < 5) {
-        if (!silent) addLog('❌ 候选太少: ' + candidates.length);
-        return null;
-      }
-      
-      const clusters = clusterCandidates(candidates, Math.floor(width/15));
-      if (!silent) addLog('   簇: ' + clusters.length);
-      
-      if (clusters.length < 3) {
-        if (!silent) addLog('❌ 簇不足: ' + clusters.length);
-        return null;
-      }
-      
-      const pts = clusters.slice(0, 3);
-      if (!silent) addLog('   (' + pts[0].x + ',' + pts[0].y + ') (' + pts[1].x + ',' + pts[1].y + ') (' + pts[2].x + ',' + pts[2].y + ')');
-      
-      const perms = permutations(pts);
-      
-      const previewArea = document.getElementById('previewArea');
-      if (!silent && previewArea.querySelector('canvas') === null) {
-        // 只在非silent模式显示调试图
-      }
-      
-      for (let pi = 0; pi < perms.length; pi++) {
-        const [tl, tr, bl] = perms[pi];
-        const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
-        const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-        const avgDist = (d1+d2)/2;
-        const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
-        const ev = Math.round((avgDist/avgMod - 10)/4);
-        
-        for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
-          const size = 17 + v*4;
-          const matrix = extractMatrix(bin, width, height, tl, tr, bl, size);
-          console.log('matrix=>',matrix)
-          let r = tryDecode(matrix, size);
-          console.log('r=>',r)
-          if (r) {
-            if (!silent) addLog('✅ P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40));
-            return r.text;
-          }
-          
-          const inv = matrix.map(row => new Uint32Array(row));
-          for (let rr=0;rr<size;rr++) for (let cc=0;cc<size;cc++) inv[rr][cc]^=1;
-          r = tryDecode(inv, size);
-          if (r) {
-            if (!silent) addLog('✅ 反转P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40));
-            return r.text;
+      if (candidates.length >= 10) {
+        const clusters = clusterCandidates(candidates, Math.floor(width/15));
+        if (clusters.length >= 3) {
+          if (!silent) addLog('🔍 检测到定位点，尝试标准解码...');
+          const pts = clusters.slice(0, 3);
+          const perms = permutations(pts);
+          for (let pi = 0; pi < perms.length; pi++) {
+            const [tl, tr, bl] = perms[pi];
+            const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
+            const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
+            const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+            const ev = Math.round(((d1+d2)/2/avgMod - 10)/4);
+            for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
+              const sz = 17+v*4;
+              const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
+              let r = tryDecode(m, sz);
+              if (r) { if (!silent) addLog('✅ 标准解码: '+r.text.substring(0,40)); return r.text; }
+              const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
+              r = tryDecode(inv, sz);
+              if (r) { if (!silent) addLog('✅ 标准解码(反转): '+r.text.substring(0,40)); return r.text; }
+            }
           }
         }
       }
-      if (!silent) addLog('❌ 所有组合均失败');
+
+      // 方式2：无定位点二维码
+      if (!silent) addLog('🔍 尝试无定位点解码...');
+      const grid = inferGrid(bin, width, height);
+      if (!grid) { if (!silent) addLog('❌ 无法检测时序图案'); return null; }
+      if (!silent) addLog('📐 模块:'+grid.moduleSize+' 偏移:('+grid.offsetX+','+grid.offsetY+') 大小:'+grid.qrSize+' v'+grid.version);
+      
+      const matrix2 = extractMatrixFromGrid(bin, width, height, grid);
+      for (let v = Math.max(1,grid.version-2); v <= Math.min(10,grid.version+2); v++) {
+        const sz = 17+v*4;
+        if (sz > matrix2.length) continue;
+        const sub = matrix2.slice(0, sz).map(r => r.slice(0, sz));
+        for (const inv of [false, true]) {
+          const m = inv ? sub.map(r => new Uint32Array(r.map(v=>v^1))) : sub;
+          for (let mask = 0; mask < 8; mask++) {
+            const work = m.map(r => new Uint32Array(r));
+            for (let r=0;r<sz;r++) for (let c=0;c<sz;c++) {
+              if (r===6||c===6) continue;
+              let iv = false;
+              switch(mask){
+                case 0:iv=(r+c)%2===0;break;case 1:iv=r%2===0;break;
+                case 2:iv=c%3===0;break;case 3:iv=(r+c)%3===0;break;
+                case 4:iv=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;
+                case 5:iv=((r*c)%2)+((r*c)%3)===0;break;
+                case 6:iv=(((r*c)%2)+((r*c)%3))%2===0;break;
+                case 7:iv=(((r+c)%2)+((r*c)%3))%2===0;break;
+              }
+              if(iv) work[r][c]^=1;
+            }
+            const bits = readBitsNoFinder(work, sz);
+            if (bits.length < 12) continue;
+            let mode = 0;
+            for (let i=0;i<4;i++) mode=(mode<<1)|bits[i];
+            if (mode !== 4) continue;
+            let count = 0;
+            for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
+            if (count<=0||count>300) continue;
+            if (12+count*8 > bits.length) continue;
+            const bytes = [];
+            for (let i=0;i<count;i++) {
+              let b=0;
+              for (let j=0;j<8;j++) b=(b<<1)|bits[12+i*8+j];
+              bytes.push(b);
+            }
+            try {
+              const text = new TextDecoder().decode(new Uint8Array(bytes));
+              if (text.length>0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) {
+                if (!silent) addLog('✅ 无定位点解码: v'+v+' mask'+mask+' '+text.substring(0,40));
+                return text;
+              }
+            } catch(e) {}
+          }
+        }
+      }
+      if (!silent) addLog('❌ 解码失败');
       return null;
     }
-    // ==================== UI 元素 ====================
+
+    // ==================== UI ====================
     const uploadBox = document.getElementById('uploadBox');
     const fileInput = document.getElementById('fileInput');
     const video = document.getElementById('video');
@@ -375,210 +437,77 @@
     const logBox = document.getElementById('logBox');
     const hiddenCanvas = document.getElementById('hiddenCanvas');
     const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
-    
-    let cameraStream = null;
-    let lastResult = '';
-    let scanTimer = null;
+    let cameraStream = null, lastResult = '', scanTimer = null;
 
     function addLog(msg) {
       logBox.textContent += '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg + '\n';
       logBox.scrollTop = logBox.scrollHeight;
     }
 
-    // ==================== 图片上传处理 ====================
     function processImage(img) {
       logBox.textContent = '';
-      addLog('🚀 开始解析（图片上传）');
-      
-      hiddenCanvas.width = img.width;
-      hiddenCanvas.height = img.height;
+      addLog('🚀 开始解析');
+      hiddenCanvas.width = img.width; hiddenCanvas.height = img.height;
       hiddenCtx.drawImage(img, 0, 0);
-      
-      // 显示原图
       previewArea.innerHTML = '';
-      const origImg = document.createElement('img');
-      origImg.src = hiddenCanvas.toDataURL();
-      origImg.style.maxWidth = '200px';
-      origImg.style.maxHeight = '200px';
-      previewArea.appendChild(origImg);
-      
-      const imageData = hiddenCtx.getImageData(0, 0, img.width, img.height);
-      const result = decodeQR(imageData, false);
-
-      if (result) {
-        scanResult.textContent = result;
-        scanResult.classList.remove('empty');
-        lastResult = result;
-      } else {
-        scanResult.textContent = '解析失败';
-        scanResult.classList.add('empty');
-        lastResult = '';
-      }
+      const oi = document.createElement('img');
+      oi.src = hiddenCanvas.toDataURL(); oi.style.maxWidth='200px'; oi.style.maxHeight='200px';
+      previewArea.appendChild(oi);
+      const r = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
+      if (r) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; }
+      else { scanResult.textContent = '解析失败'; scanResult.classList.add('empty'); lastResult = ''; }
     }
 
-    // ==================== 上传：点击 ====================
     uploadBox.addEventListener('click', () => fileInput.click());
-    
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      
+    fileInput.addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => processImage(img);
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-      fileInput.value = '';
+      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
+      reader.readAsDataURL(f); fileInput.value = '';
     });
-
-    // ==================== 上传：拖拽 ====================
-    uploadBox.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadBox.classList.add('dragging');
-    });
-    
-    uploadBox.addEventListener('dragleave', () => {
-      uploadBox.classList.remove('dragging');
-    });
-    
-    uploadBox.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadBox.classList.remove('dragging');
-      
-      const file = e.dataTransfer.files[0];
-      if (!file) return;
-      
+    uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.style.borderColor='#43e97b'; });
+    uploadBox.addEventListener('dragleave', () => { uploadBox.style.borderColor='rgba(255,255,255,0.3)'; });
+    uploadBox.addEventListener('drop', e => {
+      e.preventDefault(); uploadBox.style.borderColor='rgba(255,255,255,0.3)';
+      const f = e.dataTransfer.files[0]; if (!f) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => processImage(img);
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
+      reader.readAsDataURL(f);
     });
-
-    // ==================== 摄像头扫描 ====================
     cameraBtn.addEventListener('click', async () => {
       try {
-        // 请求摄像头
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } },
-          audio: false
-        });
-        
-        video.srcObject = cameraStream;
-        videoContainer.classList.add('active');
-        cameraBtn.style.display = 'none';
-        stopBtn.style.display = 'block';
-        
-        logBox.textContent = '';
-        addLog('📸 摄像头已开启，持续扫描中...');
-        addLog('   将二维码对准镜头');
-        
-        // 开始持续扫描
-        function scanLoop() {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 } }, audio: false });
+        video.srcObject = cameraStream; videoContainer.classList.add('active');
+        cameraBtn.style.display = 'none'; stopBtn.style.display = 'block';
+        addLog('📸 摄像头已开启');
+        function scan() {
           if (!cameraStream) return;
-          
           if (video.readyState >= 2 && video.videoWidth > 0) {
-            hiddenCanvas.width = video.videoWidth;
-            hiddenCanvas.height = video.videoHeight;
+            hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
-            
-            const imageData = hiddenCtx.getImageData(0, 0, hiddenCanvas.width, hiddenCanvas.height);
-            const result = decodeQR(imageData, true); // silent模式，不输出日志
-            
-            if (result && result !== lastResult) {
-              lastResult = result;
-              scanResult.textContent = result;
-              scanResult.classList.remove('empty');
-              addLog('✅ 扫描成功: ' + result.substring(0, 40));
-            }
+            const r = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
+            if (r && r !== lastResult) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; addLog('✅ '+r.substring(0,30)); }
           }
-          
-          scanTimer = setTimeout(scanLoop, 300);
+          scanTimer = setTimeout(scan, 300);
         }
-        
-        scanLoop();
-        
-      } catch (err) {
-        addLog('❌ 摄像头错误: ' + (err.message || '未知错误'));
-        if (err.name === 'NotAllowedError') {
-          alert('摄像头权限被拒绝，请在浏览器设置中允许访问摄像头。');
-        } else if (err.name === 'NotFoundError') {
-          alert('未找到摄像头设备。');
-        }
-      }
+        scan();
+      } catch(err) {}
     });
-
     stopBtn.addEventListener('click', () => {
-      // 停止扫描
-      if (scanTimer) {
-        clearTimeout(scanTimer);
-        scanTimer = null;
-      }
-      
-      // 关闭摄像头
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        cameraStream = null;
-      }
-      
-      video.srcObject = null;
-      videoContainer.classList.remove('active');
-      cameraBtn.style.display = 'block';
-      stopBtn.style.display = 'none';
-      
-      addLog('⏹️ 摄像头已关闭');
+      if (scanTimer) clearTimeout(scanTimer);
+      if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
+      video.srcObject = null; videoContainer.classList.remove('active');
+      cameraBtn.style.display = 'block'; stopBtn.style.display = 'none';
     });
-
-    // ==================== 结果操作 ====================
-    copyBtn.addEventListener('click', () => {
-      if (!lastResult) {
-        alert('没有可复制的结果');
-        return;
-      }
-      navigator.clipboard.writeText(lastResult).then(() => {
-        addLog('📋 已复制到剪贴板');
-      }).catch(() => {
-        const textarea = document.createElement('textarea');
-        textarea.value = lastResult;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        addLog('📋 已复制');
-      });
-    });
-
+    copyBtn.addEventListener('click', () => { if (lastResult) navigator.clipboard.writeText(lastResult); });
     openBtn.addEventListener('click', () => {
-      if (!lastResult) {
-        alert('没有可打开的内容');
-        return;
-      }
-      
-      try {
-        const url = new URL(lastResult);
-        if (url.protocol === 'http:' || url.protocol === 'https:') {
-          window.open(lastResult, '_blank', 'noopener,noreferrer');
-          return;
-        }
-      } catch (e) {}
-      
-      if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(lastResult)) {
-        window.open('https://' + lastResult, '_blank', 'noopener,noreferrer');
-      } else {
-        alert('内容不是有效网址');
-      }
+      if (!lastResult) return;
+      try { new URL(lastResult); window.open(lastResult, '_blank'); }
+      catch(e) { if (/^[\w.-]+\.[a-z]{2,}/i.test(lastResult)) window.open('https://'+lastResult, '_blank'); }
     });
-
-    // ==================== 页面卸载清理 ====================
     window.addEventListener('beforeunload', () => {
       if (scanTimer) clearTimeout(scanTimer);
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-      }
+      if (cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
     });
   </script>
 </body>
