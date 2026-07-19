@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>纯手写二维码解析器 | 参数修复版</title>
+  <title>纯手写二维码解析器 | 聚类终极修复</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); font-family: 'Segoe UI', Roboto, system-ui, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -29,7 +29,7 @@
 <body>
   <div class="container">
     <h1>📷 纯手写二维码解析器</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">参数修复版 · 放宽聚类距离</p>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">聚类终极修复 · 简单粗暴合并</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
@@ -122,7 +122,7 @@
           
           if (ok && modSize > 1.0) {
             const cx = s[0].startX + s[0].len + s[1].len + Math.floor(s[2].len / 2);
-            candidates.push({ x: cx, y: y, modSize, total });
+            candidates.push({ x: cx, y: y, modSize });
           }
         }
       }
@@ -132,7 +132,6 @@
 
     function findAllCandidates(bin, width, height) {
       const all = [];
-      // 每隔5行扫描（增加覆盖率）
       for (let y = 0; y < height; y += 5) {
         all.push(...scanRow(bin, width, y));
       }
@@ -140,50 +139,73 @@
       return all;
     }
 
-    // 聚类（大幅放宽距离）
-    function clusterCandidates(candidates, dist) {
-      const clusters = [];
+    // ==================== 全新聚类：网格法 ====================
+    function clusterCandidates(candidates, gridSize) {
+      // 把图片分成网格，每个格子内的点合并
+      const grid = {};
       
       for (const pt of candidates) {
-        let added = false;
-        for (const c of clusters) {
-          const dx = Math.abs(pt.x - c.cx);
-          const dy = Math.abs(pt.y - c.cy);
-          // 距离阈值：x方向用总宽度的1/8，y方向用dist
-          if (dx < pt.total * 0.6 && dy < dist) {
-            c.pts.push(pt);
-            c.sx += pt.x;
-            c.sy += pt.y;
-            c.sm += pt.modSize;
-            added = true;
-            break;
-          }
+        const gx = Math.floor(pt.x / gridSize);
+        const gy = Math.floor(pt.y / gridSize);
+        const key = gx + ',' + gy;
+        
+        if (!grid[key]) {
+          grid[key] = { pts: [], sx: 0, sy: 0, sm: 0 };
         }
-        if (!added) {
-          clusters.push({ pts: [pt], sx: pt.x, sy: pt.y, sm: pt.modSize });
-        }
+        grid[key].pts.push(pt);
+        grid[key].sx += pt.x;
+        grid[key].sy += pt.y;
+        grid[key].sm += pt.modSize;
       }
       
-      return clusters
-        .filter(c => c.pts.length >= 5)
-        .map(c => ({
-          x: Math.round(c.sx / c.pts.length),
-          y: Math.round(c.sy / c.pts.length),
-          moduleSize: c.sm / c.pts.length,
-          count: c.pts.length
-        }));
+      // 合并相邻格子
+      const cells = Object.values(grid).filter(c => c.pts.length >= 3);
+      const merged = [];
+      const used = new Set();
+      
+      for (let i = 0; i < cells.length; i++) {
+        if (used.has(i)) continue;
+        
+        let cx = cells[i].sx / cells[i].pts.length;
+        let cy = cells[i].sy / cells[i].pts.length;
+        let cm = cells[i].sm / cells[i].pts.length;
+        let count = cells[i].pts.length;
+        
+        // 找附近格子合并
+        for (let j = i + 1; j < cells.length; j++) {
+          if (used.has(j)) continue;
+          const jx = cells[j].sx / cells[j].pts.length;
+          const jy = cells[j].sy / cells[j].pts.length;
+          const dist = Math.sqrt((cx - jx) ** 2 + (cy - jy) ** 2);
+          
+          if (dist < gridSize * 3) {
+            cx = (cx * count + jx * cells[j].pts.length) / (count + cells[j].pts.length);
+            cy = (cy * count + jy * cells[j].pts.length) / (count + cells[j].pts.length);
+            cm = (cm * count + (cells[j].sm / cells[j].pts.length) * cells[j].pts.length) / (count + cells[j].pts.length);
+            count += cells[j].pts.length;
+            used.add(j);
+          }
+        }
+        
+        merged.push({
+          x: Math.round(cx),
+          y: Math.round(cy),
+          moduleSize: cm,
+          count: count
+        });
+      }
+      
+      return merged.filter(m => m.count >= 8);
     }
 
     function orderFinders(finders) {
       if (finders.length !== 3) return null;
       const [a, b, c] = finders;
       
-      // 找左上：x+y最小
       const pts = [a, b, c];
       const tl = pts.reduce((min, p) => (p.x+p.y) < (min.x+min.y) ? p : min);
       const rest = pts.filter(p => p !== tl);
       
-      // 剩下的：x大的右上，x小的左下
       const tr = rest[0].x > rest[1].x ? rest[0] : rest[1];
       const bl = rest[0].x < rest[1].x ? rest[0] : rest[1];
       
@@ -312,7 +334,7 @@
       addLog('📊 图片: ' + width + '×' + height);
       
       const bin = toBinary(gray, width, height);
-      addLog('🔲 二值化完成 (阈值: min+40%范围)');
+      addLog('🔲 二值化完成');
       
       addLog('🔍 扫描定位点...');
       const candidates = findAllCandidates(bin, width, height);
@@ -322,13 +344,12 @@
         return null;
       }
       
-      // 大幅放宽聚类距离：用图片高度的1/3
-      const clusterDist = Math.floor(height / 3);
-      addLog('   聚类距离: ' + clusterDist + 'px');
-      const clusters = clusterCandidates(candidates, clusterDist);
+      // 网格法聚类，网格大小=图片宽度的1/15
+      const gridSize = Math.floor(width / 15);
+      addLog('   网格大小: ' + gridSize + 'px');
+      const clusters = clusterCandidates(candidates, gridSize);
       addLog('   聚类结果: ' + clusters.length + ' 个有效簇');
       
-      // 输出前几个簇的信息
       const sorted = clusters.sort((a,b) => b.count - a.count);
       for (let i = 0; i < Math.min(5, sorted.length); i++) {
         addLog('   簇' + (i+1) + ': (' + sorted[i].x + ',' + sorted[i].y + ') 点数:' + sorted[i].count + ' 模块:' + sorted[i].moduleSize.toFixed(1));
@@ -362,7 +383,7 @@
         return result;
       }
       
-      addLog('❌ 解码失败（数据位解码出错）');
+      addLog('❌ 解码失败');
       return null;
     }
 
