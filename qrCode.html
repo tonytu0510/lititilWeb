@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>二维码解析器</title>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <title>二维码解析器 | ZXing版</title>
+  <!-- ZXing 库，识别率更高 -->
+  <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -14,7 +15,7 @@
     
     body {
       background: linear-gradient(145deg, #1a1e2b 0%, #2a3142 100%);
-      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -48,7 +49,7 @@
     .upload-box {
       border: 2px dashed rgba(255, 255, 255, 0.3);
       border-radius: 1.5rem;
-      padding: 3rem 1.5rem;
+      padding: 2.5rem 1.5rem;
       text-align: center;
       cursor: pointer;
       margin-bottom: 1.5rem;
@@ -59,7 +60,6 @@
     .upload-box:hover {
       border-color: #5b8cff;
       background: rgba(30, 40, 65, 0.5);
-      transform: scale(1.02);
     }
     
     .upload-box.dragging {
@@ -103,10 +103,6 @@
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 20px rgba(59, 110, 255, 0.3);
-    }
-    
-    .btn:active {
-      transform: translateY(0);
     }
     
     .btn.stop {
@@ -215,7 +211,6 @@
       <div class="upload-hint">支持 PNG、JPG、GIF、WEBP</div>
     </div>
     
-    <!-- 隐藏的文件输入 -->
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
     
     <!-- 摄像头 -->
@@ -241,7 +236,20 @@
   </div>
 
   <script>
-    // 获取元素
+    // ========== 初始化 ZXing 读取器 ==========
+    // ZXing 支持多种二维码格式，识别率比 jsQR 高很多
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.QR_CODE,
+      ZXing.BarcodeFormat.DATA_MATRIX,
+      ZXing.BarcodeFormat.AZTEC,
+      ZXing.BarcodeFormat.PDF_417,
+    ]);
+    hints.set(ZXing.DecodeHintType.TRY_HARDER, true); // 尝试更努力地识别
+    
+    const reader = new ZXing.BrowserMultiFormatReader(hints);
+    
+    // ========== DOM 元素 ==========
     const uploadBox = document.getElementById('uploadBox');
     const fileInput = document.getElementById('fileInput');
     const video = document.getElementById('video');
@@ -257,28 +265,25 @@
     const clearBtn = document.getElementById('clearBtn');
     const hintDiv = document.getElementById('hint');
     
-    let stream = null;
-    let scanning = false;
     let lastResult = '';
-    let scanTimer = null;
+    let cameraActive = false;
     
-    // ========== 上传区域：点击 ==========
+    // ========== 点击上传 ==========
     uploadBox.addEventListener('click', () => {
       fileInput.click();
     });
     
-    // ========== 文件选择 ==========
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        parseImage(file);
-        fileInput.value = ''; // 清空，允许重复选同一个文件
+        parseImageFile(file);
+        fileInput.value = '';
       }
     });
     
-    // ========== 上传区域：拖拽 ==========
+    // ========== 拖拽上传 ==========
     uploadBox.addEventListener('dragover', (e) => {
-      e.preventDefault(); // 必须阻止，否则浏览器会打开文件
+      e.preventDefault();
       uploadBox.classList.add('dragging');
     });
     
@@ -287,17 +292,16 @@
     });
     
     uploadBox.addEventListener('drop', (e) => {
-      e.preventDefault(); // 必须阻止默认行为
+      e.preventDefault();
       uploadBox.classList.remove('dragging');
-      
       const file = e.dataTransfer.files[0];
       if (file) {
-        parseImage(file);
+        parseImageFile(file);
       }
     });
     
-    // ========== 解析图片文件 ==========
-    function parseImage(file) {
+    // ========== 解析图片文件（使用ZXing）==========
+    function parseImageFile(file) {
       if (!file.type.startsWith('image/')) {
         showHint('请选择图片文件');
         return;
@@ -309,7 +313,7 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          decodeImage(img);
+          decodeFromImage(img);
         };
         img.onerror = () => {
           showHint('图片加载失败');
@@ -319,32 +323,70 @@
       reader.readAsDataURL(file);
     }
     
-    // ========== 从图片解码二维码 ==========
-    function decodeImage(img) {
-      // 限制图片大小，提高性能
-      let width = img.width;
-      let height = img.height;
-      const maxSize = 800;
+    // ========== 使用 ZXing 从图片解码 ==========
+    function decodeFromImage(img) {
+      // 绘制到canvas
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
       
-      if (width > maxSize || height > maxSize) {
-        const ratio = Math.min(maxSize / width, maxSize / height);
-        width = Math.floor(width * ratio);
-        height = Math.floor(height * ratio);
+      // 获取图片数据
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
+      // 使用ZXing解码
+      try {
+        const source = new ZXing.RGBLuminanceSource(
+          imageData.data,
+          canvas.width,
+          canvas.height
+        );
+        const binaryBitmap = new ZXing.BinaryBitmap(
+          new ZXing.HybridBinarizer(source)
+        );
+        
+        const result = reader.decodeBitmap(binaryBitmap);
+        
+        if (result) {
+          setResult(result.getText());
+          showHint('✅ 解析成功');
+        } else {
+          setResult('');
+          showHint('❌ 未发现二维码，请确保图片清晰');
+        }
+      } catch (err) {
+        // ZXing 解码失败，尝试用 jsQR 作为备选
+        tryFallbackJsQR(imageData);
       }
-      
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const code = jsQR(imageData.data, width, height);
-      
-      if (code) {
-        setResult(code.data);
-        showHint('✅ 解析成功');
+    }
+    
+    // ========== 备选方案：jsQR ==========
+    function tryFallbackJsQR(imageData) {
+      // 动态加载 jsQR（如果还没加载）
+      if (typeof jsQR === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+        script.onload = () => {
+          doJsQRDecode(imageData);
+        };
+        document.head.appendChild(script);
       } else {
+        doJsQRDecode(imageData);
+      }
+    }
+    
+    function doJsQRDecode(imageData) {
+      try {
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          setResult(code.data);
+          showHint('✅ 解析成功（备用引擎）');
+        } else {
+          setResult('');
+          showHint('❌ 未能识别二维码，请尝试调整图片角度或清晰度');
+        }
+      } catch (err) {
         setResult('');
-        showHint('❌ 未发现二维码');
+        showHint('❌ 解析失败，图片可能不包含二维码');
       }
     }
     
@@ -365,81 +407,42 @@
       hintDiv.textContent = msg;
     }
     
-    // ========== 摄像头 ==========
+    // ========== 摄像头扫描（使用ZXing连续扫描）==========
     cameraBtn.addEventListener('click', async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' },
-          audio: false
-        });
+        // ZXing 自带的方法，从视频流中解码
+        await reader.decodeFromVideoDevice(
+          null, // 使用默认摄像头
+          video,
+          (result, err) => {
+            if (result) {
+              const text = result.getText();
+              if (text !== lastResult) {
+                setResult(text);
+                showHint('✅ 识别成功');
+              }
+            }
+          }
+        );
         
-        video.srcObject = stream;
         videoContainer.classList.add('active');
         cameraBtn.style.display = 'none';
         stopBtn.style.display = 'block';
-        scanning = true;
-        
+        cameraActive = true;
         showHint('摄像头已开启，请对准二维码');
-        scanLoop();
       } catch (err) {
         showHint('无法打开摄像头: ' + err.message);
       }
     });
     
     stopBtn.addEventListener('click', () => {
-      stopCamera();
-    });
-    
-    function stopCamera() {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
-      video.srcObject = null;
+      reader.reset(); // ZXing 的停止方法
       videoContainer.classList.remove('active');
       cameraBtn.style.display = 'block';
       stopBtn.style.display = 'none';
-      scanning = false;
-      
-      if (scanTimer) {
-        clearTimeout(scanTimer);
-        scanTimer = null;
-      }
-      
+      cameraActive = false;
       showHint('摄像头已关闭');
-    }
-    
-    // ========== 扫描循环 ==========
-    function scanLoop() {
-      if (!scanning) return;
-      
-      if (video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0) {
-        // 限制扫描尺寸
-        let width = video.videoWidth;
-        let height = video.videoHeight;
-        const maxSize = 500;
-        
-        if (width > maxSize || height > maxSize) {
-          const ratio = Math.min(maxSize / width, maxSize / height);
-          width = Math.floor(width * ratio);
-          height = Math.floor(height * ratio);
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(video, 0, 0, width, height);
-        
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const code = jsQR(imageData.data, width, height);
-        
-        if (code && code.data !== lastResult) {
-          setResult(code.data);
-          showHint('✅ 识别成功');
-        }
-      }
-      
-      scanTimer = setTimeout(scanLoop, 200);
-    }
+    });
     
     // ========== 按钮功能 ==========
     copyBtn.addEventListener('click', () => {
@@ -451,7 +454,6 @@
       navigator.clipboard.writeText(lastResult).then(() => {
         showHint('📋 已复制到剪贴板');
       }).catch(() => {
-        // 降级方案
         const textarea = document.createElement('textarea');
         textarea.value = lastResult;
         document.body.appendChild(textarea);
@@ -468,7 +470,6 @@
         return;
       }
       
-      // 尝试作为URL打开
       try {
         const url = new URL(lastResult);
         if (url.protocol === 'http:' || url.protocol === 'https:') {
@@ -477,7 +478,6 @@
         }
       } catch (e) {}
       
-      // 尝试补充https
       if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(lastResult)) {
         window.open('https://' + lastResult, '_blank');
       } else {
@@ -492,9 +492,9 @@
       showHint('');
     });
     
-    // 页面关闭时清理
+    // 页面关闭清理
     window.addEventListener('beforeunload', () => {
-      stopCamera();
+      reader.reset();
     });
   </script>
 </body>
