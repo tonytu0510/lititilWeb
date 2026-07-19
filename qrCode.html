@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>二维码解析器 | ZXing版</title>
-  <!-- ZXing 库，识别率更高 -->
+  <title>二维码解析器 | 多引擎版</title>
+  <!-- 主引擎：ZXing（Google官方） -->
   <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+  <!-- 备用引擎：jsQR -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -38,11 +40,21 @@
     h1 {
       text-align: center;
       font-size: 1.8rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       background: linear-gradient(135deg, #4f9cff, #7c5cfc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+    }
+    
+    .engine-info {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #8b95b0;
+      margin-bottom: 1.5rem;
+      padding: 0.5rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 0.5rem;
     }
     
     /* 上传区域 */
@@ -86,15 +98,20 @@
     }
     
     /* 按钮 */
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    
     .btn {
-      width: 100%;
+      flex: 1;
       padding: 1rem;
       border: none;
       border-radius: 1rem;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 0.8rem;
       transition: all 0.3s;
       color: white;
       background: linear-gradient(115deg, #3b6eff, #8b5cf6);
@@ -158,6 +175,8 @@
       padding: 0.5rem;
       background: rgba(255,255,255,0.05);
       border-radius: 0.5rem;
+      max-height: 150px;
+      overflow-y: auto;
     }
     
     .result-content.empty {
@@ -203,6 +222,9 @@
 <body>
   <div class="container">
     <h1>📷 二维码解析器</h1>
+    <div class="engine-info">
+      🔍 识别引擎：ZXing（主）+ jsQR（备）· 双重保障
+    </div>
     
     <!-- 上传区域 -->
     <div class="upload-box" id="uploadBox">
@@ -219,8 +241,10 @@
     </div>
     <canvas id="canvas"></canvas>
     
-    <button class="btn" id="cameraBtn">📸 打开相机扫描</button>
-    <button class="btn stop" id="stopBtn" style="display: none;">⏹️ 关闭相机</button>
+    <div class="btn-row">
+      <button class="btn" id="cameraBtn">📸 打开相机</button>
+      <button class="btn stop" id="stopBtn" style="display: none;">⏹️ 关闭</button>
+    </div>
     
     <!-- 结果 -->
     <div class="result-box">
@@ -228,7 +252,7 @@
       <div class="result-content empty" id="result">等待识别...</div>
       <div class="actions">
         <button class="action-btn" id="copyBtn">📋 复制</button>
-        <button class="action-btn" id="openBtn">🔗 打开链接</button>
+        <button class="action-btn" id="openBtn">🔗 打开</button>
         <button class="action-btn" id="clearBtn">🗑️ 清除</button>
       </div>
       <div class="hint" id="hint"></div>
@@ -236,20 +260,18 @@
   </div>
 
   <script>
-    // ========== 初始化 ZXing 读取器 ==========
-    // ZXing 支持多种二维码格式，识别率比 jsQR 高很多
+    // ========== 初始化双引擎 ==========
+    // 引擎1：ZXing
     const hints = new Map();
     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
       ZXing.BarcodeFormat.QR_CODE,
       ZXing.BarcodeFormat.DATA_MATRIX,
-      ZXing.BarcodeFormat.AZTEC,
-      ZXing.BarcodeFormat.PDF_417,
     ]);
-    hints.set(ZXing.DecodeHintType.TRY_HARDER, true); // 尝试更努力地识别
+    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     
-    const reader = new ZXing.BrowserMultiFormatReader(hints);
+    const zxingReader = new ZXing.BrowserMultiFormatReader(hints);
     
-    // ========== DOM 元素 ==========
+    // ========== DOM元素 ==========
     const uploadBox = document.getElementById('uploadBox');
     const fileInput = document.getElementById('fileInput');
     const video = document.getElementById('video');
@@ -266,22 +288,19 @@
     const hintDiv = document.getElementById('hint');
     
     let lastResult = '';
-    let cameraActive = false;
     
-    // ========== 点击上传 ==========
-    uploadBox.addEventListener('click', () => {
-      fileInput.click();
-    });
+    // ========== 上传：点击 ==========
+    uploadBox.addEventListener('click', () => fileInput.click());
     
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
-        parseImageFile(file);
+        parseFile(file);
         fileInput.value = '';
       }
     });
     
-    // ========== 拖拽上传 ==========
+    // ========== 上传：拖拽 ==========
     uploadBox.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadBox.classList.add('dragging');
@@ -295,45 +314,36 @@
       e.preventDefault();
       uploadBox.classList.remove('dragging');
       const file = e.dataTransfer.files[0];
-      if (file) {
-        parseImageFile(file);
-      }
+      if (file) parseFile(file);
     });
     
-    // ========== 解析图片文件（使用ZXing）==========
-    function parseImageFile(file) {
+    // ========== 文件解析 ==========
+    function parseFile(file) {
       if (!file.type.startsWith('image/')) {
         showHint('请选择图片文件');
         return;
       }
       
-      showHint('正在解析...');
+      showHint('🔄 正在解析...');
       
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
-        img.onload = () => {
-          decodeFromImage(img);
-        };
-        img.onerror = () => {
-          showHint('图片加载失败');
-        };
+        img.onload = () => decodeWithZXing(img);
+        img.onerror = () => showHint('图片加载失败');
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
     
-    // ========== 使用 ZXing 从图片解码 ==========
-    function decodeFromImage(img) {
-      // 绘制到canvas
+    // ========== ZXing解码 ==========
+    function decodeWithZXing(img) {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       
-      // 获取图片数据
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
-      // 使用ZXing解码
       try {
         const source = new ZXing.RGBLuminanceSource(
           imageData.data,
@@ -344,75 +354,37 @@
           new ZXing.HybridBinarizer(source)
         );
         
-        const result = reader.decodeBitmap(binaryBitmap);
+        const result = zxingReader.decodeBitmap(binaryBitmap);
         
         if (result) {
           setResult(result.getText());
-          showHint('✅ 解析成功');
-        } else {
-          setResult('');
-          showHint('❌ 未发现二维码，请确保图片清晰');
+          showHint('✅ 识别成功（ZXing引擎）');
+          return;
         }
       } catch (err) {
-        // ZXing 解码失败，尝试用 jsQR 作为备选
-        tryFallbackJsQR(imageData);
+        // ZXing失败，尝试jsQR
       }
-    }
-    
-    // ========== 备选方案：jsQR ==========
-    function tryFallbackJsQR(imageData) {
-      // 动态加载 jsQR（如果还没加载）
-      if (typeof jsQR === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
-        script.onload = () => {
-          doJsQRDecode(imageData);
-        };
-        document.head.appendChild(script);
-      } else {
-        doJsQRDecode(imageData);
-      }
-    }
-    
-    function doJsQRDecode(imageData) {
+      
+      // 备用：jsQR
       try {
         const code = jsQR(imageData.data, imageData.width, imageData.height);
         if (code) {
           setResult(code.data);
-          showHint('✅ 解析成功（备用引擎）');
-        } else {
-          setResult('');
-          showHint('❌ 未能识别二维码，请尝试调整图片角度或清晰度');
+          showHint('✅ 识别成功（jsQR备用引擎）');
+          return;
         }
-      } catch (err) {
-        setResult('');
-        showHint('❌ 解析失败，图片可能不包含二维码');
-      }
+      } catch (err) {}
+      
+      // 两个引擎都失败
+      setResult('');
+      showHint('❌ 未识别到二维码，请确保图片清晰且包含完整二维码');
     }
     
-    // ========== 设置结果 ==========
-    function setResult(text) {
-      if (text) {
-        resultDiv.textContent = text;
-        resultDiv.classList.remove('empty');
-        lastResult = text;
-      } else {
-        resultDiv.textContent = '未识别到二维码';
-        resultDiv.classList.add('empty');
-        lastResult = '';
-      }
-    }
-    
-    function showHint(msg) {
-      hintDiv.textContent = msg;
-    }
-    
-    // ========== 摄像头扫描（使用ZXing连续扫描）==========
+    // ========== 摄像头扫描 ==========
     cameraBtn.addEventListener('click', async () => {
       try {
-        // ZXing 自带的方法，从视频流中解码
-        await reader.decodeFromVideoDevice(
-          null, // 使用默认摄像头
+        await zxingReader.decodeFromVideoDevice(
+          null,
           video,
           (result, err) => {
             if (result) {
@@ -428,21 +400,36 @@
         videoContainer.classList.add('active');
         cameraBtn.style.display = 'none';
         stopBtn.style.display = 'block';
-        cameraActive = true;
-        showHint('摄像头已开启，请对准二维码');
+        showHint('📸 摄像头已开启，请对准二维码');
       } catch (err) {
         showHint('无法打开摄像头: ' + err.message);
       }
     });
     
     stopBtn.addEventListener('click', () => {
-      reader.reset(); // ZXing 的停止方法
+      zxingReader.reset();
       videoContainer.classList.remove('active');
       cameraBtn.style.display = 'block';
       stopBtn.style.display = 'none';
-      cameraActive = false;
       showHint('摄像头已关闭');
     });
+    
+    // ========== 结果处理 ==========
+    function setResult(text) {
+      if (text) {
+        resultDiv.textContent = text;
+        resultDiv.classList.remove('empty');
+        lastResult = text;
+      } else {
+        resultDiv.textContent = '未识别到二维码';
+        resultDiv.classList.add('empty');
+        lastResult = '';
+      }
+    }
+    
+    function showHint(msg) {
+      hintDiv.textContent = msg;
+    }
     
     // ========== 按钮功能 ==========
     copyBtn.addEventListener('click', () => {
@@ -492,9 +479,9 @@
       showHint('');
     });
     
-    // 页面关闭清理
+    // 清理
     window.addEventListener('beforeunload', () => {
-      reader.reset();
+      zxingReader.reset();
     });
   </script>
 </body>
