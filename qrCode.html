@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=no, viewport-fit=cover">
+  <title>二维码解析器 | 扫描与拖拽识别</title>
+  <!-- 引入 jsQR 库：纯前端二维码解析 -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(145deg, #1a1e2b 0%, #2a3142 100%);
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.2rem;
+      margin: 0;
+    }
+    .glass-card {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 2.8rem;
+      padding: 2rem 1.5rem 2.2rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+      color: #f0f3fa;
+      transition: all 0.2s ease;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1.9rem;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      margin-bottom: 0.2rem;
+      justify-content: center;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    h1 span {
+      background: linear-gradient(135deg, #4f9cff, #7c5cfc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .upload-area {
+      background: rgba(10, 15, 25, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 2rem;
+      padding: 2.5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      transition: border-color 0.3s, background 0.3s, transform 0.2s;
+      cursor: pointer;
+      text-align: center;
+      position: relative;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: #5b8cff;
+      background: rgba(30, 40, 65, 0.6);
+      transform: scale(1.01);
+      box-shadow: 0 0 28px rgba(70, 130, 255, 0.35);
+    }
+    .upload-icon {
+      font-size: 3.4rem;
+      filter: drop-shadow(0 8px 12px black);
+    }
+    .upload-text {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #d0d8f0;
+    }
+    .sub-text {
+      font-size: 0.9rem;
+      color: #9aa4c2;
+      margin-top: -0.3rem;
+    }
+    #fileInput {
+      display: none;
+    }
+    .camera-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 1.8rem;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 18px 30px rgba(0,0,0,0.7);
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      background: #0b0e14;
+    }
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scaleX(-1); /* 镜像效果，更自然 */
+    }
+    .canvas-hidden {
+      display: none;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      justify-content: center;
+      margin-top: 0.3rem;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.8rem 1.8rem;
+      border-radius: 3rem;
+      font-weight: 550;
+      font-size: 1rem;
+      color: #eef3ff;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: rgba(20, 30, 48, 0.6);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.4);
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+    .btn-primary {
+      background: linear-gradient(115deg, #3b6eff, #8b5cf6);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 10px 18px -6px #1e3b8a;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(115deg, #4f7eff, #9f6eff);
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+    .result-card {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 1.8rem;
+      padding: 1.5rem 1.4rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      word-break: break-word;
+      transition: 0.2s;
+    }
+    .result-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #a8b9e6;
+      margin-bottom: 0.5rem;
+    }
+    .result-content {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.5;
+      background: rgba(255,255,255,0.08);
+      padding: 0.9rem 1.2rem;
+      border-radius: 1.2rem;
+      min-height: 3.8rem;
+      display: flex;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .empty-message {
+      color: #7b85a5;
+      font-weight: 400;
+      font-size: 1rem;
+    }
+    .action-row {
+      display: flex;
+      gap: 0.7rem;
+      margin-top: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .icon-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #d3dcff;
+      padding: 0.5rem 1.1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      transition: 0.2s;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.22);
+      color: white;
+    }
+    .warning-text {
+      color: #ffb86c;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+    }
+    @media (max-width: 450px) {
+      .glass-card {
+        padding: 1.5rem 1rem;
+      }
+      .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <h1>
+      <span>📷</span> <span>二维码解析器</span>
+    </h1>
+
+    <!-- 拖拽/点击上传区域 -->
+    <div class="upload-area" id="dropArea">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text">点击或拖拽图片到此处</div>
+      <div class="sub-text">支持 PNG, JPG, GIF, WEBP</div>
+      <input type="file" id="fileInput" accept="image/*" />
+    </div>
+
+    <!-- 摄像头实时扫描区域 -->
+    <div class="camera-section">
+      <div class="video-wrapper">
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      <canvas id="canvas" class="canvas-hidden" width="400" height="400"></canvas>
+      
+      <div class="btn-group">
+        <button class="btn" id="startCameraBtn">
+          <span>📸</span> 打开相机
+        </button>
+        <button class="btn btn-primary" id="stopCameraBtn">
+          <span>⏹️</span> 关闭相机
+        </button>
+      </div>
+      <div style="font-size:0.8rem; color:#a5b3db; text-align:center; margin-top:0.2rem;">
+        将二维码对准镜头，自动识别
+      </div>
+    </div>
+
+    <!-- 结果显示区域 -->
+    <div class="result-card">
+      <div class="result-label">🔍 解析结果</div>
+      <div class="result-content" id="resultDisplay">
+        <span class="empty-message">等待识别...</span>
+      </div>
+      <div class="action-row">
+        <button class="icon-btn" id="copyBtn" title="复制内容">
+          <span>📋</span> 复制
+        </button>
+        <button class="icon-btn" id="openUrlBtn" title="如果是网址则打开">
+          <span>🔗</span> 打开链接
+        </button>
+        <button class="icon-btn" id="clearResultBtn">
+          <span>🗑️</span> 清除
+        </button>
+      </div>
+      <div id="extraHint" class="warning-text"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- DOM 元素 -----
+      const dropArea = document.getElementById('dropArea');
+      const fileInput = document.getElementById('fileInput');
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      
+      const startCameraBtn = document.getElementById('startCameraBtn');
+      const stopCameraBtn = document.getElementById('stopCameraBtn');
+      const resultDisplay = document.getElementById('resultDisplay');
+      const copyBtn = document.getElementById('copyBtn');
+      const openUrlBtn = document.getElementById('openUrlBtn');
+      const clearResultBtn = document.getElementById('clearResultBtn');
+      const extraHint = document.getElementById('extraHint');
+
+      // ----- 状态变量 -----
+      let currentStream = null;                // 摄像头媒体流
+      let animationFrameId = null;            // requestAnimationFrame ID
+      let lastDecodedText = '';               // 最近一次解析出的内容
+      let cameraActive = false;
+      
+      // 用于防止连续多次解析同一帧导致性能问题 (节流)
+      let lastScanTime = 0;
+      const SCAN_INTERVAL_MS = 180;           // 大约每秒扫描5-6次
+
+      // ----- 工具函数：更新UI结果 -----
+      function updateResult(text) {
+        if (text && text.trim() !== '') {
+          resultDisplay.innerHTML = `<span style="word-break:break-all;">${escapeHtml(text)}</span>`;
+          lastDecodedText = text;
+          extraHint.textContent = '';
+        } else {
+          resultDisplay.innerHTML = `<span class="empty-message">未识别到二维码</span>`;
+          lastDecodedText = '';
+          extraHint.textContent = '';
+        }
+      }
+
+      // 简单转义防止XSS
+      function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // 清除结果
+      function clearResult() {
+        resultDisplay.innerHTML = `<span class="empty-message">等待识别...</span>`;
+        lastDecodedText = '';
+        extraHint.textContent = '';
+      }
+
+      // ----- 核心：使用 jsQR 解析图像数据 -----
+      function decodeQRFromImageData(imageData, sourceType = 'image') {
+        if (!imageData || !imageData.data || imageData.width === 0 || imageData.height === 0) {
+          return null;
+        }
+        try {
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+          return code ? code.data : null;
+        } catch (e) {
+          console.warn('jsQR 解析出错:', e);
+          return null;
+        }
+      }
+
+      // 从图片元素(Image)提取并解析二维码
+      function processImageElement(img) {
+        // 将图片绘制到canvas以获取ImageData
+        const maxDim = 800; // 限制尺寸保证性能
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+        
+        if (width === 0 || height === 0) {
+          extraHint.textContent = '图片尺寸无效';
+          return;
+        }
+        
+        // 按比例缩放至合理大小
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        let imageData;
+        try {
+          imageData = ctx.getImageData(0, 0, width, height);
+        } catch (e) {
+          extraHint.textContent = '无法读取图片数据（可能是跨域或损坏）';
+          return;
+        }
+        
+        const decodedText = decodeQRFromImageData(imageData, 'file');
+        if (decodedText) {
+          updateResult(decodedText);
+          extraHint.textContent = '✅ 解析成功';
+        } else {
+          updateResult('');
+          extraHint.textContent = '❌ 未发现二维码，请确认图片包含清晰二维码';
+        }
+      }
+
+      // ----- 处理文件上传 (来自input或拖拽) -----
+      function handleFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          extraHint.textContent = '请选择图片文件';
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            processImageElement(img);
+          };
+          img.onerror = () => {
+            extraHint.textContent = '图片加载失败';
+            updateResult('');
+          };
+          img.src = e.target.result;
+        };
+        reader.onerror = () => {
+          extraHint.textContent = '文件读取错误';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ----- 拖拽事件绑定 -----
+      dropArea.addEventListener('click', (e) => {
+        // 防止点击按钮或内部元素误触发（但点击区域就是打开文件选择）
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleFile(file);
+        }
+        // 重置input，允许重复选择同一文件
+        fileInput.value = '';
+      });
+
+      // 拖拽相关
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+          dropArea.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+          dropArea.classList.remove('dragover');
+        });
+      });
+
+      dropArea.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt.files && dt.files.length > 0) {
+          handleFile(dt.files[0]);
+        }
+      });
+
+      // ----- 摄像头逻辑 -----
+      async function startCamera() {
+        if (cameraActive) {
+          // 如果已激活，先停止再重启（保证最新流）
+          await stopCamera();
+        }
+        
+        // 检查浏览器支持
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('您的浏览器不支持摄像头调用。请使用 HTTPS 或 localhost 环境。');
+          return;
+        }
+        
+        try {
+          // 优先使用后置摄像头（环境 facingMode: 'environment'），适合扫描二维码
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { 
+              facingMode: 'environment',
+              width: { ideal: 640 },
+              height: { ideal: 640 }
+            },
+            audio: false
+          });
+          
+          video.srcObject = stream;
+          currentStream = stream;
+          cameraActive = true;
+          
+          // 等待视频元数据加载后播放
+          video.onloadedmetadata = () => {
+            video.play().then(() => {
+              startScanningLoop();
+            }).catch(err => {
+              extraHint.textContent = '视频播放失败: ' + err.message;
+            });
+          };
+          
+          // 针对某些设备直接播放
+          if (video.readyState >= 2) {
+            video.play().then(() => {
+              startScanningLoop();
+            }).catch(() => {});
+          }
+          
+          extraHint.textContent = '摄像头已开启，将二维码对准镜头';
+        } catch (err) {
+          console.error('摄像头错误:', err);
+          if (err.name === 'NotAllowedError') {
+            alert('摄像头权限被拒绝，请在浏览器设置中允许访问摄像头。');
+          } else if (err.name === 'NotFoundError') {
+            alert('未找到摄像头设备。');
+          } else {
+            alert('无法打开摄像头: ' + (err.message || '未知错误'));
+          }
+          cameraActive = false;
+        }
+      }
+
+      function stopCamera() {
+        // 停止扫描循环
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        
+        // 停止所有轨道
+        if (currentStream) {
+          currentStream.getTracks().forEach(track => {
+            track.stop();
+          });
+          currentStream = null;
+        }
+        
+        video.srcObject = null;
+        cameraActive = false;
+        extraHint.textContent = '摄像头已关闭';
+      }
+
+      // 持续扫描视频帧
+      function startScanningLoop() {
+        if (!cameraActive) return;
+        
+        function scanFrame() {
+          if (!cameraActive || !currentStream) {
+            animationFrameId = null;
+            return;
+          }
+          
+          // 检查视频是否就绪
+          if (video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
+            const now = Date.now();
+            if (now - lastScanTime >= SCAN_INTERVAL_MS) {
+              lastScanTime = now;
+              
+              // 将视频帧绘制到canvas (考虑镜像已经通过CSS处理，但canvas绘制仍是原始方向，不影响二维码识别)
+              const vw = video.videoWidth;
+              const vh = video.videoHeight;
+              if (vw === 0 || vh === 0) {
+                animationFrameId = requestAnimationFrame(scanFrame);
+                return;
+              }
+              
+              // 设置canvas尺寸与视频一致，但限制最大尺寸提高性能
+              let drawWidth = vw;
+              let drawHeight = vh;
+              const maxSide = 600;
+              if (drawWidth > maxSide || drawHeight > maxSide) {
+                const ratio = Math.min(maxSide / drawWidth, maxSide / drawHeight);
+                drawWidth = Math.floor(drawWidth * ratio);
+                drawHeight = Math.floor(drawHeight * ratio);
+              }
+              
+              canvas.width = drawWidth;
+              canvas.height = drawHeight;
+              ctx.drawImage(video, 0, 0, drawWidth, drawHeight);
+              
+              let imageData;
+              try {
+                imageData = ctx.getImageData(0, 0, drawWidth, drawHeight);
+              } catch (e) {
+                animationFrameId = requestAnimationFrame(scanFrame);
+                return;
+              }
+              
+              const decodedText = decodeQRFromImageData(imageData, 'camera');
+              if (decodedText) {
+                // 避免重复显示相同内容导致闪烁
+                if (decodedText !== lastDecodedText) {
+                  updateResult(decodedText);
+                  extraHint.textContent = '✅ 识别成功';
+                }
+              } else {
+                // 如果没有识别到，保留上一次结果但可提示无二维码（不频繁更新）
+                if (lastDecodedText !== '') {
+                  // 可选：一段时间后若持续无识别，显示未识别
+                }
+              }
+            }
+          }
+          
+          // 继续下一帧扫描
+          animationFrameId = requestAnimationFrame(scanFrame);
+        }
+        
+        // 启动循环
+        animationFrameId = requestAnimationFrame(scanFrame);
+      }
+
+      // 绑定相机按钮
+      startCameraBtn.addEventListener('click', () => {
+        startCamera();
+      });
+      
+      stopCameraBtn.addEventListener('click', () => {
+        stopCamera();
+      });
+
+      // ----- 交互按钮：复制、打开链接、清除 -----
+      copyBtn.addEventListener('click', () => {
+        if (!lastDecodedText) {
+          extraHint.textContent = '没有可复制的内容';
+          return;
+        }
+        navigator.clipboard.writeText(lastDecodedText).then(() => {
+          extraHint.textContent = '📋 已复制到剪贴板';
+        }).catch(() => {
+          // 降级方案
+          const textarea = document.createElement('textarea');
+          textarea.value = lastDecodedText;
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand('copy');
+            extraHint.textContent = '📋 已复制 (传统方式)';
+          } catch (e) {
+            extraHint.textContent = '复制失败，请手动选择';
+          }
+          document.body.removeChild(textarea);
+        });
+      });
+
+      openUrlBtn.addEventListener('click', () => {
+        if (!lastDecodedText) {
+          extraHint.textContent = '没有内容可打开';
+          return;
+        }
+        // 尝试判断是否为有效URL
+        let urlPattern;
+        try {
+          urlPattern = new URL(lastDecodedText);
+        } catch (e) {
+          urlPattern = null;
+        }
+        
+        if (urlPattern && (urlPattern.protocol === 'http:' || urlPattern.protocol === 'https:')) {
+          window.open(lastDecodedText, '_blank', 'noopener,noreferrer');
+          extraHint.textContent = '🔗 正在打开链接...';
+        } else if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(lastDecodedText)) {
+          // 可能是缺少协议的网址，补全https
+          window.open('https://' + lastDecodedText, '_blank', 'noopener,noreferrer');
+          extraHint.textContent = '🔗 尝试打开 (补充https)';
+        } else {
+          extraHint.textContent = '内容不是有效网址，无法直接打开';
+        }
+      });
+
+      clearResultBtn.addEventListener('click', () => {
+        clearResult();
+      });
+
+      // 页面卸载时清理相机资源
+      window.addEventListener('beforeunload', () => {
+        stopCamera();
+      });
+
+      // 初始状态：确保相机关闭
+      stopCamera();
+      clearResult();
+    })();
+  </script>
+</body>
+</html>
