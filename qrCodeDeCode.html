@@ -258,7 +258,7 @@
         console.log('its.length=>',bits.length)
         console.log('Number(12+count*8) > Number(bits.length)=>',Number(12+count*8) > Number(bits.length))
         console.log('Number(12+count*8) > Number(bits.length)=>',Number(bits.length) < Number(12+count*8))
-        if(12+count*8 > bits.length) continue;
+        if(bits.length < (12+count*8)) continue;
         console.log('4=>',4)
         const bytes = [];
         for (let i=0;i<count;i++) {
