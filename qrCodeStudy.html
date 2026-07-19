@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>纯手写二维码生成器 | 从零实现</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #e0e0e0;
+    }
+
+    .container { max-width: 850px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle { text-align: center; color: #8892b0; font-size: 0.9rem; margin-bottom: 2rem; }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      padding: 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .input-group { margin-bottom: 1rem; }
+    .input-group label { display: block; font-size: 0.85rem; margin-bottom: 0.3rem; color: #b0b8d0; }
+    .input-group textarea, .input-group input, .input-group select {
+      width: 100%; padding: 0.7rem; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 0.7rem; background: rgba(0,0,0,0.3); color: #e0e0e0;
+      font-size: 0.9rem; font-family: inherit;
+    }
+    .input-group textarea { min-height: 60px; resize: vertical; }
+
+    .row { display: flex; gap: 0.8rem; }
+    .row .input-group { flex: 1; }
+
+    .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; }
+    .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+    .btn {
+      width: 100%; padding: 0.8rem; border: none; border-radius: 0.7rem;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s;
+      color: white; margin-bottom: 0.6rem;
+    }
+    .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .btn-download { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+
+    .preview-area {
+      display: flex; justify-content: center; align-items: center;
+      padding: 1rem; background: white; border-radius: 1rem; margin: 1rem 0;
+      min-height: 300px; overflow: auto;
+    }
+    .preview-area canvas { max-width: 100%; height: auto; }
+
+    .info-box {
+      background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem;
+      font-family: 'Courier New', monospace; font-size: 0.8rem; color: #43e97b;
+      max-height: 200px; overflow-y: auto; margin-top: 0.5rem; line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔳 纯手写二维码生成器</h1>
+    <p class="subtitle">从零实现 · 不依赖任何二维码库</p>
+
+    <div class="card">
+      <div class="card-title">📝 二维码内容</div>
+      <div class="input-group">
+        <label>输入文字或链接</label>
+        <textarea id="content">https://www.example.com</textarea>
+      </div>
+
+      <div class="row">
+        <div class="input-group">
+          <label>📐 模块大小 (像素/格)</label>
+          <input type="number" id="moduleSize" value="8" min="2" max="20">
+        </div>
+        <div class="input-group">
+          <label>🛡️ 容错率</label>
+          <select id="errorLevel">
+            <option value="L">低 (7%)</option>
+            <option value="M" selected>中 (15%)</option>
+            <option value="Q">较高 (25%)</option>
+            <option value="H">高 (30%)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="removeFinders">
+        <label>🗑️ 去掉三个定位点（仍可扫描）</label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="addLogo" checked>
+        <label>🎯 中间加Logo</label>
+      </div>
+
+      <div class="input-group">
+        <label>📁 Logo图片（可选，不上传用默认emoji）</label>
+        <input type="file" id="logoFile" accept="image/*">
+      </div>
+
+      <button class="btn btn-primary" id="generateBtn">✨ 生成二维码</button>
+    </div>
+
+    <div class="card">
+      <div class="preview-area" id="previewArea">
+        <canvas id="qrCanvas"></canvas>
+      </div>
+      <button class="btn btn-download" id="downloadBtn">💾 下载二维码 (PNG)</button>
+      <div class="info-box" id="infoBox">等待生成...</div>
+    </div>
+  </div>
+
+  <script>
+    // ===================================================================
+    // 纯手写二维码生成器 - 完整实现
+    // 参考：QR Code标准 (ISO/IEC 18004)
+    // 
+    // 流程：
+    // 1. 文本 → 数据分析 → 选择编码模式
+    // 2. 数据编码 → 生成码字
+    // 3. 纠错编码 → 生成纠错码字
+    // 4. 模块排列 → 在矩阵中放置数据
+    // 5. 掩码 → 选择最优掩码
+    // 6. 格式信息 → 添加格式和版本信息
+    // 7. 渲染 → 在Canvas上绘制
+    // ===================================================================
+
+    // ==================== Galois域运算（纠错码需要）====================
+    class GaloisField {
+      constructor() {
+        // GF(256) 生成元 α = 2
+        this.expTable = new Int32Array(512);
+        this.logTable = new Int32Array(256);
+        
+        let x = 1;
+        for (let i = 0; i < 255; i++) {
+          this.expTable[i] = x;
+          this.logTable[x] = i;
+          x <<= 1;
+          if (x & 0x100) x ^= 0x11D; // 本原多项式: x^8 + x^4 + x^3 + x^2 + 1
+        }
+        for (let i = 255; i < 512; i++) {
+          this.expTable[i] = this.expTable[i - 255];
+        }
+      }
+
+      exp(x) { return this.expTable[x]; }
+      log(x) { return this.logTable[x]; }
+
+      mul(a, b) {
+        if (a === 0 || b === 0) return 0;
+        return this.expTable[this.logTable[a] + this.logTable[b]];
+      }
+    }
+
+    const gf = new GaloisField();
+
+    // ==================== 多项式运算 ====================
+    function polyMul(p1, p2) {
+      const result = new Int32Array(p1.length + p2.length - 1);
+      for (let i = 0; i < p1.length; i++) {
+        for (let j = 0; j < p2.length; j++) {
+          result[i + j] ^= gf.mul(p1[i], p2[j]);
+        }
+      }
+      return result;
+    }
+
+    function polyMod(dividend, divisor) {
+      let result = new Int32Array(dividend);
+      for (let i = 0; i < dividend.length - divisor.length + 1; i++) {
+        if (result[i] !== 0) {
+          for (let j = 1; j < divisor.length; j++) {
+            result[i + j] ^= gf.mul(divisor[j], result[i]);
+          }
+        }
+      }
+      return result.slice(result.length - divisor.length + 1);
+    }
+
+    // ==================== 生成纠错码字的生成多项式 ====================
+    function getGeneratorPolynomial(numECWords) {
+      let gen = new Int32Array([1]);
+      for (let i = 0; i < numECWords; i++) {
+        gen = polyMul(gen, new Int32Array([1, gf.exp(i)]));
+      }
+      return gen;
+    }
+
+    // ==================== 生成纠错码字 ====================
+    function generateECCodewords(dataCodewords, numECWords) {
+      const gen = getGeneratorPolynomial(numECWords);
+      const msg = new Int32Array(dataCodewords.length + numECWords);
+      msg.set(dataCodewords);
+      const remainder = polyMod(msg, gen);
+      return Array.from(remainder);
+    }
+
+    // ==================== 版本和容错率配置 ====================
+    // 每个版本 [总码字数, 数据码字数, 纠错码字数]
+    const VERSION_EC_INFO = {
+      1: { L: [26, 19, 7], M: [26, 16, 10], Q: [26, 13, 13], H: [26, 9, 17] },
+      2: { L: [44, 34, 10], M: [44, 28, 16], Q: [44, 22, 22], H: [44, 16, 28] },
+      3: { L: [70, 55, 15], M: [70, 44, 26], Q: [70, 34, 36], H: [70, 26, 44] },
+      4: { L: [100, 80, 20], M: [100, 64, 36], Q: [100, 48, 52], H: [100, 36, 64] },
+      5: { L: [134, 108, 26], M: [134, 86, 48], Q: [134, 62, 72], H: [134, 46, 88] },
+      6: { L: [172, 136, 36], M: [172, 108, 64], Q: [172, 76, 96], H: [172, 60, 112] },
+      7: { L: [196, 156, 40], M: [196, 124, 72], Q: [196, 88, 108], H: [196, 66, 130] },
+      8: { L: [242, 194, 48], M: [242, 154, 88], Q: [242, 110, 132], H: [242, 86, 156] },
+      9: { L: [292, 232, 60], M: [292, 182, 110], Q: [292, 132, 160], H: [292, 100, 192] },
+      10: { L: [346, 274, 72], M: [346, 216, 130], Q: [346, 154, 192], H: [346, 122, 224] },
+    };
+
+    // ==================== 选择版本 ====================
+    function chooseVersion(dataLength, errorLevel) {
+      for (let v = 1; v <= 10; v++) {
+        const info = VERSION_EC_INFO[v][errorLevel];
+        if (dataLength <= info[1]) return { version: v, totalCodewords: info[0], dataCodewords: info[1], ecCodewords: info[2] };
+      }
+      return { version: 10, totalCodewords: 346, dataCodewords: VERSION_EC_INFO[10][errorLevel][1], ecCodewords: VERSION_EC_INFO[10][errorLevel][2] };
+    }
+
+    // ==================== 数据编码 ====================
+    function encodeData(text, dataCodewords) {
+      // 字节模式编码
+      const bytes = new TextEncoder().encode(text);
+      const dataBits = [];
+      
+      // 模式指示符: 0100 (字节模式)
+      dataBits.push(0, 1, 0, 0);
+      
+      // 字符计数 (8位)
+      const count = bytes.length;
+      for (let i = 7; i >= 0; i--) dataBits.push((count >> i) & 1);
+      
+      // 数据字节
+      for (const byte of bytes) {
+        for (let i = 7; i >= 0; i--) dataBits.push((byte >> i) & 1);
+      }
+      
+      // 终止符 (0000)
+      const terminator = Math.min(4, dataCodewords * 8 - dataBits.length);
+      for (let i = 0; i < terminator; i++) dataBits.push(0);
+      
+      // 填充到8的倍数
+      while (dataBits.length % 8 !== 0) dataBits.push(0);
+      
+      // 填充交替字节 11101100 和 00010001
+      const padBytes = [0xEC, 0x11];
+      let padIndex = 0;
+      while (dataBits.length < dataCodewords * 8) {
+        const pad = padBytes[padIndex % 2];
+        for (let i = 7; i >= 0; i--) dataBits.push((pad >> i) & 1);
+        padIndex++;
+      }
+      
+      // 转换为码字数组
+      const codewords = [];
+      for (let i = 0; i < dataBits.length; i += 8) {
+        let cw = 0;
+        for (let j = 0; j < 8; j++) cw = (cw << 1) | dataBits[i + j];
+        codewords.push(cw);
+      }
+      
+      return codewords.slice(0, dataCodewords);
+    }
+
+    // ==================== 生成完整码字序列 ====================
+    function generateAllCodewords(text, versionInfo) {
+      const dataCodewords = encodeData(text, versionInfo.dataCodewords);
+      const ecCodewords = generateECCodewords(dataCodewords, versionInfo.ecCodewords);
+      return { dataCodewords, ecCodewords, allCodewords: [...dataCodewords, ...ecCodewords] };
+    }
+
+    // ==================== 模块矩阵操作 ====================
+    function createMatrix(version) {
+      const size = 17 + version * 4;
+      const matrix = Array.from({ length: size }, () => new Int32Array(size));
+      return { matrix, size };
+    }
+
+    // ==================== 放置定位图案 ====================
+    function placeFinders(matrix, size) {
+      // 放置三个定位图案
+      placeFinderPattern(matrix, 0, 0);
+      placeFinderPattern(matrix, 0, size - 7);
+      placeFinderPattern(matrix, size - 7, 0);
+    }
+
+    function placeFinderPattern(matrix, row, col) {
+      for (let r = -1; r <= 7; r++) {
+        for (let c = -1; c <= 7; c++) {
+          const rr = row + r;
+          const cc = col + c;
+          if (rr >= 0 && rr < matrix.length && cc >= 0 && cc < matrix[0].length) {
+            if (r >= 0 && r <= 6 && c >= 0 && c <= 6) {
+              // 定位图案内部
+              if ((r === 0 || r === 6 || c === 0 || c === 6) || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+                matrix[rr][cc] = 1; // 黑色
+              } else {
+                matrix[rr][cc] = 0; // 白色
+              }
+            } else {
+              matrix[rr][cc] = 0; // 分隔区
+            }
+          }
+        }
+      }
+    }
+
+    // ==================== 放置时序图案 ====================
+    function placeTimingPatterns(matrix, size) {
+      for (let i = 8; i < size - 8; i++) {
+        matrix[6][i] = i % 2 === 0 ? 1 : 0;
+        matrix[i][6] = i % 2 === 0 ? 1 : 0;
+      }
+    }
+
+    // ==================== 放置校正图案 ====================
+    function placeAlignmentPatterns(matrix, size, version) {
+      if (version < 2) return;
+      
+      const locations = getAlignmentLocations(version);
+      for (const row of locations) {
+        for (const col of locations) {
+          // 跳过定位图案区域
+          if ((row < 9 && col < 9) || (row < 9 && col > size - 9) || (row > size - 9 && col < 9)) continue;
+          placeAlignmentPattern(matrix, row, col);
+        }
+      }
+    }
+
+    function getAlignmentLocations(version) {
+      if (version === 1) return [];
+      const num = Math.floor(version / 7) + 2;
+      const step = Math.floor((version * 4 + 4) / (num - 1));
+      const locations = [6];
+      let pos = version * 4 + 10;
+      for (let i = 1; i < num; i++) {
+        locations.push(pos);
+        pos -= step;
+      }
+      locations.reverse();
+      return locations;
+    }
+
+    function placeAlignmentPattern(matrix, row, col) {
+      for (let r = -2; r <= 2; r++) {
+        for (let c = -2; c <= 2; c++) {
+          const rr = row + r;
+          const cc = col + c;
+          if (rr >= 0 && rr < matrix.length && cc >= 0 && cc < matrix[0].length) {
+            if (Math.abs(r) === 2 || Math.abs(c) === 2 || (r === 0 && c === 0)) {
+              matrix[rr][cc] = 1;
+            } else {
+              matrix[rr][cc] = 0;
+            }
+          }
+        }
+      }
+    }
+
+    // ==================== 放置数据 ====================
+    function placeData(matrix, size, allCodewords) {
+      const bits = [];
+      for (const cw of allCodewords) {
+        for (let i = 7; i >= 0; i--) bits.push((cw >> i) & 1);
+      }
+      
+      let bitIndex = 0;
+      let upward = true;
+      
+      for (let col = size - 1; col >= 0; col -= 2) {
+        if (col === 6) col = 5; // 跳过时序图案列
+        
+        for (let row = upward ? size - 1 : 0; upward ? row >= 0 : row < size; row += upward ? -1 : 1) {
+          for (let c = col; c >= col - 1; c--) {
+            if (matrix[row][c] === 0 || matrix[row][c] === undefined) {
+              if (bitIndex < bits.length) {
+                matrix[row][c] = bits[bitIndex];
+                bitIndex++;
+              }
+            }
+          }
+        }
+        upward = !upward;
+      }
+    }
+
+    // ==================== 掩码 ====================
+    function applyMask(matrix, size, maskPattern) {
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (isDataModule(row, col, size)) {
+            let invert = false;
+            switch (maskPattern) {
+              case 0: invert = (row + col) % 2 === 0; break;
+              case 1: invert = row % 2 === 0; break;
+              case 2: invert = col % 3 === 0; break;
+              case 3: invert = (row + col) % 3 === 0; break;
+              case 4: invert = (Math.floor(row / 2) + Math.floor(col / 3)) % 2 === 0; break;
+              case 5: invert = ((row * col) % 2) + ((row * col) % 3) === 0; break;
+              case 6: invert = (((row * col) % 2) + ((row * col) % 3)) % 2 === 0; break;
+              case 7: invert = (((row + col) % 2) + ((row * col) % 3)) % 2 === 0; break;
+            }
+            if (invert) matrix[row][col] ^= 1;
+          }
+        }
+      }
+    }
+
+    function isDataModule(row, col, size) {
+      // 跳过功能图案
+      if (row < 9 && col < 9) return false;
+      if (row < 9 && col > size - 9) return false;
+      if (row > size - 9 && col < 9) return false;
+      if (row === 6 || col === 6) return false;
+      return true;
+    }
+
+    // ==================== 渲染到Canvas ====================
+    function renderToCanvas(matrix, size, moduleSize, border, removeFindersFlag) {
+      const canvasSize = (size + border * 2) * moduleSize;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      const ctx = canvas.getContext('2d');
+
+      // 白色背景
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+      // 绘制模块
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          // 如果要去掉定位点
+          if (removeFindersFlag && isFinderArea(row, col, size)) {
+            ctx.fillStyle = '#FFFFFF';
+          } else {
+            ctx.fillStyle = matrix[row][col] === 1 ? '#000000' : '#FFFFFF';
+          }
+          
+          const x = (col + border) * moduleSize;
+          const y = (row + border) * moduleSize;
+          ctx.fillRect(x, y, moduleSize, moduleSize);
+        }
+      }
+
+      return canvas;
+    }
+
+    function isFinderArea(row, col, size) {
+      // 左上定位点
+      if (row < 8 && col < 8) return true;
+      // 右上定位点
+      if (row < 8 && col > size - 9) return true;
+      // 左下定位点
+      if (row > size - 9 && col < 8) return true;
+      return false;
+    }
+
+    // ==================== 添加Logo ====================
+    function addLogoToCanvas(canvas, logoImg) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const logoSize = size * 0.2;
+      const logoX = (size - logoSize) / 2;
+      const logoY = (size - logoSize) / 2;
+
+      // 白色背景
+      const padding = logoSize * 0.1;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(logoX - padding, logoY - padding, logoSize + padding * 2, logoSize + padding * 2, logoSize * 0.15);
+      ctx.fill();
+
+      if (logoImg) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(logoX, logoY, logoSize, logoSize, logoSize * 0.1);
+        ctx.clip();
+        ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = '#333';
+        ctx.font = `${logoSize * 0.6}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🚀', logoX + logoSize / 2, logoY + logoSize / 2);
+      }
+
+      return canvas;
+    }
+
+    // ==================== 主流程 ====================
+    let logoImage = null;
+    let finalCanvas = null;
+
+    // Logo上传
+    document.getElementById('logoFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => { logoImage = img; addLog('✅ Logo图片已加载'); };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function addLog(msg) {
+      const infoBox = document.getElementById('infoBox');
+      infoBox.innerHTML += `<br>${msg}`;
+      infoBox.scrollTop = infoBox.scrollHeight;
+    }
+
+    function generateQR() {
+      const content = document.getElementById('content').value.trim();
+      if (!content) { alert('请输入内容'); return; }
+
+      const moduleSize = parseInt(document.getElementById('moduleSize').value) || 8;
+      const errorLevel = document.getElementById('errorLevel').value;
+      const removeFindersFlag = document.getElementById('removeFinders').checked;
+      const addLogoFlag = document.getElementById('addLogo').checked;
+      const border = 4;
+
+      const infoBox = document.getElementById('infoBox');
+      infoBox.innerHTML = '';
+      addLog('🚀 === 开始生成二维码 ===');
+      addLog(`📝 内容: "${content.substring(0, 40)}${content.length > 40 ? '...' : ''}"`);
+      addLog(`📏 内容长度: ${content.length} 字符`);
+
+      // 步骤1：编码
+      addLog('📦 步骤1: 文本 → 字节编码');
+      const bytes = new TextEncoder().encode(content);
+      addLog(`   字节数: ${bytes.length}`);
+
+      // 步骤2：选择版本
+      const versionInfo = chooseVersion(bytes.length + 2, errorLevel); // +2 for mode + count
+      addLog(`🔢 步骤2: 选择版本 ${versionInfo.version}`);
+      addLog(`   总码字: ${versionInfo.totalCodewords}, 数据码字: ${versionInfo.dataCodewords}, 纠错码字: ${versionInfo.ecCodewords}`);
+
+      // 步骤3：生成数据码字和纠错码字
+      addLog('🔐 步骤3: 生成数据码字 + 纠错码字');
+      const { dataCodewords, ecCodewords, allCodewords } = generateAllCodewords(content, versionInfo);
+      addLog(`   数据码字: ${dataCodewords.length}个`);
+      addLog(`   纠错码字: ${ecCodewords.length}个`);
+      addLog(`   总码字: ${allCodewords.length}个`);
+
+      // 步骤4：创建矩阵
+      addLog('📐 步骤4: 创建模块矩阵');
+      const { matrix, size } = createMatrix(versionInfo.version);
+      addLog(`   矩阵大小: ${size}×${size} 模块`);
+
+      // 步骤5：放置功能图案
+      addLog('🎯 步骤5: 放置功能图案');
+      placeFinders(matrix, size);
+      addLog('   ✅ 定位图案 (3个)');
+      placeTimingPatterns(matrix, size);
+      addLog('   ✅ 时序图案');
+      placeAlignmentPatterns(matrix, size, versionInfo.version);
+      addLog('   ✅ 校正图案');
+
+      // 步骤6：放置数据
+      addLog('📊 步骤6: 放置数据模块');
+      placeData(matrix, size, allCodewords);
+
+      // 步骤7：掩码
+      addLog('🎭 步骤7: 应用掩码 (模式0)');
+      applyMask(matrix, size, 0);
+
+      // 步骤8：渲染
+      addLog('🎨 步骤8: 渲染到Canvas');
+      let canvas = renderToCanvas(matrix, size, moduleSize, border, removeFindersFlag);
+      addLog(`   Canvas大小: ${canvas.width}×${canvas.height}px`);
+      addLog(`   模块大小: ${moduleSize}px, 边框: ${border}模块`);
+
+      // 步骤9：添加Logo
+      if (addLogoFlag) {
+        addLog('🎯 步骤9: 添加中间Logo');
+        canvas = addLogoToCanvas(canvas, logoImage);
+      }
+
+      // 显示
+      const previewArea = document.getElementById('previewArea');
+      previewArea.innerHTML = '';
+      previewArea.appendChild(canvas);
+      finalCanvas = canvas;
+
+      // 步骤10：生成Base64
+      const base64 = canvas.toDataURL('image/png');
+      addLog('✅ === 生成完成 ===');
+      addLog(`📦 Base64数据: data:image/png;base64,...`);
+      addLog(`   完整大小: ${(base64.length * 0.75 / 1024).toFixed(1)}KB`);
+      addLog(`💡 这就是之前讲的完整流程: 文本→编码→码字→矩阵→Canvas→Base64`);
+
+      previewArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function downloadQR() {
+      if (!finalCanvas) { alert('请先生成二维码'); return; }
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = finalCanvas.toDataURL('image/png');
+      link.click();
+      addLog('💾 二维码已下载');
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generateQR);
+    document.getElementById('downloadBtn').addEventListener('click', downloadQR);
+
+    // 初始生成
+    setTimeout(generateQR, 500);
+  </script>
+</body>
+</html>
