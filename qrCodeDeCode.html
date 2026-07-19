@@ -25,6 +25,7 @@
     .video-container.active { display: block; }
     #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   </style>
+<base target="_blank">
 </head>
 <body>
   <div class="container">
@@ -155,18 +156,22 @@
       return result;
     }
 
-    // ==================== 矩阵提取 ====================
+    // ==================== 矩阵提取（修复偏移）====================
     function extractMatrix(bin, width, height, tl, tr, bl, size) {
       const matrix = Array.from({ length: size }, () => new Uint32Array(size));
-      const dx1 = (tr.x - tl.x) / (size - 1);
-      const dy1 = (tr.y - tl.y) / (size - 1);
-      const dx2 = (bl.x - tl.x) / (size - 1);
-      const dy2 = (bl.y - tl.y) / (size - 1);
+      // 修复：从定位图案中心到符号边界的变换
+      const dx1 = (tr.x - tl.x) / (size - 7);
+      const dy1 = (tr.y - tl.y) / (size - 7);
+      const dx2 = (bl.x - tl.x) / (size - 7);
+      const dy2 = (bl.y - tl.y) / (size - 7);
+      // 从定位图案中心到符号左上角的偏移 = 3.5 模块（到定位图案边界）+ 4 模块（静区）= 7.5 模块
+      const offsetX = tl.x - dx1 * 3.5 - dx2 * 3.5;
+      const offsetY = tl.y - dy1 * 3.5 - dy2 * 3.5;
       const sampleR = Math.max(1, Math.floor((tl.moduleSize + tr.moduleSize + bl.moduleSize) / 9));
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
-          const sx = tl.x + col * dx1 + row * dx2;
-          const sy = tl.y + col * dy1 + row * dy2;
+          const sx = offsetX + col * dx1 + row * dx2;
+          const sy = offsetY + col * dy1 + row * dy2;
           let black = 0, total = 0;
           for (let dy = -sampleR; dy <= sampleR; dy++) {
             for (let dx = -sampleR; dx <= sampleR; dx++) {
@@ -183,8 +188,8 @@
       return matrix;
     }
 
-    // ==================== 解码 ====================
-    function readBits(matrix, size) {
+    // ==================== 解码（支持 LSB 和 MSB）====================
+    function readBitsStandard(matrix, size) {
       const bits = [];
       let up = true;
       for (let col = size - 1; col >= 0; col -= 2) {
@@ -202,6 +207,51 @@
         up = !up;
       }
       return bits;
+    }
+
+    function decodeBits(bits, msbFirst) {
+      if (bits.length < 12) return null;
+      // Mode
+      let mode = 0;
+      if (msbFirst) {
+        for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
+      } else {
+        for (let i = 0; i < 4; i++) mode |= bits[i] << i;
+      }
+      const modeNames = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
+      if (!modeNames[mode]) return null;
+      const countBits = { 1: 10, 2: 9, 4: 8, 8: 8 };
+      const cb = countBits[mode];
+      if (bits.length < 4 + cb) return null;
+      // Count
+      let count = 0;
+      if (msbFirst) {
+        for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i];
+      } else {
+        for (let i = 0; i < cb; i++) count |= bits[4 + i] << i;
+      }
+      if (count <= 0 || count > 300) return null;
+      const dataStart = 4 + cb;
+      const requiredBits = dataStart + count * 8;
+      if (requiredBits > bits.length) return null;
+      // Data
+      const bytes = [];
+      for (let i = 0; i < count; i++) {
+        let b = 0;
+        if (msbFirst) {
+          for (let j = 0; j < 8; j++) b = (b << 1) | bits[dataStart + i * 8 + j];
+        } else {
+          for (let j = 0; j < 8; j++) b |= bits[dataStart + i * 8 + j] << j;
+        }
+        bytes.push(b);
+      }
+      try {
+        const text = new TextDecoder().decode(new Uint8Array(bytes));
+        if (text.length > 0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) {
+          return { mode: modeNames[mode], count, text };
+        }
+      } catch (e) {}
+      return null;
     }
 
     function tryDecode(matrix, size) {
@@ -222,25 +272,12 @@
             if (inv) work[r][c] ^= 1;
           }
         }
-        const bits = readBits(work, size);
-        if (bits.length < 12) continue;
-        let mode = 0;
-        for (let i=0;i<4;i++) mode=(mode<<1)|bits[i];
-        if (mode !== 4) continue;
-        let count = 0;
-        for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
-        if (count<=0||count>300) continue;
-        if (12+count*8 > bits.length) continue;
-        const bytes = [];
-        for (let i=0;i<count;i++) {
-          let b=0;
-          for (let j=0;j<8;j++) b=(b<<1)|bits[12+i*8+j];
-          bytes.push(b);
+        const bits = readBitsStandard(work, size);
+        // 尝试 LSB 和 MSB
+        for (const msb of [false, true]) {
+          const result = decodeBits(bits, msb);
+          if (result) return { text: result.text, mask, msb };
         }
-        try {
-          const text = new TextDecoder().decode(new Uint8Array(bytes));
-          if (text.length>0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) return {text, mask};
-        } catch(e) {}
       }
       return null;
     }
@@ -269,10 +306,10 @@
     function inferGrid(bin, width, height) {
       const { rowCandidates, colCandidates } = detectTimingPattern(bin, width, height);
       if (rowCandidates.length === 0 || colCandidates.length === 0) return null;
-      
+
       const bestRow = rowCandidates.sort((a,b) => b.transitions - a.transitions)[0];
       const bestCol = colCandidates.sort((a,b) => b.transitions - a.transitions)[0];
-      
+
       // 测量时序图案的间距，用中位数
       const y = bestRow.y;
       const spacings = [];
@@ -286,12 +323,12 @@
       }
       spacings.sort((a,b) => a-b);
       const moduleSize = spacings[Math.floor(spacings.length/2)] || 8;
-      
+
       const offsetX = bestCol.x - 6 * moduleSize;
       const offsetY = bestRow.y - 6 * moduleSize;
       const qrSize = Math.round((width - offsetX) / moduleSize);
       const version = Math.round((qrSize - 17) / 4);
-      
+
       return {
         moduleSize,
         offsetX: Math.max(0, Math.round(offsetX)),
@@ -349,6 +386,15 @@
           const perms = permutations(pts);
           for (let pi = 0; pi < perms.length; pi++) {
             const [tl, tr, bl] = perms[pi];
+            // 几何验证
+            const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
+            const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
+            const dot = v1x * v2x + v1y * v2y;
+            const len1 = Math.sqrt(v1x*v1x + v1y*v1y);
+            const len2 = Math.sqrt(v2x*v2x + v2y*v2y);
+            const cosAngle = dot / (len1 * len2);
+            if (Math.abs(cosAngle) > 0.3) continue; // 不是直角，跳过
+
             const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
             const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
             const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
@@ -357,10 +403,17 @@
               const sz = 17+v*4;
               const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
               let r = tryDecode(m, sz);
-              if (r) { if (!silent) addLog('✅ 标准解码: '+r.text.substring(0,40)); return r.text; }
+              if (r) { 
+                if (!silent) addLog('✅ 标准解码: mask='+r.mask+' msb='+r.msb+' '+r.text.substring(0,40)); 
+                return r.text; 
+              }
+              // 尝试反转颜色
               const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
               r = tryDecode(inv, sz);
-              if (r) { if (!silent) addLog('✅ 标准解码(反转): '+r.text.substring(0,40)); return r.text; }
+              if (r) { 
+                if (!silent) addLog('✅ 标准解码(反转): mask='+r.mask+' msb='+r.msb+' '+r.text.substring(0,40)); 
+                return r.text; 
+              }
             }
           }
         }
@@ -371,7 +424,7 @@
       const grid = inferGrid(bin, width, height);
       if (!grid) { if (!silent) addLog('❌ 无法检测时序图案'); return null; }
       if (!silent) addLog('📐 模块:'+grid.moduleSize+' 偏移:('+grid.offsetX+','+grid.offsetY+') 大小:'+grid.qrSize+' v'+grid.version);
-      
+
       const matrix2 = extractMatrixFromGrid(bin, width, height, grid);
       for (let v = Math.max(1,grid.version-2); v <= Math.min(10,grid.version+2); v++) {
         const sz = 17+v*4;
@@ -395,27 +448,14 @@
               if(iv) work[r][c]^=1;
             }
             const bits = readBitsNoFinder(work, sz);
-            if (bits.length < 12) continue;
-            let mode = 0;
-            for (let i=0;i<4;i++) mode=(mode<<1)|bits[i];
-            if (mode !== 4) continue;
-            let count = 0;
-            for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
-            if (count<=0||count>300) continue;
-            if (12+count*8 > bits.length) continue;
-            const bytes = [];
-            for (let i=0;i<count;i++) {
-              let b=0;
-              for (let j=0;j<8;j++) b=(b<<1)|bits[12+i*8+j];
-              bytes.push(b);
-            }
-            try {
-              const text = new TextDecoder().decode(new Uint8Array(bytes));
-              if (text.length>0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) {
-                if (!silent) addLog('✅ 无定位点解码: v'+v+' mask'+mask+' '+text.substring(0,40));
-                return text;
+            // 尝试 MSB 和 LSB
+            for (const msb of [true, false]) {
+              const result = decodeBits(bits, msb);
+              if (result) {
+                if (!silent) addLog('✅ 无定位点解码: v'+v+' mask'+mask+' msb='+msb+' '+result.text.substring(0,40));
+                return result.text;
               }
-            } catch(e) {}
+            }
           }
         }
       }
