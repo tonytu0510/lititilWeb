@@ -327,6 +327,7 @@
           const matrix = extractMatrix(bin, width, height, tl, tr, bl, size);
           
           let r = tryDecode(matrix, size);
+          console.log('r=>',r)
           if (r) {
             if (!silent) addLog('✅ P'+(pi+1)+' v'+v+' mask'+r.mask+': '+r.text.substring(0,40));
             return r.text;
