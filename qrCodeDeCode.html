@@ -244,20 +244,24 @@
         }
         console.log('bits.length=>',bits.length)
         if (bits.length < 12) continue;
+        console.log('1')
         let mode = 0;
         for (let i=0;i<4;i++) mode=(mode<<1)|bits[i];
         if (mode !== 4) continue;
+        console.log('2')
         let count = 0;
         for (let i=0;i<8;i++) count=(count<<1)|bits[4+i];
         if (count<=0||count>300) continue;
+        console.log('3')
         if (12+count*8 > bits.length) continue;
-        
+        console.log('4')
         const bytes = [];
         for (let i=0;i<count;i++) {
           let b = 0;
           for (let j=0;j<8;j++) b=(b<<1)|bits[12+i*8+j];
           bytes.push(b);
         }
+        console.log('5')
         try {
           const text = new TextDecoder().decode(new Uint8Array(bytes));
           console.log('text.length=>',text.length)
