@@ -386,7 +386,7 @@
       previewArea.appendChild(origImg);
       
       const imageData = hiddenCtx.getImageData(0, 0, img.width, img.height);
-      const result = decodeQR(imageData, true);
+      const result = decodeQR(imageData, false);
       
       if (result) {
         scanResult.textContent = result;
