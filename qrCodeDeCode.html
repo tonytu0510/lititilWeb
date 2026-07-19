@@ -257,13 +257,7 @@
         console.log('count<=0:', count<=0);
         console.log('count>300:', count>300);
         if (count<=0||count>300) continue;
-        console.log('3')
-        console.log('count=>',count)
-        console.log('12+count*8=>',12+count*8)
-        console.log('its.length=>',bits.length)
-        console.log('Number(12+count*8) > Number(bits.length)=>',Number(12+count*8) > Number(bits.length))
-        console.log('Number(12+count*8) > Number(bits.length)=>',Number(bits.length) < Number(12+count*8))
-        //if(bits.length < (12+count*8)) continue;
+        if(bits.length < (12+count*8)) continue;
         console.log('4=>',4)
         const bytes = [];
         for (let i=0;i<count;i++) {
