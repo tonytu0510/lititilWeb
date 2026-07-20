@@ -113,6 +113,15 @@
     }
 
     function parseExact(imageData,gen){
+addLog('矩阵逐行对比(前5行):');
+const genM=gen.matrix;
+for(let r=0;r<Math.min(5,gen.size);r++){
+  let line='';
+  for(let c=0;c<gen.size;c++)line+=um[r][c]===genM[r][c]?'.':'X';
+  addLog('row'+r+': '+line);
+}
+let match=0;for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++)if(um[r][c]===genM[r][c])match++;
+addLog('总匹配: '+match+'/'+(gen.size*gen.size));
       const{gray,w,h}=toGray(imageData);
       const bin=toBin(gray,w,h);
       const fcx=gen.fcx,ms=gen.ms;
