@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 v15 修复矩阵</title>
+  <title>二维码解码器 v16 全量调试</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
-    .container { max-width: 900px; margin: 0 auto; }
+    .container { max-width: 950px; margin: 0 auto; }
     h1 { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 1.5rem; padding: 1.8rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; }
+    .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 1.5rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
     .upload-box { border: 2px dashed rgba(255,255,255,0.3); border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); margin-bottom: 1rem; }
     .upload-box:hover { border-color: #43e97b; }
     .btn { width: 100%; padding: 0.8rem; border: none; border-radius: 0.7rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: white; margin-bottom: 0.6rem; }
@@ -20,13 +19,14 @@
     .result-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 1rem; margin-top: 1rem; }
     .result-content { font-size: 1.2rem; font-weight: 600; color: #43e97b; word-break: break-all; min-height: 1.5rem; }
     .result-content.empty { color: #666; }
-    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.7rem; color: #43e97b; max-height: 500px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; }
+    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.6rem; font-family: 'Courier New', monospace; font-size: 0.65rem; color: #43e97b; max-height: 500px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; line-height:1.3; }
     .preview-area { display: flex; justify-content: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 1rem; margin: 1rem 0; }
+    .url-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(67,233,123,0.15); border-left: 4px solid #43e97b; padding: 0.5rem 1rem; border-radius: 0.4rem; font-size: 0.9rem; color: #a8f0c0; margin-top: 0.5rem; word-break: break-all; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📷 v15 修复矩阵</h1>
+    <h1>📷 v16 全量调试</h1>
     <div class="card">
       <div class="upload-box" id="uploadBox"><div style="font-size:3rem;">🖼️</div><div>点击上传 或 拖拽二维码图片</div></div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
@@ -60,19 +60,11 @@
     function clusterCandidates(cs,gs){const g={};for(const p of cs){const k=Math.floor(p.x/gs)+','+Math.floor(p.y/gs);if(!g[k])g[k]={pts:[],sx:0,sy:0,sm:0};g[k].pts.push(p);g[k].sx+=p.x;g[k].sy+=p.y;g[k].sm+=p.modSize;}const cells=Object.values(g).filter(c=>c.pts.length>=3),m=[];for(let i=0;i<cells.length;i++){if(cells[i]._used)continue;let cx=cells[i].sx/cells[i].pts.length,cy=cells[i].sy/cells[i].pts.length,cm=cells[i].sm/cells[i].pts.length,count=cells[i].pts.length;let ch=true;while(ch){ch=false;for(let j=i+1;j<cells.length;j++){if(cells[j]._used)continue;const jx=cells[j].sx/cells[j].pts.length,jy=cells[j].sy/cells[j].pts.length;if(Math.abs(cx-jx)<gs*3&&Math.abs(cy-jy)<gs*3){cx=(cx*count+jx*cells[j].pts.length)/(count+cells[j].pts.length);cy=(cy*count+jy*cells[j].pts.length)/(count+cells[j].pts.length);cm=(cm*count+(cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count+cells[j].pts.length);count+=cells[j].pts.length;cells[j]._used=true;ch=true;}}}m.push({x:Math.round(cx),y:Math.round(cy),moduleSize:cm,count});}return m.filter(x=>x.count>=5).sort((a,b)=>b.count-a.count);}
     function orderFinders(pts){const tl=pts.reduce((a,b)=>(a.x+a.y)<(b.x+b.y)?a:b);const rest=pts.filter(p=>p!==tl);const tr=rest.reduce((a,b)=>a.x>b.x?a:b);const bl=rest.find(p=>p!==tr);return{tl,tr,bl};}
 
-    // ==================== 关键修复：矩阵提取 ====================
     function extractMatrix(bin,w,h,tl,tr,bl,size){
       const m=Array.from({length:size},()=>new Uint32Array(size));
-      // 定位点中心在矩阵中的坐标是 (3,3) (size-4,3) (3,size-4)
-      // 从 (3,3) 到 (size-4,3) 的距离 = size-7 个模块
-      const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7);
-      const dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);
-      // 矩阵左上角 (0,0) 对应的源坐标 = tl - 3*dx1 - 3*dx2
+      const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7),dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);
       const ox=tl.x-dx1*3-dx2*3,oy=tl.y-dy1*3-dy2*3;
-      for(let r=0;r<size;r++)for(let c=0;c<size;c++){
-        const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);
-        if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;
-      }
+      for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}
       return m;
     }
 
@@ -105,43 +97,49 @@
       addLog('🔍 '+clusters.length+' 个簇');
       if(clusters.length<3){addLog('❌ 簇不足');return null;}
       const top3=clusters.slice(0,3);
-      addLog('📍 ('+top3[0].x+','+top3[0].y+') ('+top3[1].x+','+top3[1].y+') ('+top3[2].x+','+top3[2].y+')');
-      
       const{tl,tr,bl}=orderFinders(top3);
       addLog('🔢 TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
-      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
       const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
       const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
       
-      for(let v=Math.max(1,ev-2);v<=Math.min(10,ev+2);v++){
+      // 只试版本1（数据告诉我们就是v1）
+      for(let v=Math.max(1,ev-1);v<=Math.min(10,ev+1);v++){
         const sz=17+v*4;
         const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
-        addLog('--- v'+v+' '+sz+'×'+sz+' ---');
-        let row0='';for(let c=0;c<Math.min(sz,21);c++)row0+=m[0][c]?'█':'.';
-        addLog('  row0: ['+row0+']');
+        
+        // 打印完整矩阵（缩小版）
+        let viz='';for(let r=0;r<sz;r++){for(let c=0;c<sz;c++)viz+=m[r][c]?'██':'. ';viz+='\n';}
+        addLog('v'+v+'矩阵:\n'+viz);
         
         for(const skipFinder of[true,false]){
           for(let mask=0;mask<8;mask++){
             const w=unmask(m,sz,mask);
             const bits=readBits(w,sz,skipFinder);
-            if(bits.length<20)continue;
             
-            // 同时尝试不同偏移量
-            for(const offset of[0,1,2,3,4,8]){
-              const shifted=bits.slice(offset);
-              if(shifted.length<12)continue;
-              let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|shifted[i];
-              if(mode!==4)continue;
-              let count=0;for(let i=0;i<8;i++)count=(count<<1)|shifted[4+i];
-              if(count<=0||count>500)continue;
+            // 输出前12位
+            const first12=bits.slice(0,12).join('');
+            let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|bits[i];
+            let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
+            
+            addLog('sf='+skipFinder+' m'+mask+': bits='+bits.length+' 前12='+first12+' mode='+mode+' cnt='+count);
+            
+            if(bits.length<12)continue;
+            
+            // 尝试偏移
+            for(const off of[0,1,2,3,4,5,6,7,8]){
+              const s=bits.slice(off);
+              if(s.length<12)continue;
+              let m2=0;for(let i=0;i<4;i++)m2=(m2<<1)|s[i];
+              if(m2!==4)continue;
+              let c2=0;for(let i=0;i<8;i++)c2=(c2<<1)|s[4+i];
+              if(c2<=0||c2>500)continue;
               
-              const dataCW=(v<=10&&VD[v])?VD[v][1]:Math.floor(shifted.length/8*0.7);
-              const maxB=Math.min(count,dataCW,Math.floor((shifted.length-12)/8));
-              const bytes=[];for(let i=0;i<maxB;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|shifted[12+i*8+j];bytes.push(b);}
+              const maxB=Math.min(c2,Math.floor((s.length-12)/8),50);
+              const bytes=[];for(let i=0;i<maxB;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|s[12+i*8+j];bytes.push(b);}
               const text=bytesToText(bytes),url=tryUrl(text);
-              
-              if(v===ev)addLog('  skip='+skipFinder+' mask'+mask+' off'+offset+': mode='+mode+' cnt='+count+' text="'+text.substring(0,30)+'"');
-              if(url){addLog('✅ v'+v+' mask'+mask+' off'+offset+': '+url);return{url,text};}
+              addLog('  off='+off+' mode='+m2+' cnt='+c2+' bytes='+bytes.slice(0,10).join(',')+' text="'+text.substring(0,40)+'"');
+              if(url){addLog('✅ v'+v+' mask'+mask+' off'+off+': '+url);return{url,text};}
             }
           }
         }
