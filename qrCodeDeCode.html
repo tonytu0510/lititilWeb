@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码自测 v22</title>
+  <title>二维码自测 v23 修复readBits</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 1rem; color: #e0e0e0; }
@@ -16,7 +16,7 @@
     button { cursor: pointer; background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; font-weight: 600; border: none; }
     .qr-box { display: flex; justify-content: center; padding: 0.3rem; background: white; border-radius: 0.4rem; }
     .qr-box canvas { max-width: 120px; }
-    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.4rem; padding: 0.4rem; font-family: monospace; font-size: 0.6rem; color: #43e97b; max-height: 250px; overflow-y: auto; white-space: pre-wrap; line-height: 1.2; }
+    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.4rem; padding: 0.4rem; font-family: monospace; font-size: 0.6rem; color: #43e97b; max-height: 300px; overflow-y: auto; white-space: pre-wrap; line-height: 1.2; }
     .result { font-size: 0.9rem; font-weight: 600; padding: 0.3rem; text-align: center; }
     .result.ok { color: #43e97b; }
     .result.fail { color: #ff6b6b; }
@@ -24,7 +24,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔳 v22 修复坐标</h1>
+    <h1>🔳 v23 修复readBits bug</h1>
     <div class="flex-row">
       <div><input id="testUrl" value="https://www.lititil.com"><button id="testBtn">生成+解析</button></div>
       <div><input type="file" id="fileInput" accept="image/*" style="display:none;"><button id="uploadBtn">📁 上传</button></div>
@@ -74,9 +74,8 @@
       const canvas=document.createElement('canvas');canvas.width=cs;canvas.height=cs;
       const ctx=canvas.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cs,cs);
       for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){ctx.fillStyle=masked[r][c]?'#000':'#FFF';ctx.fillRect((c+border)*ms,(r+border)*ms,ms,ms);}
-      // 定位点中心坐标（像素）：(3+border)*ms+ms/2
       const fcx=(3+border)*ms+Math.floor(ms/2);
-      return{canvas,matrix:masked,version:v,size:sz,dataCW:data,ecCW:ec,totalCW:total,allCodewords:all,moduleSize:ms,border:border,finderCX:fcx};
+      return{canvas,matrix:masked,version:v,size:sz,dataCW:data,ecCW:ec,totalCW:total,allCodewords:all,moduleSize:ms,border,finderCX:fcx};
     }
 
     // ==================== 解析器 ====================
@@ -89,10 +88,12 @@
       for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}
       return m;
     }
+    
+    // 修复：size参数名统一
     function readBits(m,size){
       const bits=[];let up=true;
       for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;
-        for(let row=up?size-1:0;up?row>=0:row<sz;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
+        for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
           if(c<0||c>=size)continue;if(row===6||c===6)continue;
           bits.push(m[row][c]);
         }}up=!up;}
@@ -102,20 +103,42 @@
     const logBox=document.getElementById('logBox'),resultDisplay=document.getElementById('resultDisplay');
     function addLog(msg){logBox.innerHTML+=msg+'\n';logBox.scrollTop=logBox.scrollHeight;}
 
+    function parseImage(imageData, genSize, genVersion, genDataCW, genECCW){
+      const{gray,width,height}=toGray(imageData);
+      const bin=toBinary(gray,width,height);
+      const ms=8,border=4,fcx=(3+border)*ms+Math.floor(ms/2);
+      const tl={x:fcx,y:fcx,moduleSize:ms};
+      const tr={x:fcx+(genSize-7)*ms,y:fcx,moduleSize:ms};
+      const bl={x:fcx,y:fcx+(genSize-7)*ms,moduleSize:ms};
+      const m=extractMatrix(bin,width,height,tl,tr,bl,genSize);
+      let match=0;for(let r=0;r<genSize;r++)for(let c=0;c<genSize;c++)if(m[r][c]===genMatrix[r][c])match++;
+      addLog('矩阵匹配: '+match+'/'+(genSize*genSize)+' ('+(match/(genSize*genSize)*100).toFixed(1)+'%)');
+      const um=m.map(r=>new Uint32Array(r));
+      for(let r=0;r<genSize;r++)for(let c=0;c<genSize;c++){if(r===6||c===6)continue;if((r+c)%2===0)um[r][c]^=1;}
+      const bits=readBits(um,genSize);
+      let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|bits[i];
+      let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
+      addLog('mode='+mode+' count='+count+' bits='+bits.length);
+      if(mode===4&&count>0&&count<=genDataCW){
+        const bytes=[];for(let i=0;i<count;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[12+i*8+j];bytes.push(b);}
+        const text=new TextDecoder().decode(new Uint8Array(bytes));
+        addLog('结果: "'+text+'"');
+        return text;
+      }
+      return null;
+    }
+
+    let genMatrix=null, genSize=null, genVersion=null, genDataCW=null;
+
     document.getElementById('testBtn').addEventListener('click',()=>{
       logBox.innerHTML='';resultDisplay.textContent='⏳';resultDisplay.className='result';
       const url=document.getElementById('testUrl').value.trim();if(!url)return;
-      const ms=8; // 模块大小
-      const gen=generateQR(url,ms);
+      const gen=generateQR(url,8);
+      genMatrix=gen.matrix;genSize=gen.size;genVersion=gen.version;genDataCW=gen.dataCW;
       document.getElementById('qrDisplay').innerHTML='';
       document.getElementById('qrDisplay').appendChild(gen.canvas);
-      
-      // 精确坐标
-      const fcx=gen.finderCX; // 定位点中心x
-      const tl={x:fcx,y:fcx,moduleSize:ms};
-      const tr={x:fcx+(gen.size-7)*ms,y:fcx,moduleSize:ms};
-      const bl={x:fcx,y:fcx+(gen.size-7)*ms,moduleSize:ms};
-      addLog('精确定位: TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+') ms='+ms);
+      addLog('生成: v'+gen.version+' '+gen.size+'×'+gen.size+' dataCW='+gen.dataCW);
+      addLog('期望: '+url);
       
       setTimeout(()=>{
         const hc=document.getElementById('hiddenCanvas');
@@ -123,30 +146,9 @@
         const ctx=hc.getContext('2d',{willReadFrequently:true});
         ctx.drawImage(gen.canvas,0,0);
         const id=ctx.getImageData(0,0,hc.width,hc.height);
-        const{gray,width,height}=toGray(id);
-        const bin=toBinary(gray,width,height);
-        const m=extractMatrix(bin,width,height,tl,tr,bl,gen.size);
-        
-        // 匹配率
-        let match=0;
-        for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++)if(m[r][c]===gen.matrix[r][c])match++;
-        addLog('矩阵匹配: '+match+'/'+(gen.size*gen.size)+' ('+(match/(gen.size*gen.size)*100).toFixed(1)+'%)');
-        
-        // 去掩码0
-        const um=m.map(r=>new Uint32Array(r));
-        for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if((r+c)%2===0)um[r][c]^=1;}
-        // 也尝试生成器的去掩码前矩阵
-        const bits=readBits(um,gen.size);
-        let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|bits[i];
-        let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
-        addLog('mode='+mode+' count='+count+' bits='+bits.length);
-        if(mode===4&&count>0&&count<=gen.dataCW){
-          const bytes=[];for(let i=0;i<count;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[12+i*8+j];bytes.push(b);}
-          const text=new TextDecoder().decode(new Uint8Array(bytes));
-          addLog('结果: "'+text+'"');
-          if(text===url){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
-          else{resultDisplay.textContent='⚠️ '+text;resultDisplay.className='result fail';}
-        }else{resultDisplay.textContent='❌ mode='+mode;resultDisplay.className='result fail';}
+        const text=parseImage(id,gen.size,gen.version,gen.dataCW,gen.ecCW);
+        if(text===url){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
+        else{resultDisplay.textContent='❌ '+text;resultDisplay.className='result fail';}
       },100);
     });
 
@@ -158,30 +160,44 @@
         document.getElementById('qrDisplay').innerHTML='';const oi=document.createElement('img');oi.src=ev.target.result;oi.style.maxWidth='120px';document.getElementById('qrDisplay').appendChild(oi);
         const hc=document.getElementById('hiddenCanvas');hc.width=img.width;hc.height=img.height;
         const ctx=hc.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
+        logBox.innerHTML='';
         const{gray,width,height}=toGray(ctx.getImageData(0,0,img.width,img.height));
         const bin=toBinary(gray,width,height);
         // 扫描定位点
         const a=[];for(let y=0;y<height;y+=2){const s=[];let cl=bin[y*width],ln=1;for(let x=1;x<width;x++){const co=bin[y*width+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}s.push({color:cl,len:ln,startX:width-ln});for(let i=0;i<s.length-4;i++){const sg=s.slice(i,i+5);if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms2=t/7;const ra=sg.map(x=>x.len/ms2);let ok=true;for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}if(ok&&ms2>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms2});}}}
-        if(a.length<3)return;
+        if(a.length<3){resultDisplay.textContent='❌ 候选点不足';return;}
         const g2={};for(const p of a){const k=Math.floor(p.x/15)+','+Math.floor(p.y/15);if(!g2[k])g2[k]={pts:[],sx:0,sy:0,sm:0};g2[k].pts.push(p);g2[k].sx+=p.x;g2[k].sy+=p.y;g2[k].sm+=p.modSize;}
         const cells=Object.values(g2).filter(c=>c.pts.length>=3),clusters=[];for(let i=0;i<cells.length;i++){if(cells[i]._used)continue;let cx=cells[i].sx/cells[i].pts.length,cy=cells[i].sy/cells[i].pts.length,cm=cells[i].sm/cells[i].pts.length,count=cells[i].pts.length;let ch=true;while(ch){ch=false;for(let j=i+1;j<cells.length;j++){if(cells[j]._used)continue;const jx=cells[j].sx/cells[j].pts.length,jy=cells[j].sy/cells[j].pts.length;if(Math.abs(cx-jx)<45&&Math.abs(cy-jy)<45){cx=(cx*count+jx*cells[j].pts.length)/(count+cells[j].pts.length);cy=(cy*count+jy*cells[j].pts.length)/(count+cells[j].pts.length);cm=(cm*count+(cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count+cells[j].pts.length);count+=cells[j].pts.length;cells[j]._used=true;ch=true;}}}clusters.push({x:Math.round(cx),y:Math.round(cy),moduleSize:cm,count});}
         const top3=clusters.filter(x=>x.count>=5).sort((a,b)=>b.count-a.count).slice(0,3);
-        if(top3.length<3)return;
+        if(top3.length<3){resultDisplay.textContent='❌ 簇不足';return;}
         const tl=top3.reduce((a,b)=>(a.x+a.y)<(b.x+b.y)?a:b);const rest=top3.filter(p=>p!==tl);const tr=rest.reduce((a,b)=>a.x>b.x?a:b);const bl=rest.find(p=>p!==tr);
         addLog('TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
         const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
         const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
         const ev=Math.round(((d1+d2)/2/avgMod-10)/4),v=Math.max(1,Math.min(10,ev)),sz=17+v*4;
-        const dcw=VD[v]?VD[v][1]:26;addLog('v'+v+' '+sz+'×'+sz);
+        const dcw=VD[v]?VD[v][1]:26;addLog('v'+v+' '+sz+'×'+sz+' dataCW='+dcw);
         const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
         const um=m.map(r=>new Uint32Array(r));for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){if(r===6||c===6)continue;if((r+c)%2===0)um[r][c]^=1;}
         const bits=readBits(um,sz);
-        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32]){
+        addLog('bits='+bits.length);
+        // 暴力搜索
+        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40]){
           const s=bits.slice(off);if(s.length<12)continue;
           let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|s[i];if(mode!==4)continue;
           let count=0;for(let i=0;i<8;i++)count=(count<<1)|s[4+i];if(count<1||count>dcw)continue;
           const bytes=[];for(let i=0;i<count;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|s[12+i*8+j];bytes.push(b);}
-          try{const text=new TextDecoder().decode(new Uint8Array(bytes));if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text)){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';addLog('off='+off+' '+text);return;}}catch(e){}
+          try{const text=new TextDecoder().decode(new Uint8Array(bytes));addLog('off='+off+' text="'+text.substring(0,40)+'"');if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text)){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';return;}}catch(e){}
+        }
+        // 也试反转
+        const um2=m.map(r=>new Uint32Array(r));for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)um2[r][c]^=1;
+        for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){if(r===6||c===6)continue;if((r+c)%2===0)um2[r][c]^=1;}
+        const bits2=readBits(um2,sz);
+        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40]){
+          const s=bits2.slice(off);if(s.length<12)continue;
+          let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|s[i];if(mode!==4)continue;
+          let count=0;for(let i=0;i<8;i++)count=(count<<1)|s[4+i];if(count<1||count>dcw)continue;
+          const bytes=[];for(let i=0;i<count;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|s[12+i*8+j];bytes.push(b);}
+          try{const text=new TextDecoder().decode(new Uint8Array(bytes));addLog('反转off='+off+' text="'+text.substring(0,40)+'"');if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text)){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';return;}}catch(e){}
         }
         resultDisplay.textContent='❌';resultDisplay.className='result fail';
       };img.src=ev.target.result;};reader.readAsDataURL(f);fileInput.value='';
