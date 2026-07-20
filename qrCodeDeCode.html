@@ -3,96 +3,331 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解析器 · 修复版</title>
+  <title>二维码解析器 · 最终版</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
+    body { 
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; 
+      min-height: 100vh; 
+      padding: 2rem 1rem; 
+      color: #e0e0e0; 
+    }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 1.5rem; padding: 1.8rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem; }
-    .upload-box { border: 2px dashed rgba(255,255,255,0.3); border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); margin-bottom: 1rem; }
-    .upload-box:hover { border-color: #43e97b; }
-    .btn { width: 100%; padding: 0.8rem; border: none; border-radius: 0.7rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: white; margin-bottom: 0.6rem; }
+    h1 { 
+      text-align: center; 
+      font-size: 2.2rem; 
+      margin-bottom: 0.3rem; 
+      background: linear-gradient(135deg, #43e97b, #38f9d7); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      text-shadow: 0 0 30px rgba(67,233,123,0.3);
+    }
+    .subtitle { 
+      text-align: center; 
+      color: #8892b0; 
+      margin-bottom: 1.5rem; 
+      font-size: 0.95rem;
+    }
+    .card { 
+      background: rgba(255,255,255,0.05); 
+      backdrop-filter: blur(20px); 
+      border-radius: 1.5rem; 
+      padding: 1.8rem; 
+      border: 1px solid rgba(255,255,255,0.1); 
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .upload-box { 
+      border: 2px dashed rgba(255,255,255,0.3); 
+      border-radius: 1rem; 
+      padding: 2.5rem 2rem; 
+      text-align: center; 
+      cursor: pointer; 
+      background: rgba(0,0,0,0.2); 
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+    .upload-box:hover { 
+      border-color: #43e97b; 
+      background: rgba(67,233,123,0.05);
+      transform: translateY(-2px);
+    }
+    .upload-box.dragover {
+      border-color: #43e97b;
+      background: rgba(67,233,123,0.1);
+      transform: scale(1.02);
+    }
+    .upload-box .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    .upload-box .text { color: #8892b0; font-size: 0.95rem; }
+    .upload-box .hint { color: #666; font-size: 0.8rem; margin-top: 0.5rem; }
+    .btn { 
+      width: 100%; 
+      padding: 0.9rem; 
+      border: none; 
+      border-radius: 0.7rem; 
+      font-size: 0.95rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      color: white; 
+      margin-bottom: 0.6rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    .btn:hover::before { left: 100%; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+    .btn:active { transform: translateY(0); }
     .btn-row { display: flex; gap: 0.8rem; }
     .btn-row .btn { flex: 1; }
-    .result-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 1rem; margin-top: 1rem; }
-    .result-content { font-size: 1.2rem; font-weight: 600; color: #43e97b; word-break: break-all; min-height: 1.5rem; }
-    .result-content.empty { color: #666; }
+    .btn-primary { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; }
+    .btn-camera { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .btn-stop { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    .btn-copy { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #1a1a2e; }
+    .btn-open { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .result-box { 
+      background: rgba(0,0,0,0.3); 
+      border-radius: 0.7rem; 
+      padding: 1.2rem; 
+      margin-top: 1rem;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .result-label { 
+      font-size: 0.8rem; 
+      color: #8892b0; 
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .result-content { 
+      font-size: 1.2rem; 
+      font-weight: 600; 
+      color: #43e97b; 
+      word-break: break-all; 
+      min-height: 1.5rem;
+      line-height: 1.5;
+    }
+    .result-content.empty { color: #666; font-weight: 400; }
     .result-content.binary { color: #f7d44a; font-family: 'Courier New', monospace; font-size: 0.9rem; }
-    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #43e97b; max-height: 350px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; }
-    .preview-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 1rem; background: white; border-radius: 1rem; margin: 1rem 0; min-height: 100px; align-items: center; }
-    .video-container { width: 100%; max-width: 300px; margin: 0 auto 1rem; border-radius: 1rem; overflow: hidden; background: #000; aspect-ratio: 1; display: none; }
-    .video-container.active { display: block; }
-    #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .result-content.error { color: #ff6b6b; }
+    .result-content.success { color: #43e97b; }
+
     .url-badge {
-      display: inline-block;
-      background: rgba(67, 233, 123, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(67, 233, 123, 0.1);
       border-left: 4px solid #43e97b;
-      padding: 0.3rem 0.8rem;
+      padding: 0.5rem 1rem;
       border-radius: 0.4rem;
       font-size: 0.9rem;
       color: #a8f0c0;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
       word-break: break-all;
+      animation: slideIn 0.3s ease;
     }
-    .url-badge a { color: #43e97b; text-decoration: underline; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .url-badge a { color: #43e97b; text-decoration: none; font-weight: 600; }
+    .url-badge a:hover { text-decoration: underline; }
+
     .hex-dump {
       background: rgba(0,0,0,0.5);
       border-radius: 0.4rem;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-family: 'Courier New', monospace;
       font-size: 0.75rem;
       color: #aaa;
       margin-top: 0.5rem;
       word-break: break-all;
-      max-height: 100px;
+      max-height: 120px;
       overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.05);
     }
     .debug-info {
       background: rgba(0,0,0,0.3);
       border-radius: 0.4rem;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-family: 'Courier New', monospace;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: #888;
       margin-top: 0.5rem;
       word-break: break-all;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .log-box { 
+      background: rgba(0,0,0,0.3); 
+      border-radius: 0.7rem; 
+      padding: 0.8rem; 
+      font-family: 'Courier New', monospace; 
+      font-size: 0.8rem; 
+      color: #43e97b; 
+      max-height: 300px; 
+      overflow-y: auto; 
+      margin-top: 0.8rem; 
+      white-space: pre-wrap;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .log-box .log-time { color: #666; }
+    .log-box .log-info { color: #4facfe; }
+    .log-box .log-success { color: #43e97b; }
+    .log-box .log-error { color: #ff6b6b; }
+    .log-box .log-warn { color: #f7d44a; }
+
+    .preview-area { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      gap: 10px; 
+      padding: 1rem; 
+      background: rgba(0,0,0,0.2); 
+      border-radius: 1rem; 
+      margin: 1rem 0; 
+      min-height: 100px; 
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .preview-area img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .preview-area .placeholder { color: #666; font-size: 0.9rem; }
+
+    .video-container { 
+      width: 100%; 
+      max-width: 300px; 
+      margin: 0 auto 1rem; 
+      border-radius: 1rem; 
+      overflow: hidden; 
+      background: #000; 
+      aspect-ratio: 1; 
+      display: none;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .video-container.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+    .stat-item {
+      background: rgba(255,255,255,0.05);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.4rem;
+      font-size: 0.75rem;
+      color: #8892b0;
+    }
+    .stat-item strong { color: #43e97b; }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(67, 233, 123, 0.95);
+      color: #1a1a2e;
+      padding: 0.8rem 1.5rem;
+      border-radius: 0.7rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 5px 20px rgba(67,233,123,0.3);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast.error {
+      background: rgba(255, 107, 107, 0.95);
+      box-shadow: 0 5px 20px rgba(255,107,107,0.3);
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      .card { padding: 1.2rem; }
+      .btn-row { flex-direction: column; }
+      .btn-row .btn { width: 100%; }
     }
   </style>
+  <base target="_blank">
 <base target="_blank">
 </head>
 <body>
   <div class="container">
-    <h1>📷 二维码解析器 · 修复版</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">修复数据读取顺序 · 支持标准二维码</p>
+    <h1>二维码解析器 · 最终版</h1>
+    <p class="subtitle">支持标准二维码识别 · 自动网址转换 · 摄像头实时扫描</p>
+
     <div class="card">
       <div class="upload-box" id="uploadBox">
-        <div style="font-size:3rem;">🖼️</div>
-        <div>点击上传 或 拖拽二维码图片</div>
+        <div class="icon">🖼️</div>
+        <div class="text">点击上传或拖拽二维码图片</div>
+        <div class="hint">支持 JPG、PNG、GIF、WebP 格式</div>
       </div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
-      <div class="video-container" id="videoContainer"><video id="video" autoplay playsinline muted></video></div>
-      <div class="btn-row">
-        <button class="btn" style="background:linear-gradient(135deg,#4facfe,#00f2fe);" id="cameraBtn">📸 打开相机</button>
-        <button class="btn" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);display:none;" id="stopBtn">⏹️ 关闭</button>
+
+      <div class="video-container" id="videoContainer">
+        <video id="video" autoplay playsinline muted></video>
       </div>
-      <div class="preview-area" id="previewArea"><span style="color:#bbb;">预览</span></div>
+
+      <div class="btn-row">
+        <button class="btn btn-camera" id="cameraBtn">📸 打开相机</button>
+        <button class="btn btn-stop" style="display:none;" id="stopBtn">⏹️ 关闭相机</button>
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <span class="placeholder">图片预览将显示在这里</span>
+      </div>
     </div>
+
     <div class="card">
       <div class="result-box">
-        <div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
+        <div class="result-label">🔍 解析结果</div>
         <div class="result-content empty" id="scanResult">等待解析...</div>
         <div id="urlBadgeContainer"></div>
         <div id="hexDumpContainer"></div>
         <div id="debugInfo" class="debug-info"></div>
+        <div class="stats-bar" id="statsBar"></div>
       </div>
-      <div class="btn-row">
-        <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
-        <button class="btn" style="background:linear-gradient(135deg,#f093fb,#f5576c);" id="openBtn">🔗 打开</button>
+
+      <div class="btn-row" style="margin-top: 1rem;">
+        <button class="btn btn-copy" id="copyBtn">📋 复制结果</button>
+        <button class="btn btn-open" id="openBtn">🔗 打开链接</button>
       </div>
+
       <div class="log-box" id="logBox"></div>
     </div>
   </div>
+
+  <div class="toast" id="toast"></div>
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
 
   <script>
@@ -107,14 +342,33 @@
     }
 
     function toBinary(gray, width, height) {
-      let min = 255, max = 0;
-      for (let i = 0; i < gray.length; i++) {
-        if (gray[i] < min) min = gray[i];
-        if (gray[i] > max) max = gray[i];
+      const histogram = new Array(256).fill(0);
+      for (let i = 0; i < gray.length; i++) histogram[gray[i]]++;
+
+      let total = gray.length;
+      let sum = 0;
+      for (let i = 0; i < 256; i++) sum += i * histogram[i];
+
+      let sumB = 0, wB = 0, wF = 0;
+      let maxVariance = 0, threshold = 128;
+
+      for (let t = 0; t < 256; t++) {
+        wB += histogram[t];
+        if (wB === 0) continue;
+        wF = total - wB;
+        if (wF === 0) break;
+        sumB += t * histogram[t];
+        const mB = sumB / wB;
+        const mF = (sum - sumB) / wF;
+        const variance = wB * wF * (mB - mF) * (mB - mF);
+        if (variance > maxVariance) {
+          maxVariance = variance;
+          threshold = t;
+        }
       }
-      const thresh = min + (max - min) * 0.4;
+
       const bin = new Uint8Array(width * height);
-      for (let i = 0; i < gray.length; i++) bin[i] = gray[i] < thresh ? 0 : 1;
+      for (let i = 0; i < gray.length; i++) bin[i] = gray[i] < threshold ? 0 : 1;
       return bin;
     }
 
@@ -126,9 +380,14 @@
       for (let x = 1; x < width; x++) {
         const color = bin[y * width + x];
         if (color === curColor) curLen++;
-        else { segments.push({ color: curColor, len: curLen, startX: x - curLen }); curColor = color; curLen = 1; }
+        else { 
+          segments.push({ color: curColor, len: curLen, startX: x - curLen }); 
+          curColor = color; 
+          curLen = 1; 
+        }
       }
       segments.push({ color: curColor, len: curLen, startX: width - curLen });
+
       for (let i = 0; i < segments.length - 4; i++) {
         const s = segments.slice(i, i + 5);
         if (s[0].color===0 && s[1].color===1 && s[2].color===0 && s[3].color===1 && s[4].color===0) {
@@ -136,7 +395,9 @@
           const modSize = total / 7;
           const ratios = s.map(seg => seg.len / modSize);
           let ok = true;
-          for (let j = 0; j < 5; j++) { if (ratios[j] < 0.3 || ratios[j] > 4.0) { ok = false; break; } }
+          for (let j = 0; j < 5; j++) { 
+            if (ratios[j] < 0.3 || ratios[j] > 4.0) { ok = false; break; } 
+          }
           if (ok && modSize > 1.0) {
             const cx = s[0].startX + s[0].len + s[1].len + Math.floor(s[2].len / 2);
             candidates.push({ x: cx, y, modSize });
@@ -148,7 +409,7 @@
 
     function findAllCandidates(bin, width, height) {
       const all = [];
-      for (let y = 0; y < height; y += 4) all.push(...scanRow(bin, width, y));
+      for (let y = 0; y < height; y += 2) all.push(...scanRow(bin, width, y));
       return all;
     }
 
@@ -157,11 +418,15 @@
       for (const pt of candidates) {
         const key = Math.floor(pt.x/gridSize) + ',' + Math.floor(pt.y/gridSize);
         if (!grid[key]) grid[key] = { pts: [], sx: 0, sy: 0, sm: 0 };
-        grid[key].pts.push(pt); grid[key].sx += pt.x; grid[key].sy += pt.y; grid[key].sm += pt.modSize;
+        grid[key].pts.push(pt); 
+        grid[key].sx += pt.x; 
+        grid[key].sy += pt.y; 
+        grid[key].sm += pt.modSize;
       }
       const cells = Object.values(grid).filter(c => c.pts.length >= 3);
       const merged = [];
       for (let i = 0; i < cells.length; i++) {
+        if (cells[i]._used) continue;
         let cx = cells[i].sx/cells[i].pts.length, cy = cells[i].sy/cells[i].pts.length;
         let cm = cells[i].sm/cells[i].pts.length, count = cells[i].pts.length;
         let changed = true;
@@ -174,7 +439,9 @@
               cx = (cx*count + jx*cells[j].pts.length)/(count + cells[j].pts.length);
               cy = (cy*count + jy*cells[j].pts.length)/(count + cells[j].pts.length);
               cm = (cm*count + (cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count + cells[j].pts.length);
-              count += cells[j].pts.length; cells[j]._used = true; changed = true;
+              count += cells[j].pts.length; 
+              cells[j]._used = true; 
+              changed = true;
             }
           }
         }
@@ -203,6 +470,7 @@
       const offsetX = tl.x - dx1 * 3.5 - dx2 * 3.5;
       const offsetY = tl.y - dy1 * 3.5 - dy2 * 3.5;
       const sampleR = Math.max(1, Math.floor((tl.moduleSize + tr.moduleSize + bl.moduleSize) / 9));
+
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
           const sx = offsetX + col * dx1 + row * dx2;
@@ -223,61 +491,49 @@
       return matrix;
     }
 
-    // ==================== 修复版：数据读取 ====================
-    // 标准二维码：跳过定位点区域
+    // ==================== 数据读取 ====================
     function readBitsStandard(matrix, size) {
       const bits = [];
-      let direction = -1; // -1 向上，1 向下
-      let row = size - 1;
-      
-      // 从右下角开始，逐列向左扫描（每两列一组）
+      let direction = -1;
+
       for (let col = size - 1; col >= 0; col -= 2) {
-        // 如果当前列是第6列（索引6），跳到第5列（因为第6列是时序图案）
         const actualCol = (col === 6) ? 5 : col;
-        
-        // 处理两列：actualCol 和 actualCol-1
+
         for (let c = actualCol; c >= Math.max(0, actualCol - 1); c--) {
-          // 跳过时序图案列（第6列）和定位点区域
           if (c === 6) continue;
-          
-          // 从上到下或从下到上读取
+
           let startRow = (direction === -1) ? size - 1 : 0;
           let endRow = (direction === -1) ? -1 : size;
           let step = (direction === -1) ? -1 : 1;
-          
+
           for (let r = startRow; r !== endRow; r += step) {
-            // 跳过定位点区域（左上、右上、左下）
             if (r < 9 && c < 9) continue;
             if (r < 9 && c > size - 9) continue;
             if (r > size - 9 && c < 9) continue;
-            // 跳过时序图案行（第6行）
             if (r === 6) continue;
-            
+
             bits.push(matrix[r][c]);
           }
         }
-        // 切换方向
         direction = -direction;
       }
       return bits;
     }
 
-    // 无定位点：跳过时序图案行/列
     function readBitsNoFinder(matrix, size) {
       const bits = [];
       let direction = -1;
-      let row = size - 1;
-      
+
       for (let col = size - 1; col >= 0; col -= 2) {
         const actualCol = (col === 6) ? 5 : col;
-        
+
         for (let c = actualCol; c >= Math.max(0, actualCol - 1); c--) {
           if (c === 6) continue;
-          
+
           let startRow = (direction === -1) ? size - 1 : 0;
           let endRow = (direction === -1) ? -1 : size;
           let step = (direction === -1) ? -1 : 1;
-          
+
           for (let r = startRow; r !== endRow; r += step) {
             if (r === 6) continue;
             bits.push(matrix[r][c]);
@@ -288,32 +544,95 @@
       return bits;
     }
 
-    // ==================== 解码器（修复版） ====================
-    function decodeBits(bits) {
+    // ==================== 解码器 ====================
+    function getCountBits(mode, version) {
+      if (version <= 9) {
+        return { 1: 10, 2: 9, 4: 8, 8: 8 }[mode] || 8;
+      } else if (version <= 26) {
+        return { 1: 12, 2: 11, 4: 16, 8: 10 }[mode] || 16;
+      } else {
+        return { 1: 14, 2: 13, 4: 16, 8: 12 }[mode] || 16;
+      }
+    }
+
+    function decodeBits(bits, version) {
       if (bits.length < 12) return null;
-      
-      // 读取模式（4位，MSB）
+
       let mode = 0;
       for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
-      
-      const modeMap = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
+
+      const modeMap = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji', 7: 'ECI' };
       if (!modeMap[mode]) return null;
-      
-      // 读取字符数
-      const countBitsMap = { 1: 10, 2: 9, 4: 8, 8: 8 };
-      const cb = countBitsMap[mode];
+
+      if (mode === 7) {
+        const eciBits = bits.slice(4, 12);
+        let eci = 0;
+        for (let i = 0; i < 8; i++) eci = (eci << 1) | eciBits[i];
+        const remainingBits = bits.slice(12);
+        return decodeBits(remainingBits, version);
+      }
+
+      const cb = getCountBits(mode, version);
       if (bits.length < 4 + cb) return null;
-      
+
       let count = 0;
       for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i];
-      
-      if (count <= 0 || count > 300) return null;
-      
-      // 读取数据
+
+      if (count <= 0 || count > 3000) return null;
+
+      if (mode === 1) {
+        const groups = Math.floor(count / 3);
+        const remainder = count % 3;
+        const bitsPerGroup = 10;
+        const bitsPerRemainder = remainder === 1 ? 4 : (remainder === 2 ? 7 : 0);
+        const totalBits = groups * bitsPerGroup + bitsPerRemainder;
+        if (bits.length < 4 + cb + totalBits) return null;
+
+        let text = '';
+        let pos = 4 + cb;
+        for (let i = 0; i < groups; i++) {
+          let val = 0;
+          for (let j = 0; j < 10; j++) val = (val << 1) | bits[pos++];
+          text += val.toString().padStart(3, '0');
+        }
+        if (remainder === 1) {
+          let val = 0;
+          for (let j = 0; j < 4; j++) val = (val << 1) | bits[pos++];
+          text += val.toString();
+        } else if (remainder === 2) {
+          let val = 0;
+          for (let j = 0; j < 7; j++) val = (val << 1) | bits[pos++];
+          text += val.toString().padStart(2, '0');
+        }
+        return { text, bytes: new TextEncoder().encode(text), mode: modeMap[mode], count };
+      }
+
+      if (mode === 2) {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+        const pairs = Math.floor(count / 2);
+        const hasSingle = count % 2 === 1;
+        const totalBits = pairs * 11 + (hasSingle ? 6 : 0);
+        if (bits.length < 4 + cb + totalBits) return null;
+
+        let text = '';
+        let pos = 4 + cb;
+        for (let i = 0; i < pairs; i++) {
+          let val = 0;
+          for (let j = 0; j < 11; j++) val = (val << 1) | bits[pos++];
+          text += chars[Math.floor(val / 45)] + chars[val % 45];
+        }
+        if (hasSingle) {
+          let val = 0;
+          for (let j = 0; j < 6; j++) val = (val << 1) | bits[pos++];
+          text += chars[val];
+        }
+        return { text, bytes: new TextEncoder().encode(text), mode: modeMap[mode], count };
+      }
+
       const dataStart = 4 + cb;
       const requiredBits = dataStart + count * 8;
       if (requiredBits > bits.length) return null;
-      
+
       const bytes = [];
       for (let i = 0; i < count; i++) {
         let b = 0;
@@ -322,56 +641,70 @@
         }
         bytes.push(b);
       }
-      
-      // 尝试UTF-8解码
+
       try {
-        const text = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
-        // 检查是否包含可打印字符
-        if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
+        const text = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes));
+        if (text.length > 0) {
           return { text, bytes, mode: modeMap[mode], count };
         }
       } catch (e) {}
-      
-      // 如果UTF-8失败，尝试其他编码
+
       try {
-        const text = new TextDecoder('gbk').decode(new Uint8Array(bytes));
-        if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
+        const text = new TextDecoder('gbk', { fatal: true }).decode(new Uint8Array(bytes));
+        if (text.length > 0) {
           return { text, bytes, mode: modeMap[mode], count };
         }
       } catch (e) {}
-      
-      // 返回原始字节
+
+      try {
+        const text = new TextDecoder('shift_jis', { fatal: true }).decode(new Uint8Array(bytes));
+        if (text.length > 0) {
+          return { text, bytes, mode: modeMap[mode], count };
+        }
+      } catch (e) {}
+
+      try {
+        const text = new TextDecoder('iso-8859-1').decode(new Uint8Array(bytes));
+        return { text, bytes, mode: modeMap[mode], count };
+      } catch (e) {}
+
       return { text: null, bytes, mode: modeMap[mode], count };
     }
 
-    function tryDecode(matrix, size, readFn) {
-      // 尝试所有掩码
-      for (let mask = 0; mask < 8; mask++) {
-        const work = matrix.map(row => new Uint32Array(row));
-        
-        // 应用掩码
-        for (let r = 0; r < size; r++) {
-          for (let c = 0; c < size; c++) {
-            if (r === 6 || c === 6) continue;
-            let invert = false;
-            switch (mask) {
-              case 0: invert = (r + c) % 2 === 0; break;
-              case 1: invert = r % 2 === 0; break;
-              case 2: invert = c % 3 === 0; break;
-              case 3: invert = (r + c) % 3 === 0; break;
-              case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
-              case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
-              case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
-              case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
-            }
-            if (invert) work[r][c] ^= 1;
+    function applyMask(matrix, size, mask) {
+      const work = matrix.map(row => new Uint32Array(row));
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (r === 6 || c === 6) continue;
+          if (r < 9 && c < 9) continue;
+          if (r < 9 && c > size - 9) continue;
+          if (r > size - 9 && c < 9) continue;
+          if (r === size - 8 && c === 8) continue;
+
+          let invert = false;
+          switch (mask) {
+            case 0: invert = (r + c) % 2 === 0; break;
+            case 1: invert = r % 2 === 0; break;
+            case 2: invert = c % 3 === 0; break;
+            case 3: invert = (r + c) % 3 === 0; break;
+            case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
+            case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
+            case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
+            case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
           }
+          if (invert) work[r][c] ^= 1;
         }
-        
+      }
+      return work;
+    }
+
+    function tryDecode(matrix, size, readFn, version) {
+      for (let mask = 0; mask < 8; mask++) {
+        const work = applyMask(matrix, size, mask);
         const bits = readFn(work, size);
-        const result = decodeBits(bits);
+        const result = decodeBits(bits, version);
         if (result && result.text) {
-          return { ...result, mask };
+          return { ...result, mask, version };
         }
       }
       return null;
@@ -383,27 +716,26 @@
       if (!silent) addLog('📊 图像尺寸: ' + width + '×' + height);
       const bin = toBinary(gray, width, height);
 
-      // 方式1：标准二维码（有定位点）
       const candidates = findAllCandidates(bin, width, height);
       if (!silent) addLog('🔍 检测到 ' + candidates.length + ' 个定位点候选');
-      
+
       if (candidates.length >= 10) {
         const clusters = clusterCandidates(candidates, Math.floor(width/15));
         if (!silent) addLog('🔍 聚类后 ' + clusters.length + ' 个定位点簇');
-        
+
         if (clusters.length >= 3) {
-          const pts = clusters.slice(0, 3);
-          const perms = permutations(pts);
-          
+          const pts = clusters.slice(0, Math.min(6, clusters.length));
+          const perms = permutations(pts.slice(0, 3));
+
           for (let pi = 0; pi < perms.length; pi++) {
             const [tl, tr, bl] = perms[pi];
-            
-            // 检查是否构成直角
+
             const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
             const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
             const dot = v1x * v2x + v1y * v2y;
             const len1 = Math.sqrt(v1x*v1x + v1y*v1y);
             const len2 = Math.sqrt(v2x*v2x + v2y*v2y);
+            if (len1 === 0 || len2 === 0) continue;
             const cosAngle = dot / (len1 * len2);
             if (Math.abs(cosAngle) > 0.3) continue;
 
@@ -411,25 +743,23 @@
             const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
             const avgMod = (tl.moduleSize + tr.moduleSize + bl.moduleSize) / 3;
             const ev = Math.round(((d1 + d2) / 2 / avgMod - 10) / 4);
-            
-            if (!silent) addLog('📐 估计版本: ' + ev);
-            
-            for (let v = Math.max(1, ev-2); v <= Math.min(10, ev+2); v++) {
+
+            if (!silent) addLog('📐 估计版本: ' + ev + ' (模块大小: ' + avgMod.toFixed(2) + ')');
+
+            for (let v = Math.max(1, ev-3); v <= Math.min(40, ev+3); v++) {
               const sz = 17 + v * 4;
-              if (!silent) addLog('🔍 尝试版本 ' + v + ' (矩阵大小 ' + sz + '×' + sz + ')');
-              
+              if (!silent) addLog('🔍 尝试版本 ' + v + ' (矩阵 ' + sz + '×' + sz + ')');
+
               const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
-              
-              // 尝试正常读取
-              let result = tryDecode(m, sz, readBitsStandard);
+
+              let result = tryDecode(m, sz, readBitsStandard, v);
               if (result) {
                 if (!silent) addLog('✅ 解码成功! 掩码: ' + result.mask + ' 模式: ' + result.mode);
                 return result;
               }
-              
-              // 尝试反转
+
               const inv = m.map(row => new Uint32Array(row.map(v => v ^ 1)));
-              result = tryDecode(inv, sz, readBitsStandard);
+              result = tryDecode(inv, sz, readBitsStandard, v);
               if (result) {
                 if (!silent) addLog('✅ 解码成功 (反转)! 掩码: ' + result.mask + ' 模式: ' + result.mode);
                 return result;
@@ -439,13 +769,13 @@
         }
       }
 
-      // 方式2：无定位点（时序图案）
       if (!silent) addLog('🔍 尝试无定位点解码...');
-      // 简化：直接使用整个图像
       const gridSize = Math.min(width, height);
-      const size = Math.floor(gridSize / 8) * 4 + 17;
-      if (size >= 21 && size <= 57) {
+      for (let v = 1; v <= 10; v++) {
+        const size = 17 + v * 4;
         const step = gridSize / size;
+        if (step < 2) break;
+
         const matrix = Array.from({ length: size }, () => new Uint32Array(size));
         for (let r = 0; r < size; r++) {
           for (let c = 0; c < size; c++) {
@@ -456,23 +786,22 @@
             }
           }
         }
-        
-        // 尝试读取
-        let result = tryDecode(matrix, size, readBitsNoFinder);
+
+        let result = tryDecode(matrix, size, readBitsNoFinder, v);
         if (result) {
-          if (!silent) addLog('✅ 无定位点解码成功!');
+          if (!silent) addLog('✅ 无定位点解码成功! 版本: ' + v);
           return result;
         }
-        // 尝试反转
+
         const inv = matrix.map(row => new Uint32Array(row.map(v => v ^ 1)));
-        result = tryDecode(inv, size, readBitsNoFinder);
+        result = tryDecode(inv, size, readBitsNoFinder, v);
         if (result) {
-          if (!silent) addLog('✅ 无定位点解码成功 (反转)!');
+          if (!silent) addLog('✅ 无定位点解码成功 (反转)! 版本: ' + v);
           return result;
         }
       }
 
-      if (!silent) addLog('❌ 解码失败');
+      if (!silent) addLog('❌ 解码失败，未找到有效二维码');
       return null;
     }
 
@@ -487,16 +816,31 @@
     const urlBadgeContainer = document.getElementById('urlBadgeContainer');
     const hexDumpContainer = document.getElementById('hexDumpContainer');
     const debugInfo = document.getElementById('debugInfo');
+    const statsBar = document.getElementById('statsBar');
     const copyBtn = document.getElementById('copyBtn');
     const openBtn = document.getElementById('openBtn');
     const previewArea = document.getElementById('previewArea');
     const logBox = document.getElementById('logBox');
+    const toast = document.getElementById('toast');
     const hiddenCanvas = document.getElementById('hiddenCanvas');
     const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
     let cameraStream = null, lastResult = '', lastUrl = '', scanTimer = null;
 
+    function showToast(msg, isError) {
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
     function addLog(msg) {
-      logBox.textContent += '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg + '\n';
+      const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      let className = 'log-info';
+      if (msg.includes('✅')) className = 'log-success';
+      else if (msg.includes('❌')) className = 'log-error';
+      else if (msg.includes('⚠️')) className = 'log-warn';
+
+      logBox.innerHTML += '<span class="log-time">[' + time + ']</span> <span class="' + className + '">' + msg + '</span>\n';
       logBox.scrollTop = logBox.scrollHeight;
     }
 
@@ -504,31 +848,35 @@
       debugInfo.textContent = '';
       hexDumpContainer.innerHTML = '';
       urlBadgeContainer.innerHTML = '';
-      
+      statsBar.innerHTML = '';
+
       if (!result) {
-        scanResult.textContent = '解析失败';
-        scanResult.className = 'result-content empty';
+        scanResult.textContent = '解析失败，请尝试其他二维码图片';
+        scanResult.className = 'result-content error';
         lastResult = '';
         lastUrl = '';
+        copyBtn.disabled = true;
+        openBtn.disabled = true;
         return;
       }
 
-      // 显示调试信息
-      let debug = '模式: ' + result.mode + ' | 掩码: ' + result.mask + ' | 字符数: ' + result.count;
-      if (result.bytes) {
-        debug += ' | 字节数: ' + result.bytes.length;
-        // 显示十六进制前32字节
-        const hex = Array.from(result.bytes.slice(0, 32)).map(b => b.toString(16).padStart(2,'0')).join(' ');
-        hexDumpContainer.innerHTML = '<div class="hex-dump">HEX: ' + hex + (result.bytes.length > 32 ? ' ...' : '') + '</div>';
-      }
+      let debug = '模式: ' + result.mode + ' | 掩码: ' + result.mask;
+      if (result.version) debug += ' | 版本: ' + result.version;
+      if (result.count) debug += ' | 字符数: ' + result.count;
       debugInfo.textContent = debug;
+
+      if (result.bytes) {
+        const hex = Array.from(result.bytes.slice(0, 32)).map(b => b.toString(16).padStart(2,'0')).join(' ');
+        hexDumpContainer.innerHTML = '<div class="hex-dump">HEX: ' + hex + (result.bytes.length > 32 ? ' ... (' + result.bytes.length + ' 字节)' : '') + '</div>';
+        statsBar.innerHTML = '<div class="stat-item">字节数: <strong>' + result.bytes.length + '</strong></div>';
+      }
 
       if (result.text) {
         scanResult.textContent = result.text;
-        scanResult.className = 'result-content';
+        scanResult.className = 'result-content success';
         lastResult = result.text;
-        
-        // 提取网址
+        copyBtn.disabled = false;
+
         const match = result.text.match(/(https?:\/\/[^\s]+|[\w.-]+\.[a-z]{2,}[^\s]*)/i);
         if (match) {
           let url = match[0];
@@ -538,82 +886,151 @@
           badge.className = 'url-badge';
           badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank">' + url + '</a>';
           urlBadgeContainer.appendChild(badge);
+          openBtn.disabled = false;
+        } else {
+          lastUrl = '';
+          openBtn.disabled = true;
         }
       } else {
         scanResult.textContent = '二进制数据 (' + (result.bytes ? result.bytes.length : 0) + ' 字节)';
         scanResult.className = 'result-content binary';
         lastResult = result.bytes ? Array.from(result.bytes).map(b => String.fromCharCode(b)).join('') : '';
+        lastUrl = '';
+        copyBtn.disabled = false;
+        openBtn.disabled = true;
       }
     }
 
     function processImage(img) {
-      logBox.textContent = '';
-      addLog('🚀 开始解析');
-      hiddenCanvas.width = img.width; hiddenCanvas.height = img.height;
+      logBox.innerHTML = '';
+      addLog('🚀 开始解析二维码');
+      hiddenCanvas.width = img.width; 
+      hiddenCanvas.height = img.height;
       hiddenCtx.drawImage(img, 0, 0);
       previewArea.innerHTML = '';
       const oi = document.createElement('img');
-      oi.src = hiddenCanvas.toDataURL(); oi.style.maxWidth='200px'; oi.style.maxHeight='200px';
+      oi.src = hiddenCanvas.toDataURL(); 
+      oi.style.maxWidth = '200px'; 
+      oi.style.maxHeight = '200px';
       previewArea.appendChild(oi);
-      
-      const result = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
+
+      const result = decodeQR(hiddenCtx.getImageData(0, 0, img.width, img.height), false);
       displayResult(result);
       if (result && result.text) {
-        addLog('📝 结果: ' + result.text.substring(0, 50) + (result.text.length > 50 ? '...' : ''));
+        addLog('📝 结果: ' + result.text.substring(0, 60) + (result.text.length > 60 ? '...' : ''));
+        showToast('✅ 解析成功！');
+      } else {
+        showToast('❌ 未能识别二维码', true);
       }
     }
 
-    // 事件绑定
     uploadBox.addEventListener('click', () => fileInput.click());
+
     fileInput.addEventListener('change', e => {
-      const f = e.target.files[0]; if (!f) return;
+      const f = e.target.files[0]; 
+      if (!f) return;
+      if (!f.type.startsWith('image/')) {
+        showToast('❌ 请选择图片文件', true);
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
-      reader.readAsDataURL(f); fileInput.value = '';
+      reader.onload = ev => { 
+        const img = new Image(); 
+        img.onload = () => processImage(img); 
+        img.onerror = () => showToast('❌ 图片加载失败', true);
+        img.src = ev.target.result; 
+      };
+      reader.readAsDataURL(f); 
+      fileInput.value = '';
     });
-    uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.style.borderColor='#43e97b'; });
-    uploadBox.addEventListener('dragleave', () => { uploadBox.style.borderColor='rgba(255,255,255,0.3)'; });
+
+    uploadBox.addEventListener('dragover', e => { 
+      e.preventDefault(); 
+      uploadBox.classList.add('dragover'); 
+    });
+    uploadBox.addEventListener('dragleave', () => { 
+      uploadBox.classList.remove('dragover'); 
+    });
     uploadBox.addEventListener('drop', e => {
-      e.preventDefault(); uploadBox.style.borderColor='rgba(255,255,255,0.3)';
-      const f = e.dataTransfer.files[0]; if (!f) return;
+      e.preventDefault(); 
+      uploadBox.classList.remove('dragover');
+      const f = e.dataTransfer.files[0]; 
+      if (!f) return;
+      if (!f.type.startsWith('image/')) {
+        showToast('❌ 请拖拽图片文件', true);
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
+      reader.onload = ev => { 
+        const img = new Image(); 
+        img.onload = () => processImage(img); 
+        img.onerror = () => showToast('❌ 图片加载失败', true);
+        img.src = ev.target.result; 
+      };
       reader.readAsDataURL(f);
     });
 
     cameraBtn.addEventListener('click', async () => {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 } }, audio: false });
-        video.srcObject = cameraStream; videoContainer.classList.add('active');
-        cameraBtn.style.display = 'none'; stopBtn.style.display = 'block';
+        cameraStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, 
+          audio: false 
+        });
+        video.srcObject = cameraStream; 
+        videoContainer.classList.add('active');
+        cameraBtn.style.display = 'none'; 
+        stopBtn.style.display = 'block';
         addLog('📸 摄像头已开启');
+
         function scan() {
           if (!cameraStream) return;
           if (video.readyState >= 2 && video.videoWidth > 0) {
-            hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
+            hiddenCanvas.width = video.videoWidth; 
+            hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
-            const result = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
+            const result = decodeQR(hiddenCtx.getImageData(0, 0, hiddenCanvas.width, hiddenCanvas.height), true);
             if (result && result.text && result.text !== lastResult) {
               displayResult(result);
-              addLog('✅ 扫描到: ' + result.text.substring(0, 30) + (result.text.length > 30 ? '...' : ''));
+              addLog('✅ 扫描到: ' + result.text.substring(0, 40) + (result.text.length > 40 ? '...' : ''));
+              showToast('✅ 扫描成功！');
             }
           }
-          scanTimer = setTimeout(scan, 300);
+          scanTimer = setTimeout(scan, 200);
         }
         scan();
-      } catch(err) { addLog('❌ 摄像头启动失败: ' + err.message); }
+      } catch(err) { 
+        addLog('❌ 摄像头启动失败: ' + err.message); 
+        showToast('❌ 无法访问摄像头', true);
+      }
     });
 
     stopBtn.addEventListener('click', () => {
       if (scanTimer) clearTimeout(scanTimer);
-      if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
-      video.srcObject = null; videoContainer.classList.remove('active');
-      cameraBtn.style.display = 'block'; stopBtn.style.display = 'none';
+      if (cameraStream) { 
+        cameraStream.getTracks().forEach(t => t.stop()); 
+        cameraStream = null; 
+      }
+      video.srcObject = null; 
+      videoContainer.classList.remove('active');
+      cameraBtn.style.display = 'block'; 
+      stopBtn.style.display = 'none';
+      addLog('⏹️ 摄像头已关闭');
     });
 
     copyBtn.addEventListener('click', () => { 
       const text = lastUrl || lastResult;
-      if (text) navigator.clipboard.writeText(text); 
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 已复制到剪贴板');
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('📋 已复制到剪贴板');
+      });
     });
 
     openBtn.addEventListener('click', () => {
@@ -623,16 +1040,24 @@
       if (!/^https?:\/\//i.test(target) && /^[\w.-]+\.[a-z]{2,}/i.test(target)) {
         target = 'https://' + target;
       }
-      try { new URL(target); window.open(target, '_blank'); }
+      try { 
+        new URL(target); 
+        window.open(target, '_blank'); 
+      }
       catch(e) { 
-        if (/^[\w.-]+\.[a-z]{2,}/i.test(url)) window.open('https://'+url, '_blank');
+        if (/^[\w.-]+\.[a-z]{2,}/i.test(url)) {
+          window.open('https://' + url, '_blank');
+        }
       }
     });
 
     window.addEventListener('beforeunload', () => {
       if (scanTimer) clearTimeout(scanTimer);
-      if (cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
     });
+
+    copyBtn.disabled = true;
+    openBtn.disabled = true;
   </script>
 </body>
 </html>
