@@ -138,6 +138,8 @@
       for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if(!((r+c)&1))um[r][c]^=1;}
       const bits=readBits(um,gen.size);
       const rawCW=[];for(let i=0;i<gen.totalCW&&i*8<bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];rawCW.push(cw);}
+      addLog('总匹配: ' + match)
+      addLog('gen.size*gen.size: ' + gen.size*gen.size)
       // 如果矩阵匹配100%，跳过RS纠错，直接用原始位解码
       let dataCW;
       if(match===gen.size*gen.size){
