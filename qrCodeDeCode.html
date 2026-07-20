@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>纯手写二维码解析器 | 完整版</title>
+  <title>纯手写二维码解析器 · 网址解码</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -24,13 +24,24 @@
     .video-container { width: 100%; max-width: 300px; margin: 0 auto 1rem; border-radius: 1rem; overflow: hidden; background: #000; aspect-ratio: 1; display: none; }
     .video-container.active { display: block; }
     #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .url-badge {
+      display: inline-block;
+      background: rgba(67, 233, 123, 0.15);
+      border-left: 4px solid #43e97b;
+      padding: 0.3rem 0.8rem;
+      border-radius: 0.4rem;
+      font-size: 0.9rem;
+      color: #a8f0c0;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
   </style>
 <base target="_blank">
 </head>
 <body>
   <div class="container">
-    <h1>📷 纯手写二维码解析器</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">标准二维码 + 无定位点二维码</p>
+    <h1>📷 纯手写二维码解析器 · 网址解码</h1>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">标准二维码 · 无定位点二维码 · 自动识别网址</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
@@ -48,6 +59,7 @@
       <div class="result-box">
         <div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
         <div class="result-content empty" id="scanResult">等待解析...</div>
+        <div id="urlBadgeContainer"></div>
       </div>
       <div class="btn-row">
         <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
@@ -204,7 +216,7 @@
           if (matrix[startR + r][startC + c] === expected) matchCount++;
         }
       }
-      return matchCount / total >= 0.8; // 80%匹配即可（容错噪点）
+      return matchCount / total >= 0.8;
     }
 
     function checkAnyFinderPattern(matrix, size) {
@@ -451,7 +463,6 @@
         for (const inv of [false, true]) {
           const m = inv ? sub.map(r => new Uint32Array(r.map(v=>v^1))) : sub;
 
-          // 自动检测矩阵中是否有定位点图案（80%容错）
           const hasFinder = checkAnyFinderPattern(m, sz);
           const readFn = hasFinder ? readBitsStandard : readBitsNoFinder;
 
@@ -477,6 +488,7 @@
     const cameraBtn = document.getElementById('cameraBtn');
     const stopBtn = document.getElementById('stopBtn');
     const scanResult = document.getElementById('scanResult');
+    const urlBadgeContainer = document.getElementById('urlBadgeContainer');
     const copyBtn = document.getElementById('copyBtn');
     const openBtn = document.getElementById('openBtn');
     const previewArea = document.getElementById('previewArea');
@@ -490,6 +502,40 @@
       logBox.scrollTop = logBox.scrollHeight;
     }
 
+    // 显示网址徽章
+    function showUrlBadge(text) {
+      urlBadgeContainer.innerHTML = '';
+      // 尝试提取网址 (支持 http/https 或 常见域名)
+      let url = text.trim();
+      let isUrl = false;
+      try {
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          isUrl = true;
+        } else if (/^[\w.-]+\.[a-z]{2,}/i.test(url)) {
+          url = 'https://' + url;
+          isUrl = true;
+        } else {
+          // 尝试从文本中提取网址
+          const match = text.match(/(https?:\/\/[^\s]+|[\w.-]+\.[a-z]{2,}[^\s]*)/i);
+          if (match) {
+            url = match[0];
+            if (!url.startsWith('http')) url = 'https://' + url;
+            isUrl = true;
+          }
+        }
+      } catch (e) {}
+      if (isUrl) {
+        const badge = document.createElement('div');
+        badge.className = 'url-badge';
+        badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank" style="color:#43e97b;text-decoration:underline;">' + url + '</a>';
+        urlBadgeContainer.appendChild(badge);
+        // 更新 lastResult 为完整网址 (方便打开)
+        lastResult = url;
+      } else {
+        urlBadgeContainer.innerHTML = '';
+      }
+    }
+
     function processImage(img) {
       logBox.textContent = '';
       addLog('🚀 开始解析');
@@ -500,8 +546,18 @@
       oi.src = hiddenCanvas.toDataURL(); oi.style.maxWidth='200px'; oi.style.maxHeight='200px';
       previewArea.appendChild(oi);
       const r = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
-      if (r) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; }
-      else { scanResult.textContent = '解析失败'; scanResult.classList.add('empty'); lastResult = ''; }
+      if (r) {
+        scanResult.textContent = r;
+        scanResult.classList.remove('empty');
+        lastResult = r;
+        showUrlBadge(r);
+        addLog('📌 解码完成，结果长度: ' + r.length);
+      } else {
+        scanResult.textContent = '解析失败';
+        scanResult.classList.add('empty');
+        lastResult = '';
+        urlBadgeContainer.innerHTML = '';
+      }
     }
 
     uploadBox.addEventListener('click', () => fileInput.click());
@@ -532,7 +588,13 @@
             hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
             const r = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
-            if (r && r !== lastResult) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; addLog('✅ '+r.substring(0,30)); }
+            if (r && r !== lastResult) {
+              scanResult.textContent = r;
+              scanResult.classList.remove('empty');
+              lastResult = r;
+              showUrlBadge(r);
+              addLog('✅ ' + r.substring(0,30));
+            }
           }
           scanTimer = setTimeout(scan, 300);
         }
@@ -548,7 +610,11 @@
     copyBtn.addEventListener('click', () => { if (lastResult) navigator.clipboard.writeText(lastResult); });
     openBtn.addEventListener('click', () => {
       if (!lastResult) return;
-      try { new URL(lastResult); window.open(lastResult, '_blank'); }
+      let url = lastResult;
+      if (!/^https?:\/\//i.test(url) && /^[\w.-]+\.[a-z]{2,}/i.test(url)) {
+        url = 'https://' + url;
+      }
+      try { new URL(url); window.open(url, '_blank'); }
       catch(e) { if (/^[\w.-]+\.[a-z]{2,}/i.test(lastResult)) window.open('https://'+lastResult, '_blank'); }
     });
     window.addEventListener('beforeunload', () => {
