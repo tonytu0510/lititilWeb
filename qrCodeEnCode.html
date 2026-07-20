@@ -119,7 +119,6 @@
       const allCW=[];for(let i=0;i<gen.totalCW&&i*8<bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
       const corrected=rsFix(allCW,gen.ecCW)||allCW;
       const dataCW=corrected.slice(0,gen.dataCW);
-
 addLog('生成器dc: '+gen.dc.slice(0,5).map(c=>c.toString(16).padStart(2,'0')).join(' '));
 addLog('解析dataCW: '+dataCW.slice(0,5).map(c=>c.toString(16).padStart(2,'0')).join(' '));
       addLog('dataCW前5: '+dataCW.slice(0,5).map(c=>c.toString(16).padStart(2,'0')).join(' '));
