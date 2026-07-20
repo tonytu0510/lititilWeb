@@ -113,6 +113,8 @@
     }
 
     function parseExact(imageData,gen){
+console.log('parseExact called, gen=',gen);
+console.log('gen.matrix=',gen.matrix?'exists':'undefined');
 addLog('矩阵逐行对比(前5行):');
 const genM=gen.matrix;
 for(let r=0;r<Math.min(5,gen.size);r++){
