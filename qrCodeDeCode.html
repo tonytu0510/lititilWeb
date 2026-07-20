@@ -884,6 +884,7 @@
           lastUrl = url;
           const badge = document.createElement('div');
           badge.className = 'url-badge';
+          console.log('url=>',url)
           badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank">' + url + '</a>';
           urlBadgeContainer.appendChild(badge);
           openBtn.disabled = false;
