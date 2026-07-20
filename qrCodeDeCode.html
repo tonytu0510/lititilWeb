@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码自测 v28 修复跳过mode+count</title>
+  <title>二维码 v30 偏移校正</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 1rem; color: #e0e0e0; }
@@ -21,7 +21,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔳 v28 修复跳过mode+count</h1>
+    <h1>🔳 v30 偏移校正</h1>
     <div><input id="testUrl" value="https://www.lititil.com"><button id="testBtn">生成+解析</button>
     <input type="file" id="fileInput" accept="image/*" style="display:none;"><button id="uploadBtn">📁 上传</button></div>
     <div class="flex-row">
@@ -66,7 +66,7 @@
       const canvas=document.createElement('canvas');canvas.width=cs;canvas.height=cs;
       const ctx=canvas.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cs,cs);
       for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){ctx.fillStyle=masked[r][c]?'#000':'#FFF';ctx.fillRect((c+border)*ms,(r+border)*ms,ms,ms);}
-      return{canvas,version:v,size:sz,dataCW:data,ecCW:ec,totalCW:total,dc};
+      return{canvas,version:v,size:sz,dataCW:data,ecCW:ec,totalCW:total};
     }
 
     function toGray(d){const g=new Uint8Array(d.width*d.height);for(let i=0;i<g.length;i++)g[i]=Math.round(d.data[i*4]*0.299+d.data[i*4+1]*0.587+d.data[i*4+2]*0.114);return{gray:g,width:d.width,height:d.height};}
@@ -78,46 +78,92 @@
       for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}
       return m;
     }
-    function readBits(m,size){
-      const bits=[];let up=true;
-      for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;
-        for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
-          if(c<0||c>=size)continue;if(row===6||c===6)continue;
-          bits.push(m[row][c]);
-        }}up=!up;}
-      return bits;
-    }
+    function readBits(m,size){const bits=[];let up=true;for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){if(c<0||c>=size)continue;if(row===6||c===6)continue;bits.push(m[row][c]);}}up=!up;}return bits;}
 
-    // 从数据码字中解码：跳过mode(4位)+count(8位)=12位
-    function decodeFromCodewords(dataCW){
+    // 解码：跳过mode(4位)+count(8位)，取count个字节
+    function decodeRaw(dataCW){
       if(dataCW.length<2)return null;
-      // 第一个码字的高4位=mode，低4位=count的高4位
-      const mode=(dataCW[0]>>4)&0xF;
-      const countHi=dataCW[0]&0xF;
-      // 第二个码字的高4位=count的低4位
-      const countLo=(dataCW[1]>>4)&0xF;
-      const count=(countHi<<4)|countLo;
-      if(mode!==4||count<1||count>300)return null;
-      
-      // 数据从第二个码字的低4位开始 + 后续码字
+      const mode=(dataCW[0]>>4)&0xF;if(mode!==4)return null;
+      const count=((dataCW[0]&0xF)<<4)|((dataCW[1]>>4)&0xF);
+      if(count<1||count>300)return null;
+      let bits=(dataCW[1]&0xF).toString(2).padStart(4,'0');
       const bytes=[];
-      let bits='';
-      // 第二个码字的低4位
-      const low4=dataCW[1]&0xF;
-      bits+=low4.toString(2).padStart(4,'0');
-      // 后续码字
       for(let i=2;i<dataCW.length&&bytes.length<count;i++){
         bits+=dataCW[i].toString(2).padStart(8,'0');
-        while(bits.length>=8&&bytes.length<count){
-          bytes.push(parseInt(bits.substring(0,8),2));
-          bits=bits.substring(8);
+        while(bits.length>=8&&bytes.length<count){bytes.push(parseInt(bits.substring(0,8),2));bits=bits.substring(8);}
+      }
+      return {bytes,count};
+    }
+
+    // 用已知前缀推算偏移
+    function fixWithPrefix(bytes,knownPrefix){
+      if(bytes.length<knownPrefix.length)return null;
+      // 找偏移量：用前几个可匹配的字节
+      const shifts=[];
+      for(let i=0;i<Math.min(knownPrefix.length,10);i++){
+        const expected=knownPrefix.charCodeAt(i);
+        const actual=bytes[i];
+        shifts.push((expected-actual+256)%256);
+      }
+      // 取最常见的偏移
+      const freq={};for(const s of shifts)freq[s]=(freq[s]||0)+1;
+      let bestShift=0,bestCount=0;
+      for(const[s,c]of Object.entries(freq)){if(c>bestCount){bestCount=c;bestShift=parseInt(s);}}
+      if(bestCount<3)return null; // 至少3个字节一致
+      
+      const corrected=bytes.map(b=>(b+bestShift)&0xFF);
+      // 验证
+      let match=0;
+      for(let i=0;i<Math.min(knownPrefix.length,corrected.length);i++){
+        if(corrected[i]===knownPrefix.charCodeAt(i))match++;
+      }
+      if(match<knownPrefix.length*0.7)return null;
+      
+      return corrected;
+    }
+
+    function decodeToText(dataCW){
+      const raw=decodeRaw(dataCW);
+      if(!raw)return null;
+      let bytes=raw.bytes;
+      
+      // 尝试直接解码
+      let end=raw.count;
+      for(let i=0;i<raw.count-1;i++){if((bytes[i]===0xEC&&bytes[i+1]===0x11)||(bytes[i]===0x11&&bytes[i+1]===0xEC)){end=i;break;}}
+      let text=new TextDecoder().decode(new Uint8Array(bytes.slice(0,end)));
+      
+      // 如果包含URL模式，直接返回
+      if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text))return text;
+      
+      // 尝试用 https://www. 推算偏移
+      const fixed=fixWithPrefix(bytes,"https://www.");
+      if(fixed){
+        end=fixed.length;
+        for(let i=0;i<fixed.length-1;i++){if((fixed[i]===0xEC&&fixed[i+1]===0x11)||(fixed[i]===0x11&&fixed[i+1]===0xEC)){end=i;break;}}
+        text=new TextDecoder().decode(new Uint8Array(fixed.slice(0,end)));
+        if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text))return text;
+      }
+      
+      // 尝试ASCII可打印范围偏移
+      const nonPrintable=bytes.filter(b=>b<0x20||b>0x7E);
+      if(nonPrintable.length>0){
+        // 找偏移使尽量多字节落入可打印范围
+        let bestScore=0,bestBytes=null;
+        for(let shift=0;shift<256;shift++){
+          const test=bytes.map(b=>(b+shift)&0xFF);
+          let score=0;
+          for(let i=0;i<Math.min(20,test.length);i++){if(test[i]>=0x20&&test[i]<=0x7E)score++;}
+          if(score>bestScore){bestScore=score;bestBytes=test;}
+        }
+        if(bestBytes&&bestScore>=10){
+          end=bestBytes.length;
+          for(let i=0;i<bestBytes.length-1;i++){if((bestBytes[i]===0xEC&&bestBytes[i+1]===0x11)||(bestBytes[i]===0x11&&bestBytes[i+1]===0xEC)){end=i;break;}}
+          text=new TextDecoder().decode(new Uint8Array(bestBytes.slice(0,end)));
+          if(/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text))return text;
         }
       }
-      if(bytes.length===0)return null;
-      // 截断填充
-      let end=bytes.length;
-      for(let i=0;i<bytes.length-1;i++){if((bytes[i]===0xEC&&bytes[i+1]===0x11)||(bytes[i]===0x11&&bytes[i+1]===0xEC)){end=i;break;}}
-      return new TextDecoder().decode(new Uint8Array(bytes.slice(0,end)));
+      
+      return text;
     }
 
     const logBox=document.getElementById('logBox'),resultDisplay=document.getElementById('resultDisplay');
@@ -129,12 +175,10 @@
       const gen=generateQR(url,8);
       document.getElementById('qrDisplay').innerHTML='';
       document.getElementById('qrDisplay').appendChild(gen.canvas);
-      
       setTimeout(()=>{
         const hc=document.getElementById('hiddenCanvas');
         hc.width=gen.canvas.width;hc.height=gen.canvas.height;
-        const ctx=hc.getContext('2d',{willReadFrequently:true});
-        ctx.drawImage(gen.canvas,0,0);
+        const ctx=hc.getContext('2d',{willReadFrequently:true});ctx.drawImage(gen.canvas,0,0);
         const{gray,width,height}=toGray(ctx.getImageData(0,0,hc.width,hc.height));
         const bin=toBinary(gray,width,height);
         const fcx=(3+4)*8+4;
@@ -144,10 +188,8 @@
         for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if((r+c)%2===0)um[r][c]^=1;}
         const bits=readBits(um,gen.size);
         const allCW=[];for(let i=0;i<gen.totalCW&&i*8<bits.length;i++){let c=0;for(let j=0;j<8;j++)c=(c<<1)|bits[i*8+j];allCW.push(c);}
-        addLog('allCW前5: '+allCW.slice(0,5).map(c=>c.toString(16).padStart(2,'0')).join(' '));
-        
         const corrected=rsCorrect(allCW,gen.ecCW)||allCW;
-        const text=decodeFromCodewords(corrected.slice(0,gen.dataCW));
+        const text=decodeToText(corrected.slice(0,gen.dataCW));
         addLog('结果: "'+text+'"');
         if(text===url){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
         else{resultDisplay.textContent='⚠️ '+(text||'null');resultDisplay.className='result';}
@@ -161,8 +203,7 @@
         document.getElementById('qrDisplay').innerHTML='';const oi=document.createElement('img');oi.src=ev.target.result;oi.style.maxWidth='120px';document.getElementById('qrDisplay').appendChild(oi);
         const hc=document.getElementById('hiddenCanvas');hc.width=img.width;hc.height=img.height;
         const ctx=hc.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
-        logBox.innerHTML='';
-        const{gray,width,height}=toGray(ctx.getImageData(0,0,img.width,img.height));
+        logBox.innerHTML='';const{gray,width,height}=toGray(ctx.getImageData(0,0,img.width,img.height));
         const bin=toBinary(gray,width,height);
         const a=[];for(let y=0;y<height;y+=2){const s=[];let cl=bin[y*width],ln=1;for(let x=1;x<width;x++){const co=bin[y*width+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}s.push({color:cl,len:ln,startX:width-ln});for(let i=0;i<s.length-4;i++){const sg=s.slice(i,i+5);if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms2=t/7;const ra=sg.map(x=>x.len/ms2);let ok=true;for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}if(ok&&ms2>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms2});}}}
         if(a.length<3){resultDisplay.textContent='❌';return;}
@@ -185,7 +226,7 @@
           const bits=readBits(um,sz);
           const allCW=[];for(let i=0;i<total&&i*8<bits.length;i++){let c=0;for(let j=0;j<8;j++)c=(c<<1)|bits[i*8+j];allCW.push(c);}
           const corrected=rsCorrect(allCW,ecw)||allCW;
-          const text=decodeFromCodewords(corrected.slice(0,dcw));
+          const text=decodeToText(corrected.slice(0,dcw));
           addLog((inv?'反转':'正常')+': "'+(text||'null')+'"');
           if(text&&/^https?:\/\/|www\.|[a-z]+\.[a-z]{2,}/i.test(text)){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';return;}
         }
