@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 v12 强制调试</title>
+  <title>二维码解码器 v13 修复排列</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -25,7 +25,8 @@
 </head>
 <body>
   <div class="container">
-    <h1>📷 二维码解码器 v12 强制调试</h1>
+    <h1>📷 二维码解码器 v13</h1>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">修复排列 · 智能排序</p>
     <div class="card">
       <div class="upload-box" id="uploadBox"><div style="font-size:3rem;">🖼️</div><div>点击上传 或 拖拽二维码图片</div></div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
@@ -52,36 +53,26 @@
     (()=>{let x=1;for(let i=0;i<255;i++){GF_EXP[i]=x;GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11D;}for(let i=255;i<512;i++)GF_EXP[i]=GF_EXP[i-255];})();
     function gfMul(a,b){return(a===0||b===0)?0:GF_EXP[GF_LOG[a]+GF_LOG[b]];}
     function polyEval(p,x){let y=p[0];for(let i=1;i<p.length;i++)y=gfMul(y,x)^p[i];return y;}
+    function calcSyndromes(msg,nsym){const s=[];let ok=true;for(let i=0;i<nsym;i++){s[i]=polyEval(msg,GF_EXP[i]);if(s[i]!==0)ok=false;}return{hasErr:!ok};}
+    function rsCorrect(msg,nsym){if(!calcSyndromes(msg,nsym).hasErr)return msg;const n=msg.length;for(let p=0;p<Math.min(n,20);p++){for(let v=1;v<256;v++){const t=[...msg];t[p]^=v;if(!calcSyndromes(t,nsym).hasErr)return t;}}return null;}
 
     // ==================== 图像处理 ====================
     function toGray(d){const g=new Uint8Array(d.width*d.height);for(let i=0;i<g.length;i++)g[i]=Math.round(d.data[i*4]*0.299+d.data[i*4+1]*0.587+d.data[i*4+2]*0.114);return{gray:g,width:d.width,height:d.height};}
     function toBinary(g,w,h){let mn=255,mx=0;for(let i=0;i<g.length;i++){if(g[i]<mn)mn=g[i];if(g[i]>mx)mx=g[i];}const th=mn+(mx-mn)*0.4;const b=new Uint8Array(w*h);for(let i=0;i<g.length;i++)b[i]=g[i]<th?0:1;return b;}
 
-    // ==================== 定位点（只扫行，快）====================
-    function findAllCandidates(bin,w,h){
-      const a=[];
-      for(let y=0;y<h;y+=2){
-        const s=[];let cl=bin[y*w],ln=1;
-        for(let x=1;x<w;x++){const co=bin[y*w+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}
-        s.push({color:cl,len:ln,startX:w-ln});
-        for(let i=0;i<s.length-4;i++){
-          const sg=s.slice(i,i+5);
-          if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){
-            const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms=t/7;
-            const ra=sg.map(x=>x.len/ms);let ok=true;
-            for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}
-            if(ok&&ms>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms});
-          }
-        }
-      }
-      return a;
-    }
+    // ==================== 定位点 ====================
+    function findAllCandidates(bin,w,h){const a=[];for(let y=0;y<h;y+=2){const s=[];let cl=bin[y*w],ln=1;for(let x=1;x<w;x++){const co=bin[y*w+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}s.push({color:cl,len:ln,startX:w-ln});for(let i=0;i<s.length-4;i++){const sg=s.slice(i,i+5);if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms=t/7;const ra=sg.map(x=>x.len/ms);let ok=true;for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}if(ok&&ms>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms});}}}return a;}
+    function clusterCandidates(cs,gs){const g={};for(const p of cs){const k=Math.floor(p.x/gs)+','+Math.floor(p.y/gs);if(!g[k])g[k]={pts:[],sx:0,sy:0,sm:0};g[k].pts.push(p);g[k].sx+=p.x;g[k].sy+=p.y;g[k].sm+=p.modSize;}const cells=Object.values(g).filter(c=>c.pts.length>=3),m=[];for(let i=0;i<cells.length;i++){if(cells[i]._used)continue;let cx=cells[i].sx/cells[i].pts.length,cy=cells[i].sy/cells[i].pts.length,cm=cells[i].sm/cells[i].pts.length,count=cells[i].pts.length;let ch=true;while(ch){ch=false;for(let j=i+1;j<cells.length;j++){if(cells[j]._used)continue;const jx=cells[j].sx/cells[j].pts.length,jy=cells[j].sy/cells[j].pts.length;if(Math.abs(cx-jx)<gs*3&&Math.abs(cy-jy)<gs*3){cx=(cx*count+jx*cells[j].pts.length)/(count+cells[j].pts.length);cy=(cy*count+jy*cells[j].pts.length)/(count+cells[j].pts.length);cm=(cm*count+(cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count+cells[j].pts.length);count+=cells[j].pts.length;cells[j]._used=true;ch=true;}}}m.push({x:Math.round(cx),y:Math.round(cy),moduleSize:cm,count});}return m.filter(x=>x.count>=5).sort((a,b)=>b.count-a.count);}
 
-    function clusterCandidates(cs,gs){
-      const g={};for(const p of cs){const k=Math.floor(p.x/gs)+','+Math.floor(p.y/gs);if(!g[k])g[k]={pts:[],sx:0,sy:0,sm:0};g[k].pts.push(p);g[k].sx+=p.x;g[k].sy+=p.y;g[k].sm+=p.modSize;}
-      const cells=Object.values(g).filter(c=>c.pts.length>=3),m=[];
-      for(let i=0;i<cells.length;i++){if(cells[i]._used)continue;let cx=cells[i].sx/cells[i].pts.length,cy=cells[i].sy/cells[i].pts.length,cm=cells[i].sm/cells[i].pts.length,count=cells[i].pts.length;let ch=true;while(ch){ch=false;for(let j=i+1;j<cells.length;j++){if(cells[j]._used)continue;const jx=cells[j].sx/cells[j].pts.length,jy=cells[j].sy/cells[j].pts.length;if(Math.abs(cx-jx)<gs*3&&Math.abs(cy-jy)<gs*3){cx=(cx*count+jx*cells[j].pts.length)/(count+cells[j].pts.length);cy=(cy*count+jy*cells[j].pts.length)/(count+cells[j].pts.length);cm=(cm*count+(cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count+cells[j].pts.length);count+=cells[j].pts.length;cells[j]._used=true;ch=true;}}}m.push({x:Math.round(cx),y:Math.round(cy),moduleSize:cm,count});}
-      return m.filter(x=>x.count>=5).sort((a,b)=>b.count-a.count);
+    // 智能排序：根据几何位置确定 TL, TR, BL
+    function orderFinders(pts){
+      // TL = x+y最小, TR = x最大, BL = y最大
+      const sorted=[...pts];
+      const tl=sorted.reduce((a,b)=>(a.x+a.y)<(b.x+b.y)?a:b);
+      const rest=sorted.filter(p=>p!==tl);
+      const tr=rest.reduce((a,b)=>a.x>b.x?a:b);
+      const bl=rest.find(p=>p!==tr);
+      return{tl,tr,bl};
     }
 
     // ==================== 矩阵 ====================
@@ -93,13 +84,12 @@
         const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);
         if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;
       }
-      // 统计黑色比例
       let bc=0;for(let r=0;r<size;r++)for(let c=0;c<size;c++)if(m[r][c])bc++;
-      addLog('  矩阵:'+size+'×'+size+' 黑色:'+bc+'/'+(size*size)+' ('+(bc/(size*size)*100).toFixed(0)+'%)');
+      addLog('  矩阵:'+size+'×'+size+' 黑:'+bc+'/'+(size*size)+' ('+(bc/(size*size)*100).toFixed(0)+'%)');
       return m;
     }
 
-    // ==================== 读取数据 ====================
+    // ==================== 读取数据位 ====================
     function readBits(m,size,skipFinder){
       const bits=[];let up=true;
       for(let col=size-1;col>=0;col-=2){
@@ -124,20 +114,12 @@
     const maskFn=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,(r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>((r*c)%2+(r*c)%3)===0,(r,c)=>(((r*c)%2+(r*c)%3)%2)===0,(r,c)=>(((r+c)%2+(r*c)%3)%2)===0];
     function unmask(m,size,mask){const w=m.map(r=>new Uint32Array(r));for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(r===6||c===6)continue;if(maskFn[mask](r,c))w[r][c]^=1;}return w;}
 
-    // ==================== URL提取 ====================
-    function tryUrl(text){
-      if(!text||text.length<4)return null;
-      let m=text.match(/https?:\/\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]{4,}/i);if(m)return m[0];
-      m=text.match(/www\.[-a-zA-Z0-9]+\.[-a-zA-Z0-9.]+[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*/i);if(m)return'https://'+m[0];
-      m=text.match(/[a-zA-Z0-9][-a-zA-Z0-9]*\.[a-z]{2,}(?:\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*)?/i);if(m)return'https://'+m[0];
-      return null;
-    }
+    // ==================== 版本数据 ====================
+    const VD={1:[26,9,17],2:[44,16,28],3:[70,26,44],4:[100,36,64],5:[134,46,88],6:[172,60,112],7:[196,66,130],8:[242,86,156],9:[292,100,192],10:[346,122,224]};
 
-    function bytesToText(bytes){
-      for(const enc of['utf-8','gbk','iso-8859-1','windows-1252']){try{return new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));}catch(e){}}
-      let a='';for(const b of bytes)a+=(b>=32&&b<=126)?String.fromCharCode(b):(b===0?'':'.');
-      return a;
-    }
+    // ==================== URL提取 ====================
+    function tryUrl(text){if(!text||text.length<4)return null;let m=text.match(/https?:\/\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]{4,}/i);if(m)return m[0];m=text.match(/www\.[-a-zA-Z0-9]+\.[-a-zA-Z0-9.]+[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*/i);if(m)return'https://'+m[0];m=text.match(/[a-zA-Z0-9][-a-zA-Z0-9]*\.[a-z]{2,}(?:\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*)?/i);if(m)return'https://'+m[0];return null;}
+    function bytesToText(bytes){for(const enc of['utf-8','gbk','iso-8859-1','windows-1252']){try{return new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));}catch(e){}}let a='';for(const b of bytes)a+=(b>=32&&b<=126)?String.fromCharCode(b):(b===0?'':'.');return a;}
 
     // ==================== 主解析 ====================
     function decodeQR(imageData){
@@ -154,58 +136,64 @@
       if(clusters.length<3){addLog('❌ 簇不足');return null;}
       
       const top3=clusters.slice(0,3);
-      addLog('📍 ('+top3[0].x+','+top3[0].y+') ('+top3[1].x+','+top3[1].y+') ('+top3[2].x+','+top3[2].y+')');
+      addLog('📍 原始: ('+top3[0].x+','+top3[0].y+') ('+top3[1].x+','+top3[1].y+') ('+top3[2].x+','+top3[2].y+')');
       
-      const perms=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+      // 智能排序
+      const{tl,tr,bl}=orderFinders(top3);
+      addLog('🔢 排序: TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
       
-      for(let pi=0;pi<perms.length;pi++){
-        const[tl,tr,bl]=[top3[perms[pi][0]],top3[perms[pi][1]],top3[perms[pi][2]]];
-        const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-        const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
-        const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
-        
-        if(pi===0)addLog('🔢 排列1: TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+') 估算v'+ev);
+      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
+      const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+      const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
+      addLog('📐 d1='+d1.toFixed(0)+' d2='+d2.toFixed(0)+' mod='+avgMod.toFixed(1)+' 估算v'+ev);
+      
+      // 同时尝试原始顺序和智能排序
+      const orders=[
+        {tl:top3[0],tr:top3[1],bl:top3[2],label:'原始'},
+        {tl,tr,bl,label:'智能'}
+      ];
+      
+      for(const ord of orders){
+        addLog('--- '+ord.label+'排序 ---');
         
         for(let v=Math.max(1,ev-1);v<=Math.min(10,ev+1);v++){
           const sz=17+v*4;
-          const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
+          const m=extractMatrix(bin,width,height,ord.tl,ord.tr,ord.bl,sz);
           
-          // 尝试跳过/不跳过定位点区域
           for(const skipFinder of[true,false]){
-            const label='排列'+(pi+1)+' v'+v+' '+(skipFinder?'skip':'noskip');
-            
             for(let mask=0;mask<8;mask++){
               const w=unmask(m,sz,mask);
               const bits=readBits(w,sz,skipFinder);
               if(bits.length<12)continue;
               
-              // 强制输出前几个尝试的调试信息
-              if(pi===0&&v===ev&&mask<=2){
-                let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|bits[i];
-                let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
-                addLog('  '+label+' mask'+mask+': bits='+bits.length+' mode='+mode+' count='+count);
-                
-                // 尝试解码字节
-                const bytes=[];
-                for(let i=0;i<Math.min(count,Math.floor((bits.length-12)/8),30);i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[12+i*8+j];bytes.push(b);}
-                const text=bytesToText(bytes);
-                const url=tryUrl(text);
-                addLog('    text="'+text.substring(0,40)+'" url='+(url||'null'));
-              }
-              
-              // 正式解码
               let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|bits[i];
               if(mode!==4)continue;
               let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
               if(count<=0||count>500)continue;
               
+              // 取数据码字（版本1只有9个数据码字）
+              const dataCW=(v<=10&&VD[v])?VD[v][1]:Math.floor(bits.length/8*0.7);
+              const maxBytes=Math.min(count,dataCW,Math.floor((bits.length-12)/8));
               const bytes=[];
-              const maxBytes=Math.min(count,Math.floor((bits.length-12)/8));
               for(let i=0;i<maxBytes;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[12+i*8+j];bytes.push(b);}
+              
+              // RS纠错
+              const numCW=Math.min((v<=10?VD[v][0]:Math.floor(bits.length/8)),Math.floor(bits.length/8));
+              const allCW=[];for(let i=0;i<numCW;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
+              const ecCW=(v<=10)?VD[v][2]:Math.floor(numCW*0.3);
+              if(ecCW>0&&allCW.length>=numCW){
+                const corrected=rsCorrect(allCW,ecCW);
+                if(corrected){
+                  const fixedBytes=corrected.slice(0,Math.min(count,dataCW));
+                  const text2=bytesToText(fixedBytes);
+                  const url2=tryUrl(text2);
+                  if(url2){addLog('✅ '+ord.label+' v'+v+' mask'+mask+' skip='+skipFinder+' RS: '+url2);return{url:url2,text:text2};}
+                }
+              }
               
               const text=bytesToText(bytes);
               const url=tryUrl(text);
-              if(url){addLog('✅ '+label+' mask'+mask+': '+url);return{url,text};}
+              if(url){addLog('✅ '+ord.label+' v'+v+' mask'+mask+' skip='+skipFinder+': '+url);return{url,text};}
             }
             
             // 反转
@@ -218,12 +206,27 @@
               if(mode!==4)continue;
               let count=0;for(let i=0;i<8;i++)count=(count<<1)|bits[4+i];
               if(count<=0||count>500)continue;
+              const dataCW=(v<=10&&VD[v])?VD[v][1]:Math.floor(bits.length/8*0.7);
+              const maxBytes=Math.min(count,dataCW,Math.floor((bits.length-12)/8));
               const bytes=[];
-              const maxBytes=Math.min(count,Math.floor((bits.length-12)/8));
               for(let i=0;i<maxBytes;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[12+i*8+j];bytes.push(b);}
+              
+              const numCW=Math.min((v<=10?VD[v][0]:Math.floor(bits.length/8)),Math.floor(bits.length/8));
+              const allCW=[];for(let i=0;i<numCW;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
+              const ecCW=(v<=10)?VD[v][2]:Math.floor(numCW*0.3);
+              if(ecCW>0&&allCW.length>=numCW){
+                const corrected=rsCorrect(allCW,ecCW);
+                if(corrected){
+                  const fixedBytes=corrected.slice(0,Math.min(count,dataCW));
+                  const text2=bytesToText(fixedBytes);
+                  const url2=tryUrl(text2);
+                  if(url2){addLog('✅ 反转'+ord.label+' v'+v+' mask'+mask+' skip='+skipFinder+' RS: '+url2);return{url:url2,text:text2};}
+                }
+              }
+              
               const text=bytesToText(bytes);
               const url=tryUrl(text);
-              if(url){addLog('✅ 反转'+label+' mask'+mask+': '+url);return{url,text};}
+              if(url){addLog('✅ 反转'+ord.label+' v'+v+' mask'+mask+' skip='+skipFinder+': '+url);return{url,text};}
             }
           }
         }
