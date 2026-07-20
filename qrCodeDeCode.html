@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 · 带RS纠错版 v7</title>
+  <title>二维码解码器 · RS纠错修复版 v8</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -37,8 +37,8 @@
 </head>
 <body>
   <div class="container">
-    <h1>📷 二维码解码器 · RS纠错版 v7</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">Reed-Solomon纠错 · 支持Logo遮挡</p>
+    <h1>📷 二维码解码器 · RS纠错修复版 v8</h1>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">修复采样+简化纠错 · 支持Logo遮挡</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
@@ -70,34 +70,26 @@
 
   <script>
     // ===================================================================
-    // Reed-Solomon 纠错码 (GF(256))
+    // 简化版 Reed-Solomon 纠错 (GF(256))
     // ===================================================================
-    class GaloisField {
+    class GF256 {
       constructor() {
         this.exp = new Int32Array(512);
         this.log = new Int32Array(256);
         let x = 1;
         for (let i = 0; i < 255; i++) {
-          this.exp[i] = x;
-          this.log[x] = i;
-          x <<= 1;
-          if (x & 0x100) x ^= 0x11D;
+          this.exp[i] = x; this.log[x] = i;
+          x <<= 1; if (x & 0x100) x ^= 0x11D;
         }
         for (let i = 255; i < 512; i++) this.exp[i] = this.exp[i - 255];
       }
       mul(a, b) { return (a === 0 || b === 0) ? 0 : this.exp[this.log[a] + this.log[b]]; }
       inv(x) { return this.exp[255 - this.log[x]]; }
     }
-    const GF = new GaloisField();
+    const GF = new GF256();
 
-    function polyEval(poly, x) {
-      let y = poly[0];
-      for (let i = 1; i < poly.length; i++) y = GF.mul(y, x) ^ poly[i];
-      return y;
-    }
-
-    // 生成多项式 (x-α^0)(x-α^1)...(x-α^(nsym-1))
-    function rsGeneratorPoly(nsym) {
+    // 生成多项式
+    function genPoly(nsym) {
       let g = [1];
       for (let i = 0; i < nsym; i++) {
         g.push(0);
@@ -107,112 +99,65 @@
       return g;
     }
 
+    // 多项式求值
+    function polyEval(p, x) {
+      let y = p[0];
+      for (let i = 1; i < p.length; i++) y = GF.mul(y, x) ^ p[i];
+      return y;
+    }
+
     // 计算伴随式
-    function rsCalcSyndromes(msg, nsym) {
-      const synd = new Array(nsym).fill(0);
+    function calcSyndromes(msg, nsym) {
+      const s = [];
       let allZero = true;
       for (let i = 0; i < nsym; i++) {
-        synd[i] = polyEval(msg, GF.exp[i]);
-        if (synd[i] !== 0) allZero = false;
+        s[i] = polyEval(msg, GF.exp[i]);
+        if (s[i] !== 0) allZero = false;
       }
-      return { synd, hasErr: !allZero };
+      return { s, hasErr: !allZero };
     }
 
-    // Forney 算法：已知错误位置，求错误值
-    function rsForney(synd, pos, nmess) {
-      const len = pos.length;
-      // 计算位置多项式 Ω(x)
-      const sigma = [1];
-      for (const p of pos) {
-        const xp = GF.exp[(nmess - 1 - p) % 255];
-        sigma.push(0);
-        for (let j = sigma.length - 1; j > 0; j--) sigma[j] = GF.mul(sigma[j-1], xp) ^ sigma[j];
-      }
-      
-      // 计算 Ω(x) = S(x) * σ(x) mod x^(2t)
-      let omega = [1];
-      {
-        const temp = [1];
-        for (const p of pos) {
-          const xp = GF.exp[(nmess - 1 - p) % 255];
-          temp.push(0);
-          for (let j = temp.length - 1; j > 0; j--) temp[j] = GF.mul(temp[j-1], xp) ^ temp[j];
-        }
-        omega = [0];
-        for (let i = 0; i < synd.length; i++) {
-          omega.push(synd[i]);
-          for (let j = omega.length - 1; j > 0; j--) omega[j] = GF.mul(omega[j-1], 1) ^ omega[j];
-        }
-        // mul omega by temp mod x^nsym
-        const full = new Array(synd.length).fill(0);
-        for (let i = 0; i < temp.length; i++) {
-          for (let j = 0; j < omega.length; j++) {
-            if (i + j < synd.length) full[i+j] ^= GF.mul(temp[i], omega[j]);
-          }
-        }
-        omega = full;
-      }
-      
-      // 计算 σ'(x) 在错误位置的值
-      const errVals = [];
-      for (const p of pos) {
-        const xp = GF.exp[(nmess - 1 - p) % 255];
-        const xpInv = GF.inv(xp);
-        
-        let sigmaPrime = 0;
-        for (let k = 1; k < sigma.length; k += 2) {
-          sigmaPrime ^= GF.mul(sigma[k], GF.exp[((nmess - 1 - p) * (k - 1)) % 255]);
-        }
-        
-        const omegaVal = polyEval(omega, xp);
-        const errVal = GF.mul(omegaVal, GF.inv(sigmaPrime));
-        errVals.push(errVal);
-      }
-      return errVals;
-    }
+    // 简化纠错：尝试纠正 nsym/2 个以内的错误
+    function rsCorrectSimple(msg, nsym) {
+      const n = msg.length;
+      const { s, hasErr } = calcSyndromes(msg, nsym);
+      if (!hasErr) return msg; // 无错误
 
-    // 主要纠错函数：尝试纠正 upTo 个错误
-    function rsCorrect(msg, nsym) {
-      const len = msg.length;
-      const { synd, hasErr } = rsCalcSyndromes(msg, nsym);
-      
-      if (!hasErr) return msg; // 没有错误
-      
       const maxErr = Math.floor(nsym / 2);
       
-      // 暴力搜索1~3个错误（对于Logo遮挡足够了）
-      for (let nerr = 1; nerr <= Math.min(3, maxErr); nerr++) {
-        // 搜索错误位置组合
-        const combos = [];
-        function findCombos(start, depth, cur) {
-          if (depth === nerr) { combos.push([...cur]); return; }
-          for (let i = start; i < len; i++) {
-            cur.push(i);
-            findCombos(i + 1, depth + 1, cur);
-            cur.pop();
-          }
-        }
-        findCombos(0, 0, []);
-        
-        for (const pos of combos) {
-          try {
-            const errVals = rsForney(synd, pos, len);
-            if (!errVals || errVals.length !== nerr) continue;
-            
-            // 验证：修改后重新计算伴随式
-            const test = [...msg];
-            for (let i = 0; i < nerr; i++) test[pos[i]] ^= errVals[i];
-            const { hasErr: stillErr } = rsCalcSyndromes(test, nsym);
-            
-            if (!stillErr) {
-              console.log('[RS] 纠正了 ' + nerr + ' 个错误, 位置: ' + pos.join(','));
+      // 对于小规模错误（Logo遮挡通常只影响连续区域）
+      // 尝试纠正单个连续块
+      for (let errLen = 1; errLen <= Math.min(maxErr, 4); errLen++) {
+        for (let start = 0; start <= n - errLen; start++) {
+          const test = [...msg];
+          // 暴力搜索这些位置的错误值
+          for (let v1 = 0; v1 < 256; v1++) {
+            for (let i = 0; i < errLen; i++) test[start + i] ^= v1;
+            const { hasErr: e } = calcSyndromes(test.slice(0, n), nsym);
+            if (!e) {
+              console.log('[RS] 纠正位置[' + start + '-' + (start+errLen-1) + '] 值=' + v1);
               return test;
             }
-          } catch(e) {}
+            for (let i = 0; i < errLen; i++) test[start + i] ^= v1; // 还原
+            if (errLen > 1) break; // 多位置时跳过暴力（太慢），只试单字节
+          }
         }
       }
       
-      return null; // 纠错失败
+      // 尝试纠正单个错误位置（不同值）
+      for (let pos = 0; pos < n; pos++) {
+        for (let v = 1; v < 256; v++) {
+          const test = [...msg];
+          test[pos] ^= v;
+          const { hasErr: e } = calcSyndromes(test, nsym);
+          if (!e) {
+            console.log('[RS] 纠正位置' + pos + ' 值=' + v);
+            return test;
+          }
+        }
+      }
+      
+      return null;
     }
 
     // ==================== 图像处理 ====================
@@ -226,23 +171,15 @@
     }
 
     function toBinary(gray, width, height) {
-      const histogram = new Array(256).fill(0);
-      for (let i = 0; i < gray.length; i++) histogram[gray[i]]++;
-      let total = gray.length, sum = 0;
-      for (let i = 0; i < 256; i++) sum += i * histogram[i];
-      let sumB = 0, wB = 0, maxVar = 0, thresh = 128;
-      for (let t = 0; t < 256; t++) {
-        wB += histogram[t];
-        if (wB === 0) continue;
-        let wF = total - wB;
-        if (wF === 0) break;
-        sumB += t * histogram[t];
-        let mB = sumB / wB, mF = (sum - sumB) / wF;
-        let v = wB * wF * (mB - mF) * (mB - mF);
-        if (v > maxVar) { maxVar = v; thresh = t; }
+      let min = 255, max = 0;
+      for (let i = 0; i < gray.length; i++) {
+        if (gray[i] < min) min = gray[i];
+        if (gray[i] > max) max = gray[i];
       }
+      const thresh = min + (max - min) * 0.4;
       const bin = new Uint8Array(width * height);
       for (let i = 0; i < gray.length; i++) bin[i] = gray[i] < thresh ? 0 : 1;
+      console.log('[BIN] 阈值=' + thresh.toFixed(0) + ' min=' + min + ' max=' + max);
       return bin;
     }
 
@@ -276,9 +213,8 @@
 
     function findAllCandidates(bin, width, height) {
       const all = [];
-      for (let y = 0; y < height; y += 1) all.push(...scanRow(bin, width, y));
-      // 扫描列
-      for (let x = 0; x < width; x += 1) {
+      for (let y = 0; y < height; y += 2) all.push(...scanRow(bin, width, y));
+      for (let x = 0; x < width; x += 2) {
         const colSegments = [];
         let curColor = bin[x], curLen = 1;
         for (let y = 1; y < height; y++) {
@@ -337,7 +273,7 @@
       return merged.filter(m => m.count >= 5).sort((a,b) => b.count - a.count);
     }
 
-    // ==================== 矩阵提取 ====================
+    // ==================== 矩阵提取（修复采样范围）====================
     function extractMatrix(bin, width, height, tl, tr, bl, size) {
       const matrix = Array.from({ length: size }, () => new Uint32Array(size));
       const dx1 = (tr.x - tl.x) / (size - 7);
@@ -346,16 +282,16 @@
       const dy2 = (bl.y - tl.y) / (size - 7);
       const offsetX = tl.x - dx1 * 3.5 - dx2 * 3.5;
       const offsetY = tl.y - dy1 * 3.5 - dy2 * 3.5;
-      const sampleR = Math.max(0.5, (tl.moduleSize + tr.moduleSize + bl.moduleSize) / 9);
-      const sr = Math.ceil(sampleR);
+      const sampleR = Math.max(1, Math.floor((tl.moduleSize + tr.moduleSize + bl.moduleSize) / 6));
+      console.log('[EXTRACT] size=' + size + ' sampleR=' + sampleR + ' modSizes=' + tl.moduleSize.toFixed(1) + ',' + tr.moduleSize.toFixed(1) + ',' + bl.moduleSize.toFixed(1));
 
       for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
           const sx = offsetX + col * dx1 + row * dx2;
           const sy = offsetY + col * dy1 + row * dy2;
           let black = 0, total = 0;
-          for (let dy = -sr; dy <= sr; dy++) {
-            for (let dx = -sr; dx <= sr; dx++) {
+          for (let dy = -sampleR; dy <= sampleR; dy++) {
+            for (let dx = -sampleR; dx <= sampleR; dx++) {
               const ix = Math.round(sx + dx), iy = Math.round(sy + dy);
               if (ix >= 0 && ix < width && iy >= 0 && iy < height) {
                 if (bin[iy * width + ix] === 0) black++;
@@ -366,6 +302,12 @@
           matrix[row][col] = (total > 0 && black > total * 0.5) ? 1 : 0;
         }
       }
+      
+      // 统计
+      let bc = 0;
+      for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) if (matrix[r][c] === 1) bc++;
+      console.log('[EXTRACT] 黑色模块: ' + bc + '/' + (size*size) + ' (' + (bc/(size*size)*100).toFixed(1) + '%)');
+      
       return matrix;
     }
 
@@ -419,16 +361,10 @@
       return work;
     }
 
-    // ==================== 版本-纠错配置 ====================
-    const EC_TABLE = {
-      1:{L:7,M:10,Q:13,H:17},2:{L:10,M:16,Q:22,H:28},3:{L:15,M:26,Q:18,H:44},
-      4:{L:20,M:18,Q:26,H:32},5:{L:26,M:24,Q:18,H:42},6:{L:18,M:16,Q:24,H:20},
-      7:{L:20,M:18,Q:18,H:26},8:{L:24,M:22,Q:22,H:26},9:{L:30,M:22,Q:20,H:24},
-      10:{L:18,M:26,Q:24,H:28}
-    };
-    // [total, data, ec]  for H level
+    // ==================== 版本数据 ====================
     const VERSION_DATA = {
-      1:[26,9],2:[44,16],3:[70,26],4:[100,36],5:[134,46],6:[172,60],7:[196,66],8:[242,86],9:[292,100],10:[346,122]
+      1:[26,9,17],2:[44,16,28],3:[70,26,44],4:[100,36,64],5:[134,46,88],
+      6:[172,60,112],7:[196,66,130],8:[242,86,156],9:[292,100,192],10:[346,122,224]
     };
 
     // ==================== URL 提取 ====================
@@ -453,7 +389,7 @@
     }
 
     function decodeBytes(bytes) {
-      const encodings = ['utf-8', 'gbk', 'big5', 'shift_jis', 'iso-8859-1', 'windows-1252'];
+      const encodings = ['utf-8', 'gbk', 'iso-8859-1'];
       for (const enc of encodings) {
         try {
           const text = new TextDecoder(enc, { fatal: false }).decode(new Uint8Array(bytes));
@@ -469,33 +405,27 @@
     }
 
     // ==================== 解码（带RS纠错）====================
-    function decodeWithRS(bits, version, ecLevel) {
+    function decodeWithRS(bits, version) {
       if (bits.length < 12) return null;
       
-      // 读取模式
       let mode = 0;
       for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
-      if (mode !== 4) return null; // 只支持字节模式
+      if (mode !== 4) return null;
       
-      // 读取计数
       let count = 0;
       for (let i = 0; i < 8; i++) count = (count << 1) | bits[4 + i];
       if (count <= 0 || count > 500) return null;
       
-      // 获取纠错参数
-      let totalCW, dataCW;
+      // 获取版本参数
+      let totalCW, dataCW, ecCW;
       if (version <= 10 && VERSION_DATA[version]) {
-        [totalCW, dataCW] = VERSION_DATA[version];
+        [totalCW, dataCW, ecCW] = VERSION_DATA[version];
       } else {
-        // 估算
         totalCW = Math.floor(bits.length / 8);
-        dataCW = Math.floor(totalCW * 0.6);
+        ecCW = Math.floor(totalCW * 0.3);
+        dataCW = totalCW - ecCW;
       }
-      const ecCW = totalCW - dataCW;
       
-      addLog('  [RS] 版本' + version + ': 总码字=' + totalCW + ' 数据=' + dataCW + ' 纠错=' + ecCW);
-      
-      // 把 bits 转成码字数组
       const numCodewords = Math.min(totalCW, Math.floor(bits.length / 8));
       const allCodewords = [];
       for (let i = 0; i < numCodewords; i++) {
@@ -504,23 +434,27 @@
         allCodewords.push(cw);
       }
       
+      console.log('[RS] v' + version + ' total=' + totalCW + ' data=' + dataCW + ' ec=' + ecCW + ' got=' + numCodewords);
+      
       // RS 纠错
-      if (ecCW > 0) {
-        const corrected = rsCorrect(allCodewords, ecCW);
+      let dataCodewords;
+      if (ecCW > 0 && allCodewords.length >= totalCW) {
+        const corrected = rsCorrectSimple(allCodewords, ecCW);
         if (corrected) {
-          addLog('  [RS] ✅ 纠错成功!');
-          // 取前 dataCW 个数据码字
-          const dataCodewords = corrected.slice(0, dataCW);
-          const bytes = [];
-          for (const cw of dataCodewords) bytes.push(cw);
-          return decodeBytes(bytes);
+          console.log('[RS] ✅ 纠错成功');
+          dataCodewords = corrected.slice(0, dataCW);
         } else {
-          addLog('  [RS] ⚠️ 纠错失败，尝试原始数据');
+          console.log('[RS] ⚠️ 纠错失败，使用原始数据');
+          dataCodewords = allCodewords.slice(0, dataCW);
         }
+      } else {
+        dataCodewords = allCodewords.slice(0, Math.min(dataCW, allCodewords.length));
       }
       
-      // 无纠错：直接取前 dataCW 个码字
-      const bytes = allCodewords.slice(0, Math.min(dataCW, allCodewords.length));
+      // 取前 count 个数据码字
+      const bytes = dataCodewords.slice(0, Math.min(count, dataCodewords.length));
+      console.log('[DECODE] 解码 ' + bytes.length + ' 字节, 前8: ' + bytes.slice(0,8).map(b=>b.toString(16).padStart(2,'0')).join(' '));
+      
       return decodeBytes(bytes);
     }
 
@@ -530,7 +464,6 @@
       if (!silent) addLog('📊 ' + width + '×' + height);
       let bin = toBinary(gray, width, height);
       
-      // 颜色反转检测
       const cornerSum = bin[0] + bin[width-1] + bin[(height-1)*width] + bin[height*width-1];
       if (cornerSum < 2) {
         if (!silent) addLog('🔄 颜色反转');
@@ -538,70 +471,67 @@
       }
 
       const candidates = findAllCandidates(bin, width, height);
+      console.log('[FIND] 候选点: ' + candidates.length);
       if (!silent) addLog('🔍 ' + candidates.length + ' 候选点');
 
       if (candidates.length >= 10) {
         const clusters = clusterCandidates(candidates, Math.floor(width/15));
+        console.log('[CLUSTER] 簇: ' + clusters.length);
         if (!silent) addLog('🔍 ' + clusters.length + ' 个簇');
 
         if (clusters.length >= 3) {
-          const topClusters = clusters.slice(0, Math.min(7, clusters.length));
-          const combos = [];
-          for (let i = 0; i < topClusters.length; i++)
-            for (let j = i+1; j < topClusters.length; j++)
-              for (let k = j+1; k < topClusters.length; k++)
-                combos.push([topClusters[i], topClusters[j], topClusters[k]]);
+          const top3 = clusters.slice(0, 3);
+          console.log('[CLUSTER] Top3:', top3.map(c => '(' + c.x + ',' + c.y + ') n=' + c.count + ' m=' + c.moduleSize.toFixed(1)));
+          
+          const perms = [
+            [top3[0],top3[1],top3[2]],[top3[0],top3[2],top3[1]],
+            [top3[1],top3[0],top3[2]],[top3[1],top3[2],top3[0]],
+            [top3[2],top3[0],top3[1]],[top3[2],top3[1],top3[0]]
+          ];
 
-          for (let ci = 0; ci < combos.length; ci++) {
-            const pts = combos[ci];
-            const perms = [[pts[0],pts[1],pts[2]],[pts[0],pts[2],pts[1]],[pts[1],pts[0],pts[2]],[pts[1],pts[2],pts[0]],[pts[2],pts[0],pts[1]],[pts[2],pts[1],pts[0]]];
+          for (let pi = 0; pi < perms.length; pi++) {
+            const [tl, tr, bl] = perms[pi];
+            const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
+            const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
+            const dot = v1x * v2x + v1y * v2y;
+            const len1 = Math.sqrt(v1x*v1x+v1y*v1y), len2 = Math.sqrt(v2x*v2x+v2y*v2y);
+            if (len1===0||len2===0) continue;
+            if (Math.abs(dot/(len1*len2)) > 0.5) continue;
 
-            for (let pi = 0; pi < perms.length; pi++) {
-              const [tl, tr, bl] = perms[pi];
-              const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
-              const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
-              const dot = v1x * v2x + v1y * v2y;
-              const len1 = Math.sqrt(v1x*v1x+v1y*v1y), len2 = Math.sqrt(v2x*v2x+v2y*v2y);
-              if (len1===0||len2===0) continue;
-              if (Math.abs(dot/(len1*len2)) > 0.5) continue;
+            const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
+            const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
+            if (Math.abs(d1-d2)/Math.max(d1,d2) > 0.5) continue;
 
-              const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
-              const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-              if (Math.abs(d1-d2)/Math.max(d1,d2) > 0.5) continue;
-
-              const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
-              const ev = Math.round(((d1+d2)/2/avgMod - 10)/4);
+            const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+            const ev = Math.round(((d1+d2)/2/avgMod - 10)/4);
+            console.log('[PERM' + pi + '] TL(' + tl.x + ',' + tl.y + ') TR(' + tr.x + ',' + tr.y + ') BL(' + bl.x + ',' + bl.y + ') ev=' + ev);
+            
+            for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
+              const sz = 17+v*4;
+              const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
               
-              for (let v = Math.max(1,ev-3); v <= Math.min(10,ev+3); v++) {
-                const sz = 17+v*4;
-                const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
+              for (let mask = 0; mask < 8; mask++) {
+                const work = applyMask(m, sz, mask);
+                const bits = readBitsStandard(work, sz);
+                if (bits.length < 20) continue;
                 
-                for (let mask = 0; mask < 8; mask++) {
-                  const work = applyMask(m, sz, mask);
-                  const bits = readBitsStandard(work, sz);
-                  
-                  // 多种偏移
-                  for (const off of [0,1,2,3,4,8,12,16,20,24,28,32]) {
-                    const result = decodeWithRS(bits.slice(off), v, 'H');
-                    if (result && result.url) {
-                      if (!silent) addLog('✅ 成功! v' + v + ' mask' + mask + ' off' + off);
-                      return { ...result, mask, offset: off, version: v };
-                    }
-                  }
+                const result = decodeWithRS(bits, v);
+                if (result && result.url) {
+                  if (!silent) addLog('✅ v' + v + ' mask' + mask + ': ' + result.url);
+                  return result;
                 }
+              }
+              
+              const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
+              for (let mask = 0; mask < 8; mask++) {
+                const work = applyMask(inv, sz, mask);
+                const bits = readBitsStandard(work, sz);
+                if (bits.length < 20) continue;
                 
-                // 反转
-                const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
-                for (let mask = 0; mask < 8; mask++) {
-                  const work = applyMask(inv, sz, mask);
-                  const bits = readBitsStandard(work, sz);
-                  for (const off of [0,1,2,3,4,8,12,16,20,24,28,32]) {
-                    const result = decodeWithRS(bits.slice(off), v, 'H');
-                    if (result && result.url) {
-                      if (!silent) addLog('✅ 反转成功! v' + v + ' mask' + mask + ' off' + off);
-                      return { ...result, mask, offset: off, version: v };
-                    }
-                  }
+                const result = decodeWithRS(bits, v);
+                if (result && result.url) {
+                  if (!silent) addLog('✅ 反转v' + v + ' mask' + mask + ': ' + result.url);
+                  return result;
                 }
               }
             }
@@ -660,34 +590,33 @@
       badge.className = 'url-badge';
       badge.innerHTML = '🌐 <a href="' + result.url + '" target="_blank">' + result.url + '</a>';
       badgeContainer.appendChild(badge);
-      if (result.offset !== undefined) {
-        const fix = document.createElement('div');
-        fix.className = 'fix-badge';
-        fix.textContent = '🔧 v' + (result.version||'?') + ' mask' + (result.mask||'?') + ' off' + result.offset + ' enc:' + (result.encoding||'?');
-        badgeContainer.appendChild(fix);
-      }
     }
 
     function processImage(img) {
       logBox.innerHTML = '';
-      addLog('🚀 开始解析（RS纠错已启用）');
+      addLog('🚀 开始解析');
+      console.log('========== 开始解析 ==========');
       hiddenCanvas.width = img.width; hiddenCanvas.height = img.height;
       hiddenCtx.drawImage(img, 0, 0);
       previewArea.innerHTML = '';
       const oi = document.createElement('img');
       oi.src = hiddenCanvas.toDataURL(); oi.style.maxWidth = '200px'; oi.style.maxHeight = '200px';
       previewArea.appendChild(oi);
+      
       const result = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
       displayResult(result);
       if (result && result.url) showToast('✅ 成功提取网址！');
       else showToast('❌ 未能提取网址', true);
+      console.log('========== 解析完成 ==========');
     }
 
     uploadBox.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => {
       const f = e.target.files[0]; if (!f) return;
+      addLog('📁 加载图片: ' + f.name + ' (' + (f.size/1024).toFixed(0) + 'KB)');
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
+      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.onerror = () => addLog('❌ 图片加载失败'); img.src = ev.target.result; };
+      reader.onerror = () => addLog('❌ 文件读取失败');
       reader.readAsDataURL(f); fileInput.value = '';
     });
     uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
@@ -695,8 +624,10 @@
     uploadBox.addEventListener('drop', e => {
       e.preventDefault(); uploadBox.classList.remove('dragover');
       const f = e.dataTransfer.files[0]; if (!f) return;
+      addLog('📁 拖入图片: ' + f.name);
       const reader = new FileReader();
-      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
+      reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.onerror = () => addLog('❌ 图片加载失败'); img.src = ev.target.result; };
+      reader.onerror = () => addLog('❌ 文件读取失败');
       reader.readAsDataURL(f);
     });
     cameraBtn.addEventListener('click', async () => {
@@ -704,24 +635,26 @@
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 } }, audio: false });
         video.srcObject = cameraStream; videoContainer.classList.add('active');
         cameraBtn.style.display = 'none'; stopBtn.style.display = 'block';
+        addLog('📸 摄像头已开启');
         function scan() {
           if (!cameraStream) return;
           if (video.readyState >= 2 && video.videoWidth > 0) {
             hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
             const result = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
-            if (result && result.url && result.url !== lastUrl) { displayResult(result); }
+            if (result && result.url && result.url !== lastUrl) { displayResult(result); addLog('✅ ' + result.url); }
           }
           scanTimer = setTimeout(scan, 300);
         }
         scan();
-      } catch(err) {}
+      } catch(err) { addLog('❌ 摄像头错误: ' + err.message); }
     });
     stopBtn.addEventListener('click', () => {
       if (scanTimer) clearTimeout(scanTimer);
       if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
       video.srcObject = null; videoContainer.classList.remove('active');
       cameraBtn.style.display = 'block'; stopBtn.style.display = 'none';
+      addLog('⏹️ 摄像头已关闭');
     });
     copyBtn.addEventListener('click', () => { if (lastUrl) navigator.clipboard.writeText(lastUrl).then(() => showToast('📋 已复制')); });
     openBtn.addEventListener('click', () => { if (lastUrl) window.open(lastUrl, '_blank'); });
