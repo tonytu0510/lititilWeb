@@ -1,28 +1,33 @@
-// 模拟 dataCW 里的数据部分（跳过 mode+count 后的位）
 const dataCW = [0x41,0x76,0x87,0x47,0x47,0x07,0x33,0xa2,0xf2,0xf7,0x77,0x77,0x72,0xe6,0xc6,0x97,0x46,0x97,0x46,0x96,0xc2,0xe6,0x36,0xf6,0xd0,0xec];
 
-// 从 dataCW[1] 低4位开始
-let bits = (dataCW[1]&0xF).toString(2).padStart(4,'0');
-console.log('起始4位:', bits);
-
-// 拼接后续码字
-for(let i=2; i<dataCW.length; i++) {
-  bits += dataCW[i].toString(2).padStart(8,'0');
+let bits = (dataCW[1] & 0xF).toString(2).padStart(4, '0');
+for (let i = 2; i < dataCW.length; i++) {
+  bits += dataCW[i].toString(2).padStart(8, '0');
 }
 
-// 每8位一个字节
 const bytes = [];
-for(let i=0; i+8<=bits.length; i+=8) {
-  bytes.push(parseInt(bits.substring(i,i+8), 2));
+for (let i = 0; i + 8 <= bits.length; i += 8) {
+  bytes.push(parseInt(bits.substring(i, i + 8), 2));
 }
-console.log('字节数:', bytes.length);
-console.log('前14:', bytes.slice(0,14).map(b=>b.toString(16).padStart(2,'0')).join(' '));
-console.log('前14文本:', bytes.slice(0,14).map(b=>String.fromCharCode(b)).join(''));
-console.log('全部文本:', bytes.map(b=>b>=32&&b<=126?String.fromCharCode(b):'.').join(''));
 
-// 关键：看看第14个字节后面是什么
-console.log('bytes[14]:', bytes[14].toString(16), '=', String.fromCharCode(bytes[14]));
-console.log('bytes[15]:', bytes[15].toString(16));
+console.log('Total bits:', bits.length);
+console.log('Total bytes:', bytes.length);
+console.log('First 14 hex:', bytes.slice(0, 14).map(b => b.toString(16).padStart(2, '0')).join(' '));
+console.log('First 14 text:', bytes.slice(0, 14).map(b => String.fromCharCode(b)).join(''));
+console.log('All text (dot=nonprintable):', bytes.map(b => b >= 32 && b <= 126 ? String.fromCharCode(b) : '.').join(''));
 
-// 期望第14字节后应该是 'ititil.com'
-// 即: 69 74 69 74 69 6c 2e 63 6f 6d
+console.log('---');
+console.log('bytes[14] hex:', bytes[14].toString(16).padStart(2, '0'), 'char:', String.fromCharCode(bytes[14]));
+console.log('bytes[15] hex:', bytes[15].toString(16).padStart(2, '0'));
+
+// Expected bytes 14-22: 69 74 69 74 69 6c 2e 63 6f 6d = "ititil.com"
+console.log('Expected hex:', ['69','74','69','74','69','6c','2e','63','6f','6d'].join(' '));
+
+// Compare bit by bit from byte 14 onwards
+console.log('--- Bit comparison from byte 14 ---');
+for (let i = 14; i < Math.min(23, bytes.length); i++) {
+  const actual = bytes[i].toString(2).padStart(8, '0');
+  const expected = [0x69, 0x74, 0x69, 0x74, 0x69, 0x6c, 0x2e, 0x63, 0x6f, 0x6d][i - 14];
+  const expBin = expected ? expected.toString(2).padStart(8, '0') : 'N/A';
+  console.log('byte[' + i + ']: actual=' + actual + ' expected=' + expBin);
+}
