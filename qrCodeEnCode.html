@@ -23,6 +23,7 @@
     .ok { color: #43e97b; }
     .fail { color: #ff6b6b; }
   </style>
+<base target="_blank">
 </head>
 <body>
   <div class="container">
@@ -60,12 +61,13 @@
     // ==================== 生成器 ====================
     function genQR(text,ms=8){
       const bytes=new TextEncoder().encode(text);
-      let v=1;while(v<=10&&VD[v][1]<bytes.length+2)v++;
+      const targetDC=bytes.length*2;
+      let v=1;while(v<=10&&VD[v][1]<targetDC)v++;
       const[t,d,e]=VD[v],sz=17+v*4;
       const bits=[0,1,0,0];const c=bytes.length;for(let i=7;i>=0;i--)bits.push((c>>i)&1);
       for(const b of bytes)for(let i=7;i>=0;i--)bits.push((b>>i)&1);
       while(bits.length%8)bits.push(0);
-      while(bits.length<d*8){bits.push(1,1,1,0,1,1,0,0);if(bits.length>=d*8)break;bits.push(0,0,0,1,0,0,0,1);}
+      while(bits.length<d*8){bits.push(0);}
       bits.length=d*8;
       const dc=[];for(let i=0;i<bits.length;i+=8){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i+j];dc.push(cw);}
       const gen=GF.gpoly(e);const msg=new Int32Array(d+e);msg.set(dc);
@@ -117,9 +119,9 @@
       const fcx=gen.fcx,ms=gen.ms;
       const tl={x:fcx,y:fcx},tr={x:fcx+(gen.size-7)*ms,y:fcx},bl={x:fcx,y:fcx+(gen.size-7)*ms};
       const m=extractM(bin,w,h,tl,tr,bl,gen.size);
-      const um=m.map(r=>Array.from(r));for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if(!((r+c)&1))um[r][c]^=1;}
+      const um=m.map(r=>Array.from(r));
 
-      // 矩阵对比
+      // 矩阵对比（对比提取的原始矩阵和生成的mask后矩阵）
       if(gen.matrix){
         addLog('矩阵逐行对比(前5行):');
         for(let r=0;r<Math.min(5,gen.size);r++){
@@ -131,11 +133,20 @@
         addLog('总匹配: '+match+'/'+(gen.size*gen.size)+' ('+(match/(gen.size*gen.size)*100).toFixed(1)+'%)');
       }
 
+      // 取消mask后再读取bits
+      for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if(!((r+c)&1))um[r][c]^=1;}
       const bits=readBits(um,gen.size);
       const rawCW=[];for(let i=0;i<gen.totalCW&&i*8<bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];rawCW.push(cw);}
-      const fixed=GF.rs(rawCW,gen.ecCW);
-      const allCW=fixed?Array.from(fixed):Array.from(rawCW);
-      const dataCW=allCW.slice(0,gen.dataCW);
+      // 如果矩阵匹配100%，跳过RS纠错，直接用原始位解码
+      let dataCW;
+      if(match===gen.size*gen.size){
+        dataCW=rawCW.slice(0,gen.dataCW);
+        addLog('矩阵完美匹配，跳过RS纠错');
+      }else{
+        const fixed=GF.rs(rawCW,gen.ecCW);
+        const allCW=fixed?Array.from(fixed):Array.from(rawCW);
+        dataCW=allCW.slice(0,gen.dataCW);
+      }
 
       addLog('生成器dc: '+gen.dc.slice(0,10).map(c=>c.toString(16).padStart(2,'0')).join(' ')+'...');
       addLog('解析dataCW: '+dataCW.slice(0,10).map(c=>c.toString(16).padStart(2,'0')).join(' ')+'...');
@@ -232,7 +243,7 @@
         const text=parseScanned(ctx.getImageData(0,0,img.width,img.height));
         if(text){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
         else{resultDisplay.textContent='❌ 失败';resultDisplay.className='result fail';}
-      };img.src=ev.target.result;};reader.readAsDataURL(f);fileInput.value='';
+      };img.src=ev.target.result;};reader.readAsDataURL(f);document.getElementById('fileInput').value='';
     });
 
     setTimeout(()=>document.getElementById('bothBtn').click(),300);
