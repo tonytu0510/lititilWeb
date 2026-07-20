@@ -97,6 +97,7 @@
       const count=((dataCW[0]&0xF)<<4)|((dataCW[1]>>4)&0xF);
       if(count<1||count>300)return null;
       let allBits='';for(const cw of dataCW)allBits+=cw.toString(2).padStart(8,'0');
+addLog('decodeFromCW: dataCW.length='+dataCW.length+' allBits.length='+allBits.length+' count='+count);
       const dataStart=12+bitOffset;
       const bytes=[];for(let i=dataStart;i+8<=allBits.length&&bytes.length<count;i+=8)bytes.push(parseInt(allBits.substring(i,i+8),2));
       return{bytes,count};
