@@ -24,6 +24,7 @@
     .fail { color: #ff6b6b; }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
   <div class="container">
@@ -92,7 +93,7 @@
     function toGray(d){const g=new Uint8Array(d.width*d.height);for(let i=0;i<g.length;i++)g[i]=Math.round(d.data[i*4]*.299+d.data[i*4+1]*.587+d.data[i*4+2]*.114);return{gray:g,w:d.width,h:d.height};}
     function toBin(g,w,h){let mn=255,mx=0;for(let i=0;i<g.length;i++){if(g[i]<mn)mn=g[i];if(g[i]>mx)mx=g[i];}const th=mn+(mx-mn)*.4;const b=new Uint8Array(w*h);for(let i=0;i<g.length;i++)b[i]=g[i]<th?0:1;return b;}
     function extractM(bin,w,h,tl,tr,bl,size){const m=Array.from({length:size},()=>new Uint32Array(size));const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7),dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);const ox=tl.x-dx1*3-dx2*3,oy=tl.y-dy1*3-dy2*3;for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]?0:1;}return m;}
-    function readBits(m,size){const bits=[];let up=1;for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){if(c<0||c>=size)continue;if(row===6||c===6)continue;if(row<7&&c<7)continue;if(row<7&&c>=size-7)continue;if(row>=size-7&&c<7)continue;bits.push(m[row][c]);}}up=!up;}return bits;}
+    function readBits(m,size){const bits=[];let up=1;for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){if(c<0||c>=size)continue;if(row===6||c===6)continue;if(row<7&&c<7)continue;if(row<7&&c>=size-7)continue;if(row>=size-7&&c<7)continue;if(row>=28&&row<=32&&c>=28&&c<=32)continue;bits.push(m[row][c]);}}up=!up;}return bits;}
 
     function decodeFromCW(cw,bitOffset){
       const arr=Array.from(cw);
