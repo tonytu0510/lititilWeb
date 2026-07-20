@@ -140,17 +140,17 @@
       margin-bottom: 0.5rem;
     }
   </style>
+<base target="_blank">
 </head>
 <body>
   <div class="container">
     <h1>🔳 纯手写二维码生成器</h1>
     <p class="subtitle">去掉定位点 · 原位置填充数据模块 · 仍可扫描</p>
-    
-    <!-- 配置面板 -->
+
     <div class="card">
       <div class="section-title">📝 二维码内容</div>
       <input id="qrText" value="https://www.baidu.com" placeholder="输入文字或链接">
-      
+
       <div class="flex-row" style="margin-top: 0.8rem;">
         <div>
           <label>📐 模块大小 (像素/格)</label>
@@ -166,7 +166,7 @@
           </select>
         </div>
       </div>
-      
+
       <div class="flex-row" style="margin-top: 0.5rem;">
         <div class="toggle">
           <input type="checkbox" id="removeFinders" checked>
@@ -177,7 +177,7 @@
           <label for="addLogo" style="margin:0; cursor:pointer;">🎯 中间加Logo</label>
         </div>
       </div>
-      
+
       <div id="logoSection" style="margin-top: 0.8rem;">
         <div class="section-title">🎯 Logo 设置</div>
         <div class="flex-row">
@@ -193,11 +193,10 @@
         </div>
         <div class="logo-preview" id="logoPreview">🌹</div>
       </div>
-      
+
       <button class="btn-gen" id="genBtn" style="margin-top: 1rem;">✨ 生成二维码</button>
     </div>
-    
-    <!-- 结果展示 -->
+
     <div class="flex-row">
       <div class="card" style="text-align:center; flex: 1;">
         <div class="section-title">📱 二维码预览</div>
@@ -211,11 +210,26 @@
       </div>
     </div>
   </div>
-  
+
   <canvas id="workCanvas" style="display:none;"></canvas>
 
   <script>
-    // ==================== GF(256) 伽罗华域 ====================
+    // ==================== 兼容层：圆角矩形 ====================
+    function drawRoundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // ==================== GF(256) ====================
     const GF = (() => {
       const exp = new Int32Array(512), log = new Int32Array(256);
       let x = 1;
@@ -224,7 +238,7 @@
         x <<= 1; if (x & 0x100) x ^= 0x11D;
       }
       for (let i = 255; i < 512; i++) exp[i] = exp[i - 255];
-      
+
       const mul = (a, b) => (a && b) ? exp[log[a] + log[b]] : 0;
       const polyEval = (p, x) => { let y = p[0]; for (let i = 1; i < p.length; i++) y = mul(y, x) ^ p[i]; return y; };
       const syndromes = (msg, nsym) => { for (let i = 0; i < nsym; i++) if (polyEval(msg, exp[i])) return 0; return 1; };
@@ -258,7 +272,6 @@
     })();
 
     // ==================== QR码版本表 ====================
-    // 格式: [总码字, 数据码字, 纠错码字] 对应 L,M,Q,H 四级
     const VD = {
       1:  { L: [26, 19, 7],  M: [26, 16, 10], Q: [26, 13, 13], H: [26, 9, 17] },
       2:  { L: [44, 34, 10], M: [44, 28, 16], Q: [44, 22, 22], H: [44, 16, 28] },
@@ -272,7 +285,6 @@
       10: { L: [346, 274, 72], M: [346, 216, 130], Q: [346, 154, 192], H: [346, 122, 224] }
     };
 
-    // Alignment Pattern 位置
     function getAlignmentLocs(v) {
       if (v === 1) return [];
       const n = Math.floor(v / 7) + 2;
@@ -280,20 +292,20 @@
       const locs = [6];
       let p = v * 4 + 10;
       for (let i = 1; i < n; i++) { locs.push(p); p -= step; }
-      locs.sort((a, b) => a - b);
+      locs.sort(function(a, b) { return a - b; });
       return locs;
     }
 
     // ==================== 日志工具 ====================
     const logBox = document.getElementById("logBox");
     const resultDisplay = document.getElementById("resultDisplay");
-    
+
     function addLog(msg) {
       const t = new Date().toLocaleTimeString("zh-CN", { hour12: false });
-      logBox.innerHTML += `<span style="color:#666;">[${t}]</span> ${msg}\n`;
+      logBox.innerHTML += "<span style=\"color:#666;\">[" + t + "]</span> " + msg + "\n";
       logBox.scrollTop = logBox.scrollHeight;
     }
-    
+
     function clearLog() {
       logBox.innerHTML = "";
       resultDisplay.textContent = "等待...";
@@ -302,98 +314,102 @@
 
     // ==================== 核心生成器 ====================
     async function genQR(text, options) {
-      const { moduleSize = 8, ecLevel = 'H', removeFinders = true, addLogo = false, logoCanvas = null } = options;
-      
+      var moduleSize = options.moduleSize || 8;
+      var ecLevel = options.ecLevel || 'H';
+      var removeFinders = options.removeFinders || false;
+      var addLogo = options.addLogo || false;
+      var logoCanvas = options.logoCanvas || null;
+
       addLog("🚀 === 开始生成二维码 ===");
-      addLog(`📝 内容: "${text}"`);
-      
-      const bytes = new TextEncoder().encode(text);
-      addLog(`📦 步骤1: 文本 → ${bytes.length} 字节`);
-      
-      // 计算所需数据码字数
-      const dataBitsNeeded = 4 + 8 + bytes.length * 8;
-      const targetDC = Math.ceil(dataBitsNeeded / 8);
-      
-      // 选择版本（如果去掉Finder Pattern，需要更高容错）
-      let v = 1;
+      addLog("📝 内容: \"" + text + "\"");
+
+      var bytes = new TextEncoder().encode(text);
+      addLog("📦 步骤1: 文本 → " + bytes.length + " 字节");
+
+      var dataBitsNeeded = 4 + 8 + bytes.length * 8;
+      var targetDC = Math.ceil(dataBitsNeeded / 8);
+
+      var v = 1;
       while (v <= 10 && VD[v][ecLevel][1] < targetDC) v++;
       if (v > 10) throw new Error("文本太长，需要版本 > 10");
-      
-      const vd = VD[v][ecLevel];
-      const totalCW = vd[0], dataCW = vd[1], ecCW = vd[2];
-      const sz = 17 + v * 4;
-      
-      addLog(`🔢 步骤2: 版本 ${v} | 数据:${dataCW} 纠错:${ecCW}`);
-      addLog(`🔐 步骤3: 数据码字${dataCW} + 纠错码字${ecCW} = 总${totalCW}`);
-      addLog(`📐 步骤4: ${sz}×${sz} 矩阵 (初始值全-1)`);
-      
+
+      var vd = VD[v][ecLevel];
+      var totalCW = vd[0], dataCW = vd[1], ecCW = vd[2];
+      var sz = 17 + v * 4;
+
+      addLog("🔢 步骤2: 版本 " + v + " | 数据:" + dataCW + " 纠错:" + ecCW);
+      addLog("🔐 步骤3: 数据码字" + dataCW + " + 纠错码字" + ecCW + " = 总" + totalCW);
+      addLog("📐 步骤4: " + sz + "×" + sz + " 矩阵 (初始值全-1)");
+
       // 构建数据位流
-      const bits = [0, 1, 0, 0]; // Byte mode
-      const lenByte = bytes.length;
-      for (let i = 7; i >= 0; i--) bits.push((lenByte >> i) & 1);
-      for (const b of bytes) {
-        for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1);
+      var bits = [0, 1, 0, 0];
+      var lenByte = bytes.length;
+      for (var i = 7; i >= 0; i--) bits.push((lenByte >> i) & 1);
+      for (var idx = 0; idx < bytes.length; idx++) {
+        var b = bytes[idx];
+        for (var j = 7; j >= 0; j--) bits.push((b >> j) & 1);
       }
       while (bits.length % 8) bits.push(0);
       while (bits.length < dataCW * 8) bits.push(0);
       bits.length = dataCW * 8;
-      
+
       // 转换为数据码字
-      const dc = [];
-      for (let i = 0; i < bits.length; i += 8) {
-        let cw = 0;
-        for (let j = 0; j < 8; j++) cw = (cw << 1) | bits[i + j];
+      var dc = [];
+      for (var i = 0; i < bits.length; i += 8) {
+        var cw = 0;
+        for (var j = 0; j < 8; j++) cw = (cw << 1) | bits[i + j];
         dc.push(cw);
       }
-      
+
       // 生成纠错码
-      const gen = GF.genPoly(ecCW);
-      const msg = new Int32Array(dataCW + ecCW);
-      msg.set(dc);
-      const rem = GF.polyMod(msg, gen);
-      const allCW = [...dc, ...rem];
-      
+      var gen = GF.genPoly(ecCW);
+      var msgArr = new Int32Array(dataCW + ecCW);
+      for (var i = 0; i < dc.length; i++) msgArr[i] = dc[i];
+      var rem = GF.polyMod(msgArr, gen);
+      var allCW = dc.concat(Array.from(rem));
+
       // 构建矩阵
-      const m = [];
-      for (let r = 0; r < sz; r++) {
+      var m = [];
+      for (var r = 0; r < sz; r++) {
         m[r] = new Int32Array(sz).fill(-1);
       }
-      
-      const alocs = getAlignmentLocs(v);
-      
-      // 放置 Timing Patterns (第6行/列)
-      for (let i = 8; i < sz - 8; i++) {
+
+      var alocs = getAlignmentLocs(v);
+
+      // 放置 Timing Patterns
+      for (var i = 8; i < sz - 8; i++) {
         m[6][i] = i % 2 ? 0 : 1;
         m[i][6] = i % 2 ? 0 : 1;
       }
-      
+
       // 放置 Alignment Patterns
-      for (let ri = 0; ri < alocs.length; ri++) {
-        for (let ci = 0; ci < alocs.length; ci++) {
-          const r = alocs[ri], c = alocs[ci];
+      for (var ri = 0; ri < alocs.length; ri++) {
+        for (var ci = 0; ci < alocs.length; ci++) {
+          var r = alocs[ri], c = alocs[ci];
           if (r === 6 && c === 6) continue;
-          for (let dr = -2; dr <= 2; dr++) {
-            for (let dc = -2; dc <= 2; dc++) {
-              const rr = r + dr, cc = c + dc;
+          for (var dr = -2; dr <= 2; dr++) {
+            for (var dc2 = -2; dc2 <= 2; dc2++) {
+              var rr = r + dr, cc = c + dc2;
               if (rr >= 0 && rr < sz && cc >= 0 && cc < sz) {
-                m[rr][cc] = (Math.abs(dr) === 2 || Math.abs(dc) === 2 || (!dr && !dc)) ? 1 : 0;
+                m[rr][cc] = (Math.abs(dr) === 2 || Math.abs(dc2) === 2 || (!dr && !dc2)) ? 1 : 0;
               }
             }
           }
         }
       }
-      
+
       // 放置 Finder Patterns（如果不移除）
       if (!removeFinders) {
-        const fp = [{ r: 0, c: 0 }, { r: 0, c: sz - 7 }, { r: sz - 7, c: 0 }];
-        for (const { r: fr, c: fc } of fp) {
-          for (let dr = -1; dr < 8; dr++) {
-            for (let dc = -1; dc < 8; dc++) {
-              const rr = fr + dr, cc = fc + dc;
+        var fp = [{r:0,c:0}, {r:0,c:sz-7}, {r:sz-7,c:0}];
+        for (var fi = 0; fi < fp.length; fi++) {
+          var fr = fp[fi].r, fc = fp[fi].c;
+          for (var dr = -1; dr < 8; dr++) {
+            for (var dc2 = -1; dc2 < 8; dc2++) {
+              var rr = fr + dr, cc = fc + dc2;
               if (rr < 0 || rr >= sz || cc < 0 || cc >= sz) continue;
-              if (dr >= 0 && dr < 7 && dc >= 0 && dc < 7) {
-                if (dr === 0 || dr === 6 || dc === 0 || dc === 6) m[rr][cc] = 1;
-                else if (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4) m[rr][cc] = 1;
+              if (dr >= 0 && dr < 7 && dc2 >= 0 && dc2 < 7) {
+                if (dr === 0 || dr === 6 || dc2 === 0 || dc2 === 6) m[rr][cc] = 1;
+                else if (dr >= 2 && dr <= 4 && dc2 >= 2 && dc2 <= 4) m[rr][cc] = 1;
                 else m[rr][cc] = 0;
               } else {
                 m[rr][cc] = 0;
@@ -402,37 +418,37 @@
           }
         }
       }
-      
+
       // Dark Module
       m[sz - 8][8] = 1;
-      
-      addLog(`🎯 步骤5: 时序+校正图案已放置${removeFinders ? '（跳过了定位点）' : ''}`);
-      
+
+      addLog("🎯 步骤5: 时序+校正图案已放置" + (removeFinders ? "（跳过了定位点）" : ""));
+
       // 放置数据位
-      const ab = [];
-      for (const cw of allCW) {
-        for (let i = 7; i >= 0; i--) ab.push((cw >> i) & 1);
+      var ab = [];
+      for (var ai = 0; ai < allCW.length; ai++) {
+        var cw = allCW[ai];
+        for (var i = 7; i >= 0; i--) ab.push((cw >> i) & 1);
       }
-      
-      let bi = 0, up = true;
-      for (let col = sz - 1; col >= 0; col -= 2) {
-        const rc = col === 6 ? 5 : col;
-        for (let row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
-          for (let c = rc; c >= rc - 1; c--) {
+
+      var bi = 0, up = true;
+      for (var col = sz - 1; col >= 0; col -= 2) {
+        var rc = col === 6 ? 5 : col;
+        for (var row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
+          for (var c = rc; c >= rc - 1; c--) {
             if (c < 0 || c >= sz) continue;
-            if (row === 6 || c === 6) continue; // Timing Pattern
-            
-            // 如果不移除Finder Pattern，跳过这些区域
+            if (row === 6 || c === 6) continue;
+
             if (!removeFinders) {
               if (row < 8 && c < 8) continue;
               if (row < 8 && c >= sz - 8) continue;
               if (row >= sz - 8 && c < 8) continue;
             }
-            
-            // 跳过 Alignment Pattern
-            let inAlign = false;
-            for (const ar of alocs) {
-              for (const ac of alocs) {
+
+            var inAlign = false;
+            for (var ari = 0; ari < alocs.length; ari++) {
+              for (var aci = 0; aci < alocs.length; aci++) {
+                var ar = alocs[ari], ac = alocs[aci];
                 if (ar === 6 && ac === 6) continue;
                 if (row >= ar - 2 && row <= ar + 2 && c >= ac - 2 && c <= ac + 2) {
                   inAlign = true; break;
@@ -441,7 +457,7 @@
               if (inAlign) break;
             }
             if (inAlign) continue;
-            
+
             if (m[row][c] === -1) {
               m[row][c] = bi < ab.length ? ab[bi] : 0;
               bi++;
@@ -450,216 +466,165 @@
         }
         up = !up;
       }
-      
+
       // 填充未使用区域
-      for (let r = 0; r < sz; r++) {
-        for (let c = 0; c < sz; c++) {
+      for (var r = 0; r < sz; r++) {
+        for (var c = 0; c < sz; c++) {
           if (m[r][c] === -1) m[r][c] = 0;
         }
       }
-      
-      addLog(`📊 步骤6: 数据已填充所有位置${removeFinders ? '（包括原定位点区域）' : ''}`);
-      
+
+      addLog("📊 步骤6: 数据已填充所有位置" + (removeFinders ? "（包括原定位点区域）" : ""));
+
       // 应用 Mask Pattern 0
-      const mk = [];
-      for (let r = 0; r < sz; r++) {
+      var mk = [];
+      for (var r = 0; r < sz; r++) {
         mk[r] = [];
-        for (let c = 0; c < sz; c++) {
+        for (var c = 0; c < sz; c++) {
           mk[r][c] = m[r][c];
         }
       }
-      
-      for (let r = 0; r < sz; r++) {
-        for (let c = 0; c < sz; c++) {
-          if (r === 6 || c === 6) continue; // Timing Pattern
-          
-          // 如果不移除Finder Pattern，跳过这些区域
+
+      for (var r = 0; r < sz; r++) {
+        for (var c = 0; c < sz; c++) {
+          if (r === 6 || c === 6) continue;
+
           if (!removeFinders) {
             if ((r < 8 && c < 8) || (r < 8 && c >= sz - 8) || (r >= sz - 8 && c < 8)) continue;
           }
-          
-          // 跳过 Alignment Pattern
-          let inAlign = false;
-          for (const ar of alocs) {
-            for (const ac of alocs) {
+
+          var inAlign2 = false;
+          for (var ari = 0; ari < alocs.length; ari++) {
+            for (var aci = 0; aci < alocs.length; aci++) {
+              var ar = alocs[ari], ac = alocs[aci];
               if (ar === 6 && ac === 6) continue;
               if (r >= ar - 2 && r <= ar + 2 && c >= ac - 2 && c <= ac + 2) {
-                inAlign = true; break;
+                inAlign2 = true; break;
               }
             }
-            if (inAlign) break;
+            if (inAlign2) break;
           }
-          if (inAlign) continue;
-          
-          // 跳过 Dark Module
+          if (inAlign2) continue;
+
           if (r === sz - 8 && c === 8) continue;
-          
-          // Mask 0: (r+c)%2==0
+
           if (!((r + c) & 1)) mk[r][c] ^= 1;
         }
       }
-      
-      addLog(`🎭 步骤7: 掩码已应用`);
-      
+
+      addLog("🎭 步骤7: 掩码已应用");
+
       // 绘制二维码
-      const border = 4;
-      const canvasSize = (sz + border * 2) * moduleSize;
-      const canvas = document.createElement("canvas");
+      var border = 4;
+      var canvasSize = (sz + border * 2) * moduleSize;
+      var canvas = document.createElement("canvas");
       canvas.width = canvasSize;
       canvas.height = canvasSize;
-      const ctx = canvas.getContext("2d");
-      
-      // 白色背景
+      var ctx = canvas.getContext("2d");
+
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, canvasSize, canvasSize);
-      
-      // 绘制模块
-      for (let r = 0; r < sz; r++) {
-        for (let c = 0; c < sz; c++) {
+
+      for (var r = 0; r < sz; r++) {
+        for (var c = 0; c < sz; c++) {
           ctx.fillStyle = mk[r][c] ? "#000" : "#FFF";
           ctx.fillRect((c + border) * moduleSize, (r + border) * moduleSize, moduleSize, moduleSize);
         }
       }
-      
-      addLog(`🎨 步骤8: 渲染 ${canvasSize}×${canvasSize}px`);
-      
+
+      addLog("🎨 步骤8: 渲染 " + canvasSize + "×" + canvasSize + "px");
+
       // 添加 Logo
       if (addLogo && logoCanvas) {
-        const logoSize = Math.floor(sz * moduleSize * 0.25); // Logo占25%
-        const logoX = (canvasSize - logoSize) / 2;
-        const logoY = (canvasSize - logoSize) / 2;
-        
-        // 绘制白色圆角背景
+        var logoSize = Math.floor(sz * moduleSize * 0.25);
+        var logoX = (canvasSize - logoSize) / 2;
+        var logoY = (canvasSize - logoSize) / 2;
+
+        // 绘制白色圆角背景 - 使用兼容的 drawRoundRect
         ctx.fillStyle = "#FFF";
-        ctx.beginPath();
-        const radius = moduleSize * 2;
-        ctx.roundRect(logoX - moduleSize, logoY - moduleSize, logoSize + moduleSize * 2, logoSize + moduleSize * 2, radius);
+        drawRoundRect(ctx, logoX - moduleSize, logoY - moduleSize, logoSize + moduleSize * 2, logoSize + moduleSize * 2, moduleSize * 2);
         ctx.fill();
-        
+
         // 绘制Logo
         ctx.drawImage(logoCanvas, logoX, logoY, logoSize, logoSize);
-        
-        addLog(`🎯 步骤9: Logo已添加`);
+
+        addLog("🎯 步骤9: Logo已添加");
       }
-      
-      addLog(`✅ === 完成 ===`);
-      addLog(`📦 Base64大小: ${(canvas.toDataURL().length / 1024).toFixed(1)}KB`);
+
+      addLog("✅ === 完成 ===");
+      addLog("📦 Base64大小: " + (canvas.toDataURL().length / 1024).toFixed(1) + "KB");
       if (removeFinders) {
-        addLog(`💡 三个角现在有数据像素，不再是空白`);
+        addLog("💡 三个角现在有数据像素，不再是空白");
       }
-      
+
       return {
-        canvas,
+        canvas: canvas,
         version: v,
         size: sz,
-        dataCW,
-        ecCW,
-        totalCW,
-        dc,
-        moduleSize,
+        dataCW: dataCW,
+        ecCW: ecCW,
+        totalCW: totalCW,
+        dc: dc,
+        moduleSize: moduleSize,
         matrix: mk,
-        alocs,
-        removeFinders,
+        alocs: alocs,
+        removeFinders: removeFinders,
         hasLogo: addLogo && !!logoCanvas
       };
     }
 
-    // ==================== 识别器（支持无Finder Pattern）====================
+    // ==================== 识别器 ====================
     function toGray(imageData) {
-      const g = new Uint8Array(imageData.width * imageData.height);
-      for (let i = 0; i < g.length; i++) {
+      var g = new Uint8Array(imageData.width * imageData.height);
+      for (var i = 0; i < g.length; i++) {
         g[i] = Math.round(imageData.data[i * 4] * 0.299 + imageData.data[i * 4 + 1] * 0.587 + imageData.data[i * 4 + 2] * 0.114);
       }
       return { gray: g, w: imageData.width, h: imageData.height };
     }
-    
+
     function toBin(g, w, h) {
-      let mn = 255, mx = 0;
-      for (let i = 0; i < g.length; i++) {
+      var mn = 255, mx = 0;
+      for (var i = 0; i < g.length; i++) {
         if (g[i] < mn) mn = g[i];
         if (g[i] > mx) mx = g[i];
       }
-      const th = mn + (mx - mn) * 0.4;
-      const b = new Uint8Array(w * h);
-      for (let i = 0; i < g.length; i++) {
+      var th = mn + (mx - mn) * 0.4;
+      var b = new Uint8Array(w * h);
+      for (var i = 0; i < g.length; i++) {
         b[i] = g[i] < th ? 0 : 1;
       }
       return b;
     }
-    
-    // 通过 Timing Pattern 定位二维码
-    function locateByTiming(bin, w, h) {
-      // 寻找第6行/列的黑白交替模式
-      // 扫描水平线，寻找 1:1:1:1... 的交替模式
-      const candidates = [];
-      
-      for (let y = 0; y < h; y += 2) {
-        const runs = [];
-        let cl = bin[y * w], ln = 1;
-        for (let x = 1; x < w; x++) {
-          const co = bin[y * w + x];
-          if (co === cl) {
-            ln++;
-          } else {
-            runs.push({ cl, len: ln });
-            cl = co;
-            ln = 1;
-          }
-        }
-        runs.push({ cl, len: ln });
-        
-        // 检查是否有长交替序列（Timing Pattern特征）
-        let altCount = 0;
-        let altStart = 0;
-        for (let i = 0; i < runs.length - 1; i++) {
-          if (runs[i].cl !== runs[i + 1].cl && 
-              Math.abs(runs[i].len - runs[i + 1].len) < Math.max(runs[i].len, runs[i + 1].len) * 0.5) {
-            if (altCount === 0) altStart = i;
-            altCount++;
-          } else {
-            if (altCount >= 10) { // 至少10次交替
-              const modSize = runs[altStart].len;
-              candidates.push({ y, modSize, x: runs[altStart].len * altStart });
-            }
-            altCount = 0;
-          }
-        }
-      }
-      
-      return candidates;
-    }
-    
-    // 通过图片尺寸推算（最可靠的方法）
+
     function locateBySize(w, h) {
-      // 假设有4模块的空白边距
-      // 二维码尺寸 = w - 2*border
-      // 模块大小 = (w - 2*border) / (17 + 4*v)
-      // 需要尝试不同版本
-      
-      const borders = [4, 8, 12, 16, 20, 24, 28, 32];
-      const results = [];
-      
-      for (const border of borders) {
-        const qrSize = Math.min(w, h) - border * 2;
-        for (let v = 1; v <= 10; v++) {
-          const sz = 17 + v * 4;
-          const modSize = qrSize / sz;
+      var borders = [4, 8, 12, 16, 20, 24, 28, 32];
+      var results = [];
+
+      for (var i = 0; i < borders.length; i++) {
+        var border = borders[i];
+        var qrSize = Math.min(w, h) - border * 2;
+        for (var v = 1; v <= 10; v++) {
+          var sz = 17 + v * 4;
+          var modSize = qrSize / sz;
           if (modSize >= 4 && modSize <= 20 && Math.abs(modSize - Math.round(modSize)) < 0.1) {
-            results.push({ v, modSize: Math.round(modSize), border, sz });
+            results.push({ v: v, modSize: Math.round(modSize), border: border, sz: sz });
           }
         }
       }
-      
-      return results.sort((a, b) => Math.abs(a.modSize - 8) - Math.abs(b.modSize - 8));
+
+      results.sort(function(a, b) {
+        return Math.abs(a.modSize - 8) - Math.abs(b.modSize - 8);
+      });
+      return results;
     }
-    
+
     function extractMatrix(bin, w, h, tl, modSize, sz) {
-      const m = [];
-      for (let r = 0; r < sz; r++) {
+      var m = [];
+      for (var r = 0; r < sz; r++) {
         m[r] = new Uint32Array(sz);
-        for (let c = 0; c < sz; c++) {
-          const px = Math.round(tl.x + c * modSize);
-          const py = Math.round(tl.y + r * modSize);
+        for (var c = 0; c < sz; c++) {
+          var px = Math.round(tl.x + c * modSize);
+          var py = Math.round(tl.y + r * modSize);
           if (px >= 0 && px < w && py >= 0 && py < h) {
             m[r][c] = bin[py * w + px] ? 0 : 1;
           }
@@ -667,27 +632,26 @@
       }
       return m;
     }
-    
+
     function readBits(m, sz, alocs, hasLogo) {
-      const bits = [];
-      let up = true;
-      
-      // Logo区域（如果知道的话）
-      const logoModules = hasLogo ? Math.floor(sz * 0.25) : 0;
-      const logoStart = hasLogo ? Math.floor((sz - logoModules) / 2) : -1;
-      const logoEnd = hasLogo ? logoStart + logoModules : -1;
-      
-      for (let col = sz - 1; col >= 0; col -= 2) {
-        const rc = col === 6 ? 5 : col;
-        for (let row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
-          for (let c = rc; c >= rc - 1; c--) {
+      var bits = [];
+      var up = true;
+
+      var logoModules = hasLogo ? Math.floor(sz * 0.25) : 0;
+      var logoStart = hasLogo ? Math.floor((sz - logoModules) / 2) : -1;
+      var logoEnd = hasLogo ? logoStart + logoModules : -1;
+
+      for (var col = sz - 1; col >= 0; col -= 2) {
+        var rc = col === 6 ? 5 : col;
+        for (var row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
+          for (var c = rc; c >= rc - 1; c--) {
             if (c < 0 || c >= sz) continue;
-            if (row === 6 || c === 6) continue; // Timing Pattern
-            
-            // 跳过 Alignment Pattern
-            let inAlign = false;
-            for (const ar of alocs) {
-              for (const ac of alocs) {
+            if (row === 6 || c === 6) continue;
+
+            var inAlign = false;
+            for (var ai = 0; ai < alocs.length; ai++) {
+              for (var aj = 0; aj < alocs.length; aj++) {
+                var ar = alocs[ai], ac = alocs[aj];
                 if (ar === 6 && ac === 6) continue;
                 if (row >= ar - 2 && row <= ar + 2 && c >= ac - 2 && c <= ac + 2) {
                   inAlign = true; break;
@@ -696,15 +660,13 @@
               if (inAlign) break;
             }
             if (inAlign) continue;
-            
-            // 跳过 Dark Module
+
             if (row === sz - 8 && c === 8) continue;
-            
-            // 跳过 Logo 区域（如果存在）
+
             if (hasLogo && row >= logoStart && row <= logoEnd && c >= logoStart && c <= logoEnd) {
               continue;
             }
-            
+
             bits.push(m[row][c]);
           }
         }
@@ -712,31 +674,31 @@
       }
       return bits;
     }
-    
+
     function decodeFromCW(cw) {
       if (cw.length < 2) return null;
-      const mode = (cw[0] >> 4) & 0xF;
-      if (mode !== 4) return null; // Byte mode
-      const count = ((cw[0] & 0xF) << 4) | ((cw[1] >> 4) & 0xF);
+      var mode = (cw[0] >> 4) & 0xF;
+      if (mode !== 4) return null;
+      var count = ((cw[0] & 0xF) << 4) | ((cw[1] >> 4) & 0xF);
       if (count < 1 || count > 1000) return null;
-      
-      let allBits = "";
-      for (const b of cw) {
-        allBits += b.toString(2).padStart(8, "0");
+
+      var allBits = "";
+      for (var i = 0; i < cw.length; i++) {
+        allBits += cw[i].toString(2).padStart(8, "0");
       }
-      
-      const dataStart = 12;
-      const bytes = [];
-      for (let i = dataStart; i + 8 <= allBits.length && bytes.length < count; i += 8) {
+
+      var dataStart = 12;
+      var bytes = [];
+      for (var i = dataStart; i + 8 <= allBits.length && bytes.length < count; i += 8) {
         bytes.push(parseInt(allBits.substring(i, i + 8), 2));
       }
-      return { bytes, count };
+      return { bytes: bytes, count: count };
     }
-    
+
     function decodeBytes(bytes) {
-      const b = Array.from(bytes);
-      let end = b.length;
-      for (let i = 0; i < b.length - 1; i++) {
+      var b = Array.from(bytes);
+      var end = b.length;
+      for (var i = 0; i < b.length - 1; i++) {
         if ((b[i] === 0xEC && b[i + 1] === 0x11) || (b[i] === 0x11 && b[i + 1] === 0xEC)) {
           end = i; break;
         }
@@ -747,45 +709,43 @@
         return null;
       }
     }
-    
-    // ==================== 解析入口 ====================
+
     function parseQR(imageData, expectedGen) {
-      const grayResult = toGray(imageData);
-      const gray = grayResult.gray;
-      const w = grayResult.w;
-      const h = grayResult.h;
-      const bin = toBin(gray, w, h);
-      
+      var grayResult = toGray(imageData);
+      var gray = grayResult.gray;
+      var w = grayResult.w;
+      var h = grayResult.h;
+      var bin = toBin(gray, w, h);
+
       addLog("🚀 开始解析二维码...");
-      
-      // 策略1: 如果知道生成参数，直接用
+
       if (expectedGen) {
         addLog("使用生成器参数直接解析");
-        const modSize = expectedGen.moduleSize;
-        const sz = expectedGen.size;
-        const border = 4;
-        const tl = { x: border * modSize, y: border * modSize };
-        
-        const m = extractMatrix(bin, w, h, tl, modSize, sz);
-        
-        // 取消 Mask
-        const um = [];
-        for (let r = 0; r < sz; r++) {
+        var modSize = expectedGen.moduleSize;
+        var sz = expectedGen.size;
+        var border = 4;
+        var tl = { x: border * modSize, y: border * modSize };
+
+        var m = extractMatrix(bin, w, h, tl, modSize, sz);
+
+        var um = [];
+        for (var r = 0; r < sz; r++) {
           um[r] = [];
-          for (let c = 0; c < sz; c++) {
+          for (var c = 0; c < sz; c++) {
             um[r][c] = m[r][c];
           }
         }
-        
-        for (let r = 0; r < sz; r++) {
-          for (let c = 0; c < sz; c++) {
+
+        for (var r = 0; r < sz; r++) {
+          for (var c = 0; c < sz; c++) {
             if (r === 6 || c === 6) continue;
             if (!expectedGen.removeFinders) {
               if ((r < 8 && c < 8) || (r < 8 && c >= sz - 8) || (r >= sz - 8 && c < 8)) continue;
             }
-            let inAlign = false;
-            for (const ar of expectedGen.alocs) {
-              for (const ac of expectedGen.alocs) {
+            var inAlign = false;
+            for (var ai = 0; ai < expectedGen.alocs.length; ai++) {
+              for (var aj = 0; aj < expectedGen.alocs.length; aj++) {
+                var ar = expectedGen.alocs[ai], ac = expectedGen.alocs[aj];
                 if (ar === 6 && ac === 6) continue;
                 if (r >= ar - 2 && r <= ar + 2 && c >= ac - 2 && c <= ac + 2) {
                   inAlign = true; break;
@@ -798,118 +758,116 @@
             if (!((r + c) & 1)) um[r][c] ^= 1;
           }
         }
-        
-        const bits = readBits(um, sz, expectedGen.alocs, expectedGen.hasLogo);
-        const rawCW = [];
-        for (let i = 0; i < expectedGen.totalCW && i * 8 < bits.length; i++) {
-          let cw = 0;
-          for (let j = 0; j < 8; j++) cw = (cw << 1) | bits[i * 8 + j];
+
+        var bits = readBits(um, sz, expectedGen.alocs, expectedGen.hasLogo);
+        var rawCW = [];
+        for (var i = 0; i < expectedGen.totalCW && i * 8 < bits.length; i++) {
+          var cw = 0;
+          for (var j = 0; j < 8; j++) cw = (cw << 1) | bits[i * 8 + j];
           rawCW.push(cw);
         }
-        
-        const fixed = GF.rsDecode(new Int32Array(rawCW), expectedGen.ecCW);
-        const allCW = fixed ? Array.from(fixed) : rawCW;
-        const dataCW = allCW.slice(0, expectedGen.dataCW);
-        
-        const decoded = decodeFromCW(dataCW);
+
+        var fixed = GF.rsDecode(new Int32Array(rawCW), expectedGen.ecCW);
+        var allCW = fixed ? Array.from(fixed) : rawCW;
+        var dataCW = allCW.slice(0, expectedGen.dataCW);
+
+        var decoded = decodeFromCW(dataCW);
         if (decoded) {
-          const text = decodeBytes(decoded.bytes);
+          var text = decodeBytes(decoded.bytes);
           if (text) {
-            addLog(`✅ 解析成功: ${text}`);
+            addLog("✅ 解析成功: " + text);
             return text;
           }
         }
       }
-      
-      // 策略2: 通过尺寸推算
+
       addLog("尝试通过尺寸推算...");
-      const sizeCandidates = locateBySize(w, h);
-      addLog(`找到 ${sizeCandidates.length} 个尺寸候选`);
-      
-      for (const cand of sizeCandidates.slice(0, 3)) {
-        addLog(`尝试 v${cand.v} mod=${cand.modSize} border=${cand.border}`);
-        const tl = { x: cand.border * cand.modSize, y: cand.border * cand.modSize };
-        const m = extractMatrix(bin, w, h, tl, cand.modSize, cand.sz);
-        const alocs = getAlignmentLocs(cand.v);
-        
-        for (let mask = 0; mask < 8; mask++) {
-          const um = [];
-          for (let r = 0; r < cand.sz; r++) {
-            um[r] = [];
-            for (let c = 0; c < cand.sz; c++) {
-              um[r][c] = m[r][c];
+      var sizeCandidates = locateBySize(w, h);
+      addLog("找到 " + sizeCandidates.length + " 个尺寸候选");
+
+      for (var ci = 0; ci < Math.min(3, sizeCandidates.length); ci++) {
+        var cand = sizeCandidates[ci];
+        addLog("尝试 v" + cand.v + " mod=" + cand.modSize + " border=" + cand.border);
+        var tl2 = { x: cand.border * cand.modSize, y: cand.border * cand.modSize };
+        var m2 = extractMatrix(bin, w, h, tl2, cand.modSize, cand.sz);
+        var alocs2 = getAlignmentLocs(cand.v);
+
+        for (var mask = 0; mask < 8; mask++) {
+          var um2 = [];
+          for (var r = 0; r < cand.sz; r++) {
+            um2[r] = [];
+            for (var c = 0; c < cand.sz; c++) {
+              um2[r][c] = m2[r][c];
             }
           }
-          
-          // 取消 Mask
-          for (let r = 0; r < cand.sz; r++) {
-            for (let c = 0; c < cand.sz; c++) {
+
+          for (var r = 0; r < cand.sz; r++) {
+            for (var c = 0; c < cand.sz; c++) {
               if (r === 6 || c === 6) continue;
-              const maskFuncs = [
+              var maskFuncs = [
                 (r + c) % 2 === 0, r % 2 === 0, c % 3 === 0, (r + c) % 3 === 0,
                 (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
                 ((r * c) % 2 + (r * c) % 3) === 0,
                 (((r * c) % 2 + (r * c) % 3) % 2) === 0,
                 (((r + c) % 2 + (r * c) % 3) % 2) === 0
               ];
-              if (maskFuncs[mask]) um[r][c] ^= 1;
+              if (maskFuncs[mask]) um2[r][c] ^= 1;
             }
           }
-          
-          const bits = readBits(um, cand.sz, alocs, false);
-          const rawCW = [];
-          const totalCW = VD[cand.v].H[0];
-          const ecCW = VD[cand.v].H[2];
-          for (let i = 0; i < totalCW && i * 8 < bits.length; i++) {
-            let cw = 0;
-            for (let j = 0; j < 8; j++) cw = (cw << 1) | bits[i * 8 + j];
-            rawCW.push(cw);
+
+          var bits2 = readBits(um2, cand.sz, alocs2, false);
+          var rawCW2 = [];
+          var totalCW2 = VD[cand.v].H[0];
+          var ecCW2 = VD[cand.v].H[2];
+          for (var i = 0; i < totalCW2 && i * 8 < bits2.length; i++) {
+            var cw = 0;
+            for (var j = 0; j < 8; j++) cw = (cw << 1) | bits2[i * 8 + j];
+            rawCW2.push(cw);
           }
-          
-          const fixed = GF.rsDecode(new Int32Array(rawCW), ecCW);
-          const allCW = fixed ? Array.from(fixed) : rawCW;
-          const dataCW = allCW.slice(0, VD[cand.v].H[1]);
-          
-          const decoded = decodeFromCW(dataCW);
-          if (decoded) {
-            const text = decodeBytes(decoded.bytes);
-            if (text) {
-              addLog(`✅ v${cand.v} mask${mask}: ${text}`);
-              return text;
+
+          var fixed2 = GF.rsDecode(new Int32Array(rawCW2), ecCW2);
+          var allCW2 = fixed2 ? Array.from(fixed2) : rawCW2;
+          var dataCW2 = allCW2.slice(0, VD[cand.v].H[1]);
+
+          var decoded2 = decodeFromCW(dataCW2);
+          if (decoded2) {
+            var text2 = decodeBytes(decoded2.bytes);
+            if (text2) {
+              addLog("✅ v" + cand.v + " mask" + mask + ": " + text2);
+              return text2;
             }
           }
         }
       }
-      
+
       addLog("❌ 所有尝试失败");
       return null;
     }
 
     // ==================== Logo 处理 ====================
-    let logoImageData = null;
-    
-    function createLogoCanvas(source, size = 128) {
-      const canvas = document.createElement("canvas");
+    var logoImageData = null;
+
+    function createLogoCanvas(source, size) {
+      size = size || 128;
+      var canvas = document.createElement("canvas");
       canvas.width = size;
       canvas.height = size;
-      const ctx = canvas.getContext("2d");
-      
+      var ctx = canvas.getContext("2d");
+
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, size, size);
-      
-      if (typeof source === 'string' && source.startsWith('data:')) {
-        // 图片
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
+
+      if (typeof source === 'string' && source.indexOf('data:') === 0) {
+        return new Promise(function(resolve) {
+          var img = new Image();
+          img.onload = function() {
             ctx.drawImage(img, 0, 0, size, size);
             resolve(canvas);
           };
           img.src = source;
         });
       } else {
-        // Emoji
-        ctx.font = `${size * 0.7}px serif`;
+        ctx.font = (size * 0.7) + "px serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#000";
@@ -919,15 +877,15 @@
     }
 
     // ==================== 事件绑定 ====================
-    let lastGenResult = null;
-    
+    var lastGenResult = null;
+
     document.getElementById("logoInput").addEventListener("change", function(e) {
-      const f = e.target.files[0];
+      var f = e.target.files[0];
       if (!f) return;
-      const reader = new FileReader();
+      var reader = new FileReader();
       reader.onload = function(ev) {
         logoImageData = ev.target.result;
-        const img = new Image();
+        var img = new Image();
         img.onload = function() {
           document.getElementById("logoPreview").innerHTML = "";
           img.style.width = "60px";
@@ -939,71 +897,68 @@
       };
       reader.readAsDataURL(f);
     });
-    
+
     document.getElementById("logoEmoji").addEventListener("input", function(e) {
       logoImageData = null;
       document.getElementById("logoPreview").textContent = e.target.value || "🌹";
     });
-    
+
     document.getElementById("genBtn").addEventListener("click", async function() {
       clearLog();
-      const text = document.getElementById("qrText").value.trim();
+      var text = document.getElementById("qrText").value.trim();
       if (!text) {
         resultDisplay.textContent = "❌ 请输入内容";
         resultDisplay.className = "result fail";
         return;
       }
-      
-      const moduleSize = parseInt(document.getElementById("moduleSize").value) || 8;
-      const ecLevel = document.getElementById("ecLevel").value;
-      const removeFinders = document.getElementById("removeFinders").checked;
-      const addLogo = document.getElementById("addLogo").checked;
-      
+
+      var moduleSize = parseInt(document.getElementById("moduleSize").value) || 8;
+      var ecLevel = document.getElementById("ecLevel").value;
+      var removeFinders = document.getElementById("removeFinders").checked;
+      var addLogo = document.getElementById("addLogo").checked;
+
       try {
-        let logoCanvas = null;
+        var logoCanvas = null;
         if (addLogo) {
-          const emoji = document.getElementById("logoEmoji").value || "🌹";
+          var emoji = document.getElementById("logoEmoji").value || "🌹";
           logoCanvas = await createLogoCanvas(logoImageData || emoji, 128);
         }
-        
-        const gen = await genQR(text, {
-          moduleSize,
-          ecLevel,
-          removeFinders,
-          addLogo,
-          logoCanvas
+
+        var gen = await genQR(text, {
+          moduleSize: moduleSize,
+          ecLevel: ecLevel,
+          removeFinders: removeFinders,
+          addLogo: addLogo,
+          logoCanvas: logoCanvas
         });
-        
+
         lastGenResult = gen;
-        
-        // 显示二维码
-        const display = document.getElementById("qrDisplay");
+
+        var display = document.getElementById("qrDisplay");
         display.innerHTML = "";
         display.appendChild(gen.canvas);
-        
-        // 显示下载按钮
-        const downloadBtn = document.getElementById("downloadBtn");
+
+        var downloadBtn = document.getElementById("downloadBtn");
         downloadBtn.style.display = "block";
-        downloadBtn.onclick = () => {
-          const link = document.createElement("a");
+        downloadBtn.onclick = function() {
+          var link = document.createElement("a");
           link.download = "qrcode.png";
           link.href = gen.canvas.toDataURL();
           link.click();
           addLog("💾 已下载");
         };
-        
-        // 自解析验证
+
         resultDisplay.textContent = "⏳ 自解析验证中...";
         resultDisplay.className = "result info";
-        
-        setTimeout(() => {
-          const workCanvas = document.getElementById("workCanvas");
+
+        setTimeout(function() {
+          var workCanvas = document.getElementById("workCanvas");
           workCanvas.width = gen.canvas.width;
           workCanvas.height = gen.canvas.height;
-          const ctx = workCanvas.getContext("2d", { willReadFrequently: true });
+          var ctx = workCanvas.getContext("2d", { willReadFrequently: true });
           ctx.drawImage(gen.canvas, 0, 0);
-          
-          const parsed = parseQR(ctx.getImageData(0, 0, workCanvas.width, workCanvas.height), gen);
+
+          var parsed = parseQR(ctx.getImageData(0, 0, workCanvas.width, workCanvas.height), gen);
           if (parsed === text) {
             resultDisplay.textContent = "✅ 自解析成功: " + parsed;
             resultDisplay.className = "result ok";
@@ -1012,7 +967,7 @@
             resultDisplay.className = "result fail";
           }
         }, 100);
-        
+
       } catch (err) {
         resultDisplay.textContent = "❌ 错误: " + err.message;
         resultDisplay.className = "result fail";
@@ -1020,12 +975,10 @@
         console.error(err);
       }
     });
-    
-    // 默认生成一次
-    setTimeout(() => {
+
+    setTimeout(function() {
       document.getElementById("genBtn").click();
     }, 500);
   </script>
 </body>
-
 </html>
