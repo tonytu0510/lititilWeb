@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解析器 · 增强网址解码</title>
+  <title>二维码解析器 · 修复版</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -48,16 +48,23 @@
       max-height: 100px;
       overflow-y: auto;
     }
-    .tabs { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-    .tab { padding: 0.3rem 0.8rem; border-radius: 0.4rem; background: rgba(255,255,255,0.1); cursor: pointer; font-size: 0.8rem; }
-    .tab.active { background: rgba(67, 233, 123, 0.2); color: #43e97b; }
+    .debug-info {
+      background: rgba(0,0,0,0.3);
+      border-radius: 0.4rem;
+      padding: 0.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
   </style>
 <base target="_blank">
 </head>
 <body>
   <div class="container">
-    <h1>📷 二维码解析器 · 增强网址解码</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">支持标准/无定位点二维码 · 自动提取网址</p>
+    <h1>📷 二维码解析器 · 修复版</h1>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">修复数据读取顺序 · 支持标准二维码</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
@@ -77,6 +84,7 @@
         <div class="result-content empty" id="scanResult">等待解析...</div>
         <div id="urlBadgeContainer"></div>
         <div id="hexDumpContainer"></div>
+        <div id="debugInfo" class="debug-info"></div>
       </div>
       <div class="btn-row">
         <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
@@ -110,7 +118,7 @@
       return bin;
     }
 
-    // ==================== 定位点扫描（标准二维码）====================
+    // ==================== 定位点扫描 ====================
     function scanRow(bin, width, y) {
       const candidates = [];
       const segments = [];
@@ -215,229 +223,182 @@
       return matrix;
     }
 
-    function hasFinderPattern(matrix, size, corner) {
-      let startR, startC;
-      if (corner === 'tl') { startR = 0; startC = 0; }
-      else if (corner === 'tr') { startR = 0; startC = size - 7; }
-      else if (corner === 'bl') { startR = size - 7; startC = 0; }
-      else return false;
-      if (startR < 0 || startC < 0 || startR + 7 > size || startC + 7 > size) return false;
-      let matchCount = 0;
-      for (let r = 0; r < 7; r++) {
-        for (let c = 0; c < 7; c++) {
-          const expected = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
-          if (matrix[startR + r][startC + c] === expected) matchCount++;
-        }
-      }
-      return matchCount / 49 >= 0.8;
-    }
-
-    function checkAnyFinderPattern(matrix, size) {
-      return hasFinderPattern(matrix, size, 'tl') || hasFinderPattern(matrix, size, 'tr') || hasFinderPattern(matrix, size, 'bl');
-    }
-
-    // ==================== 解码 ====================
+    // ==================== 修复版：数据读取 ====================
+    // 标准二维码：跳过定位点区域
     function readBitsStandard(matrix, size) {
       const bits = [];
-      let up = true;
+      let direction = -1; // -1 向上，1 向下
+      let row = size - 1;
+      
+      // 从右下角开始，逐列向左扫描（每两列一组）
       for (let col = size - 1; col >= 0; col -= 2) {
-        const rc = col === 6 ? 5 : col;
-        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
-          for (let c = rc; c >= rc - 1; c--) {
-            if (c < 0 || c >= size) continue;
-            if (row < 9 && c < 9) continue;
-            if (row < 9 && c > size - 9) continue;
-            if (row > size - 9 && c < 9) continue;
-            if (row === 6 || c === 6) continue;
-            bits.push(matrix[row][c]);
+        // 如果当前列是第6列（索引6），跳到第5列（因为第6列是时序图案）
+        const actualCol = (col === 6) ? 5 : col;
+        
+        // 处理两列：actualCol 和 actualCol-1
+        for (let c = actualCol; c >= Math.max(0, actualCol - 1); c--) {
+          // 跳过时序图案列（第6列）和定位点区域
+          if (c === 6) continue;
+          
+          // 从上到下或从下到上读取
+          let startRow = (direction === -1) ? size - 1 : 0;
+          let endRow = (direction === -1) ? -1 : size;
+          let step = (direction === -1) ? -1 : 1;
+          
+          for (let r = startRow; r !== endRow; r += step) {
+            // 跳过定位点区域（左上、右上、左下）
+            if (r < 9 && c < 9) continue;
+            if (r < 9 && c > size - 9) continue;
+            if (r > size - 9 && c < 9) continue;
+            // 跳过时序图案行（第6行）
+            if (r === 6) continue;
+            
+            bits.push(matrix[r][c]);
           }
         }
-        up = !up;
+        // 切换方向
+        direction = -direction;
       }
       return bits;
     }
 
+    // 无定位点：跳过时序图案行/列
     function readBitsNoFinder(matrix, size) {
       const bits = [];
-      let up = true;
+      let direction = -1;
+      let row = size - 1;
+      
       for (let col = size - 1; col >= 0; col -= 2) {
-        const rc = col === 6 ? 5 : col;
-        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
-          for (let c = rc; c >= rc - 1; c--) {
-            if (c < 0 || c >= size) continue;
-            if (row === 6 || c === 6) continue;
-            bits.push(matrix[row][c]);
+        const actualCol = (col === 6) ? 5 : col;
+        
+        for (let c = actualCol; c >= Math.max(0, actualCol - 1); c--) {
+          if (c === 6) continue;
+          
+          let startRow = (direction === -1) ? size - 1 : 0;
+          let endRow = (direction === -1) ? -1 : size;
+          let step = (direction === -1) ? -1 : 1;
+          
+          for (let r = startRow; r !== endRow; r += step) {
+            if (r === 6) continue;
+            bits.push(matrix[r][c]);
           }
         }
-        up = !up;
+        direction = -direction;
       }
       return bits;
     }
 
-    // 增强版解码：返回原始字节和文本
-    function decodeBitsAdvanced(bits, msbFirst) {
+    // ==================== 解码器（修复版） ====================
+    function decodeBits(bits) {
       if (bits.length < 12) return null;
+      
+      // 读取模式（4位，MSB）
       let mode = 0;
-      if (msbFirst) {
-        for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
-      } else {
-        for (let i = 0; i < 4; i++) mode |= bits[i] << i;
-      }
-      const modeNames = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
-      if (!modeNames[mode]) return null;
-      const countBits = { 1: 10, 2: 9, 4: 8, 8: 8 };
-      const cb = countBits[mode];
+      for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i];
+      
+      const modeMap = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
+      if (!modeMap[mode]) return null;
+      
+      // 读取字符数
+      const countBitsMap = { 1: 10, 2: 9, 4: 8, 8: 8 };
+      const cb = countBitsMap[mode];
       if (bits.length < 4 + cb) return null;
+      
       let count = 0;
-      if (msbFirst) {
-        for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i];
-      } else {
-        for (let i = 0; i < cb; i++) count |= bits[4 + i] << i;
-      }
+      for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i];
+      
       if (count <= 0 || count > 300) return null;
+      
+      // 读取数据
       const dataStart = 4 + cb;
       const requiredBits = dataStart + count * 8;
       if (requiredBits > bits.length) return null;
+      
       const bytes = [];
       for (let i = 0; i < count; i++) {
         let b = 0;
-        if (msbFirst) {
-          for (let j = 0; j < 8; j++) b = (b << 1) | bits[dataStart + i * 8 + j];
-        } else {
-          for (let j = 0; j < 8; j++) b |= bits[dataStart + i * 8 + j] << j;
+        for (let j = 0; j < 8; j++) {
+          b = (b << 1) | bits[dataStart + i * 8 + j];
         }
         bytes.push(b);
       }
-      // 尝试多种编码
-      const encodings = ['utf-8', 'gbk', 'big5', 'shift-jis', 'iso-8859-1'];
-      for (const enc of encodings) {
-        try {
-          const decoder = new TextDecoder(enc);
-          const text = decoder.decode(new Uint8Array(bytes));
-          if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
-            return { mode: modeNames[mode], count, text, bytes, encoding: enc };
-          }
-        } catch (e) {}
-      }
-      // 如果所有编码都失败，返回原始字节
-      return { mode: modeNames[mode], count, text: null, bytes, encoding: 'binary' };
+      
+      // 尝试UTF-8解码
+      try {
+        const text = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+        // 检查是否包含可打印字符
+        if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
+          return { text, bytes, mode: modeMap[mode], count };
+        }
+      } catch (e) {}
+      
+      // 如果UTF-8失败，尝试其他编码
+      try {
+        const text = new TextDecoder('gbk').decode(new Uint8Array(bytes));
+        if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
+          return { text, bytes, mode: modeMap[mode], count };
+        }
+      } catch (e) {}
+      
+      // 返回原始字节
+      return { text: null, bytes, mode: modeMap[mode], count };
     }
 
-    function tryDecodeAdvanced(matrix, size, readBitsFn) {
+    function tryDecode(matrix, size, readFn) {
+      // 尝试所有掩码
       for (let mask = 0; mask < 8; mask++) {
-        const work = matrix.map(r => new Uint32Array(r));
+        const work = matrix.map(row => new Uint32Array(row));
+        
+        // 应用掩码
         for (let r = 0; r < size; r++) {
           for (let c = 0; c < size; c++) {
             if (r === 6 || c === 6) continue;
-            let inv = false;
+            let invert = false;
             switch (mask) {
-              case 0: inv=(r+c)%2===0;break; case 1: inv=r%2===0;break;
-              case 2: inv=c%3===0;break; case 3: inv=(r+c)%3===0;break;
-              case 4: inv=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;
-              case 5: inv=((r*c)%2)+((r*c)%3)===0;break;
-              case 6: inv=(((r*c)%2)+((r*c)%3))%2===0;break;
-              case 7: inv=(((r+c)%2)+((r*c)%3))%2===0;break;
+              case 0: invert = (r + c) % 2 === 0; break;
+              case 1: invert = r % 2 === 0; break;
+              case 2: invert = c % 3 === 0; break;
+              case 3: invert = (r + c) % 3 === 0; break;
+              case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
+              case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
+              case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
+              case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
             }
-            if (inv) work[r][c] ^= 1;
+            if (invert) work[r][c] ^= 1;
           }
         }
-        const bits = readBitsFn(work, size);
-        for (const msb of [false, true]) {
-          const result = decodeBitsAdvanced(bits, msb);
-          if (result) {
-            // 检查是否包含网址
-            let url = null;
-            if (result.text) {
-              const match = result.text.match(/(https?:\/\/[^\s]+|[\w.-]+\.[a-z]{2,}[^\s]*)/i);
-              if (match) url = match[0];
-            }
-            return { ...result, mask, msb, url };
-          }
+        
+        const bits = readFn(work, size);
+        const result = decodeBits(bits);
+        if (result && result.text) {
+          return { ...result, mask };
         }
       }
       return null;
     }
 
-    // ==================== 时序图案检测 ====================
-    function detectTimingPattern(bin, width, height) {
-      const rowCandidates = [], colCandidates = [];
-      for (let y = 0; y < height; y++) {
-        let transitions = 0, last = bin[y * width];
-        for (let x = 1; x < width; x++) {
-          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
-        }
-        if (transitions >= 15 && transitions <= 60) rowCandidates.push({ y, transitions });
-      }
-      for (let x = 0; x < width; x++) {
-        let transitions = 0, last = bin[x];
-        for (let y = 1; y < height; y++) {
-          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
-        }
-        if (transitions >= 15 && transitions <= 60) colCandidates.push({ x, transitions });
-      }
-      return { rowCandidates, colCandidates };
-    }
-
-    function inferGrid(bin, width, height) {
-      const { rowCandidates, colCandidates } = detectTimingPattern(bin, width, height);
-      if (rowCandidates.length === 0 || colCandidates.length === 0) return null;
-      const bestRow = rowCandidates.sort((a,b) => b.transitions - a.transitions)[0];
-      const bestCol = colCandidates.sort((a,b) => b.transitions - a.transitions)[0];
-      const y = bestRow.y;
-      const spacings = [];
-      let lastColor = bin[y * width], lastX = 0;
-      for (let x = 1; x < width; x++) {
-        if (bin[y * width + x] !== lastColor) {
-          spacings.push(x - lastX);
-          lastX = x;
-          lastColor = bin[y * width + x];
-        }
-      }
-      spacings.sort((a,b) => a-b);
-      const moduleSize = spacings[Math.floor(spacings.length/2)] || 8;
-      const offsetX = bestCol.x - 6 * moduleSize;
-      const offsetY = bestRow.y - 6 * moduleSize;
-      const qrSize = Math.round((width - offsetX) / moduleSize);
-      return {
-        moduleSize,
-        offsetX: Math.max(0, Math.round(offsetX)),
-        offsetY: Math.max(0, Math.round(offsetY)),
-        qrSize: Math.min(qrSize, Math.round((height - offsetY) / moduleSize)),
-        version: Math.max(1, Math.min(10, Math.round((qrSize - 17) / 4)))
-      };
-    }
-
-    function extractMatrixFromGrid(bin, width, height, grid) {
-      const { moduleSize, offsetX, offsetY, qrSize } = grid;
-      const matrix = Array.from({ length: qrSize }, () => new Uint32Array(qrSize));
-      for (let row = 0; row < qrSize; row++) {
-        for (let col = 0; col < qrSize; col++) {
-          const px = Math.round(offsetX + col * moduleSize + moduleSize/2);
-          const py = Math.round(offsetY + row * moduleSize + moduleSize/2);
-          if (px >= 0 && px < width && py >= 0 && py < height) {
-            matrix[row][col] = bin[py * width + px] === 0 ? 1 : 0;
-          }
-        }
-      }
-      return matrix;
-    }
-
     // ==================== 主解析 ====================
     function decodeQR(imageData, silent) {
       const { gray, width, height } = toGray(imageData);
-      if (!silent) addLog('📊 ' + width + '×' + height);
+      if (!silent) addLog('📊 图像尺寸: ' + width + '×' + height);
       const bin = toBinary(gray, width, height);
 
-      // 方式1：标准二维码
+      // 方式1：标准二维码（有定位点）
       const candidates = findAllCandidates(bin, width, height);
+      if (!silent) addLog('🔍 检测到 ' + candidates.length + ' 个定位点候选');
+      
       if (candidates.length >= 10) {
         const clusters = clusterCandidates(candidates, Math.floor(width/15));
+        if (!silent) addLog('🔍 聚类后 ' + clusters.length + ' 个定位点簇');
+        
         if (clusters.length >= 3) {
-          if (!silent) addLog('🔍 检测到定位点，尝试标准解码...');
           const pts = clusters.slice(0, 3);
           const perms = permutations(pts);
+          
           for (let pi = 0; pi < perms.length; pi++) {
             const [tl, tr, bl] = perms[pi];
+            
+            // 检查是否构成直角
             const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
             const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
             const dot = v1x * v2x + v1y * v2y;
@@ -448,51 +409,69 @@
 
             const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
             const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-            const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
-            const ev = Math.round(((d1+d2)/2/avgMod - 10)/4);
-            for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
-              const sz = 17+v*4;
+            const avgMod = (tl.moduleSize + tr.moduleSize + bl.moduleSize) / 3;
+            const ev = Math.round(((d1 + d2) / 2 / avgMod - 10) / 4);
+            
+            if (!silent) addLog('📐 估计版本: ' + ev);
+            
+            for (let v = Math.max(1, ev-2); v <= Math.min(10, ev+2); v++) {
+              const sz = 17 + v * 4;
+              if (!silent) addLog('🔍 尝试版本 ' + v + ' (矩阵大小 ' + sz + '×' + sz + ')');
+              
               const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
-              let r = tryDecodeAdvanced(m, sz, readBitsStandard);
-              if (r) { 
-                if (!silent) addLog('✅ 标准解码: mask='+r.mask+' msb='+r.msb+' 编码='+r.encoding);
-                return r; 
+              
+              // 尝试正常读取
+              let result = tryDecode(m, sz, readBitsStandard);
+              if (result) {
+                if (!silent) addLog('✅ 解码成功! 掩码: ' + result.mask + ' 模式: ' + result.mode);
+                return result;
               }
-              const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
-              r = tryDecodeAdvanced(inv, sz, readBitsStandard);
-              if (r) { 
-                if (!silent) addLog('✅ 标准解码(反转): mask='+r.mask+' msb='+r.msb+' 编码='+r.encoding);
-                return r; 
+              
+              // 尝试反转
+              const inv = m.map(row => new Uint32Array(row.map(v => v ^ 1)));
+              result = tryDecode(inv, sz, readBitsStandard);
+              if (result) {
+                if (!silent) addLog('✅ 解码成功 (反转)! 掩码: ' + result.mask + ' 模式: ' + result.mode);
+                return result;
               }
             }
           }
         }
       }
 
-      // 方式2：时序图案解码
-      if (!silent) addLog('🔍 尝试时序图案解码...');
-      const grid = inferGrid(bin, width, height);
-      if (!grid) { if (!silent) addLog('❌ 无法检测时序图案'); return null; }
-      if (!silent) addLog('📐 模块:'+grid.moduleSize+' 偏移:('+grid.offsetX+','+grid.offsetY+') 大小:'+grid.qrSize);
-
-      const matrix2 = extractMatrixFromGrid(bin, width, height, grid);
-      for (let v = Math.max(1,grid.version-2); v <= Math.min(10,grid.version+2); v++) {
-        const sz = 17+v*4;
-        if (sz > matrix2.length) continue;
-        const sub = matrix2.slice(0, sz).map(r => r.slice(0, sz));
-        for (const inv of [false, true]) {
-          const m = inv ? sub.map(r => new Uint32Array(r.map(v=>v^1))) : sub;
-          const hasFinder = checkAnyFinderPattern(m, sz);
-          const readFn = hasFinder ? readBitsStandard : readBitsNoFinder;
-          if (!silent && hasFinder) addLog('   检测到定位点图案(≥80%匹配)');
-          if (!silent && !hasFinder) addLog('   未检测到定位点图案，读取所有数据');
-          let r = tryDecodeAdvanced(m, sz, readFn);
-          if (r) {
-            if (!silent) addLog('✅ 时序解码: v'+v+' mask='+r.mask+' msb='+r.msb+' 编码='+r.encoding);
-            return r;
+      // 方式2：无定位点（时序图案）
+      if (!silent) addLog('🔍 尝试无定位点解码...');
+      // 简化：直接使用整个图像
+      const gridSize = Math.min(width, height);
+      const size = Math.floor(gridSize / 8) * 4 + 17;
+      if (size >= 21 && size <= 57) {
+        const step = gridSize / size;
+        const matrix = Array.from({ length: size }, () => new Uint32Array(size));
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            const px = Math.round(c * step + step/2);
+            const py = Math.round(r * step + step/2);
+            if (px < width && py < height) {
+              matrix[r][c] = bin[py * width + px] === 0 ? 1 : 0;
+            }
           }
         }
+        
+        // 尝试读取
+        let result = tryDecode(matrix, size, readBitsNoFinder);
+        if (result) {
+          if (!silent) addLog('✅ 无定位点解码成功!');
+          return result;
+        }
+        // 尝试反转
+        const inv = matrix.map(row => new Uint32Array(row.map(v => v ^ 1)));
+        result = tryDecode(inv, size, readBitsNoFinder);
+        if (result) {
+          if (!silent) addLog('✅ 无定位点解码成功 (反转)!');
+          return result;
+        }
       }
+
       if (!silent) addLog('❌ 解码失败');
       return null;
     }
@@ -507,6 +486,7 @@
     const scanResult = document.getElementById('scanResult');
     const urlBadgeContainer = document.getElementById('urlBadgeContainer');
     const hexDumpContainer = document.getElementById('hexDumpContainer');
+    const debugInfo = document.getElementById('debugInfo');
     const copyBtn = document.getElementById('copyBtn');
     const openBtn = document.getElementById('openBtn');
     const previewArea = document.getElementById('previewArea');
@@ -521,51 +501,48 @@
     }
 
     function displayResult(result) {
+      debugInfo.textContent = '';
+      hexDumpContainer.innerHTML = '';
+      urlBadgeContainer.innerHTML = '';
+      
       if (!result) {
         scanResult.textContent = '解析失败';
         scanResult.className = 'result-content empty';
-        urlBadgeContainer.innerHTML = '';
-        hexDumpContainer.innerHTML = '';
         lastResult = '';
         lastUrl = '';
         return;
       }
 
-      // 显示文本或二进制
+      // 显示调试信息
+      let debug = '模式: ' + result.mode + ' | 掩码: ' + result.mask + ' | 字符数: ' + result.count;
+      if (result.bytes) {
+        debug += ' | 字节数: ' + result.bytes.length;
+        // 显示十六进制前32字节
+        const hex = Array.from(result.bytes.slice(0, 32)).map(b => b.toString(16).padStart(2,'0')).join(' ');
+        hexDumpContainer.innerHTML = '<div class="hex-dump">HEX: ' + hex + (result.bytes.length > 32 ? ' ...' : '') + '</div>';
+      }
+      debugInfo.textContent = debug;
+
       if (result.text) {
         scanResult.textContent = result.text;
         scanResult.className = 'result-content';
         lastResult = result.text;
-      } else if (result.bytes) {
-        // 显示十六进制
-        const hex = Array.from(result.bytes).map(b => b.toString(16).padStart(2,'0')).join(' ');
-        scanResult.textContent = '🔢 二进制数据 (' + result.bytes.length + ' 字节)';
-        scanResult.className = 'result-content binary';
-        hexDumpContainer.innerHTML = '<div class="hex-dump">' + hex + '</div>';
-        lastResult = Array.from(result.bytes).map(b => String.fromCharCode(b)).join('');
-      } else {
-        scanResult.textContent = '解析结果为空';
-        scanResult.className = 'result-content empty';
-        lastResult = '';
-      }
-
-      // 提取网址
-      let url = result.url || null;
-      if (!url && result.text) {
+        
+        // 提取网址
         const match = result.text.match(/(https?:\/\/[^\s]+|[\w.-]+\.[a-z]{2,}[^\s]*)/i);
-        if (match) url = match[0];
-      }
-      lastUrl = url || '';
-
-      // 显示网址徽章
-      urlBadgeContainer.innerHTML = '';
-      if (url) {
-        if (!url.startsWith('http')) url = 'https://' + url;
-        const badge = document.createElement('div');
-        badge.className = 'url-badge';
-        badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank">' + url + '</a>';
-        urlBadgeContainer.appendChild(badge);
-        lastUrl = url;
+        if (match) {
+          let url = match[0];
+          if (!url.startsWith('http')) url = 'https://' + url;
+          lastUrl = url;
+          const badge = document.createElement('div');
+          badge.className = 'url-badge';
+          badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank">' + url + '</a>';
+          urlBadgeContainer.appendChild(badge);
+        }
+      } else {
+        scanResult.textContent = '二进制数据 (' + (result.bytes ? result.bytes.length : 0) + ' 字节)';
+        scanResult.className = 'result-content binary';
+        lastResult = result.bytes ? Array.from(result.bytes).map(b => String.fromCharCode(b)).join('') : '';
       }
     }
 
@@ -581,11 +558,8 @@
       
       const result = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
       displayResult(result);
-      if (result) {
-        addLog('📌 解码完成，模式: ' + result.mode + ', 编码: ' + result.encoding);
-        if (result.text) addLog('📝 文本长度: ' + result.text.length);
-        if (result.bytes) addLog('📦 字节数: ' + result.bytes.length);
-        if (lastUrl) addLog('🌐 提取网址: ' + lastUrl);
+      if (result && result.text) {
+        addLog('📝 结果: ' + result.text.substring(0, 50) + (result.text.length > 50 ? '...' : ''));
       }
     }
 
@@ -619,12 +593,9 @@
             hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
             const result = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
-            if (result) {
-              const displayText = result.text || (result.bytes ? '二进制数据' : '');
-              if (displayText && displayText !== lastResult) {
-                displayResult(result);
-                addLog('✅ 扫描到: ' + (displayText.substring(0,30) + (displayText.length>30?'...':'')));
-              }
+            if (result && result.text && result.text !== lastResult) {
+              displayResult(result);
+              addLog('✅ 扫描到: ' + result.text.substring(0, 30) + (result.text.length > 30 ? '...' : ''));
             }
           }
           scanTimer = setTimeout(scan, 300);
