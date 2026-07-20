@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码 v38 全量对比</title>
+  <title>二维码 v39 矩阵对比</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 1.5rem; color: #e0e0e0; }
@@ -26,7 +26,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🔳 v38 全量对比</h1>
+    <h1>🔳 v39 矩阵对比</h1>
     <div class="card">
       <div class="flex-row">
         <div><input id="testUrl" value="https://www.lititil.com"><button class="btn-both" id="bothBtn">生成+解析</button></div>
@@ -41,7 +41,7 @@
   <canvas id="hc" style="display:none;"></canvas>
 
   <script>
-    // ==================== GF(256) - 完全独立 ====================
+    // ==================== GF(256) ====================
     const GF=(()=>{
       const e=new Int32Array(512),l=new Int32Array(256);
       let x=1;for(let i=0;i<255;i++){e[i]=x;l[x]=i;x<<=1;if(x&0x100)x^=0x11D;}
@@ -83,7 +83,6 @@
       const cx=cv.getContext('2d');cx.fillStyle='#FFF';cx.fillRect(0,0,cs,cs);
       for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){cx.fillStyle=mk[r][c]?'#000':'#FFF';cx.fillRect((c+bd)*ms,(r+bd)*ms,ms,ms);}
       const fcx=(3+bd)*ms+Math.floor(ms/2);
-      //return{cv,version:v,size:sz,dataCW:d,ecCW:e,totalCW:t,dc:Array.from(dc),fcx,ms};
       return{cv,version:v,size:sz,dataCW:d,ecCW:e,totalCW:t,dc:Array.from(dc),fcx,ms,matrix:mk};
     }
 
@@ -113,35 +112,36 @@
     }
 
     function parseExact(imageData,gen){
-addLog('gen.matrix='+(gen.matrix?'exists length='+gen.matrix.length:'undefined'));
-addLog('gen.size='+gen.size);
-addLog('矩阵逐行对比(前5行):');
-const genM=gen.matrix;
-for(let r=0;r<Math.min(5,gen.size);r++){
-  let line='';
-  for(let c=0;c<gen.size;c++)line+=um[r][c]===genM[r][c]?'.':'X';
-  addLog('row'+r+': '+line);
-}
-let match=0;for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++)if(um[r][c]===genM[r][c])match++;
-addLog('总匹配: '+match+'/'+(gen.size*gen.size));
       const{gray,w,h}=toGray(imageData);
       const bin=toBin(gray,w,h);
       const fcx=gen.fcx,ms=gen.ms;
       const tl={x:fcx,y:fcx},tr={x:fcx+(gen.size-7)*ms,y:fcx},bl={x:fcx,y:fcx+(gen.size-7)*ms};
       const m=extractM(bin,w,h,tl,tr,bl,gen.size);
       const um=m.map(r=>Array.from(r));for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++){if(r===6||c===6)continue;if(!((r+c)&1))um[r][c]^=1;}
+
+      // 矩阵对比
+      if(gen.matrix){
+        addLog('矩阵逐行对比(前5行):');
+        for(let r=0;r<Math.min(5,gen.size);r++){
+          let line='';
+          for(let c=0;c<gen.size;c++)line+=um[r][c]===gen.matrix[r][c]?'.':'X';
+          addLog('row'+r+': '+line);
+        }
+        let match=0;for(let r=0;r<gen.size;r++)for(let c=0;c<gen.size;c++)if(um[r][c]===gen.matrix[r][c])match++;
+        addLog('总匹配: '+match+'/'+(gen.size*gen.size)+' ('+(match/(gen.size*gen.size)*100).toFixed(1)+'%)');
+      }
+
       const bits=readBits(um,gen.size);
-      
       const rawCW=[];for(let i=0;i<gen.totalCW&&i*8<bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];rawCW.push(cw);}
       const fixed=GF.rs(rawCW,gen.ecCW);
       const allCW=fixed?Array.from(fixed):Array.from(rawCW);
       const dataCW=allCW.slice(0,gen.dataCW);
-      
+
       addLog('生成器dc: '+gen.dc.slice(0,10).map(c=>c.toString(16).padStart(2,'0')).join(' ')+'...');
       addLog('解析dataCW: '+dataCW.slice(0,10).map(c=>c.toString(16).padStart(2,'0')).join(' ')+'...');
       const diff=gen.dc.filter((x,i)=>x!==dataCW[i]).length;
       addLog('差异码字数: '+diff+'/'+gen.dataCW);
-      
+
       for(let off=-2;off<=2;off++){
         const r=decodeFromCW(dataCW,off);
         if(r){
@@ -206,15 +206,16 @@ addLog('总匹配: '+match+'/'+(gen.size*gen.size));
     document.getElementById('bothBtn').addEventListener('click',()=>{
       logBox.innerHTML='';resultDisplay.textContent='⏳';resultDisplay.className='result';
       const url=document.getElementById('testUrl').value.trim();if(!url)return;
-      genResult=genQR(url);
+      const gen=genQR(url);
+      genResult=gen;
       document.getElementById('qrDisplay').innerHTML='';
-      document.getElementById('qrDisplay').appendChild(genResult.cv);
-      addLog('生成v'+genResult.version);
+      document.getElementById('qrDisplay').appendChild(gen.cv);
+      addLog('生成v'+gen.version);
       setTimeout(()=>{
         const hc=document.getElementById('hc');
-  hc.width=gen.cv.width;hc.height=gen.cv.height;
-  const ctx=hc.getContext('2d',{willReadFrequently:1});ctx.drawImage(gen.cv,0,0);
-  const text=parseExact(ctx.getImageData(0,0,hc.width,hc.height),gen);
+        hc.width=gen.cv.width;hc.height=gen.cv.height;
+        const ctx=hc.getContext('2d',{willReadFrequently:1});ctx.drawImage(gen.cv,0,0);
+        const text=parseExact(ctx.getImageData(0,0,hc.width,hc.height),gen);
         if(text===url){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
         else{resultDisplay.textContent='⚠️ '+(text||'失败');resultDisplay.className='result fail';}
       },100);
