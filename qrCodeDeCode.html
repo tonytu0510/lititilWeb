@@ -3,211 +3,246 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 v19 RS纠错</title>
+  <title>二维码自测 v20 一体化</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
-    .container { max-width: 950px; margin: 0 auto; }
-    h1 { text-align: center; font-size: 1.8rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
-    .upload-box { border: 2px dashed rgba(255,255,255,0.3); border-radius: 1rem; padding: 1.5rem; text-align: center; cursor: pointer; background: rgba(0,0,0,0.2); margin-bottom: 1rem; }
-    .upload-box:hover { border-color: #43e97b; }
-    .btn { width: 100%; padding: 0.7rem; border: none; border-radius: 0.7rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: white; margin-bottom: 0.5rem; }
-    .btn-row { display: flex; gap: 0.6rem; }
-    .btn-row .btn { flex: 1; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .result-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 1rem; margin-top: 1rem; }
-    .result-content { font-size: 1.2rem; font-weight: 600; color: #43e97b; word-break: break-all; min-height: 1.5rem; }
-    .result-content.empty { color: #666; }
-    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.5rem; font-family: 'Courier New', monospace; font-size: 0.65rem; color: #43e97b; max-height: 500px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; line-height:1.3; }
-    .preview-area { display: flex; justify-content: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 1rem; margin: 1rem 0; }
-    .url-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(67,233,123,0.15); border-left: 4px solid #43e97b; padding: 0.5rem 1rem; border-radius: 0.4rem; font-size: 0.9rem; color: #a8f0c0; margin-top: 0.5rem; word-break: break-all; }
+    body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 1.5rem; color: #e0e0e0; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { text-align: center; font-size: 1.5rem; margin-bottom: 0.3rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .flex-row { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .flex-row > * { flex: 1; min-width: 200px; }
+    input, button { width: 100%; padding: 0.6rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 0.5rem; background: rgba(0,0,0,0.3); color: #e0e0e0; font-size: 0.85rem; margin-bottom: 0.4rem; }
+    button { cursor: pointer; background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; font-weight: 600; border: none; }
+    button.red { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+    .qr-box { display: flex; justify-content: center; padding: 0.5rem; background: white; border-radius: 0.5rem; }
+    .qr-box canvas { max-width: 150px; }
+    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.5rem; padding: 0.5rem; font-family: monospace; font-size: 0.65rem; color: #43e97b; max-height: 250px; overflow-y: auto; white-space: pre-wrap; line-height: 1.3; }
+    .result { font-size: 1.1rem; font-weight: 600; padding: 0.5rem; text-align: center; }
+    .result.ok { color: #43e97b; }
+    .result.fail { color: #ff6b6b; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📷 v19 RS纠错暴力搜索</h1>
+    <h1>🔳 二维码自测 v20</h1>
     <div class="card">
-      <div class="upload-box" id="uploadBox"><div style="font-size:2.5rem;">🖼️</div><div>点击上传 或 拖拽二维码图片</div></div>
-      <input type="file" id="fileInput" accept="image/*" style="display:none;">
-      <div class="preview-area" id="previewArea"><span style="color:#666;">预览</span></div>
+      <div class="flex-row">
+        <div>
+          <input id="testUrl" value="https://www.lititil.com" placeholder="输入测试URL">
+          <div style="display:flex;gap:0.4rem;">
+            <button id="genBtn">生成二维码</button>
+            <button id="testBtn" class="red">生成+解析</button>
+          </div>
+        </div>
+        <div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none;">
+          <button id="uploadBtn">📁 上传图片解析</button>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div class="result-box"><div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
-        <div class="result-content empty" id="scanResult">等待解析...</div><div id="badgeContainer"></div>
+    <div class="flex-row">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:0.7rem;color:#8892b0;margin-bottom:0.3rem;">生成的二维码</div>
+        <div class="qr-box"><div id="qrDisplay"></div></div>
       </div>
-      <div class="btn-row">
-        <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn" disabled>📋 复制</button>
-        <button class="btn" style="background:linear-gradient(135deg,#f093fb,#f5576c);" id="openBtn" disabled>🔗 打开</button>
+      <div class="card">
+        <div class="result" id="resultDisplay">等待操作...</div>
+        <div class="log-box" id="logBox"></div>
       </div>
-      <div class="log-box" id="logBox"></div>
     </div>
   </div>
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
 
   <script>
-    // GF(256) RS纠错
+    // ==================== 生成器（精简版，固定掩码0）====================
     const GF_EXP=new Int32Array(512),GF_LOG=new Int32Array(256);
     (()=>{let x=1;for(let i=0;i<255;i++){GF_EXP[i]=x;GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11D;}for(let i=255;i<512;i++)GF_EXP[i]=GF_EXP[i-255];})();
     function gfMul(a,b){return(a===0||b===0)?0:GF_EXP[GF_LOG[a]+GF_LOG[b]];}
-    function polyEval(p,x){let y=p[0];for(let i=1;i<p.length;i++)y=gfMul(y,x)^p[i];return y;}
-    function calcSyndromes(msg,nsym){const s=[];let ok=true;for(let i=0;i<nsym;i++){s[i]=polyEval(msg,GF_EXP[i]);if(s[i]!==0)ok=false;}return{hasErr:!ok};}
+    function polyMod(d,div){let r=new Int32Array(d);for(let i=0;i<d.length-div.length+1;i++){if(r[i]!==0)for(let j=1;j<div.length;j++)r[i+j]^=gfMul(div[j],r[i]);}return r.slice(r.length-div.length+1);}
+    function genPoly(n){let g=new Int32Array([1]);for(let i=0;i<n;i++)g=polyMod(new Int32Array([...g,0]),new Int32Array([1,gfMul(g[0],GF_EXP[i])]));return g;}
+    const VD={1:[26,9,17],2:[44,16,28],3:[70,26,44],4:[100,36,64],5:[134,46,88],6:[172,60,112],7:[196,66,130],8:[242,86,156],9:[292,100,192],10:[346,122,224]};
 
-    // RS纠错：单字节 + 连续双字节
-    function rsCorrect(msg,nsym){
-      if(!calcSyndromes(msg,nsym).hasErr)return msg;
-      const n=msg.length;
-      // 单字节
-      for(let p=0;p<Math.min(n,30);p++){for(let v=1;v<256;v++){const t=[...msg];t[p]^=v;if(!calcSyndromes(t,nsym).hasErr)return t;}}
-      // 连续双字节
-      for(let p=0;p<Math.min(n-1,25);p++){for(let v1=1;v1<128;v1++){for(let v2=1;v2<128;v2++){const t=[...msg];t[p]^=v1;t[p+1]^=v2;if(!calcSyndromes(t,nsym).hasErr)return t;}}}
-      // 不连续双字节
-      for(let p1=0;p1<Math.min(n,15);p1++){for(let p2=p1+2;p2<Math.min(n,20);p2++){for(let v1=1;v1<128;v1++){for(let v2=1;v2<128;v2++){const t=[...msg];t[p1]^=v1;t[p2]^=v2;if(!calcSyndromes(t,nsym).hasErr)return t;}}}}
-      return null;
+    function generateQR(text){
+      const bytes=new TextEncoder().encode(text);
+      let v=1;while(v<=10&&VD[v][1]<bytes.length+2)v++;
+      const[total,data,ec]=VD[v],sz=17+v*4;
+      
+      const bits=[];bits.push(0,1,0,0);const cnt=bytes.length;for(let i=7;i>=0;i--)bits.push((cnt>>i)&1);
+      for(const b of bytes)for(let i=7;i>=0;i--)bits.push((b>>i)&1);
+      const term=Math.min(4,data*8-bits.length);for(let i=0;i<term;i++)bits.push(0);
+      while(bits.length%8!==0)bits.push(0);
+      const pads=[0xEC,0x11];let pi=0;while(bits.length<data*8){const p=pads[pi%2];for(let i=7;i>=0;i--)bits.push((p>>i)&1);pi++;}
+      const dc=[];for(let i=0;i<bits.length;i+=8){let c=0;for(let j=0;j<8;j++)c=(c<<1)|bits[i+j];dc.push(c);}
+      
+      const gen=genPoly(ec);const msg=new Int32Array(data+ec);msg.set(dc.slice(0,data));
+      const rem=polyMod(msg,gen);const ecw=Array.from(rem);
+      const all=[...dc.slice(0,data),...ecw];
+      
+      const m=Array.from({length:sz},()=>new Int32Array(sz).fill(-1));
+      // 时序
+      for(let i=8;i<sz-8;i++){m[6][i]=i%2===0?1:0;m[i][6]=i%2===0?1:0;}
+      // 校正(版本2+)
+      if(v>=2){const n=Math.floor(v/7)+2,step=Math.floor((v*4+4)/(n-1));const locs=[6];let p=v*4+10;for(let i=1;i<n;i++){locs.push(p);p-=step;}locs.reverse();for(const r of locs)for(const c of locs){for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const rr=r+dr,cc=c+dc;if(rr>=0&&rr<sz&&cc>=0&&cc<sz)m[rr][cc]=(Math.abs(dr)===2||Math.abs(dc)===2||(dr===0&&dc===0))?1:0;}}}
+      // 数据
+      const allBits=[];for(const cw of all)for(let i=7;i>=0;i--)allBits.push((cw>>i)&1);
+      let bi=0,up=true;
+      for(let col=sz-1;col>=0;col-=2){const rc=col===6?5:col;for(let row=up?sz-1:0;up?row>=0:row<sz;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){if(c<0||c>=sz)continue;if(row===6||c===6)continue;if(m[row][c]===-1){m[row][c]=bi<allBits.length?allBits[bi]:0;bi++;}}}up=!up;}
+      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++)if(m[r][c]===-1)m[r][c]=0;
+      // 掩码0
+      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){if(r===6||c===6)continue;if((r+c)%2===0)m[r][c]^=1;}
+      // 渲染
+      const ms=8,border=4,cs=(sz+border*2)*ms;
+      const canvas=document.createElement('canvas');canvas.width=cs;canvas.height=cs;
+      const ctx=canvas.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cs,cs);
+      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){ctx.fillStyle=m[r][c]?'#000':'#FFF';ctx.fillRect((c+border)*ms,(r+border)*ms,ms,ms);}
+      
+      return{canvas,matrix:m,version:v,size:sz,dataCW:data,ecCW:ec,totalCW:total};
     }
 
+    // ==================== 解析器（匹配生成器）====================
     function toGray(d){const g=new Uint8Array(d.width*d.height);for(let i=0;i<g.length;i++)g[i]=Math.round(d.data[i*4]*0.299+d.data[i*4+1]*0.587+d.data[i*4+2]*0.114);return{gray:g,width:d.width,height:d.height};}
     function toBinary(g,w,h){let mn=255,mx=0;for(let i=0;i<g.length;i++){if(g[i]<mn)mn=g[i];if(g[i]>mx)mx=g[i];}const th=mn+(mx-mn)*0.4;const b=new Uint8Array(w*h);for(let i=0;i<g.length;i++)b[i]=g[i]<th?0:1;return b;}
     function findAllCandidates(bin,w,h){const a=[];for(let y=0;y<h;y+=2){const s=[];let cl=bin[y*w],ln=1;for(let x=1;x<w;x++){const co=bin[y*w+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}s.push({color:cl,len:ln,startX:w-ln});for(let i=0;i<s.length-4;i++){const sg=s.slice(i,i+5);if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms=t/7;const ra=sg.map(x=>x.len/ms);let ok=true;for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}if(ok&&ms>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms});}}}return a;}
     function clusterCandidates(cs,gs){const g={};for(const p of cs){const k=Math.floor(p.x/gs)+','+Math.floor(p.y/gs);if(!g[k])g[k]={pts:[],sx:0,sy:0,sm:0};g[k].pts.push(p);g[k].sx+=p.x;g[k].sy+=p.y;g[k].sm+=p.modSize;}const cells=Object.values(g).filter(c=>c.pts.length>=3),m=[];for(let i=0;i<cells.length;i++){if(cells[i]._used)continue;let cx=cells[i].sx/cells[i].pts.length,cy=cells[i].sy/cells[i].pts.length,cm=cells[i].sm/cells[i].pts.length,count=cells[i].pts.length;let ch=true;while(ch){ch=false;for(let j=i+1;j<cells.length;j++){if(cells[j]._used)continue;const jx=cells[j].sx/cells[j].pts.length,jy=cells[j].sy/cells[j].pts.length;if(Math.abs(cx-jx)<gs*3&&Math.abs(cy-jy)<gs*3){cx=(cx*count+jx*cells[j].pts.length)/(count+cells[j].pts.length);cy=(cy*count+jy*cells[j].pts.length)/(count+cells[j].pts.length);cm=(cm*count+(cells[j].sm/cells[j].pts.length)*cells[j].pts.length)/(count+cells[j].pts.length);count+=cells[j].pts.length;cells[j]._used=true;ch=true;}}}m.push({x:Math.round(cx),y:Math.round(cy),moduleSize:cm,count});}return m.filter(x=>x.count>=5).sort((a,b)=>b.count-a.count);}
     function orderFinders(pts){const tl=pts.reduce((a,b)=>(a.x+a.y)<(b.x+b.y)?a:b);const rest=pts.filter(p=>p!==tl);const tr=rest.reduce((a,b)=>a.x>b.x?a:b);const bl=rest.find(p=>p!==tr);return{tl,tr,bl};}
-    function extractMatrix(bin,w,h,tl,tr,bl,size){const m=Array.from({length:size},()=>new Uint32Array(size));const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7),dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);const ox=tl.x-dx1*3-dx2*3,oy=tl.y-dy1*3-dy2*3;for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}return m;}
 
-    function readBits(m,size){
-      const bits=[];let up=true;
-      for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;
-        for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
-          if(c<0||c>=size)continue;if(row===6||c===6)continue;
-          bits.push(m[row][c]);
-        }}up=!up;}
-      return bits;
+    function extractMatrix(bin,w,h,tl,tr,bl,size){
+      const m=Array.from({length:size},()=>new Uint32Array(size));
+      const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7),dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);
+      const ox=tl.x-dx1*3-dx2*3,oy=tl.y-dy1*3-dy2*3;
+      for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}
+      return m;
     }
 
-    const maskFn=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,(r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>((r*c)%2+(r*c)%3)===0,(r,c)=>(((r*c)%2+(r*c)%3)%2)===0,(r,c)=>(((r+c)%2+(r*c)%3)%2)===0];
-    function unmask(m,size,mask){const w=m.map(r=>new Uint32Array(r));for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(r===6||c===6)continue;if(maskFn[mask](r,c))w[r][c]^=1;}return w;}
-
-    const VD={1:[26,9,17],2:[44,16,28],3:[70,26,44],4:[100,36,64],5:[134,46,88],6:[172,60,112],7:[196,66,130],8:[242,86,156],9:[292,100,192],10:[346,122,224]};
-
-    function tryUrl(text){if(!text||text.length<4)return null;let m=text.match(/https?:\/\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]{4,}/i);if(m)return m[0];m=text.match(/www\.[-a-zA-Z0-9]+\.[-a-zA-Z0-9.]+[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*/i);if(m)return'https://'+m[0];m=text.match(/[a-zA-Z0-9][-a-zA-Z0-9]*\.[a-z]{2,}(?:\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*)?/i);if(m)return'https://'+m[0];return null;}
-
-    function bytesToText(bytes){for(const enc of['utf-8','gbk','iso-8859-1']){try{return new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));}catch(e){}}let a='';for(const b of bytes)a+=(b>=32&&b<=126)?String.fromCharCode(b):'.';return a;}
-
-    function decodeQR(imageData){
-      const{gray,width,height}=toGray(imageData);
-      addLog('📊 '+width+'×'+height);
-      const bin=toBinary(gray,width,height);
-      const cs=findAllCandidates(bin,width,height);
-      addLog('🔍 '+cs.length+' 候选点');
-      const clusters=clusterCandidates(cs,Math.floor(width/15));
-      if(clusters.length<3){addLog('❌ 簇不足');return null;}
-      const top3=clusters.slice(0,3);
-      const{tl,tr,bl}=orderFinders(top3);
-      addLog('🔢 TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
-      const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
-      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-      const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
-      const v=Math.max(1,Math.min(10,ev));
-      const sz=17+v*4;
-      addLog('📐 v'+v+' '+sz+'×'+sz);
+    function decodeMatrix(m,version,dataCW,ecCW,totalCW){
+      const sz=m.length;
+      // 去掩码0（已知生成器用掩码0）
+      const w=m.map(r=>new Uint32Array(r));
+      for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){if(r===6||c===6)continue;if((r+c)%2===0)w[r][c]^=1;}
       
-      const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
-      const dataCW=(v<=10&&VD[v])?VD[v][1]:9;
-      const ecCW=(v<=10)?VD[v][2]:17;
-      const totalCW=(v<=10)?VD[v][0]:26;
+      // 读取bits
+      const bits=[];let up=true;
+      for(let col=sz-1;col>=0;col-=2){const rc=col===6?5:col;
+        for(let row=up?sz-1:0;up?row>=0:row<sz;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
+          if(c<0||c>=sz)continue;if(row===6||c===6)continue;
+          bits.push(w[row][c]);
+        }}up=!up;}
       
-      addLog('dataCW='+dataCW+' ecCW='+ecCW+' totalCW='+totalCW);
-
-      for(let mask=0;mask<8;mask++){
-        const w=unmask(m,sz,mask);
-        const bits=readBits(w,sz);
-        
-        // 取totalCW个码字进行RS纠错
-        const allCW=[];
-        for(let i=0;i<totalCW&&i*8+8<=bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
-        
-        // RS纠错
-        const corrected=rsCorrect(allCW,ecCW)||allCW;
-        const dataBytes=corrected.slice(0,dataCW);
-        
-        // 从前12位读mode和count
-        const first12=bits.slice(0,12);
-        let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|first12[i];
-        let count=0;for(let i=0;i<8;i++)count=(count<<1)|first12[4+i];
-        
-        addLog('mask'+mask+': mode='+mode+' count='+count);
-        
-        // 如果mode对，直接用纠错后的数据
-        if(mode===4&&count>0&&count<=dataCW){
-          const result=dataBytes.slice(0,count);
-          const text=bytesToText(result),url=tryUrl(text);
-          addLog('  RS text="'+text.substring(0,50)+'"');
-          if(url){addLog('✅ mask'+mask+': '+url);return{url,text};}
-        }
-        
-        // 暴力偏移
-        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40,44,48,52,56,60]){
-          const s=bits.slice(off);
-          if(s.length<12)continue;
-          let m2=0;for(let i=0;i<4;i++)m2=(m2<<1)|s[i];
-          if(m2!==4)continue;
-          let c2=0;for(let i=0;i<8;i++)c2=(c2<<1)|s[4+i];
-          if(c2<4||c2>dataCW)continue;
-          
-          const r=dataBytes.slice(0,Math.min(c2,dataBytes.length));
-          const text=bytesToText(r),url=tryUrl(text);
-          if(url){addLog('✅ mask'+mask+' off'+off+': '+url);return{url,text};}
+      addLog('bits='+bits.length+' totalCW='+totalCW);
+      
+      // 前12位
+      const f12=bits.slice(0,12);let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|f12[i];
+      let count=0;for(let i=0;i<8;i++)count=(count<<1)|f12[4+i];
+      addLog('mode='+mode+' count='+count);
+      
+      // 取码字
+      const allCW=[];for(let i=0;i<Math.min(totalCW,Math.floor(bits.length/8));i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
+      
+      // 打印前几个码字
+      addLog('前9数据码字: '+allCW.slice(0,9).map(c=>c.toString(16).padStart(2,'0')).join(' '));
+      
+      if(mode===4&&count>0&&count<=dataCW){
+        const bytes=allCW.slice(0,count);
+        for(const enc of['utf-8','gbk','iso-8859-1']){
+          try{const text=new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));addLog('text('+enc+'): "'+text+'"');return text;}catch(e){}
         }
       }
-      
-      // 反转
-      const inv=m.map(row=>new Uint32Array(row.map(x=>x^1)));
-      for(let mask=0;mask<8;mask++){
-        const w=unmask(inv,sz,mask);
-        const bits=readBits(w,sz);
-        const allCW=[];
-        for(let i=0;i<totalCW&&i*8+8<=bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
-        const corrected=rsCorrect(allCW,ecCW)||allCW;
-        const dataBytes=corrected.slice(0,dataCW);
-        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40,44,48,52,56,60]){
-          const s=bits.slice(off);if(s.length<12)continue;
-          let m2=0;for(let i=0;i<4;i++)m2=(m2<<1)|s[i];if(m2!==4)continue;
-          let c2=0;for(let i=0;i<8;i++)c2=(c2<<1)|s[4+i];if(c2<4||c2>dataCW)continue;
-          const text=bytesToText(dataBytes.slice(0,Math.min(c2,dataBytes.length))),url=tryUrl(text);
-          if(url){addLog('✅ 反转 mask'+mask+' off'+off+': '+url);return{url,text};}
-        }
-      }
-      
-      addLog('❌ 失败');
       return null;
     }
 
-    const uploadBox=document.getElementById('uploadBox'),fileInput=document.getElementById('fileInput');
-    const scanResult=document.getElementById('scanResult'),badgeContainer=document.getElementById('badgeContainer');
-    const copyBtn=document.getElementById('copyBtn'),openBtn=document.getElementById('openBtn');
-    const previewArea=document.getElementById('previewArea'),logBox=document.getElementById('logBox');
-    const hiddenCanvas=document.getElementById('hiddenCanvas'),hiddenCtx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
+    // ==================== UI ====================
+    const logBox=document.getElementById('logBox'),resultDisplay=document.getElementById('resultDisplay');
     let lastUrl='';
 
     function addLog(msg){const t=new Date().toLocaleTimeString('zh-CN',{hour12:false});logBox.innerHTML+='<span style="color:#666;">['+t+']</span> '+msg+'\n';logBox.scrollTop=logBox.scrollHeight;}
 
-    function processImage(img){
-      logBox.innerHTML='';addLog('🚀 开始解析');
-      hiddenCanvas.width=img.width;hiddenCanvas.height=img.height;hiddenCtx.drawImage(img,0,0);
-      previewArea.innerHTML='';const oi=document.createElement('img');oi.src=hiddenCanvas.toDataURL();oi.style.maxWidth='200px';oi.style.maxHeight='200px';previewArea.appendChild(oi);
+    // 生成+解析一体化测试
+    document.getElementById('testBtn').addEventListener('click',()=>{
+      logBox.innerHTML='';resultDisplay.textContent='⏳ 测试中...';resultDisplay.className='result';
+      const url=document.getElementById('testUrl').value.trim();
+      if(!url)return;
+      
+      addLog('🔳 生成二维码: '+url);
+      const gen=generateQR(url);
+      document.getElementById('qrDisplay').innerHTML='';
+      document.getElementById('qrDisplay').appendChild(gen.canvas);
+      addLog('✅ 生成完成 v'+gen.version+' '+gen.size+'×'+gen.size);
+      
+      // 从Canvas解析
       setTimeout(()=>{
-        const r=decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height));
-        if(r&&r.url){scanResult.textContent=r.url;scanResult.className='result-content';lastUrl=r.url;copyBtn.disabled=false;openBtn.disabled=false;badgeContainer.innerHTML='<div class="url-badge">🌐 <a href="'+r.url+'" target="_blank">'+r.url+'</a></div>';}
-        else{scanResult.textContent='未能提取到有效网址';scanResult.className='result-content error';lastUrl='';copyBtn.disabled=true;openBtn.disabled=true;badgeContainer.innerHTML='';}
-      },50);
-    }
+        addLog('🔍 开始解析...');
+        const hiddenCanvas=document.getElementById('hiddenCanvas');
+        hiddenCanvas.width=gen.canvas.width;hiddenCanvas.height=gen.canvas.height;
+        const ctx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(gen.canvas,0,0);
+        const imageData=ctx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height);
+        
+        const{gray,width,height}=toGray(imageData);
+        const bin=toBinary(gray,width,height);
+        const cs=findAllCandidates(bin,width,height);
+        addLog('候选点: '+cs.length);
+        if(cs.length<10){resultDisplay.textContent='❌ 候选点不足';resultDisplay.className='result fail';return;}
+        const clusters=clusterCandidates(cs,Math.floor(width/15));
+        if(clusters.length<3){resultDisplay.textContent='❌ 簇不足';resultDisplay.className='result fail';return;}
+        const{tl,tr,bl}=orderFinders(clusters.slice(0,3));
+        addLog('TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
+        
+        const m=extractMatrix(bin,width,height,tl,tr,bl,gen.size);
+        addLog('矩阵: '+gen.size+'×'+gen.size);
+        const text=decodeMatrix(m,gen.version,gen.dataCW,gen.ecCW,gen.totalCW);
+        
+        if(text){
+          if(text===url){resultDisplay.textContent='✅ 完美匹配: '+text;resultDisplay.className='result ok';addLog('✅ 解析结果: '+text);}
+          else{resultDisplay.textContent='⚠️ 不匹配: '+text;resultDisplay.className='result fail';addLog('⚠️ 期望:'+url+' 实际:'+text);}
+          lastUrl=text;
+        }else{
+          resultDisplay.textContent='❌ 解析失败';resultDisplay.className='result fail';
+        }
+      },100);
+    });
 
-    uploadBox.addEventListener('click',()=>fileInput.click());
-    fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{const img=new Image();img.onload=()=>processImage(img);img.src=ev.target.result;};reader.readAsDataURL(f);fileInput.value='';});
-    uploadBox.addEventListener('dragover',e=>{e.preventDefault();uploadBox.style.borderColor='#43e97b';});
-    uploadBox.addEventListener('dragleave',()=>{uploadBox.style.borderColor='rgba(255,255,255,0.3)';});
-    uploadBox.addEventListener('drop',e=>{e.preventDefault();uploadBox.style.borderColor='rgba(255,255,255,0.3)';const f=e.dataTransfer.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{const img=new Image();img.onload=()=>processImage(img);img.src=ev.target.result;};reader.readAsDataURL(f);});
-    copyBtn.addEventListener('click',()=>{if(lastUrl)navigator.clipboard.writeText(lastUrl);});
-    openBtn.addEventListener('click',()=>{if(lastUrl)window.open(lastUrl,'_blank');});
+    // 上传图片
+    document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
+    document.getElementById('fileInput').addEventListener('change',e=>{
+      const f=e.target.files[0];if(!f)return;
+      logBox.innerHTML='';addLog('📁 '+f.name);
+      const reader=new FileReader();
+      reader.onload=ev=>{const img=new Image();img.onload=()=>{
+        document.getElementById('qrDisplay').innerHTML='';
+        const oi=document.createElement('img');oi.src=ev.target.result;oi.style.maxWidth='150px';
+        document.getElementById('qrDisplay').appendChild(oi);
+        
+        const hiddenCanvas=document.getElementById('hiddenCanvas');
+        hiddenCanvas.width=img.width;hiddenCanvas.height=img.height;
+        const ctx=hiddenCanvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(img,0,0);
+        const imageData=ctx.getImageData(0,0,img.width,img.height);
+        const{gray,width,height}=toGray(imageData);
+        const bin=toBinary(gray,width,height);
+        const cs=findAllCandidates(bin,width,height);
+        addLog('候选点: '+cs.length);
+        if(cs.length<10){resultDisplay.textContent='❌ 候选点不足';resultDisplay.className='result fail';return;}
+        const clusters=clusterCandidates(cs,Math.floor(width/15));
+        if(clusters.length<3){resultDisplay.textContent='❌ 簇不足';resultDisplay.className='result fail';return;}
+        const{tl,tr,bl}=orderFinders(clusters.slice(0,3));
+        addLog('TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
+        const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+        const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
+        const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
+        const v=Math.max(1,Math.min(10,ev)),sz=17+v*4;
+        const dataCW=VD[v]?VD[v][1]:9,ecCW=VD[v]?VD[v][2]:17,totalCW=VD[v]?VD[v][0]:26;
+        addLog('v'+v+' '+sz+'×'+sz+' dataCW='+dataCW);
+        
+        const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
+        const text=decodeMatrix(m,v,dataCW,ecCW,totalCW);
+        if(text){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';lastUrl=text;}
+        else{resultDisplay.textContent='❌ 解析失败';resultDisplay.className='result fail';}
+      };img.src=ev.target.result;};reader.readAsDataURL(f);fileInput.value='';
+    });
+
+    // 初始生成
+    setTimeout(()=>document.getElementById('testBtn').click(),300);
   </script>
 </body>
 </html>
