@@ -113,8 +113,8 @@
     }
 
     function parseExact(imageData,gen){
-console.log('parseExact called, gen=',gen);
-console.log('gen.matrix=',gen.matrix?'exists':'undefined');
+addLog('gen.matrix='+(gen.matrix?'exists length='+gen.matrix.length:'undefined'));
+addLog('gen.size='+gen.size);
 addLog('矩阵逐行对比(前5行):');
 const genM=gen.matrix;
 for(let r=0;r<Math.min(5,gen.size);r++){
@@ -212,9 +212,9 @@ addLog('总匹配: '+match+'/'+(gen.size*gen.size));
       addLog('生成v'+genResult.version);
       setTimeout(()=>{
         const hc=document.getElementById('hc');
-        hc.width=genResult.cv.width;hc.height=genResult.cv.height;
-        const ctx=hc.getContext('2d',{willReadFrequently:1});ctx.drawImage(genResult.cv,0,0);
-        const text=parseExact(ctx.getImageData(0,0,hc.width,hc.height),genResult);
+  hc.width=gen.cv.width;hc.height=gen.cv.height;
+  const ctx=hc.getContext('2d',{willReadFrequently:1});ctx.drawImage(gen.cv,0,0);
+  const text=parseExact(ctx.getImageData(0,0,hc.width,hc.height),gen);
         if(text===url){resultDisplay.textContent='✅ '+text;resultDisplay.className='result ok';}
         else{resultDisplay.textContent='⚠️ '+(text||'失败');resultDisplay.className='result fail';}
       },100);
