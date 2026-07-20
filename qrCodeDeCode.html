@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 v18 暴力搜索</title>
+  <title>二维码解码器 v19 RS纠错</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -26,7 +26,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>📷 v18 暴力搜索</h1>
+    <h1>📷 v19 RS纠错暴力搜索</h1>
     <div class="card">
       <div class="upload-box" id="uploadBox"><div style="font-size:2.5rem;">🖼️</div><div>点击上传 或 拖拽二维码图片</div></div>
       <input type="file" id="fileInput" accept="image/*" style="display:none;">
@@ -46,6 +46,26 @@
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
 
   <script>
+    // GF(256) RS纠错
+    const GF_EXP=new Int32Array(512),GF_LOG=new Int32Array(256);
+    (()=>{let x=1;for(let i=0;i<255;i++){GF_EXP[i]=x;GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11D;}for(let i=255;i<512;i++)GF_EXP[i]=GF_EXP[i-255];})();
+    function gfMul(a,b){return(a===0||b===0)?0:GF_EXP[GF_LOG[a]+GF_LOG[b]];}
+    function polyEval(p,x){let y=p[0];for(let i=1;i<p.length;i++)y=gfMul(y,x)^p[i];return y;}
+    function calcSyndromes(msg,nsym){const s=[];let ok=true;for(let i=0;i<nsym;i++){s[i]=polyEval(msg,GF_EXP[i]);if(s[i]!==0)ok=false;}return{hasErr:!ok};}
+
+    // RS纠错：单字节 + 连续双字节
+    function rsCorrect(msg,nsym){
+      if(!calcSyndromes(msg,nsym).hasErr)return msg;
+      const n=msg.length;
+      // 单字节
+      for(let p=0;p<Math.min(n,30);p++){for(let v=1;v<256;v++){const t=[...msg];t[p]^=v;if(!calcSyndromes(t,nsym).hasErr)return t;}}
+      // 连续双字节
+      for(let p=0;p<Math.min(n-1,25);p++){for(let v1=1;v1<128;v1++){for(let v2=1;v2<128;v2++){const t=[...msg];t[p]^=v1;t[p+1]^=v2;if(!calcSyndromes(t,nsym).hasErr)return t;}}}
+      // 不连续双字节
+      for(let p1=0;p1<Math.min(n,15);p1++){for(let p2=p1+2;p2<Math.min(n,20);p2++){for(let v1=1;v1<128;v1++){for(let v2=1;v2<128;v2++){const t=[...msg];t[p1]^=v1;t[p2]^=v2;if(!calcSyndromes(t,nsym).hasErr)return t;}}}}
+      return null;
+    }
+
     function toGray(d){const g=new Uint8Array(d.width*d.height);for(let i=0;i<g.length;i++)g[i]=Math.round(d.data[i*4]*0.299+d.data[i*4+1]*0.587+d.data[i*4+2]*0.114);return{gray:g,width:d.width,height:d.height};}
     function toBinary(g,w,h){let mn=255,mx=0;for(let i=0;i<g.length;i++){if(g[i]<mn)mn=g[i];if(g[i]>mx)mx=g[i];}const th=mn+(mx-mn)*0.4;const b=new Uint8Array(w*h);for(let i=0;i<g.length;i++)b[i]=g[i]<th?0:1;return b;}
     function findAllCandidates(bin,w,h){const a=[];for(let y=0;y<h;y+=2){const s=[];let cl=bin[y*w],ln=1;for(let x=1;x<w;x++){const co=bin[y*w+x];if(co===cl)ln++;else{s.push({color:cl,len:ln,startX:x-ln});cl=co;ln=1;}}s.push({color:cl,len:ln,startX:w-ln});for(let i=0;i<s.length-4;i++){const sg=s.slice(i,i+5);if(sg[0].color===0&&sg[1].color===1&&sg[2].color===0&&sg[3].color===1&&sg[4].color===0){const t=sg[0].len+sg[1].len+sg[2].len+sg[3].len+sg[4].len,ms=t/7;const ra=sg.map(x=>x.len/ms);let ok=true;for(let j=0;j<5;j++){if(ra[j]<0.3||ra[j]>4.0){ok=false;break;}}if(ok&&ms>1.0)a.push({x:sg[0].startX+sg[0].len+sg[1].len+Math.floor(sg[2].len/2),y,modSize:ms});}}}return a;}
@@ -53,28 +73,24 @@
     function orderFinders(pts){const tl=pts.reduce((a,b)=>(a.x+a.y)<(b.x+b.y)?a:b);const rest=pts.filter(p=>p!==tl);const tr=rest.reduce((a,b)=>a.x>b.x?a:b);const bl=rest.find(p=>p!==tr);return{tl,tr,bl};}
     function extractMatrix(bin,w,h,tl,tr,bl,size){const m=Array.from({length:size},()=>new Uint32Array(size));const dx1=(tr.x-tl.x)/(size-7),dy1=(tr.y-tl.y)/(size-7),dx2=(bl.x-tl.x)/(size-7),dy2=(bl.y-tl.y)/(size-7);const ox=tl.x-dx1*3-dx2*3,oy=tl.y-dy1*3-dy2*3;for(let r=0;r<size;r++)for(let c=0;c<size;c++){const ix=Math.round(ox+c*dx1+r*dx2),iy=Math.round(oy+c*dy1+r*dy2);if(ix>=0&&ix<w&&iy>=0&&iy<h)m[r][c]=bin[iy*w+ix]===0?1:0;}return m;}
 
-    // 按生成器相同的顺序读取（不跳过定位点）
-    function readBitsSameAsGenerator(m,size){
-      const bits=[];
-      let upward=true;
-      for(let col=size-1;col>=0;col-=2){
-        const rc=col===6?5:col;
-        for(let row=upward?size-1:0;upward?row>=0:row<size;row+=upward?-1:1){
-          for(let c=rc;c>=rc-1;c--){
-            if(c<0||c>=size)continue;
-            if(row===6||c===6)continue; // 只跳过时序图案
-            bits.push(m[row][c]);
-          }
-        }
-        upward=!upward;
-      }
+    function readBits(m,size){
+      const bits=[];let up=true;
+      for(let col=size-1;col>=0;col-=2){const rc=col===6?5:col;
+        for(let row=up?size-1:0;up?row>=0:row<size;row+=up?-1:1){for(let c=rc;c>=rc-1;c--){
+          if(c<0||c>=size)continue;if(row===6||c===6)continue;
+          bits.push(m[row][c]);
+        }}up=!up;}
       return bits;
     }
 
     const maskFn=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,(r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>((r*c)%2+(r*c)%3)===0,(r,c)=>(((r*c)%2+(r*c)%3)%2)===0,(r,c)=>(((r+c)%2+(r*c)%3)%2)===0];
     function unmask(m,size,mask){const w=m.map(r=>new Uint32Array(r));for(let r=0;r<size;r++)for(let c=0;c<size;c++){if(r===6||c===6)continue;if(maskFn[mask](r,c))w[r][c]^=1;}return w;}
 
+    const VD={1:[26,9,17],2:[44,16,28],3:[70,26,44],4:[100,36,64],5:[134,46,88],6:[172,60,112],7:[196,66,130],8:[242,86,156],9:[292,100,192],10:[346,122,224]};
+
     function tryUrl(text){if(!text||text.length<4)return null;let m=text.match(/https?:\/\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]{4,}/i);if(m)return m[0];m=text.match(/www\.[-a-zA-Z0-9]+\.[-a-zA-Z0-9.]+[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*/i);if(m)return'https://'+m[0];m=text.match(/[a-zA-Z0-9][-a-zA-Z0-9]*\.[a-z]{2,}(?:\/[^\x00-\x1f\x7f-\x9f\s"'<>\[\]{}|\\^`]*)?/i);if(m)return'https://'+m[0];return null;}
+
+    function bytesToText(bytes){for(const enc of['utf-8','gbk','iso-8859-1']){try{return new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));}catch(e){}}let a='';for(const b of bytes)a+=(b>=32&&b<=126)?String.fromCharCode(b):'.';return a;}
 
     function decodeQR(imageData){
       const{gray,width,height}=toGray(imageData);
@@ -83,85 +99,85 @@
       const cs=findAllCandidates(bin,width,height);
       addLog('🔍 '+cs.length+' 候选点');
       const clusters=clusterCandidates(cs,Math.floor(width/15));
-      addLog('🔍 '+clusters.length+' 簇');
       if(clusters.length<3){addLog('❌ 簇不足');return null;}
       const top3=clusters.slice(0,3);
       const{tl,tr,bl}=orderFinders(top3);
       addLog('🔢 TL('+tl.x+','+tl.y+') TR('+tr.x+','+tr.y+') BL('+bl.x+','+bl.y+')');
-      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
       const avgMod=(tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+      const d1=Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2),d2=Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
       const ev=Math.round(((d1+d2)/2/avgMod-10)/4);
-      addLog('📐 v'+ev);
-      
       const v=Math.max(1,Math.min(10,ev));
       const sz=17+v*4;
-      const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
+      addLog('📐 v'+v+' '+sz+'×'+sz);
       
-      // 暴力搜索：对所有掩码、所有偏移、所有count尝试解码
+      const m=extractMatrix(bin,width,height,tl,tr,bl,sz);
+      const dataCW=(v<=10&&VD[v])?VD[v][1]:9;
+      const ecCW=(v<=10)?VD[v][2]:17;
+      const totalCW=(v<=10)?VD[v][0]:26;
+      
+      addLog('dataCW='+dataCW+' ecCW='+ecCW+' totalCW='+totalCW);
+
       for(let mask=0;mask<8;mask++){
         const w=unmask(m,sz,mask);
-        const bits=readBitsSameAsGenerator(w,sz);
+        const bits=readBits(w,sz);
         
-        // 暴力搜索偏移
-        for(let off=0;off<Math.min(64,bits.length-8);off++){
+        // 取totalCW个码字进行RS纠错
+        const allCW=[];
+        for(let i=0;i<totalCW&&i*8+8<=bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
+        
+        // RS纠错
+        const corrected=rsCorrect(allCW,ecCW)||allCW;
+        const dataBytes=corrected.slice(0,dataCW);
+        
+        // 从前12位读mode和count
+        const first12=bits.slice(0,12);
+        let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|first12[i];
+        let count=0;for(let i=0;i<8;i++)count=(count<<1)|first12[4+i];
+        
+        addLog('mask'+mask+': mode='+mode+' count='+count);
+        
+        // 如果mode对，直接用纠错后的数据
+        if(mode===4&&count>0&&count<=dataCW){
+          const result=dataBytes.slice(0,count);
+          const text=bytesToText(result),url=tryUrl(text);
+          addLog('  RS text="'+text.substring(0,50)+'"');
+          if(url){addLog('✅ mask'+mask+': '+url);return{url,text};}
+        }
+        
+        // 暴力偏移
+        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40,44,48,52,56,60]){
           const s=bits.slice(off);
-          if(s.length<12)break;
+          if(s.length<12)continue;
+          let m2=0;for(let i=0;i<4;i++)m2=(m2<<1)|s[i];
+          if(m2!==4)continue;
+          let c2=0;for(let i=0;i<8;i++)c2=(c2<<1)|s[4+i];
+          if(c2<4||c2>dataCW)continue;
           
-          // 尝试找到 mode=4 字节模式
-          let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|s[i];
-          if(mode!==4)continue;
-          
-          let count=0;for(let i=0;i<8;i++)count=(count<<1)|s[4+i];
-          if(count<4||count>100)continue;
-          
-          const maxB=Math.min(count,Math.floor((s.length-12)/8));
-          const bytes=[];
-          for(let i=0;i<maxB;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|s[12+i*8+j];bytes.push(b);}
-          
-          // 多种编码尝试
-          for(const enc of['utf-8','gbk','iso-8859-1','windows-1252']){
-            try{
-              const text=new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));
-              const url=tryUrl(text);
-              if(url){
-                addLog('✅ mask'+mask+' off'+off+' count='+count+' enc='+enc+': '+url);
-                return{url,text};
-              }
-            }catch(e){}
-          }
-          
-          // 纯ASCII扫描
-          let ascii='';
-          for(const b of bytes)ascii+=(b>=32&&b<=126)?String.fromCharCode(b):(b===0?'':'.');
-          const url=tryUrl(ascii);
-          if(url){
-            addLog('✅ mask'+mask+' off'+off+' count='+count+' ascii: '+url);
-            return{url,text:ascii};
-          }
+          const r=dataBytes.slice(0,Math.min(c2,dataBytes.length));
+          const text=bytesToText(r),url=tryUrl(text);
+          if(url){addLog('✅ mask'+mask+' off'+off+': '+url);return{url,text};}
         }
       }
       
-      // 反转矩阵再试
+      // 反转
       const inv=m.map(row=>new Uint32Array(row.map(x=>x^1)));
       for(let mask=0;mask<8;mask++){
         const w=unmask(inv,sz,mask);
-        const bits=readBitsSameAsGenerator(w,sz);
-        for(let off=0;off<Math.min(64,bits.length-8);off++){
-          const s=bits.slice(off);
-          if(s.length<12)break;
-          let mode=0;for(let i=0;i<4;i++)mode=(mode<<1)|s[i];
-          if(mode!==4)continue;
-          let count=0;for(let i=0;i<8;i++)count=(count<<1)|s[4+i];
-          if(count<4||count>100)continue;
-          const maxB=Math.min(count,Math.floor((s.length-12)/8));
-          const bytes=[];for(let i=0;i<maxB;i++){let b=0;for(let j=0;j<8;j++)b=(b<<1)|s[12+i*8+j];bytes.push(b);}
-          for(const enc of['utf-8','gbk','iso-8859-1','windows-1252']){
-            try{const text=new TextDecoder(enc,{fatal:false}).decode(new Uint8Array(bytes));const url=tryUrl(text);if(url){addLog('✅ 反转 mask'+mask+' off'+off+': '+url);return{url,text};}}catch(e){}
-          }
+        const bits=readBits(w,sz);
+        const allCW=[];
+        for(let i=0;i<totalCW&&i*8+8<=bits.length;i++){let cw=0;for(let j=0;j<8;j++)cw=(cw<<1)|bits[i*8+j];allCW.push(cw);}
+        const corrected=rsCorrect(allCW,ecCW)||allCW;
+        const dataBytes=corrected.slice(0,dataCW);
+        for(const off of[0,1,2,3,4,5,6,7,8,12,16,20,24,28,32,36,40,44,48,52,56,60]){
+          const s=bits.slice(off);if(s.length<12)continue;
+          let m2=0;for(let i=0;i<4;i++)m2=(m2<<1)|s[i];if(m2!==4)continue;
+          let c2=0;for(let i=0;i<8;i++)c2=(c2<<1)|s[4+i];if(c2<4||c2>dataCW)continue;
+          const text=bytesToText(dataBytes.slice(0,Math.min(c2,dataBytes.length))),url=tryUrl(text);
+          if(url){addLog('✅ 反转 mask'+mask+' off'+off+': '+url);return{url,text};}
         }
       }
       
-      addLog('❌ 暴力搜索失败 ('+sz+'×'+sz+')');
+      addLog('❌ 失败');
       return null;
     }
 
