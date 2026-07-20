@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>二维码解码器 · 智能修复版</title>
+  <title>纯手写二维码解析器</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #1a1a2e; font-family: 'Segoe UI', Roboto, sans-serif; min-height: 100vh; padding: 2rem 1rem; color: #e0e0e0; }
@@ -18,53 +18,18 @@
     .result-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 1rem; margin-top: 1rem; }
     .result-content { font-size: 1.2rem; font-weight: 600; color: #43e97b; word-break: break-all; min-height: 1.5rem; }
     .result-content.empty { color: #666; }
-    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #43e97b; max-height: 350px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; }
+    .log-box { background: rgba(0,0,0,0.3); border-radius: 0.7rem; padding: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #43e97b; max-height: 300px; overflow-y: auto; margin-top: 0.5rem; white-space: pre-wrap; }
     .preview-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 1rem; background: white; border-radius: 1rem; margin: 1rem 0; min-height: 100px; align-items: center; }
+    .preview-area canvas { border: 1px solid #ddd; }
     .video-container { width: 100%; max-width: 300px; margin: 0 auto 1rem; border-radius: 1rem; overflow: hidden; background: #000; aspect-ratio: 1; display: none; }
     .video-container.active { display: block; }
     #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-    .fix-badge {
-      display: inline-block;
-      background: rgba(255, 200, 50, 0.15);
-      border-left: 4px solid #ffcc33;
-      padding: 0.3rem 0.8rem;
-      border-radius: 0.4rem;
-      font-size: 0.8rem;
-      color: #ffdd77;
-      margin-top: 0.5rem;
-      word-break: break-all;
-    }
-    .url-badge {
-      display: inline-block;
-      background: rgba(67, 233, 123, 0.15);
-      border-left: 4px solid #43e97b;
-      padding: 0.3rem 0.8rem;
-      border-radius: 0.4rem;
-      font-size: 0.9rem;
-      color: #a8f0c0;
-      margin-top: 0.5rem;
-      word-break: break-all;
-    }
-    .url-badge a { color: #43e97b; text-decoration: underline; }
-    .hex-dump {
-      background: rgba(0,0,0,0.5);
-      border-radius: 0.4rem;
-      padding: 0.5rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.75rem;
-      color: #aaa;
-      margin-top: 0.5rem;
-      word-break: break-all;
-      max-height: 100px;
-      overflow-y: auto;
-    }
   </style>
-<base target="_blank">
 </head>
 <body>
   <div class="container">
-    <h1>📷 二维码解码器 · 智能修复版</h1>
-    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">自动尝试多种读取偏移 · 修复乱码问题</p>
+    <h1>📷 纯手写二维码解析器</h1>
+    <p style="text-align:center;color:#8892b0;margin-bottom:1.5rem;">标准二维码 + 无定位点二维码</p>
     <div class="card">
       <div class="upload-box" id="uploadBox">
         <div style="font-size:3rem;">🖼️</div>
@@ -82,8 +47,6 @@
       <div class="result-box">
         <div style="font-size:0.8rem;color:#8892b0;">🔍 解析结果</div>
         <div class="result-content empty" id="scanResult">等待解析...</div>
-        <div id="badgeContainer"></div>
-        <div id="hexDumpContainer"></div>
       </div>
       <div class="btn-row">
         <button class="btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#1a1a2e;" id="copyBtn">📋 复制</button>
@@ -95,6 +58,28 @@
   <canvas id="hiddenCanvas" style="display:none;"></canvas>
 
   <script>
+    // ==================== 调试日志（输出到控制台）====================
+    function consoleDebug(msg, data) {
+      if (data !== undefined) {
+        console.log('[DEBUG] ' + msg, data);
+      } else {
+        console.log('[DEBUG] ' + msg);
+      }
+    }
+
+    function consoleGroup(label, fn) {
+      console.group('[DEBUG] ' + label);
+      fn();
+      console.groupEnd();
+    }
+
+    // ==================== 界面日志（输出到页面）====================
+    function addLog(msg) {
+      const logBox = document.getElementById('logBox');
+      logBox.textContent += '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg + '\n';
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
     // ==================== 图像处理 ====================
     function toGray(imageData) {
       const { data, width, height } = imageData;
@@ -102,6 +87,7 @@
       for (let i = 0; i < width * height; i++) {
         gray[i] = Math.round(data[i*4]*0.299 + data[i*4+1]*0.587 + data[i*4+2]*0.114);
       }
+      consoleDebug('灰度化: ' + width + '×' + height);
       return { gray, width, height };
     }
 
@@ -113,7 +99,12 @@
       }
       const thresh = min + (max - min) * 0.4;
       const bin = new Uint8Array(width * height);
-      for (let i = 0; i < gray.length; i++) bin[i] = gray[i] < thresh ? 0 : 1;
+      let blackCount = 0;
+      for (let i = 0; i < gray.length; i++) {
+        bin[i] = gray[i] < thresh ? 0 : 1;
+        if (bin[i] === 0) blackCount++;
+      }
+      consoleDebug('二值化: 阈值=' + thresh.toFixed(0) + ' 黑色=' + (blackCount/gray.length*100).toFixed(1) + '%');
       return bin;
     }
 
@@ -148,6 +139,7 @@
     function findAllCandidates(bin, width, height) {
       const all = [];
       for (let y = 0; y < height; y += 4) all.push(...scanRow(bin, width, y));
+      consoleDebug('定位点候选: ' + all.length + ' 个');
       return all;
     }
 
@@ -179,7 +171,12 @@
         }
         merged.push({ x: Math.round(cx), y: Math.round(cy), moduleSize: cm, count });
       }
-      return merged.filter(m => m.count >= 5).sort((a,b) => b.count - a.count);
+      const result = merged.filter(m => m.count >= 5).sort((a,b) => b.count - a.count);
+      consoleDebug('聚类: ' + result.length + ' 个有效簇');
+      result.slice(0, 3).forEach((c, i) => {
+        consoleDebug('  簇' + (i+1) + ': (' + c.x + ',' + c.y + ') n=' + c.count + ' mod=' + c.moduleSize.toFixed(1));
+      });
+      return result;
     }
 
     function permutations(arr) {
@@ -222,280 +219,303 @@
       return matrix;
     }
 
-    // ==================== 修复版数据读取 ====================
-    // 标准读取：跳过定位点
-    function readBitsStandard(matrix, size) {
-      const bits = [];
-      let direction = -1; // -1 向上, 1 向下
-      
-      // 从右下角开始，逐列向左
-      for (let col = size - 1; col >= 0; col -= 2) {
-        const actualCol = (col === 6) ? 5 : col;
-        
-        for (let c = actualCol; c >= Math.max(0, actualCol - 1); c--) {
-          if (c === 6) continue;
-          
-          let startRow = (direction === -1) ? size - 1 : 0;
-          let endRow = (direction === -1) ? -1 : size;
-          let step = (direction === -1) ? -1 : 1;
-          
-          for (let r = startRow; r !== endRow; r += step) {
-            // 跳过定位点区域
-            if (r < 9 && c < 9) continue;
-            if (r < 9 && c > size - 9) continue;
-            if (r > size - 9 && c < 9) continue;
-            if (r === 6) continue;
-            
-            bits.push(matrix[r][c]);
+    // ==================== 定位点检测 ====================
+    function checkAnyFinderPattern(matrix, size) {
+      const check = (sr, sc) => {
+        if (sr < 0 || sc < 0 || sr + 7 > size || sc + 7 > size) return false;
+        let match = 0;
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 7; c++) {
+            const exp = (r===0||r===6||c===0||c===6||(r>=2&&r<=4&&c>=2&&c<=4)) ? 1 : 0;
+            if (matrix[sr+r][sc+c] === exp) match++;
           }
         }
-        direction = -direction;
+        return match / 49 >= 0.8;
+      };
+      return check(0, 0) || check(0, size-7) || check(size-7, 0);
+    }
+
+    // ==================== 解码 ====================
+    function readBitsStandard(matrix, size) {
+      const bits = [];
+      let up = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        const rc = col === 6 ? 5 : col;
+        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
+          for (let c = rc; c >= rc - 1; c--) {
+            if (c < 0 || c >= size) continue;
+            if (row < 9 && c < 9) continue;
+            if (row < 9 && c > size - 9) continue;
+            if (row > size - 9 && c < 9) continue;
+            if (row === 6 || c === 6) continue;
+            bits.push(matrix[row][c]);
+          }
+        }
+        up = !up;
       }
       return bits;
     }
 
-    // ==================== 智能解码器（尝试多种偏移） ====================
-    function decodeBitsWithOffset(bits, offset) {
-      // 从 offset 位置开始尝试读取
-      const startPos = Math.max(0, Math.min(offset, bits.length - 12));
-      const slice = bits.slice(startPos);
-      
-      if (slice.length < 12) return null;
-      
-      // 读取模式
+    function readBitsNoFinder(matrix, size) {
+      const bits = [];
+      let up = true;
+      for (let col = size - 1; col >= 0; col -= 2) {
+        const rc = col === 6 ? 5 : col;
+        for (let row = up ? size - 1 : 0; up ? row >= 0 : row < size; row += up ? -1 : 1) {
+          for (let c = rc; c >= rc - 1; c--) {
+            if (c < 0 || c >= size) continue;
+            if (row === 6 || c === 6) continue;
+            bits.push(matrix[row][c]);
+          }
+        }
+        up = !up;
+      }
+      return bits;
+    }
+
+    function decodeBits(bits, msbFirst) {
+      if (bits.length < 12) return null;
       let mode = 0;
-      for (let i = 0; i < 4; i++) mode = (mode << 1) | slice[i];
-      
-      const modeMap = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
-      if (!modeMap[mode]) return null;
-      
-      // 读取字符数
-      const countBitsMap = { 1: 10, 2: 9, 4: 8, 8: 8 };
-      const cb = countBitsMap[mode];
-      if (slice.length < 4 + cb) return null;
-      
+      if (msbFirst) { for (let i = 0; i < 4; i++) mode = (mode << 1) | bits[i]; }
+      else { for (let i = 0; i < 4; i++) mode |= bits[i] << i; }
+      const modeNames = { 1: 'Numeric', 2: 'Alphanumeric', 4: 'Byte', 8: 'Kanji' };
+      if (!modeNames[mode]) return null;
+      const countBits = { 1: 10, 2: 9, 4: 8, 8: 8 };
+      const cb = countBits[mode];
+      if (bits.length < 4 + cb) return null;
       let count = 0;
-      for (let i = 0; i < cb; i++) count = (count << 1) | slice[4 + i];
-      
+      if (msbFirst) { for (let i = 0; i < cb; i++) count = (count << 1) | bits[4 + i]; }
+      else { for (let i = 0; i < cb; i++) count |= bits[4 + i] << i; }
       if (count <= 0 || count > 300) return null;
-      
       const dataStart = 4 + cb;
-      const requiredBits = dataStart + count * 8;
-      if (requiredBits > slice.length) return null;
-      
+      if (dataStart + count * 8 > bits.length) return null;
       const bytes = [];
       for (let i = 0; i < count; i++) {
         let b = 0;
-        for (let j = 0; j < 8; j++) {
-          b = (b << 1) | slice[dataStart + i * 8 + j];
-        }
+        if (msbFirst) { for (let j = 0; j < 8; j++) b = (b << 1) | bits[dataStart + i * 8 + j]; }
+        else { for (let j = 0; j < 8; j++) b |= bits[dataStart + i * 8 + j] << j; }
         bytes.push(b);
       }
-      
-      // 尝试多种编码
-      const encodings = ['utf-8', 'gbk', 'big5', 'shift-jis', 'iso-8859-1'];
-      for (const enc of encodings) {
-        try {
-          const text = new TextDecoder(enc).decode(new Uint8Array(bytes));
-          // 检查是否是有效的 URL 或可读文本
-          if (text.length > 0 && /[\x20-\x7E\u4e00-\u9fff]/.test(text)) {
-            // 检查是否包含网址
-            const urlMatch = text.match(/(https?:\/\/[^\s]+|[\w.-]+\.[a-z]{2,}[^\s]*)/i);
-            if (urlMatch) {
-              return { text, bytes, mode: modeMap[mode], count, offset, encoding: enc, isUrl: true, url: urlMatch[0] };
-            }
-            // 至少是可读文本
-            if (text.length >= 10) {
-              return { text, bytes, mode: modeMap[mode], count, offset, encoding: enc, isUrl: false };
-            }
-          }
-        } catch (e) {}
-      }
-      
+      try {
+        const text = new TextDecoder().decode(new Uint8Array(bytes));
+        if (text.length > 0 && /^[\x20-\x7E\u4e00-\u9fff]+/.test(text)) return { mode: modeNames[mode], count, text };
+      } catch (e) {}
       return null;
     }
 
-    // ==================== 主解码（智能尝试所有偏移） ====================
+    function tryDecode(matrix, size, readBitsFn, label) {
+      consoleGroup('tryDecode[' + label + '] size=' + size, () => {
+        for (let mask = 0; mask < 8; mask++) {
+          const work = matrix.map(r => new Uint32Array(r));
+          for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+              if (r === 6 || c === 6) continue;
+              let inv = false;
+              switch (mask) {
+                case 0: inv=(r+c)%2===0;break; case 1: inv=r%2===0;break;
+                case 2: inv=c%3===0;break; case 3: inv=(r+c)%3===0;break;
+                case 4: inv=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;
+                case 5: inv=((r*c)%2)+((r*c)%3)===0;break;
+                case 6: inv=(((r*c)%2)+((r*c)%3))%2===0;break;
+                case 7: inv=(((r+c)%2)+((r*c)%3))%2===0;break;
+              }
+              if (inv) work[r][c] ^= 1;
+            }
+          }
+          const bits = readBitsFn(work, size);
+          consoleDebug('mask=' + mask + ' bits=' + bits.length);
+          for (const msb of [true, false]) {
+            const result = decodeBits(bits, msb);
+            if (result) {
+              consoleDebug('✅ mask=' + mask + ' msb=' + msb + ' text=' + result.text.substring(0, 40));
+              return { text: result.text, mask, msb };
+            }
+          }
+        }
+      });
+      
+      // 实际执行（上面console.group只是打印，这里真正执行）
+      for (let mask = 0; mask < 8; mask++) {
+        const work = matrix.map(r => new Uint32Array(r));
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (r === 6 || c === 6) continue;
+            let inv = false;
+            switch (mask) {
+              case 0: inv=(r+c)%2===0;break; case 1: inv=r%2===0;break;
+              case 2: inv=c%3===0;break; case 3: inv=(r+c)%3===0;break;
+              case 4: inv=(Math.floor(r/2)+Math.floor(c/3))%2===0;break;
+              case 5: inv=((r*c)%2)+((r*c)%3)===0;break;
+              case 6: inv=(((r*c)%2)+((r*c)%3))%2===0;break;
+              case 7: inv=(((r+c)%2)+((r*c)%3))%2===0;break;
+            }
+            if (inv) work[r][c] ^= 1;
+          }
+        }
+        const bits = readBitsFn(work, size);
+        for (const msb of [true, false]) {
+          const result = decodeBits(bits, msb);
+          if (result) return { text: result.text, mask, msb };
+        }
+      }
+      return null;
+    }
+
+    // ==================== 时序图案检测 ====================
+    function detectTimingPattern(bin, width, height) {
+      const rowCandidates = [], colCandidates = [];
+      for (let y = 0; y < height; y++) {
+        let transitions = 0, last = bin[y * width];
+        for (let x = 1; x < width; x++) {
+          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
+        }
+        if (transitions >= 15 && transitions <= 60) rowCandidates.push({ y, transitions });
+      }
+      for (let x = 0; x < width; x++) {
+        let transitions = 0, last = bin[x];
+        for (let y = 1; y < height; y++) {
+          if (bin[y * width + x] !== last) { transitions++; last = bin[y * width + x]; }
+        }
+        if (transitions >= 15 && transitions <= 60) colCandidates.push({ x, transitions });
+      }
+      consoleDebug('时序检测: ' + rowCandidates.length + ' 行, ' + colCandidates.length + ' 列');
+      return { rowCandidates, colCandidates };
+    }
+
+    function inferGrid(bin, width, height) {
+      const { rowCandidates, colCandidates } = detectTimingPattern(bin, width, height);
+      if (rowCandidates.length === 0 || colCandidates.length === 0) return null;
+      const bestRow = rowCandidates.sort((a,b) => b.transitions - a.transitions)[0];
+      const bestCol = colCandidates.sort((a,b) => b.transitions - a.transitions)[0];
+      const y = bestRow.y;
+      const spacings = [];
+      let lastColor = bin[y * width], lastX = 0;
+      for (let x = 1; x < width; x++) {
+        if (bin[y * width + x] !== lastColor) { spacings.push(x - lastX); lastX = x; lastColor = bin[y * width + x]; }
+      }
+      spacings.sort((a,b) => a-b);
+      const moduleSize = spacings[Math.floor(spacings.length/2)] || 8;
+      const offsetX = bestCol.x - 6 * moduleSize;
+      const offsetY = bestRow.y - 6 * moduleSize;
+      const qrSize = Math.round((width - offsetX) / moduleSize);
+      const version = Math.round((qrSize - 17) / 4);
+      const result = {
+        moduleSize, offsetX: Math.max(0, Math.round(offsetX)), offsetY: Math.max(0, Math.round(offsetY)),
+        qrSize: Math.min(qrSize, Math.round((height - offsetY) / moduleSize)),
+        version: Math.max(1, Math.min(10, version))
+      };
+      consoleDebug('inferGrid: ' + JSON.stringify(result));
+      return result;
+    }
+
+    function extractMatrixFromGrid(bin, width, height, grid) {
+      const { moduleSize, offsetX, offsetY, qrSize } = grid;
+      const matrix = Array.from({ length: qrSize }, () => new Uint32Array(qrSize));
+      for (let row = 0; row < qrSize; row++) {
+        for (let col = 0; col < qrSize; col++) {
+          const px = Math.round(offsetX + col * moduleSize + moduleSize/2);
+          const py = Math.round(offsetY + row * moduleSize + moduleSize/2);
+          if (px >= 0 && px < width && py >= 0 && py < height) {
+            matrix[row][col] = bin[py * width + px] === 0 ? 1 : 0;
+          }
+        }
+      }
+      return matrix;
+    }
+
+    // ==================== 主解析 ====================
     function decodeQR(imageData, silent) {
+      console.log('%c========== 开始解析 ==========', 'color:#43e97b;font-weight:bold');
+      
       const { gray, width, height } = toGray(imageData);
-      if (!silent) addLog('📊 图像尺寸: ' + width + '×' + height);
+      if (!silent) addLog('📊 ' + width + '×' + height);
       const bin = toBinary(gray, width, height);
 
-      // 检测定位点
+      // 方式1：标准二维码
+      console.log('%c--- 方式1: 定位点扫描 ---', 'color:#4facfe');
       const candidates = findAllCandidates(bin, width, height);
-      if (!silent) addLog('🔍 检测到 ' + candidates.length + ' 个定位点候选');
       
       if (candidates.length >= 10) {
         const clusters = clusterCandidates(candidates, Math.floor(width/15));
-        if (!silent) addLog('🔍 聚类后 ' + clusters.length + ' 个定位点簇');
-        
         if (clusters.length >= 3) {
+          if (!silent) addLog('🔍 检测到定位点，尝试标准解码...');
           const pts = clusters.slice(0, 3);
           const perms = permutations(pts);
           
           for (let pi = 0; pi < perms.length; pi++) {
             const [tl, tr, bl] = perms[pi];
-            
             const v1x = tr.x - tl.x, v1y = tr.y - tl.y;
             const v2x = bl.x - tl.x, v2y = bl.y - tl.y;
             const dot = v1x * v2x + v1y * v2y;
             const len1 = Math.sqrt(v1x*v1x + v1y*v1y);
             const len2 = Math.sqrt(v2x*v2x + v2y*v2y);
-            const cosAngle = dot / (len1 * len2);
-            if (Math.abs(cosAngle) > 0.3) continue;
-
+            if (Math.abs(dot/(len1*len2)) > 0.3) continue;
+            
+            consoleDebug('排列' + (pi+1) + ': TL(' + tl.x + ',' + tl.y + ') TR(' + tr.x + ',' + tr.y + ') BL(' + bl.x + ',' + bl.y + ')');
+            
             const d1 = Math.sqrt((tr.x-tl.x)**2+(tr.y-tl.y)**2);
             const d2 = Math.sqrt((bl.x-tl.x)**2+(bl.y-tl.y)**2);
-            const avgMod = (tl.moduleSize + tr.moduleSize + bl.moduleSize) / 3;
-            const ev = Math.round(((d1 + d2) / 2 / avgMod - 10) / 4);
+            const avgMod = (tl.moduleSize+tr.moduleSize+bl.moduleSize)/3;
+            const ev = Math.round(((d1+d2)/2/avgMod - 10)/4);
             
-            if (!silent) addLog('📐 估计版本: ' + ev);
-            
-            for (let v = Math.max(1, ev-2); v <= Math.min(10, ev+2); v++) {
-              const sz = 17 + v * 4;
-              if (!silent) addLog('🔍 尝试版本 ' + v + ' (矩阵 ' + sz + '×' + sz + ')');
-              
+            for (let v = Math.max(1,ev-2); v <= Math.min(10,ev+2); v++) {
+              const sz = 17+v*4;
               const m = extractMatrix(bin, width, height, tl, tr, bl, sz);
               
-              // 尝试所有掩码
-              for (let mask = 0; mask < 8; mask++) {
-                const work = m.map(row => new Uint32Array(row));
-                for (let r = 0; r < sz; r++) {
-                  for (let c = 0; c < sz; c++) {
-                    if (r === 6 || c === 6) continue;
-                    let invert = false;
-                    switch (mask) {
-                      case 0: invert = (r + c) % 2 === 0; break;
-                      case 1: invert = r % 2 === 0; break;
-                      case 2: invert = c % 3 === 0; break;
-                      case 3: invert = (r + c) % 3 === 0; break;
-                      case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
-                      case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
-                      case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
-                      case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
-                    }
-                    if (invert) work[r][c] ^= 1;
-                  }
-                }
-                
-                const bits = readBitsStandard(work, sz);
-                
-                // 尝试多种偏移量 (0, 1, 2, 3, 4, 8, 16, 32)
-                const offsets = [0, 1, 2, 3, 4, 8, 16, 32];
-                for (const offset of offsets) {
-                  const result = decodeBitsWithOffset(bits, offset);
-                  if (result && result.isUrl) {
-                    if (!silent) addLog('✅ 解码成功! 偏移: ' + offset + ' 掩码: ' + mask + ' 编码: ' + result.encoding);
-                    return result;
-                  }
-                  // 保存第一个可读结果
-                  if (result && result.text && !result.isUrl) {
-                    if (!silent) addLog('📝 找到可读文本 (偏移:' + offset + ' 掩码:' + mask + ')');
-                    return result;
-                  }
-                }
+              let r = tryDecode(m, sz, readBitsStandard, '标准');
+              if (r) { 
+                if (!silent) addLog('✅ ' + r.text.substring(0, 40)); 
+                console.log('%c========== 解析成功! ==========', 'color:#43e97b;font-weight:bold');
+                return r.text; 
               }
               
-              // 尝试反转矩阵
-              const inv = m.map(row => new Uint32Array(row.map(v => v ^ 1)));
-              for (let mask = 0; mask < 8; mask++) {
-                const work = inv.map(row => new Uint32Array(row));
-                for (let r = 0; r < sz; r++) {
-                  for (let c = 0; c < sz; c++) {
-                    if (r === 6 || c === 6) continue;
-                    let invert = false;
-                    switch (mask) {
-                      case 0: invert = (r + c) % 2 === 0; break;
-                      case 1: invert = r % 2 === 0; break;
-                      case 2: invert = c % 3 === 0; break;
-                      case 3: invert = (r + c) % 3 === 0; break;
-                      case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
-                      case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
-                      case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
-                      case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
-                    }
-                    if (invert) work[r][c] ^= 1;
-                  }
-                }
-                const bits = readBitsStandard(work, sz);
-                const offsets = [0, 1, 2, 3, 4, 8, 16, 32];
-                for (const offset of offsets) {
-                  const result = decodeBitsWithOffset(bits, offset);
-                  if (result && result.isUrl) {
-                    if (!silent) addLog('✅ 解码成功 (反转)! 偏移: ' + offset + ' 掩码: ' + mask);
-                    return result;
-                  }
-                  if (result && result.text && !result.isUrl) {
-                    if (!silent) addLog('📝 找到可读文本 (反转 偏移:' + offset + ')');
-                    return result;
-                  }
-                }
+              const inv = m.map(row => new Uint32Array(row.map(v=>v^1)));
+              r = tryDecode(inv, sz, readBitsStandard, '标准-反转');
+              if (r) { 
+                if (!silent) addLog('✅ ' + r.text.substring(0, 40)); 
+                console.log('%c========== 解析成功! ==========', 'color:#43e97b;font-weight:bold');
+                return r.text; 
               }
             }
           }
         }
       }
 
-      // 无定位点模式
-      if (!silent) addLog('🔍 尝试无定位点解码...');
-      const gridSize = Math.min(width, height);
-      const size = Math.floor(gridSize / 8) * 4 + 17;
-      if (size >= 21 && size <= 57) {
-        const step = gridSize / size;
-        const matrix = Array.from({ length: size }, () => new Uint32Array(size));
-        for (let r = 0; r < size; r++) {
-          for (let c = 0; c < size; c++) {
-            const px = Math.round(c * step + step/2);
-            const py = Math.round(r * step + step/2);
-            if (px < width && py < height) {
-              matrix[r][c] = bin[py * width + px] === 0 ? 1 : 0;
-            }
-          }
-        }
+      // 方式2：无定位点
+      console.log('%c--- 方式2: 时序图案检测 ---', 'color:#f093fb');
+      if (!silent) addLog('🔍 尝试时序图案解码...');
+      
+      const grid = inferGrid(bin, width, height);
+      if (!grid) { 
+        if (!silent) addLog('❌ 无法检测时序图案'); 
+        console.log('%c========== 解析失败 ==========', 'color:#ff6b6b');
+        return null; 
+      }
+      
+      if (!silent) addLog('📐 模块:'+grid.moduleSize+' v'+grid.version);
+
+      const matrix2 = extractMatrixFromGrid(bin, width, height, grid);
+      for (let v = Math.max(1,grid.version-2); v <= Math.min(10,grid.version+2); v++) {
+        const sz = 17+v*4;
+        if (sz > matrix2.length) continue;
+        const sub = matrix2.slice(0, sz).map(r => r.slice(0, sz));
         
-        for (let mask = 0; mask < 8; mask++) {
-          const work = matrix.map(row => new Uint32Array(row));
-          for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-              if (r === 6 || c === 6) continue;
-              let invert = false;
-              switch (mask) {
-                case 0: invert = (r + c) % 2 === 0; break;
-                case 1: invert = r % 2 === 0; break;
-                case 2: invert = c % 3 === 0; break;
-                case 3: invert = (r + c) % 3 === 0; break;
-                case 4: invert = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
-                case 5: invert = ((r * c) % 2 + (r * c) % 3) === 0; break;
-                case 6: invert = (((r * c) % 2 + (r * c) % 3) % 2) === 0; break;
-                case 7: invert = (((r + c) % 2 + (r * c) % 3) % 2) === 0; break;
-              }
-              if (invert) work[r][c] ^= 1;
-            }
-          }
-          // 简单读取
-          const bits = [];
-          for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-              if (r === 6 || c === 6) continue;
-              bits.push(work[r][c]);
-            }
-          }
-          const offsets = [0, 1, 2, 3, 4, 8, 16, 32];
-          for (const offset of offsets) {
-            const result = decodeBitsWithOffset(bits, offset);
-            if (result && result.isUrl) {
-              if (!silent) addLog('✅ 无定位点解码成功!');
-              return result;
-            }
-            if (result && result.text && !result.isUrl) {
-              if (!silent) addLog('📝 无定位点找到文本');
-              return result;
-            }
+        for (const inv of [false, true]) {
+          const m = inv ? sub.map(r => new Uint32Array(r.map(v=>v^1))) : sub;
+          const hasFinder = checkAnyFinderPattern(m, sz);
+          const readFn = hasFinder ? readBitsStandard : readBitsNoFinder;
+          
+          let r = tryDecode(m, sz, readFn, '时序-' + (inv ? '反转' : '正常'));
+          if (r) {
+            if (!silent) addLog('✅ ' + r.text.substring(0, 40));
+            console.log('%c========== 解析成功! ==========', 'color:#43e97b;font-weight:bold');
+            return r.text;
           }
         }
       }
-
+      
       if (!silent) addLog('❌ 解码失败');
+      console.log('%c========== 解析失败 ==========', 'color:#ff6b6b');
       return null;
     }
 
@@ -507,67 +527,15 @@
     const cameraBtn = document.getElementById('cameraBtn');
     const stopBtn = document.getElementById('stopBtn');
     const scanResult = document.getElementById('scanResult');
-    const badgeContainer = document.getElementById('badgeContainer');
-    const hexDumpContainer = document.getElementById('hexDumpContainer');
     const copyBtn = document.getElementById('copyBtn');
     const openBtn = document.getElementById('openBtn');
     const previewArea = document.getElementById('previewArea');
-    const logBox = document.getElementById('logBox');
     const hiddenCanvas = document.getElementById('hiddenCanvas');
     const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
-    let cameraStream = null, lastResult = '', lastUrl = '', scanTimer = null;
-
-    function addLog(msg) {
-      logBox.textContent += '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg + '\n';
-      logBox.scrollTop = logBox.scrollHeight;
-    }
-
-    function displayResult(result) {
-      hexDumpContainer.innerHTML = '';
-      badgeContainer.innerHTML = '';
-      
-      if (!result) {
-        scanResult.textContent = '解析失败';
-        scanResult.className = 'result-content empty';
-        lastResult = '';
-        lastUrl = '';
-        return;
-      }
-
-      if (result.bytes) {
-        const hex = Array.from(result.bytes.slice(0, 32)).map(b => b.toString(16).padStart(2,'0')).join(' ');
-        hexDumpContainer.innerHTML = '<div class="hex-dump">HEX: ' + hex + (result.bytes.length > 32 ? ' ...' : '') + '</div>';
-      }
-
-      let displayText = result.text || '二进制数据';
-      
-      // 如果有 URL，优先显示 URL
-      if (result.url) {
-        let url = result.url;
-        if (!url.startsWith('http')) url = 'https://' + url;
-        displayText = url;
-        lastUrl = url;
-        const badge = document.createElement('div');
-        badge.className = 'url-badge';
-        badge.innerHTML = '🌐 识别为网址：<a href="' + url + '" target="_blank">' + url + '</a>';
-        badgeContainer.appendChild(badge);
-      }
-
-      // 显示修复信息
-      if (result.offset !== undefined && result.offset > 0) {
-        const badge = document.createElement('div');
-        badge.className = 'fix-badge';
-        badge.textContent = '🔧 自动修复：读取偏移 ' + result.offset + ' 位 | 编码: ' + (result.encoding || 'UTF-8');
-        badgeContainer.appendChild(badge);
-      }
-
-      scanResult.textContent = displayText;
-      scanResult.className = 'result-content';
-      lastResult = displayText;
-    }
+    let cameraStream = null, lastResult = '', scanTimer = null;
 
     function processImage(img) {
-      logBox.textContent = '';
+      document.getElementById('logBox').textContent = '';
       addLog('🚀 开始解析');
       hiddenCanvas.width = img.width; hiddenCanvas.height = img.height;
       hiddenCtx.drawImage(img, 0, 0);
@@ -575,15 +543,11 @@
       const oi = document.createElement('img');
       oi.src = hiddenCanvas.toDataURL(); oi.style.maxWidth='200px'; oi.style.maxHeight='200px';
       previewArea.appendChild(oi);
-      
-      const result = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
-      displayResult(result);
-      if (result && result.text) {
-        addLog('📝 结果: ' + result.text.substring(0, 60) + (result.text.length > 60 ? '...' : ''));
-      }
+      const r = decodeQR(hiddenCtx.getImageData(0,0,img.width,img.height), false);
+      if (r) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; }
+      else { scanResult.textContent = '解析失败'; scanResult.classList.add('empty'); lastResult = ''; }
     }
 
-    // 事件绑定
     uploadBox.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', e => {
       const f = e.target.files[0]; if (!f) return;
@@ -600,7 +564,6 @@
       reader.onload = ev => { const img = new Image(); img.onload = () => processImage(img); img.src = ev.target.result; };
       reader.readAsDataURL(f);
     });
-
     cameraBtn.addEventListener('click', async () => {
       try {
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 } }, audio: false });
@@ -612,43 +575,26 @@
           if (video.readyState >= 2 && video.videoWidth > 0) {
             hiddenCanvas.width = video.videoWidth; hiddenCanvas.height = video.videoHeight;
             hiddenCtx.drawImage(video, 0, 0);
-            const result = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
-            if (result && result.text && result.text !== lastResult) {
-              displayResult(result);
-              addLog('✅ 扫描到: ' + result.text.substring(0, 30) + (result.text.length > 30 ? '...' : ''));
-            }
+            const r = decodeQR(hiddenCtx.getImageData(0,0,hiddenCanvas.width,hiddenCanvas.height), true);
+            if (r && r !== lastResult) { scanResult.textContent = r; scanResult.classList.remove('empty'); lastResult = r; }
           }
           scanTimer = setTimeout(scan, 300);
         }
         scan();
-      } catch(err) { addLog('❌ 摄像头启动失败: ' + err.message); }
+      } catch(err) {}
     });
-
     stopBtn.addEventListener('click', () => {
       if (scanTimer) clearTimeout(scanTimer);
       if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
       video.srcObject = null; videoContainer.classList.remove('active');
       cameraBtn.style.display = 'block'; stopBtn.style.display = 'none';
     });
-
-    copyBtn.addEventListener('click', () => { 
-      const text = lastUrl || lastResult;
-      if (text) navigator.clipboard.writeText(text); 
-    });
-
+    copyBtn.addEventListener('click', () => { if (lastResult) navigator.clipboard.writeText(lastResult); });
     openBtn.addEventListener('click', () => {
-      const url = lastUrl || lastResult;
-      if (!url) return;
-      let target = url;
-      if (!/^https?:\/\//i.test(target) && /^[\w.-]+\.[a-z]{2,}/i.test(target)) {
-        target = 'https://' + target;
-      }
-      try { new URL(target); window.open(target, '_blank'); }
-      catch(e) { 
-        if (/^[\w.-]+\.[a-z]{2,}/i.test(url)) window.open('https://'+url, '_blank');
-      }
+      if (!lastResult) return;
+      try { new URL(lastResult); window.open(lastResult, '_blank'); }
+      catch(e) { if (/^[\w.-]+\.[a-z]{2,}/i.test(lastResult)) window.open('https://'+lastResult, '_blank'); }
     });
-
     window.addEventListener('beforeunload', () => {
       if (scanTimer) clearTimeout(scanTimer);
       if (cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
