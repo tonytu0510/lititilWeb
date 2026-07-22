@@ -398,8 +398,7 @@
             img4.src = './svg/4.svg';
 
 // 2. 使用现代的 Promise.allSettled 代替 Promise.all
-// allSettled 的特点是：不管图片是加载成功还是加载失败，它都会等你，不会卡死
-Promise.allSettled([
+Promise.all([
     new Promise((resolve, reject) => {
         img1.onload = resolve;
         img1.onerror = () => reject(new Error('图1加载失败'));
