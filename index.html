@@ -397,25 +397,26 @@
             let img4 = newImage;
             img4.src = './svg/4.svg';
 
-// 2. 使用现代的 Promise.allSettled 代替 Promise.all
-await Promise.allSettled([
-    new Promise((resolve, reject) => {
+let pa = new Promise((resolve, reject) => {
         img1.onload = () => resolve;
         img1.onerror = () => reject(new Error('图1加载失败'));
     }),
-    new Promise((resolve, reject) => {
+let pb = new Promise((resolve, reject) => {
         img2.onload = () => resolve;
         img2.onerror = () => reject(new Error('图2加载失败'));
     }),
-    new Promise((resolve, reject) => {
+let pc = new Promise((resolve, reject) => {
         img3.onload = () => resolve;
         img3.onerror = () => reject(new Error('图3加载失败'));
     }),
-    new Promise((resolve, reject) => {
+let pd =new Promise((resolve, reject) => {
         img4.onload = () => resolve;
         img4.onerror = () => reject(new Error('图4加载失败'));
     })
-]).then((result) => {
+const tasks = [pa,pb,pc,pd).then(() => { throw new Error('fail'); })];
+const results = await Promise.allSettled(tasks);
+results.forEach((res, i) => {
+  if (res.status === 'fulfilled')｛ 
     // 3. 检查哪些图加载失败了
     results.forEach((result, index) => {
         if (result.status === 'rejected') {
@@ -430,6 +431,10 @@ await Promise.allSettled([
     ctx.drawImage(img4, img4X, img4Y, img4W, img4H); // 素描狗通常比较大，放下面
 
     console.log("绘制动作已完成！");
+	console.log(`任务${i}成功:`, res.value);
+  }else{
+	console.warn(`任务${i}失败:`, res.reason);
+  ｝
 });
             }
 
