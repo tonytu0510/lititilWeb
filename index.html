@@ -413,7 +413,7 @@ let pd =new Promise((resolve, reject) => {
         img4.onload = () => resolve;
         img4.onerror = () => reject(new Error('图4加载失败'));
     })
-const tasks = [pa,pb,pc,pd).then(() => { throw new Error('fail'); })];
+const tasks = [pa(),pb(),pc(),pd()).then(() => { throw new Error('fail'); })];
 const results = await Promise.allSettled(tasks);
 results.forEach((res, i) => {
   if (res.status === 'fulfilled')｛ 
