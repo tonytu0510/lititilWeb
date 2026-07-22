@@ -398,20 +398,20 @@
             img4.src = './svg/4.svg';
 
 // 2. 使用现代的 Promise.allSettled 代替 Promise.all
-Promise.all([
-    new Promise((resolve, reject) => {
+Promise.allSettled([
+    Promise((resolve, reject) => {
         img1.onload = resolve;
         img1.onerror = () => reject(new Error('图1加载失败'));
     }),
-    new Promise((resolve, reject) => {
+    Promise((resolve, reject) => {
         img2.onload = resolve;
         img2.onerror = () => reject(new Error('图2加载失败'));
     }),
-    new Promise((resolve, reject) => {
+    Promise((resolve, reject) => {
         img3.onload = resolve;
         img3.onerror = () => reject(new Error('图3加载失败'));
     }),
-    new Promise((resolve, reject) => {
+    Promise((resolve, reject) => {
         img4.onload = resolve;
         img4.onerror = () => reject(new Error('图4加载失败'));
     })
