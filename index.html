@@ -415,7 +415,7 @@ Promise.allSettled([
         img4.onload = () => resolve;
         img4.onerror = () => reject(new Error('图4加载失败'));
     })
-]).then((results) => {
+]).then((result) => {
     // 3. 检查哪些图加载失败了
     results.forEach((result, index) => {
         if (result.status === 'rejected') {
