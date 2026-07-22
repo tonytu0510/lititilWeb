@@ -372,7 +372,7 @@ const img4 = new Image();
             const textWidth = ctx.measureText(displayText).width;	
             console.log('displayText=>',displayText)
             ctx.fillStyle = '#fff';
-            ctx.font = `bold ${Math.min(W * 0.03, 50)}px 'Georgia', serif`;
+            ctx.font = `bold ${Math.min(W * 0.03, 50)}px  '微软雅黑','Georgia', serif`;
             ctx.textAlign = 'left';
             ctx.fillText(displayText, W*0.09, H * 0.25);
             //ctx.fillRect(W / 2 + textWidth / 2 + 5, H * 0.22, 10, Math.min(W * 0.07, 45))
