@@ -6,108 +6,108 @@
   <title>🔳 纯手写二维码生成器</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
-      font-family: "Segoe UI", Roboto, sans-serif; 
-      min-height: 100vh; 
-      padding: 1.5rem; 
-      color: #e0e0e0; 
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      font-family: "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem;
+      color: #e0e0e0;
     }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { 
-      text-align: center; 
-      font-size: 1.8rem; 
-      margin-bottom: 0.3rem; 
-      background: linear-gradient(135deg, #43e97b, #38f9d7); 
-      -webkit-background-clip: text; 
-      -webkit-text-fill-color: transparent; 
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 0.3rem;
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .subtitle { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .card { 
-      background: rgba(255,255,255,0.05); 
-      border-radius: 1rem; 
-      padding: 1.2rem; 
-      border: 1px solid rgba(255,255,255,0.1); 
-      margin-bottom: 1rem; 
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 1rem;
+      padding: 1.2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 1rem;
     }
     .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
     .flex-row > * { flex: 1; min-width: 200px; }
     label { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 0.3rem; }
-    input, select, button { 
-      padding: 0.7rem; 
-      border: 1px solid rgba(255,255,255,0.2); 
-      border-radius: 0.5rem; 
-      background: rgba(0,0,0,0.3); 
-      color: #e0e0e0; 
-      font-size: 0.9rem; 
-      width: 100%; 
+    input, select, button {
+      padding: 0.7rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      width: 100%;
       margin-bottom: 0.5rem;
     }
-    button { 
-      cursor: pointer; 
-      font-weight: 600; 
-      border: none; 
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
       transition: all 0.2s;
     }
     button:hover { transform: translateY(-1px); filter: brightness(1.1); }
-    .btn-gen { 
-      background: linear-gradient(135deg, #4facfe, #00f2fe); 
-      color: #1a1a2e; 
+    .btn-gen {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: #1a1a2e;
       font-size: 1rem;
       padding: 0.9rem;
     }
-    .btn-download { 
-      background: linear-gradient(135deg, #43e97b, #38f9d7); 
-      color: #1a1a2e; 
+    .btn-download {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: #1a1a2e;
     }
-    .btn-upload { 
-      background: linear-gradient(135deg, #ffb86c, #ff6b6b); 
-      color: #1a1a2e; 
+    .btn-upload {
+      background: linear-gradient(135deg, #ffb86c, #ff6b6b);
+      color: #1a1a2e;
     }
-    .qr-box { 
-      display: flex; 
-      justify-content: center; 
+    .qr-box {
+      display: flex;
+      justify-content: center;
       align-items: center;
-      padding: 1rem; 
-      background: white; 
+      padding: 1rem;
+      background: white;
       border-radius: 0.8rem;
       min-height: 200px;
     }
-    .qr-box canvas, .qr-box img { 
-      max-width: 250px; 
-      max-height: 250px; 
+    .qr-box canvas, .qr-box img {
+      max-width: 250px;
+      max-height: 250px;
       border-radius: 0.5rem;
     }
-    .log-box { 
-      background: rgba(0,0,0,0.4); 
-      border-radius: 0.5rem; 
-      padding: 0.6rem; 
-      font-family: monospace; 
-      font-size: 0.75rem; 
-      color: #43e97b; 
-      max-height: 350px; 
-      overflow-y: auto; 
-      white-space: pre-wrap; 
-      line-height: 1.4; 
+    .log-box {
+      background: rgba(0,0,0,0.4);
+      border-radius: 0.5rem;
+      padding: 0.6rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #43e97b;
+      max-height: 350px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
     }
-    .result { 
-      font-size: 1.1rem; 
-      font-weight: 600; 
-      padding: 0.5rem; 
-      text-align: center; 
+    .result {
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.5rem;
+      text-align: center;
       border-radius: 0.5rem;
       margin-top: 0.5rem;
     }
     .ok { color: #43e97b; background: rgba(67,233,123,0.1); }
     .fail { color: #ff6b6b; background: rgba(255,107,107,0.1); }
     .info { color: #4facfe; background: rgba(79,172,254,0.1); }
-    .logo-preview { 
-      width: 60px; 
-      height: 60px; 
-      border-radius: 0.5rem; 
-      background: white; 
-      display: flex; 
-      align-items: center; 
+    .logo-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.5rem;
+      background: white;
+      display: flex;
+      align-items: center;
       justify-content: center;
       font-size: 2rem;
       margin-top: 0.5rem;
@@ -123,26 +123,24 @@
     .tag-green { background: rgba(67,233,123,0.2); color: #43e97b; }
     .tag-blue { background: rgba(79,172,254,0.2); color: #4facfe; }
     .tag-orange { background: rgba(255,184,108,0.2); color: #ffb86c; }
-    .section-title { 
-      color: #ffb86c; 
-      font-size: 0.75rem; 
-      text-transform: uppercase; 
+    .section-title {
+      color: #ffb86c;
+      font-size: 0.75rem;
+      text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 0.5rem;
     }
   </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
   <div class="container">
     <h1>🔳 纯手写二维码生成器</h1>
-    <p class="subtitle">去掉定位点 · 原位置填充数据模块 · 仍可扫描</p>
+    <p class="subtitle">可选去掉定位点 · 原位置填充数据模块 · 仍可扫描</p>
 
     <div style="text-align: center; margin-bottom: 1rem;">
-      <span class="feature-tag tag-green">🗑️ 去掉三个定位点</span>
+      <span class="feature-tag tag-green">🗑️ 可选去掉定位点</span>
       <span class="feature-tag tag-blue">🎯 中间加Logo</span>
-      <span class="feature-tag tag-orange">🛡️ H级容错 30%</span>
+      <span class="feature-tag tag-orange">🛡️ 支持L/M容错</span>
     </div>
 
     <div class="card">
@@ -157,18 +155,16 @@
         <div>
           <label>🛡️ 容错率</label>
           <select id="ecLevel">
-            <option value="L">低 (~7%)</option>
-            <option value="M">中 (~15%)</option>
-            <option value="Q">较高 (~25%)</option>
-            <option value="H" selected>高 (30%)</option>
+            <option value="L">低 (L ~7%)</option>
+            <option value="M" selected>中 (M ~15%)</option>
           </select>
         </div>
       </div>
 
       <div class="flex-row" style="margin-top: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
-          <input type="checkbox" id="removeFinders" checked style="width: auto; margin: 0;">
-          <label for="removeFinders" style="margin:0; cursor:pointer; font-size: 0.85rem;">🗑️ 去掉三个定位点（原位置填充数据）</label>
+          <input type="checkbox" id="keepFinders" checked style="width: auto; margin: 0;">
+          <label for="keepFinders" style="margin:0; cursor:pointer; font-size: 0.85rem;">📍 三个定位点（原位置填充数据）</label>
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
           <input type="checkbox" id="addLogo" checked style="width: auto; margin: 0;">
@@ -315,7 +311,7 @@
     // ==================== 核心生成器 ====================
     async function genQR(text, options) {
       const moduleSize = options.moduleSize || 8;
-      const ecLevel = options.ecLevel || 'H';
+      const ecLevel = options.ecLevel || 'M';
       const removeFinders = options.removeFinders || false;
       const addLogo = options.addLogo || false;
       const logoCanvas = options.logoCanvas || null;
@@ -448,7 +444,7 @@
         addLog(`🎯 Logo区域: 模块 ${logoRegion.start}-${logoRegion.end}`);
       }
 
-      // 放置数据位 - 使用Set避免重复访问
+      // 放置数据位
       const ab = [];
       for (const cw of allCW) {
         for (let i = 7; i >= 0; i--) ab.push((cw >> i) & 1);
@@ -482,7 +478,7 @@
             }
             if (inAlign) continue;
 
-            if (logoRegion && row >= logoRegion.start && row <= logoRegion.end && 
+            if (logoRegion && row >= logoRegion.start && row <= logoRegion.end &&
                 c >= logoRegion.start && c <= logoRegion.end) {
               continue;
             }
@@ -598,22 +594,17 @@
       };
     }
 
-    // ==================== 识别器 - 直接使用原始矩阵 ====================
+    // ==================== 识别器 ====================
     function parseQRFromMatrix(gen) {
       addLog("🚀 开始解析二维码...");
       addLog("使用生成器原始矩阵数据直接解析");
 
       const sz = gen.size;
-      const m = gen.rawMatrix;  // 原始矩阵（数据位已经是未掩码的）
+      const m = gen.rawMatrix;
       const alocs = gen.alocs;
       const removeFinders = gen.removeFinders;
       const logoRegion = gen.logoRegion;
 
-      // 关键修复：直接使用原始矩阵，不取消掩码
-      // 因为rawMatrix中的数据位在放置时就是未掩码的
-      // 掩码只应用于渲染矩阵mk，不影响rawMatrix
-
-      // 读取数据位 - 使用Set避免重复访问
       const bits = [];
       let up = true;
       const visited = new Set();
@@ -645,7 +636,7 @@
 
             if (row === sz - 8 && c === 8) continue;
 
-            if (logoRegion && row >= logoRegion.start && row <= logoRegion.end && 
+            if (logoRegion && row >= logoRegion.start && row <= logoRegion.end &&
                 c >= logoRegion.start && c <= logoRegion.end) {
               continue;
             }
@@ -800,7 +791,10 @@
 
       const moduleSize = parseInt(document.getElementById("moduleSize").value) || 8;
       const ecLevel = document.getElementById("ecLevel").value;
-      const removeFinders = document.getElementById("removeFinders").checked;
+      // 勾选=保留定位点 → removeFinders=false
+      // 不勾选=去掉定位点 → removeFinders=true
+      const keepFinders = document.getElementById("keepFinders").checked;
+      const removeFinders = !keepFinders;
       const addLogo = document.getElementById("addLogo").checked;
 
       try {

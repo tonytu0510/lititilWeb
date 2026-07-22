@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -241,19 +242,15 @@
       const polyEval = (p, x) => { let y = p[0]; for (let i = 1; i < p.length; i++) y = mul(y, x) ^ p[i]; return y; };
       const syndromes = (msg, nsym) => { for (let i = 0; i < nsym; i++) if (polyEval(msg, exp[i])) return 0; return 1; };
 
-      // RS解码 - 单错误纠正（避免暴力搜索导致卡死）
       const rsDecode = (msg, nsym) => {
         if (syndromes(msg, nsym)) return msg;
         const n = msg.length;
-
-        // 只尝试单错误纠正，避免双错误纠正的O(n²)循环导致卡死
         for (let p = 0; p < n; p++) {
           for (let v = 1; v < 256; v++) {
             const t = [...msg]; t[p] ^= v;
             if (syndromes(t, nsym)) return t;
           }
         }
-
         return null;
       };
 
@@ -354,14 +351,9 @@
       }
 
       // 标准填充
-      // 1. 终止符 (4个0，如果空间允许)
       const terminatorLen = Math.min(4, dataCW * 8 - bits.length);
       for (let i = 0; i < terminatorLen; i++) bits.push(0);
-
-      // 2. 补0使长度为8的倍数
       while (bits.length % 8) bits.push(0);
-
-      // 3. 交替填充 0xEC (11101100) 和 0x11 (00010001)
       const padBytes = [0xEC, 0x11];
       let padIdx = 0;
       while (bits.length < dataCW * 8) {
@@ -441,19 +433,15 @@
 
       addLog(`🎯 步骤5: 时序+校正图案已放置${removeFinders ? '（跳过了定位点）' : ''}`);
 
-      // 计算Logo区域（用于数据放置时跳过）
+      // 计算Logo区域
       let logoRegion = null;
       if (addLogo && logoCanvas) {
         const logoSizePx = Math.floor(sz * moduleSize * 0.25);
-        const canvasSize = (sz + 8) * moduleSize;  // border=4
+        const canvasSize = (sz + 8) * moduleSize;
         const logoX = Math.floor((canvasSize - logoSizePx) / 2);
-        const logoY = Math.floor((canvasSize - logoSizePx) / 2);
         const borderPx = 4 * moduleSize;
-
-        // 计算Logo覆盖的模块范围
         const logoStartMod = Math.floor((logoX - borderPx) / moduleSize);
         const logoEndMod = Math.ceil((logoX + logoSizePx - borderPx) / moduleSize);
-
         logoRegion = {
           start: Math.max(0, logoStartMod),
           end: Math.min(sz - 1, logoEndMod - 1)
@@ -461,13 +449,15 @@
         addLog(`🎯 Logo区域: 模块 ${logoRegion.start}-${logoRegion.end}`);
       }
 
-      // 放置数据位 - 跳过Logo区域
+      // 放置数据位 - 使用Set避免重复访问
       const ab = [];
       for (const cw of allCW) {
         for (let i = 7; i >= 0; i--) ab.push((cw >> i) & 1);
       }
 
       let bi = 0, up = true;
+      const visited = new Set();
+
       for (let col = sz - 1; col >= 0; col -= 2) {
         const rc = col === 6 ? 5 : col;
         for (let row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
@@ -493,11 +483,14 @@
             }
             if (inAlign) continue;
 
-            // 跳过Logo区域 - 生成器和解析器使用相同的逻辑
             if (logoRegion && row >= logoRegion.start && row <= logoRegion.end && 
                 c >= logoRegion.start && c <= logoRegion.end) {
               continue;
             }
+
+            const key = `${row},${c}`;
+            if (visited.has(key)) continue;
+            visited.add(key);
 
             if (m[row][c] === -1) {
               m[row][c] = bi < ab.length ? ab[bi] : 0;
@@ -530,11 +523,9 @@
       for (let r = 0; r < sz; r++) {
         for (let c = 0; c < sz; c++) {
           if (r === 6 || c === 6) continue;
-
           if (!removeFinders) {
             if ((r < 8 && c < 8) || (r < 8 && c >= sz - 8) || (r >= sz - 8 && c < 8)) continue;
           }
-
           let inAlign2 = false;
           for (const ar of alocs) {
             for (const ac of alocs) {
@@ -546,10 +537,7 @@
             if (inAlign2) break;
           }
           if (inAlign2) continue;
-
           if (r === sz - 8 && c === 8) continue;
-
-          // Logo区域也应用掩码
           if ((r + c) % 2 === 0) mk[r][c] ^= 1;
         }
       }
@@ -581,14 +569,9 @@
         const logoSize = Math.floor(sz * moduleSize * 0.25);
         const logoX = (canvasSize - logoSize) / 2;
         const logoY = (canvasSize - logoSize) / 2;
-
-        // 绘制白色背景（Logo区域）
         ctx.fillStyle = "#FFF";
         ctx.fillRect(logoX - 2, logoY - 2, logoSize + 4, logoSize + 4);
-
-        // 绘制Logo
         ctx.drawImage(logoCanvas, logoX, logoY, logoSize, logoSize);
-
         addLog(`🎯 步骤9: Logo已添加`);
       }
 
@@ -608,7 +591,7 @@
         dc,
         moduleSize,
         matrix: mk,
-        rawMatrix: m,  // 保存原始矩阵（未应用掩码）
+        rawMatrix: m,
         alocs,
         removeFinders,
         hasLogo: addLogo && !!logoCanvas,
@@ -616,52 +599,26 @@
       };
     }
 
-    // ==================== 识别器 - 使用生成器原始数据 ====================
+    // ==================== 识别器 - 直接使用原始矩阵 ====================
     function parseQRFromMatrix(gen) {
       addLog("🚀 开始解析二维码...");
-      addLog("使用生成器原始矩阵数据直接解析（避免图像采样误差）");
+      addLog("使用生成器原始矩阵数据直接解析");
 
       const sz = gen.size;
-      const m = gen.rawMatrix;  // 使用原始矩阵（未应用掩码）
+      const m = gen.rawMatrix;  // 原始矩阵（数据位已经是未掩码的）
       const alocs = gen.alocs;
       const removeFinders = gen.removeFinders;
-      const hasLogo = gen.hasLogo;
       const logoRegion = gen.logoRegion;
 
-      // 取消 Mask
-      const um = [];
-      for (let r = 0; r < sz; r++) {
-        um[r] = [];
-        for (let c = 0; c < sz; c++) {
-          um[r][c] = m[r][c];
-        }
-      }
+      // 关键修复：直接使用原始矩阵，不取消掩码
+      // 因为rawMatrix中的数据位在放置时就是未掩码的
+      // 掩码只应用于渲染矩阵mk，不影响rawMatrix
 
-      for (let r = 0; r < sz; r++) {
-        for (let c = 0; c < sz; c++) {
-          if (r === 6 || c === 6) continue;
-          if (!removeFinders) {
-            if ((r < 8 && c < 8) || (r < 8 && c >= sz - 8) || (r >= sz - 8 && c < 8)) continue;
-          }
-          let inAlign = false;
-          for (const ar of alocs) {
-            for (const ac of alocs) {
-              if (ar === 6 && ac === 6) continue;
-              if (r >= ar - 2 && r <= ar + 2 && c >= ac - 2 && c <= ac + 2) {
-                inAlign = true; break;
-              }
-            }
-            if (inAlign) break;
-          }
-          if (inAlign) continue;
-          if (r === sz - 8 && c === 8) continue;
-          if ((r + c) % 2 === 0) um[r][c] ^= 1;
-        }
-      }
-
-      // 读取数据位 - 使用与生成器完全相同的逻辑
+      // 读取数据位 - 使用Set避免重复访问
       const bits = [];
       let up = true;
+      const visited = new Set();
+
       for (let col = sz - 1; col >= 0; col -= 2) {
         const rc = col === 6 ? 5 : col;
         for (let row = up ? sz - 1 : 0; up ? row >= 0 : row < sz; row += up ? -1 : 1) {
@@ -689,13 +646,16 @@
 
             if (row === sz - 8 && c === 8) continue;
 
-            // 跳过Logo区域 - 与生成器使用相同的逻辑
             if (logoRegion && row >= logoRegion.start && row <= logoRegion.end && 
                 c >= logoRegion.start && c <= logoRegion.end) {
               continue;
             }
 
-            bits.push(um[row][c]);
+            const key = `${row},${c}`;
+            if (visited.has(key)) continue;
+            visited.add(key);
+
+            bits.push(m[row][c]);
           }
         }
         up = !up;
@@ -878,10 +838,8 @@
         resultDisplay.textContent = "⏳ 自解析验证中...";
         resultDisplay.className = "result info";
 
-        // 使用setTimeout让UI先更新
         setTimeout(() => {
           try {
-            // 使用生成器的原始矩阵数据进行自解析
             const parsed = parseQRFromMatrix(gen);
             if (parsed === text) {
               resultDisplay.textContent = "✅ 自解析成功: " + parsed;
@@ -905,7 +863,6 @@
       }
     });
 
-    // 页面加载后自动触发一次生成
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById("genBtn").click();
