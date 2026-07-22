@@ -110,6 +110,9 @@
     <script>
         // ==================== 轮播逻辑 ====================
         let current = 0;
+        let indexTime = 7000;
+        let otherTime = 2000;
+        let time = indexTime
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
 
@@ -124,6 +127,15 @@
         function nextSlide() {
             showSlide((current + 1) % 7);
         }
+        function isIndexTime(){
+	console.log('current=>',current)
+           if(current == 0){
+	time = indexTime
+            }else{
+	time = otherTime
+            }
+           return time;
+        }
 
         function prevSlide() {
             showSlide((current - 1 + 7) % 7);
@@ -132,6 +144,15 @@
         function goTo(n) {
             showSlide(n);
         }
+        function initTimer(time){
+	console.log('time=>',time)
+	setTimeout(function(time){
+	      nextSlide()
+	      time = isIndexTime()
+	      initTimer(time)
+	},time)
+        }
+        initTimer(time)
 
         function updateSliderHeight() {
             const dinoBar = document.getElementById('dinoBar');
@@ -366,11 +387,8 @@ const img4 = new Image();
 	     canvas._textIndex++
                      canvas._textTimer = 0
 	}
-            console.log('text=>',text)
-            console.log('canvas._textIndex=>',canvas._textIndex)
             const displayText = text.substring(0,canvas._textIndex);
-            const textWidth = ctx.measureText(displayText).width;	
-            console.log('displayText=>',displayText)
+            const textWidth = ctx.measureText(displayText).width;
             ctx.fillStyle = '#fff';
             ctx.font = `bold ${Math.min(W * 0.03, 50)}px  '微软雅黑','Georgia', serif`;
             ctx.textAlign = 'left';
@@ -413,13 +431,13 @@ const img4 = new Image();
         }
         animate();
 
-        function initOtherCanvas() {
-            drawCanvas2(document.getElementById('canvas2'));
-            drawCanvas3(document.getElementById('canvas3'));
-            drawCanvas4(document.getElementById('canvas4'));
-            drawCanvas5(document.getElementById('canvas5'));
-            drawCanvas6(document.getElementById('canvas6'));
-            drawCanvas7(document.getElementById('canvas7'));
+        function initOtherCanvas(aug) {
+	drawCanvas2(document.getElementById('canvas2'));
+                drawCanvas3(document.getElementById('canvas3'));
+                drawCanvas4(document.getElementById('canvas4'));
+                drawCanvas5(document.getElementById('canvas5'));
+                drawCanvas6(document.getElementById('canvas6'));
+                drawCanvas7(document.getElementById('canvas7'));
         }
         initOtherCanvas();
         window.addEventListener('resize', initOtherCanvas);
