@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像分析 Canvas 输出</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .canvas-wrapper {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
+            width: 300px;
+            height: 300px;
+        }
+        .title {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>根据您的图片分析生成的 Canvas 示意图</h2>
+    <p>（注：由于 AI 无法直接“抠图”像素，此处使用 Canvas 绘制了剪影、渐变背景和结构布局来还原您的图片描述）</p>
+
+    <div class="grid-container">
+        <!-- 图1 -->
+        <div class="canvas-wrapper">
+            <div class="title">图1：奔跑的孩子 (剪影+倒影)</div>
+            <canvas id="canvas1" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 图2 -->
+        <div class="canvas-wrapper">
+            <div class="title">图2：长椅上的女孩与猫 (黄昏)</div>
+            <canvas id="canvas2" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 图3 -->
+        <div class="canvas-wrapper">
+            <div class="title">图3：扑蝴蝶的小狗 (夕阳)</div>
+            <canvas id="canvas3" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 图4 -->
+        <div class="canvas-wrapper">
+            <div class="title">图4：边境牧羊犬 (素描线稿)</div>
+            <canvas id="canvas4" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 图5 -->
+        <div class="canvas-wrapper">
+            <div class="title">图5：倒影与剪影 (拼图布局)</div>
+            <canvas id="canvas5" width="300" height="300"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 基础通用设置
+        function getCtx(id) {
+            const canvas = document.getElementById(id);
+            return canvas.getContext('2d');
+        }
+
+        // 1. 绘制奔跑的孩子
+        function drawChild() {
+            const ctx = getCtx('canvas1');
+            ctx.fillStyle = '#000';
+            
+            // 画身体（简化版奔跑姿势）
+            ctx.beginPath();
+            // 头
+            ctx.arc(150, 100, 30, 0, Math.PI*2);
+            // 身体 & 手（粗略的贝塞尔曲线）
+            ctx.moveTo(120, 120);
+            ctx.bezierCurveTo(110, 160, 120, 190, 135, 210);
+            ctx.lineTo(150, 190);
+            ctx.lineTo(160, 210);
+            ctx.bezierCurveTo(170, 190, 170, 150, 160, 130);
+            ctx.lineTo(150, 130);
+            // 向后摆的手臂
+            ctx.moveTo(120, 130);
+            ctx.bezierCurveTo(100, 150, 110, 170, 115, 180);
+            // 向前摆的手臂
+            ctx.moveTo(160, 150);
+            ctx.bezierCurveTo(180, 160, 185, 180, 170, 200);
+            ctx.fill();
+
+            // 画倒影（底部波浪线）
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.moveTo(40, 270);
+            ctx.bezierCurveTo(80, 250, 120, 260, 140, 255);
+            ctx.bezierCurveTo(160, 250, 180, 265, 200, 260);
+            ctx.bezierCurveTo(220, 255, 240, 265, 260, 270);
+            ctx.lineTo(260, 290);
+            ctx.lineTo(40, 290);
+            ctx.fill();
+        }
+
+        // 2. 绘制长椅上的女孩与猫 (黄昏剪影)
+        function drawSunsetCat() {
+            const ctx = getCtx('canvas2');
+            // 黄昏渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, '#b5c6e8'); // 紫蓝
+            gradient.addColorStop(0.5, '#f6a085'); // 橙红
+            gradient.addColorStop(1, '#f9d686'); // 黄
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 300, 300);
+
+            // 长椅
+            ctx.fillStyle = '#000';
+            ctx.fillRect(30, 200, 240, 8); // 椅面
+            ctx.fillRect(40, 208, 8, 60);  // 左腿
+            ctx.fillRect(252, 208, 8, 60); // 右腿
+            ctx.fillRect(80, 220, 140, 4); // 横杆
+
+            // 女孩
+            ctx.beginPath();
+            ctx.arc(210, 165, 22, 0, Math.PI*2); // 头
+            ctx.fillRect(198, 185, 24, 30); // 身体
+            ctx.moveTo(190, 185); ctx.lineTo(230, 195); ctx.lineTo(230, 230); ctx.lineTo(190, 230); ctx.lineTo(190, 185); // 衣服
+            ctx.fillRect(195, 230, 8, 30); // 腿1
+            ctx.fillRect(218, 230, 8, 30); // 腿2
+            
+            // 猫（在长椅左侧）
+            ctx.beginPath();
+            ctx.arc(80, 180, 25, Math.PI, 0); // 猫的身体
+            ctx.moveTo(60, 180); ctx.lineTo(50, 160); ctx.lineTo(55, 165); // 猫头
+            ctx.fill();
+        }
+
+        // 3. 绘制扑蝴蝶的小狗 (夕阳)
+        function drawDogButterfly() {
+            const ctx = getCtx('canvas3');
+            // 夕阳渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, '#c6b5a8');
+            gradient.addColorStop(0.3, '#eea084');
+            gradient.addColorStop(1, '#ea6843');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 300, 300);
+
+            ctx.fillStyle = '#000';
+            // 狗的剪影
+            ctx.beginPath();
+            ctx.moveTo(120, 280); ctx.lineTo(80, 280); // 尾巴底部
+            ctx.quadraticCurveTo(60, 260, 80, 230); // 尾巴上翘
+            ctx.lineTo(95, 210); ctx.quadraticCurveTo(100, 190, 120, 170); // 后腿
+            ctx.lineTo(135, 160); ctx.quadraticCurveTo(150, 150, 170, 150); // 背部
+            ctx.lineTo(180, 140); ctx.quadraticCurveTo(170, 150, 170, 160); // 前爪上抬1
+            ctx.quadraticCurveTo(190, 175, 180, 190);
+            ctx.quadraticCurveTo(170, 185, 165, 180); // 前爪上抬2
+            ctx.lineTo(160, 150); ctx.quadraticCurveTo(155, 140, 160, 130); // 头
+            ctx.quadraticCurveTo(150, 125, 130, 135); // 鼻子
+            ctx.quadraticCurveTo(120, 150, 120, 170); // 胸膛
+            ctx.lineTo(140, 200); // 后腿
+            ctx.quadraticCurveTo(140, 240, 120, 280); // 前蹲
+            ctx.fill();
+
+            // 蝴蝶
+            ctx.beginPath();
+            ctx.moveTo(190, 120);
+            ctx.quadraticCurveTo(210, 90, 220, 110); // 上翅膀
+            ctx.quadraticCurveTo(205, 105, 195, 120);
+            ctx.quadraticCurveTo(195, 130, 190, 120); // 下翅膀
+            ctx.fill();
+        }
+
+        // 4. 绘制素描牧羊犬
+        function drawSketchDog() {
+            const ctx = getCtx('canvas4');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, 300, 300);
+
+            // 素描黑白灰还原
+            ctx.fillStyle = '#555'; // 深灰毛发（面部/背）
+            ctx.beginPath();
+            ctx.ellipse(160, 110, 30, 20, 0, 0, Math.PI*2); // 头部
+            ctx.fillStyle = '#222'; // 耳朵
+            ctx.fillRect(130, 90, 20, 30);
+            ctx.fillRect(170, 90, 20, 25);
+
+            // 画眼睛和鼻子
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(145, 110, 2, 0, Math.PI*2); ctx.fill(); // 眼睛
+            ctx.beginPath(); ctx.arc(175, 110, 2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(160, 125, 6, 4, 0, 0, Math.PI*2); ctx.fill(); // 鼻子
+
+            // 身体（白色/浅灰毛发）
+            ctx.fillStyle = '#ccc';
+            ctx.beginPath();
+            ctx.moveTo(140, 130); ctx.lineTo(110, 160); ctx.quadraticCurveTo(100, 200, 120, 230); // 脖子 & 前胸
+            ctx.lineTo(120, 280); ctx.lineTo(180, 280); ctx.lineTo(190, 240); ctx.quadraticCurveTo(195, 200, 170, 160);
+            ctx.fill();
+
+            // 尾巴
+            ctx.strokeStyle = '#444'; ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(180, 250); ctx.quadraticCurveTo(210, 240, 220, 220); ctx.quadraticCurveTo(230, 200, 210, 210);
+            ctx.stroke();
+
+            // 腿
+            ctx.fillRect(115, 260, 15, 40);
+            ctx.fillRect(145, 260, 20, 40);
+            ctx.fillRect(175, 260, 20, 40);
+        }
+
+        // 5. 绘制拼图布局 (倒影与剪影)
+        function drawGrid() {
+            const ctx = getCtx('canvas5');
+            ctx.fillStyle = '#f5f5f5';
+            ctx.fillRect(0, 0, 300, 300);
+            
+            // 绘制6个格子
+            const title = 'REFLECTION & SILHOUETTE';
+            ctx.fillStyle = '#444'; ctx.fillRect(0, 0, 300, 40);
+            ctx.fillStyle = '#fff';
+            ctx.font = '18px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(title, 150, 28);
+
+            // 1,2,3 上排倒影
+            ctx.fillStyle = '#d5d5d5'; // 灰白背景模仿水面
+            ctx.fillRect(10, 55, 90, 90); // 1
+            ctx.fillRect(105, 55, 90, 90); // 2
+            ctx.fillRect(200, 55, 90, 90); // 3
+            // 画个倒影小人示意
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(50, 100, 10, 0, Math.PI*2); ctx.fill();
+            ctx.fillRect(45, 110, 10, 20);
+            ctx.fillRect(145, 100, 10, 20);
+            ctx.fillRect(245, 110, 10, 20);
+
+            // 4,5,6 下排剪影
+            ctx.fillStyle = '#222';
+            ctx.fillRect(10, 160, 90, 120); // 4
+            ctx.fillRect(105, 160, 90, 120); // 5
+            ctx.fillRect(200, 160, 90, 120); // 6
+
+            // 画个剪影情侣示意
+            ctx.fillStyle = '#0f0f0f';
+            ctx.beginPath(); ctx.arc(40, 210, 15, 0, Math.PI*2); ctx.fill(); // 女头
+            ctx.beginPath(); ctx.arc(70, 200, 18, 0, Math.PI*2); ctx.fill(); // 男头
+            ctx.fillRect(35, 225, 20, 40); ctx.fillRect(65, 218, 25, 50); // 身体
+            ctx.fillRect(140, 210, 15, 40); ctx.fillRect(155, 200, 20, 50);
+            ctx.fillRect(230, 210, 20, 40); ctx.fillRect(250, 205, 20, 50);
+
+            // 标注数字
+            ctx.fillStyle = '#fff'; ctx.font = '18px Arial'; ctx.textAlign = 'center';
+            ctx.fillText('1', 55, 110); ctx.fillText('2', 150, 110); ctx.fillText('3', 245, 110);
+            ctx.fillText('4', 55, 240); ctx.fillText('5', 150, 240); ctx.fillText('6', 245, 240);
+        }
+
+        // 页面加载完成后执行绘制
+        window.onload = function() {
+            drawChild();
+            drawSunsetCat();
+            drawDogButterfly();
+            drawSketchDog();
+            drawGrid();
+        }
+    </script>
+</body>
+</html>
