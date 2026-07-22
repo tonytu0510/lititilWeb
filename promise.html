@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas 完美组合展示</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            /* 你的画布尺寸可以根据需要调整 */
+            width: 800px;
+            height: 800px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="myCanvas" width="800" height="800"></canvas>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- 1. 创建你的图片资源（这里假设你把抠出来的 SVG 放在了同级目录下） ---
+        // 图1：奔跑的小孩
+        const img1 = new Image();
+        img1.src = 'running_boy.svg'; // 换成你的文件名
+
+        // 图2：女孩和猫
+        const img2 = new Image();
+        img2.src = 'girl_cat.svg';
+
+        // 图3：狗和蝴蝶
+        const img3 = new Image();
+        img3.src = 'dog_butterfly.svg';
+
+        // --- 2. 等图片加载完成后，再画到 Canvas 上 ---
+        // 使用 Promise.all 确保所有图片都加载完毕了
+        Promise.all([
+            new Promise(resolve => img1.onload = resolve),
+            new Promise(resolve => img2.onload = resolve),
+            new Promise(resolve => img3.onload = resolve)
+        ]).then(() => {
+
+            // 拼接画布：你可以自由调整 x, y, width, height
+            // 画图1 (小孩)
+            ctx.drawImage(img1, 50, 50, 200, 220);
+
+            // 画图2 (女孩)
+            ctx.drawImage(img2, 300, 60, 200, 200);
+
+            // 画图3 (狗)
+            ctx.drawImage(img3, 550, 50, 200, 230);
+
+            // 你甚至可以对它们做特效！
+            // 比如给图4加上蓝色滤镜（如果用它来画图）
+            // ctx.filter = 'hue-rotate(180deg)'; // 变色
+            // ctx.drawImage(img4, ...);
+            // ctx.filter = 'none'; // 记得重置滤镜
+
+            console.log("所有图片已成功绘制到 Canvas 上！");
+        });
+
+    </script>
+</body>
+</html>
