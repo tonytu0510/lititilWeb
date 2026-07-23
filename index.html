@@ -393,30 +393,42 @@
              drawImageSafe('svg/3.svg', img3X, img3Y, img3W, img3H,ctx)
              drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
 }
-function drawImageSafe(imgSrc, x, y, w, h,ctx) {
-    let img = new Image();
-    img.src = imgSrc;
-    // 1. 如果图片早就加载好了（比如从缓存里取的），直接画，无需等待
-    if (img.complete && img.naturalWidth !== 0) {
-        ctx.drawImage(img, x, y, w, h);
-        return;
-    }
+/**
+ * 极速安全的图片绘制函数 (铁壁版)
+ * 核心逻辑：优先使用 decode()，失败则 fallback 到 onload，并处理跨域和缓存问题
+ * @param {string} url    图片路径
+ * @param {number} x      画布 X 坐标
+ * @param {number} y      画布 Y 坐标
+ * @param {number} w      宽度
+ * @param {number} h      高度
+ * @param {CanvasRenderingContext2D} ctx  Canvas 上下文
+ */
+function drawImageSafe(url, x, y, w, h, ctx) {
+    const img = new Image();
 
-    // 2. 核心：优先使用 decode() 这种不阻塞主线程的现代 API
+    // 关键点：如果是在线服务器（非本地 file://），且图片与 HTML 不同域，加上这行防止 Canvas 被污染
+    // 如果在本地双击打开，这行可以忽略。
+    img.crossOrigin = "anonymous"; 
+
+    // 逻辑 1: 使用现代浏览器的 decode() 异步解码技术
+    // 这会让浏览器在后台静默解图，绝不阻塞主线程渲染
     if (img.decode) {
+        img.src = url;
         img.decode().then(() => {
             ctx.drawImage(img, x, y, w, h);
         }).catch(() => {
-            // 3. 兜底：如果 decode() 在某些旧浏览器报错，立刻退回传统的 onload
+            // 逻辑 2: 兜底方案，如果 decode() 因为某些奇怪原因失败了，
+            // 立刻退回到传统的 onload 方式
             img.onload = () => {
                 ctx.drawImage(img, x, y, w, h);
             };
         });
     } else {
-        // 4. 兜底二：如果是非常老的浏览器，直接走 onload
+        // 逻辑 3: 终极兜底（针对远古浏览器）
         img.onload = () => {
             ctx.drawImage(img, x, y, w, h);
         };
+        img.src = url;
     }
 }
         // ==================== Canvas 2-7: 简化版 ====================
