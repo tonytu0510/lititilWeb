@@ -421,7 +421,7 @@ const pd = function(){
         		img4.onerror = () => reject(new Error('图1加载失败'));
     	})
  }
-const tasks = [pa(), pb(), pc(),pd()].then(() => { throw new Error('fail'); });
+const tasks = [pa(), pb(), pc(),pd()]
 const results = Promise.allSettled(tasks)
 results.forEach((res, i) => {
   if (res.status === 'fulfilled'){
