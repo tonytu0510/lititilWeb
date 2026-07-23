@@ -347,22 +347,26 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             // "I LOVE LJ" 打字机效果
-           // 原配置
-          const text1 = 'I LOVE LJ,爱LI没有惧怕！';
-          // 单独定义每个字的大小权重： [大, 小, 大, 小, 小...]
-          const myWeights = [2.5, 1, 2.5, 1, 1, 1, 1, 0.8, 2.5, 1, 1, 1, 1, 0.5, 0.5, 0.8, 0.5, 0.5, 0.5];
-          if (!canvas._textIndex) canvas._textIndex = 0;
-          // 渲染逻辑：
-          typewriterDrawEx(
-	ctx, 
-    	text1, 
-    	canvas._textIndex, 
-    	W * 0.09, 
-    	H * 0.25, 
-    	45,                 // 基础字号
-    	myWeights,          // ✅ 关键点：传入自定义权重数组，实现每个字不同大小
-    	'#ff4444'           // 颜色
-             )
+            // 1. 定义你想要打字机效果的文字
+           const text = 'I LOVE LJ,爱LI没有惧怕！';
+           if (!canvas._textIndex) canvas._textIndex = 0;
+
+           // 2. 在每一帧的渲染里调用：
+           typewriterDraw(
+               	ctx, 
+    	text, 
+    	canvas._textIndex,        // 传入当前进度
+    	W * 0.09,                 // 起始 X
+    	H * 0.25,                 // 起始 Y
+    	45,                       // 默认大小
+    	// 3. 这里是实现【每个字单独大小】的神秘核心函数
+    	(i) => {
+        		// i 是当前字符的索引。你可以任意定义谁大谁小。
+        		if (i === 0 || i === 2) return 90; // 第1个和第3个字特别大
+        		if (i === text.length - 1) return 60; // 最后一个字稍微大点
+        		return 45; // 其他都是正常大小 45px
+    	}
+              );
              /****
             const text = 'I LOVE LJ,爱LI没有惧怕！';
             const count = 20
@@ -450,50 +454,47 @@ function drawImageSafe(url, x, y, w, h, ctx) {
     }
 }
 /**
- * 精细版打字机 (支持每个字独立设置大小、颜色)
- * @param {CanvasRenderingContext2D} ctx - Canvas上下文
- * @param {string} text - 显示的完整文字
- * @param {number} index - 当前显示到的字符下标
- * @param {number} startX - 起始 X 坐标
- * @param {number} startY - 起始 Y 坐标
- * @param {number} baseSize - 基础字体大小
- * @param {Array|Function} sizeMap - 每个字符的大小权重数组或计算函数
- * @param {string} color - 颜色
+ * 打字机引擎 (支持每个字独立设置大小，保留 substring 截断)
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} text - 完整文本
+ * @param {number} index - 当前打字进度 (0 ~ text.length)
+ * @param {number} x - 起始 X 坐标
+ * @param {number} y - 起始 Y 坐标
+ * @param {number} baseSize - 基础字号
+ * @param {function} getCharSize - 计算每一个字大小的函数，返回数字
  */
-function typewriterDrawEx(ctx, text, index, startX, startY, baseSize = 40, sizeMap = [], color = '#fff') {
-    if (index === 0) return; // 还没字
+function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => baseSize) {
+    if (index <= 0) return;
+
+    // 1. 【核心修复】用 substring 把整个需要显示的文字一次性截出来
+    const displayText = text.substring(0, index);
 
     ctx.save();
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
-    ctx.fillStyle = color;
+    ctx.fillStyle = '#fff';
 
-    let currentX = startX;
+    let currentX = x;
 
-    // 遍历当前已经应该显示出来的所有字符
-    for (let i = 0; i < Math.min(index, text.length); i++) {
-        const char = text[i];
+    // 2. 遍历当前已经显示出来的每个字符，逐个画出来并计算坐标偏移
+    for (let i = 0; i < displayText.length; i++) {
+        const char = displayText[i];
+        
+        // 3. 获取这个字独立设置的大小
+        const fontSize = getCharSize(i);
+        ctx.font = `bold ${fontSize}px '微软雅黑', 'Georgia', serif`;
 
-        // 计算当前这个字的实际大小
-        let currentSize = baseSize;
-        // 如果 sizeMap 是个数组，按索引取；如果是函数，则调用计算
-        if (Array.isArray(sizeMap) && i < sizeMap.length) {
-            currentSize = baseSize * sizeMap[i];
-        } else if (typeof sizeMap === 'function') {
-            currentSize = sizeMap(baseSize, i, char);
-        }
-
-        ctx.font = `bold ${currentSize}px '微软雅黑','Georgia', serif`;
-        ctx.fillText(char, currentX, startY);
-
-        // 更新 next X 坐标 (根据当前字符的宽度推算出下一个字的起始位)
+        // 画出这个字
+        ctx.fillText(char, currentX, y);
+        
+        // 4. 计算下一个字的 X 坐标 (利用 measureText 获取当前字宽度)
         currentX += ctx.measureText(char).width;
     }
 
-    // 光标逻辑 (如果有的话)
+    // 光标逻辑 (打字没结束时显示)
     if (index < text.length) {
         ctx.fillStyle = '#fff';
-        ctx.fillRect(currentX + 5, startY, 3, baseSize * 0.8);
+        ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
     }
 
     ctx.restore();
