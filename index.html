@@ -349,12 +349,14 @@
             // "I LOVE LJ" 打字机效果
             // 1. 定义你想要打字机效果的文字
            const text = 'I LOVE LJ,爱LI没有惧怕！';
-
+           const count = 20
            // 2. 在每一帧的渲染里调用：
            typewriterDraw(
                	ctx, 
     	text, 
     	canvas._textIndex,        // 传入当前进度
+	count,//控制时间
+	canvas._textTimer,
     	W * 0.09,                 // 起始 X
     	H * 0.25,                 // 起始 Y
     	45,                       // 默认大小
@@ -462,7 +464,14 @@ function drawImageSafe(url, x, y, w, h, ctx) {
  * @param {number} baseSize - 基础字号
  * @param {function} getCharSize - 计算每一个字大小的函数，返回数字
  */
-function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => baseSize) {
+function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCharSize = (i) => baseSize) {
+           if (!index) index = 0;
+           if (!textTimer)textTimer = 0;
+           textTimer++
+	if(textTimer == count){
+	     index++
+                     textTimer = 0
+	}
     if (index <= 0) return;
 
     // 1. 【核心修复】用 substring 把整个需要显示的文字一次性截出来
@@ -494,8 +503,9 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => b
     if (index < text.length) {
         ctx.fillStyle = '#fff';
         ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
-    }
-
+    }else if(index == text.length){
+	index = 0
+     }
     ctx.restore();
 }
         // ==================== Canvas 2-7: 简化版 ====================
