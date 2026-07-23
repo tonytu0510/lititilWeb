@@ -399,28 +399,28 @@
 
 const pa = async function(){
 	let res = await new Promise((resolve, reject) => {
-        		img1.onload = () => resolve;
+        		img1.onload = (res) => resolve(res);
         		img1.onerror = () => reject(new Error('图1加载失败'));
     	})
 	return res
  }
 const pb = async function(){
 	let res = await new Promise((resolve, reject) => {
-        		img2.onload = () => resolve;
+        		img2.onload = (res) => resolve(res);
         		img2.onerror = () => reject(new Error('图1加载失败'));
     	})
 	return res
  }
 const pc = async function(){
 	let res = await new Promise((resolve, reject) => {
-        		img3.onload = () => resolve;
+        		img3.onload = (res) => resolve(res);
         		img3.onerror = () => reject(new Error('图1加载失败'));
     	})
 	return res
  }
 const pd = async function(){
 	let res = await new Promise((resolve, reject) => {
-        		img4.onload = () => resolve;
+        		img4.onload = (res) => resolve(res);
         		img4.onerror = () => reject(new Error('图1加载失败'));
     	})
 	return res
