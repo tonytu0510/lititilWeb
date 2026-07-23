@@ -416,7 +416,7 @@ const pd =new Promise((resolve, reject) => {
 const tasks = [pa(), pb(), pc(),pd()].then(() => { throw new Error('fail'); });
 const results = Promise.allSettled(tasks)
 results.forEach((res, i) => {
-  if (res.status === 'fulfilled')｛ 
+  if (res.status === 'fulfilled'){
     // 3. 检查哪些图加载失败了
     results.forEach((result, index) => {
         if (result.status === 'rejected') {
