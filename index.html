@@ -414,7 +414,7 @@ const pd =new Promise((resolve, reject) => {
         img4.onerror = () => reject(new Error('图4加载失败'));
     })
 const tasks = [pa(),pb(),pc(),pd()].then(() => { throw new Error('fail'); });
-const results = await Promise.allSettled(tasks);
+const results = await Promise.allSettled(tasks)
 results.forEach((res, i) => {
   if (res.status === 'fulfilled')｛ 
     // 3. 检查哪些图加载失败了
