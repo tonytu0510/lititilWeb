@@ -398,26 +398,26 @@
             img4.src = './svg/4.svg';
 
 const pa = function(){
-	return new Promise((resolve, reject) => {
-        		img1.onload = () => resolve;
+	new Promise((resolve, reject) => {
+        		img1.onload = () => return resolve;
         		img1.onerror = () => reject(new Error('图1加载失败'));
     	})
  }
 const pb = function(){
-	return new Promise((resolve, reject) => {
-        		img2.onload = () => resolve;
+	new Promise((resolve, reject) => {
+        		img2.onload = () => return resolve;
         		img2.onerror = () => reject(new Error('图1加载失败'));
     	})
  }
 const pc = function(){
-	return new Promise((resolve, reject) => {
-        		img3.onload = () => resolve;
+	new Promise((resolve, reject) => {
+        		img3.onload = () => return resolve;
         		img3.onerror = () => reject(new Error('图1加载失败'));
     	})
  }
 const pd = function(){
-	return new Promise((resolve, reject) => {
-        		img4.onload = () => resolve;
+	new Promise((resolve, reject) => {
+        		img4.onload = () => return resolve;
         		img4.onerror = () => reject(new Error('图1加载失败'));
     	})
  }
