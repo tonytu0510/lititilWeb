@@ -365,16 +365,24 @@ if (canvas._textTimer >= 20) { // 控制打字速度
 typewriterDraw(
     ctx, 
     text, 
-    canvas._textIndex,        // 传入当前进度
-    W * 0.09,                 // 起始 X
-    H * 0.25,                 // 起始 Y
-    45,                       // 默认大小
-    // 3. 这里是实现【每个字单独大小】的神秘核心函数
+    canvas._textIndex,
+    W * 0.09, 
+    H * 0.25,
+    45,
+    // 参数1: 每个字的大小控制
     (i) => {
-        // i 是当前字符的索引。你可以任意定义谁大谁小。
-        if (i === 0 || i === 2 ||  i === 11 ||  i === 12) return 90; // 第1个和第3个字特别大
-        if (i === text.length - 1) return 60; // 最后一个字稍微大点
-        return 45; // 其他都是正常大小 45px
+        if (i === 0 || i === 2 || i === 11 || i === 12) return 90; // 大字母
+        if (i === text.length - 1) return 60; 
+        return 45; 
+    },
+    // 参数2: 【新功能】每个字的位置微调控制
+    (i) => {
+        // 如果索引是 11 (爱) 和 12 (L)，把它们稍微往下错开一点，或者往右挪
+        if (i === 11) return { x: 0, y: 5 };  // 把 '爱' 往下微调 5px
+        if (i === 12) return { x: 0, y: 5 };  // 把 'L' 也往下微调 5px，和前面的大字对齐视觉
+        
+        // 其它所有字符，没有任何偏移
+        return { x: 0, y: 0 };
     }
 );
 
@@ -447,19 +455,19 @@ function drawImageSafe(url, x, y, w, h, ctx) {
     }
 }
 /**
- * 打字机引擎 (支持每个字独立设置大小，保留 substring 截断)
+ * 打字机引擎 (支持每个字独立设置大小 + 独立设置 x/y 坐标偏移)
  * @param {CanvasRenderingContext2D} ctx
  * @param {string} text - 完整文本
- * @param {number} index - 当前打字进度 (0 ~ text.length)
+ * @param {number} index - 当前打字进度
  * @param {number} x - 起始 X 坐标
  * @param {number} y - 起始 Y 坐标
  * @param {number} baseSize - 基础字号
- * @param {function} getCharSize - 计算每一个字大小的函数，返回数字
+ * @param {function} getCharSize - 返回每个字的大小
+ * @param {object} getCharOffset - 【新增】返回每个字的 { x, y } 偏移量
  */
-function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => baseSize) {
+function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0})) {
     if (index <= 0) return;
 
-    // 1. 【核心修复】用 substring 把整个需要显示的文字一次性截出来
     const displayText = text.substring(0, index);
 
     ctx.save();
@@ -469,22 +477,24 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => b
 
     let currentX = x;
 
-    // 2. 遍历当前已经显示出来的每个字符，逐个画出来并计算坐标偏移
     for (let i = 0; i < displayText.length; i++) {
         const char = displayText[i];
         
-        // 3. 获取这个字独立设置的大小
+        // 1. 获取当前字的大小
         const fontSize = getCharSize(i);
         ctx.font = `bold ${fontSize}px '微软雅黑', 'Georgia', serif`;
 
-        // 画出这个字
-        ctx.fillText(char, currentX, y);
+        // 2. 【新增核心修改】获取当前字的 X 和 Y 坐标偏移
+        const offset = getCharOffset(i);
         
-        // 4. 计算下一个字的 X 坐标 (利用 measureText 获取当前字宽度)
+        // 3. 画字的时候，加入偏移量
+        ctx.fillText(char, currentX + offset.x, y + offset.y);
+        
+        // 4. 计算下一个字的 X 坐标 (依然按照正常宽度累加)
         currentX += ctx.measureText(char).width;
     }
 
-    // 光标逻辑 (打字没结束时显示)
+    // 光标逻辑
     if (index < text.length) {
         ctx.fillStyle = '#fff';
         ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
