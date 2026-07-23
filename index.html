@@ -426,7 +426,7 @@ const pd = async function(){
 	return res
  }
 const tasks = [pa(), pb(), pc(),pd()]
-const results = Promise.allSettled(tasks)
+const results = await Promise.allSettled(tasks)
 console.log('results=>',results)
 results.forEach((res, i) => {
   if (res.status === 'fulfilled'){
