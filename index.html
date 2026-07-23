@@ -397,46 +397,27 @@
             let img4 = newImage;
             img4.src = './svg/4.svg';
 
-const pa = async function(){
-	let res = await new Promise((resolve, reject) => {
+const pa = Promise((resolve, reject) => {
         		img1.onload = (res) => resolve(res);
         		img1.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return res
- }
-const pb = async function(){
-	let res = await new Promise((resolve, reject) => {
+const pb = Promise((resolve, reject) => {
         		img2.onload = (res) => resolve(res);
         		img2.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return res
- }
-const pc = async function(){
-	let res = await new Promise((resolve, reject) => {
+const pc = Promise((resolve, reject) => {
         		img3.onload = (res) => resolve(res);
         		img3.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return res
- }
-const pd = async function(){
-	let res = await new Promise((resolve, reject) => {
+const pd = Promise((resolve, reject) => {
         		img4.onload = (res) => resolve(res);
         		img4.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return res
- }
 const tasks = [pa(), pb(), pc(),pd()]
-Promise.all(tasks).then(results => {
+Promise.allSettled(tasks).then(results => {
 	console.log('results=>',results)
 results.forEach((res, i) => {
   if (res.status === 'fulfilled'){
-    // 3. 检查哪些图加载失败了
-    results.forEach((result, index) => {
-        if (result.status === 'rejected') {
-            console.warn(`第 ${index + 1} 张图加载失败，请检查路径或转为Base64！`);
-        }
-    });
-
     // 4. 开始绘制（只要有一张图成功就会画，不会卡住）
     ctx.drawImage(img1, img1X, img1Y, img1W, img1H);
     ctx.drawImage(img2, img2X, img2Y, img2W, img2H);
