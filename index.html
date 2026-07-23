@@ -397,22 +397,30 @@
             let img4 = newImage;
             img4.src = './svg/4.svg';
 
-const pa = new Promise((resolve, reject) => {
-        img1.onload = () => resolve;
-        img1.onerror = () => reject(new Error('图1加载失败'));
-    })
-const pb = new Promise((resolve, reject) => {
-        img2.onload = () => resolve;
-        img2.onerror = () => reject(new Error('图2加载失败'));
-    })
-const pc = new Promise((resolve, reject) => {
-        img3.onload = () => resolve;
-        img3.onerror = () => reject(new Error('图3加载失败'));
-    })
-const pd =new Promise((resolve, reject) => {
-        img4.onload = () => resolve;
-        img4.onerror = () => reject(new Error('图4加载失败'));
-    })
+const pa = function(){
+	return new Promise((resolve, reject) => {
+        		img1.onload = () => resolve;
+        		img1.onerror = () => reject(new Error('图1加载失败'));
+    	})
+ }
+const pb = function(){
+	return new Promise((resolve, reject) => {
+        		img2.onload = () => resolve;
+        		img2.onerror = () => reject(new Error('图1加载失败'));
+    	})
+ }
+const pc = function(){
+	return new Promise((resolve, reject) => {
+        		img3.onload = () => resolve;
+        		img3.onerror = () => reject(new Error('图1加载失败'));
+    	})
+ }
+const pd = function(){
+	return new Promise((resolve, reject) => {
+        		img4.onload = () => resolve;
+        		img4.onerror = () => reject(new Error('图1加载失败'));
+    	})
+ }
 const tasks = [pa(), pb(), pc(),pd()].then(() => { throw new Error('fail'); });
 const results = Promise.allSettled(tasks)
 results.forEach((res, i) => {
