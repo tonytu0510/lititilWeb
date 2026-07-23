@@ -423,7 +423,7 @@ const pd = function(){
  }
 const tasks = [pa(), pb(), pc(),pd()]
 const results = Promise.allSettled(tasks)
-console.log('results=>',results)
+console.log('results=>',await results)
 results.forEach((res, i) => {
   if (res.status === 'fulfilled'){
     // 3. 检查哪些图加载失败了
