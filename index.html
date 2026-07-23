@@ -397,33 +397,33 @@
             let img4 = newImage;
             img4.src = './svg/4.svg';
 
-const pa = function(){
-	new Promise((resolve, reject) => {
+const pa = async anasy function(){
+	let res = await new Promise((resolve, reject) => {
         		img1.onload = () => resolve;
         		img1.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return resolve
+	return res
  }
-const pb = function(){
-	new Promise((resolve, reject) => {
+const pb = async anasy function(){
+	let res = await new Promise((resolve, reject) => {
         		img2.onload = () => resolve;
         		img2.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return resolve
+	return res
  }
-const pc = function(){
-	new Promise((resolve, reject) => {
+const pc = async anasy function(){
+	let res = await new Promise((resolve, reject) => {
         		img3.onload = () => resolve;
         		img3.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return resolve
+	return res
  }
-const pd = function(){
-	new Promise((resolve, reject) => {
+const pd = async anasy function(){
+	let res = await new Promise((resolve, reject) => {
         		img4.onload = () => resolve;
         		img4.onerror = () => reject(new Error('图1加载失败'));
     	})
-	return resolve
+	return res
  }
 const tasks = [pa(), pb(), pc(),pd()]
 const results = Promise.allSettled(tasks)
