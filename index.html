@@ -347,6 +347,23 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             // "I LOVE LJ" 打字机效果
+           // 原配置
+          const text1 = 'I LOVE LJ,爱LI没有惧怕！';
+          // 单独定义每个字的大小权重： [大, 小, 大, 小, 小...]
+          const myWeights = [2.5, 1, 2.5, 1, 1, 1, 1, 0.8, 2.5, 1, 1, 1, 1, 0.5, 0.5, 0.8, 0.5, 0.5, 0.5];
+
+          // 渲染逻辑：
+          typewriterDrawEx(
+	ctx, 
+    	text1, 
+    	canvas._textIndex, 
+    	W * 0.09, 
+    	H * 0.25, 
+    	45,                 // 基础字号
+    	myWeights,          // ✅ 关键点：传入自定义权重数组，实现每个字不同大小
+    	'#ff4444'           // 颜色
+             )
+             /****
             const text = 'I LOVE LJ,爱LI没有惧怕！';
             const count = 20
             if (!canvas._textIndex) canvas._textIndex = 0;
@@ -367,6 +384,7 @@
             if(canvas._textIndex == text.length){
 	canvas._textIndex = 0
               }
+        *****/
         // --- 2. 等图片加载完成后，再画到 Canvas 上 ---
             const img1X = W * 0.05;
             const img1Y = H * 0.45;
@@ -430,6 +448,55 @@ function drawImageSafe(url, x, y, w, h, ctx) {
         };
         img.src = url;
     }
+}
+/**
+ * 精细版打字机 (支持每个字独立设置大小、颜色)
+ * @param {CanvasRenderingContext2D} ctx - Canvas上下文
+ * @param {string} text - 显示的完整文字
+ * @param {number} index - 当前显示到的字符下标
+ * @param {number} startX - 起始 X 坐标
+ * @param {number} startY - 起始 Y 坐标
+ * @param {number} baseSize - 基础字体大小
+ * @param {Array|Function} sizeMap - 每个字符的大小权重数组或计算函数
+ * @param {string} color - 颜色
+ */
+function typewriterDrawEx(ctx, text, index, startX, startY, baseSize = 40, sizeMap = [], color = '#fff') {
+    if (index === 0) return; // 还没字
+
+    ctx.save();
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = color;
+
+    let currentX = startX;
+
+    // 遍历当前已经应该显示出来的所有字符
+    for (let i = 0; i < Math.min(index, text.length); i++) {
+        const char = text[i];
+
+        // 计算当前这个字的实际大小
+        let currentSize = baseSize;
+        // 如果 sizeMap 是个数组，按索引取；如果是函数，则调用计算
+        if (Array.isArray(sizeMap) && i < sizeMap.length) {
+            currentSize = baseSize * sizeMap[i];
+        } else if (typeof sizeMap === 'function') {
+            currentSize = sizeMap(baseSize, i, char);
+        }
+
+        ctx.font = `bold ${currentSize}px '微软雅黑','Georgia', serif`;
+        ctx.fillText(char, currentX, startY);
+
+        // 更新 next X 坐标 (根据当前字符的宽度推算出下一个字的起始位)
+        currentX += ctx.measureText(char).width;
+    }
+
+    // 光标逻辑 (如果有的话)
+    if (index < text.length) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(currentX + 5, startY, 3, baseSize * 0.8);
+    }
+
+    ctx.restore();
 }
         // ==================== Canvas 2-7: 简化版 ====================
         function drawSimpleCanvas(canvas, emoji, label, color1, color2) {
