@@ -473,7 +473,7 @@ function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCha
                      textTimer = 0
 	}
     if (index < 0) return;
-
+    console.log('index=>',index)
     // 1. 【核心修复】用 substring 把整个需要显示的文字一次性截出来
     const displayText = text.substring(0, index);
 
