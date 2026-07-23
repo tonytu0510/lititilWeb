@@ -394,8 +394,8 @@
              drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H)
 }
 function drawImageSafe(imgSrc, x, y, w, h) {
-    let img4 = new Image();
-    img4.src = imgSrc;
+    let img = new Image();
+    img.src = imgSrc;
     // 1. 如果图片早就加载好了（比如从缓存里取的），直接画，无需等待
     if (img.complete && img.naturalWidth !== 0) {
         ctx.drawImage(img, x, y, w, h);
