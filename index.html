@@ -372,59 +372,54 @@
             const img1Y = H * 0.45;
             const img1W = W * 0.22;
             const img1H = W * 0.22;
-            let img1 = new Image();
-            img1.src = 'svg/2.svg';
            
             const img2X = W * 0.3;
             const img2Y = H * 0.12;
             const img2W =  W * 0.46;
             const img2H =  W * 0.46;
-            let img2 = new Image();
-            img2.src = 'svg/1.svg';
+
            
             const img3X = W * 0.63;
             const img3Y = H * 0.5;
             const img3W =  W * 0.15;
             const img3H =  W * 0.22;
-            let img3 = new Image();
-            img3.src = 'svg/3.svg'; 
-           
+
             const img4X = W * 0.82;
             const img4Y = H * 0.6;
             const img4W =  W * 0.22;
             const img4H =  W * 0.22;
-            let img4 = new Image();
-            img4.src = 'svg/4.svg';
 
-            // 只有真正解码完成后，才执行画图
-            img1.decode().then(() => {
-                 ctx.drawImage(img1, img1X, img1Y, img1W, img1H);
-             });
-             img2.decode().then(() => {
-                 ctx.drawImage(img2, img2X, img2Y, img2W, img2H);
-             });
-            img3.decode().then(() => {
-                 ctx.drawImage(img3, img3X, img3Y, img3W, img3H);
-             });
-             img4.decode().then(() => {
-                 ctx.drawImage(img4, img4X, img4Y, img4W, img4H);
-             });
-/*
-            img1.onload = (function(){
-	ctx.drawImage(img1, img1X, img1Y, img1W, img1H);
-            })()
-            img2.onload = (function() {
-	ctx.drawImage(img2, img2X, img2Y, img2W, img2H);
-            })()
-            img3.onload = (function(){
-	ctx.drawImage(img3, img3X, img3Y, img3W, img3H);
-            })()
-           img4.onload = (function(){
-	ctx.drawImage(img4, img4X, img4Y, img4W, img4H);
-            })()
-*/
+             drawImageSafe('svg/2.svg', img1X, img1Y, img1W, img1H)
+             drawImageSafe('svg/1.svg', img2X, img2Y, img2W, img2H)
+             drawImageSafe('svg/3.svg', img3X, img3Y, img3W, img3H)
+             drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H
 }
+function drawImageSafe(imgSrc, x, y, w, h) {
+    let img4 = new Image();
+    img4.src = imgSrc;
+    // 1. 如果图片早就加载好了（比如从缓存里取的），直接画，无需等待
+    if (img.complete && img.naturalWidth !== 0) {
+        ctx.drawImage(img, x, y, w, h);
+        return;
+    }
 
+    // 2. 核心：优先使用 decode() 这种不阻塞主线程的现代 API
+    if (img.decode) {
+        img.decode().then(() => {
+            ctx.drawImage(img, x, y, w, h);
+        }).catch(() => {
+            // 3. 兜底：如果 decode() 在某些旧浏览器报错，立刻退回传统的 onload
+            img.onload = () => {
+                ctx.drawImage(img, x, y, w, h);
+            };
+        });
+    } else {
+        // 4. 兜底二：如果是非常老的浏览器，直接走 onload
+        img.onload = () => {
+            ctx.drawImage(img, x, y, w, h);
+        };
+    }
+}
         // ==================== Canvas 2-7: 简化版 ====================
         function drawSimpleCanvas(canvas, emoji, label, color1, color2) {
             const ctx = canvas.getContext('2d');
