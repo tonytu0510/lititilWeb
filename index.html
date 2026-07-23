@@ -347,27 +347,41 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             // "I LOVE LJ" 打字机效果
-            // 1. 定义你想要打字机效果的文字
-           const text = 'I LOVE LJ,爱LI没有惧怕！';
-           const count = 20
-           // 2. 在每一帧的渲染里调用：
-           typewriterDraw(
-               	ctx, 
-    	text, 
-    	canvas._textIndex,        // 传入当前进度
-	count,//控制时间
-	canvas._textTimer,
-    	W * 0.09,                 // 起始 X
-    	H * 0.25,                 // 起始 Y
-    	45,                       // 默认大小
-    	// 3. 这里是实现【每个字单独大小】的神秘核心函数
-    	(i) => {
-        		// i 是当前字符的索引。你可以任意定义谁大谁小。
-        		if (i === 0 || i === 2) return 90; // 第1个和第3个字特别大
-        		if (i === text.length - 1) return 60; // 最后一个字稍微大点
-        		return 45; // 其他都是正常大小 45px
-    	}
-              );
+const text = 'I LOVE LJ,爱LI没有惧怕！';
+
+// 2. 在渲染循环 (Update 或 Tick) 中：
+// (假设你的画布上挂载了自定义属性 `_textIndex` 和 `_textTimer`)
+if (!canvas._textIndex) canvas._textIndex = 0;
+if (!canvas._textTimer) canvas._textTimer = 0;
+
+canvas._textTimer++;
+if (canvas._textTimer >= 20) { // 控制打字速度
+    canvas._textIndex++;
+    canvas._textTimer = 0;
+}
+
+// 3. 调用封装后的引擎绘制！
+// 2. 在每一帧的渲染里调用：
+typewriterDraw(
+    ctx, 
+    text, 
+    canvas._textIndex,        // 传入当前进度
+    W * 0.09,                 // 起始 X
+    H * 0.25,                 // 起始 Y
+    45,                       // 默认大小
+    // 3. 这里是实现【每个字单独大小】的神秘核心函数
+    (i) => {
+        // i 是当前字符的索引。你可以任意定义谁大谁小。
+        if (i === 0 || i === 2) return 90; // 第1个和第3个字特别大
+        if (i === text.length - 1) return 60; // 最后一个字稍微大点
+        return 45; // 其他都是正常大小 45px
+    }
+);
+
+// 4. 循环重置逻辑
+if (canvas._textIndex > text.length) {
+    canvas._textIndex = 0; // 循环播放
+}
              /****
             const text = 'I LOVE LJ,爱LI没有惧怕！';
             const count = 20
@@ -464,16 +478,9 @@ function drawImageSafe(url, x, y, w, h, ctx) {
  * @param {number} baseSize - 基础字号
  * @param {function} getCharSize - 计算每一个字大小的函数，返回数字
  */
-function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCharSize = (i) => baseSize) {
-           if (!index) canvas._textIndex= 0;
-           if (!textTimer)canvas._textTimer = 0;
-           canvas._textTimer ++
-	if(canvas._textTimer == count){
-	     canvas._textIndex++
-                     canvas._textTimer = 0
-	}
-    if (index < 0) return;
-    console.log('index=>',index)
+function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize = (i) => baseSize) {
+    if (index <= 0) return;
+
     // 1. 【核心修复】用 substring 把整个需要显示的文字一次性截出来
     const displayText = text.substring(0, index);
 
@@ -503,9 +510,8 @@ function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCha
     if (index < text.length) {
         ctx.fillStyle = '#fff';
         ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
-    }else if(canvas._textIndex == text.length){
-	canvas._textIndex= 0
-     }
+    }
+
     ctx.restore();
 }
         // ==================== Canvas 2-7: 简化版 ====================
