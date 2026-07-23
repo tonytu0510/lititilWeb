@@ -351,7 +351,7 @@
           const text1 = 'I LOVE LJ,爱LI没有惧怕！';
           // 单独定义每个字的大小权重： [大, 小, 大, 小, 小...]
           const myWeights = [2.5, 1, 2.5, 1, 1, 1, 1, 0.8, 2.5, 1, 1, 1, 1, 0.5, 0.5, 0.8, 0.5, 0.5, 0.5];
-
+          if (!canvas._textIndex) canvas._textIndex = 0;
           // 渲染逻辑：
           typewriterDrawEx(
 	ctx, 
