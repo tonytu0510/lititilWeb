@@ -465,12 +465,12 @@ function drawImageSafe(url, x, y, w, h, ctx) {
  * @param {function} getCharSize - 计算每一个字大小的函数，返回数字
  */
 function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCharSize = (i) => baseSize) {
-           if (!index) index = 0;
-           if (!textTimer)textTimer = 0;
-           textTimer++
-	if(textTimer == count){
-	     index++
-                     textTimer = 0
+           if (!index) canvas._textIndex= 0;
+           if (!textTimer)canvas._textTimer = 0;
+           canvas._textTimer ++
+	ifcanvas._textTimer == count){
+	     canvas._textIndex++
+                     canvas._textTimer = 0
 	}
     if (index < 0) return;
     console.log('index=>',index)
@@ -503,8 +503,8 @@ function typewriterDraw(ctx, text, index,count,textTimer, x, y, baseSize, getCha
     if (index < text.length) {
         ctx.fillStyle = '#fff';
         ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
-    }else if(index == text.length){
-	index = 0
+    }else if(canvas._textIndex == text.length){
+	canvas._textIndex= 0
      }
     ctx.restore();
 }
