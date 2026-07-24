@@ -144,9 +144,11 @@
         function goTo(n) {
             showSlide(n);
         }
+        let TimeOutTimer = null;
         function initTimer(time){
 	console.log('time=>',time)
-	setTimeout(function(time){
+	clearTimeout(TimeOutTimer)
+	TimeOutTimer = setTimeout(function(time){
 	      nextSlide()
 	      time = isIndexTime()
 	      initTimer(time)
