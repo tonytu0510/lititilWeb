@@ -115,6 +115,7 @@
         let time = indexTime
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
+        const canvas6Event = document.getElementById("canvas6")
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -541,7 +542,6 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
         animate();
         function initMath(){
             //给数学tab绑定跳转事件
-                let canvas6Event = document.getElementById("canvas6")
                 canvas6Event.addEventListener('click', function(event) {
                     window.open("./nestedInvolutionRingHuge.html","_blank")
                 });
