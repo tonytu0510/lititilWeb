@@ -28,9 +28,14 @@
             left: 0;
             opacity: 0;
             transition: opacity 0.6s;
+            z-index: 1;
         }
         .slide.active {
             opacity: 1;
+            z-index: 2;
+        }
+        .slide.active:nth-child(6){
+            cursor: pointer!important;
         }
         .slide canvas {
             width: 100%;
@@ -77,7 +82,6 @@
         }
         #dots span.active {
             background: #c4334c;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -106,7 +110,7 @@
             <span onclick="goTo(6)"></span>
         </div>
     </div>
-
+    <a href="./nestedInvolutionRingHuge.html" target="_blank" id="nestedInvolutionRingHugeId" style="display: none">模拟点击跳转详情页</a>
     <script src="common.js"></script>
     <script>
         // ==================== 轮播逻辑 ====================
@@ -117,6 +121,7 @@
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
+        const goTonestedInvolutionRingHugeEvent = document.getElementById("nestedInvolutionRingHugeId")
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -545,7 +550,7 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
             //给数学tab绑定跳转事件
             const that = window
             canvas6Event.addEventListener('click', function(event) {
-                that.open("./nestedInvolutionRingHuge.html","_blank")
+                goTonestedInvolutionRingHugeEvent.click()
             });
         }
         function initOtherCanvas(aug) {
