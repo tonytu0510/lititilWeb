@@ -545,9 +545,7 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
         }
         animate();
         function initMath(){
-            //给数学tab绑定跳转事件
-            const that = window
-            canvas6Event.addEventListener('click', function(event) {
+            canvas6Event.addEventListener('click', () => {
                 // 1. 同步创建一个a标签，设置临时href
                 const link = document.createElement('a');
                 link.href = './nestedInvolutionRingHuge.html';  // 预设一个默认中转地址
