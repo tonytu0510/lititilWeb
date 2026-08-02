@@ -110,8 +110,7 @@
             <span onclick="goTo(6)"></span>
         </div>
     </div>
-<a href="./nestedInvolutionRingHuge.html" target="_blank" id="nestedInvolutionRingHugeId" style="height:50px;width: 100vw">模拟点击跳转详情页</a>
-<script src="common.js"></script>
+    <script src="common.js"></script>
     <script>
         // ==================== 轮播逻辑 ====================
         let current = 0;
@@ -121,7 +120,6 @@
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
-        const goTonestedInvolutionRingHugeEvent = document.getElementById("nestedInvolutionRingHugeId")
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -550,7 +548,16 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
             //给数学tab绑定跳转事件
             const that = window
             canvas6Event.addEventListener('click', function(event) {
-                goTonestedInvolutionRingHugeEvent.click()
+                // 1. 同步创建一个a标签，设置临时href
+                const link = document.createElement('a');
+                link.href = './nestedInvolutionRingHuge.html';  // 预设一个默认中转地址
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+
+                // 2. 同步点击（不会被拦截）
+                link.click();
+                document.body.removeChild(link);
             });
         }
         function initOtherCanvas(aug) {
