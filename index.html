@@ -542,9 +542,10 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
         animate();
         function initMath(){
             //给数学tab绑定跳转事件
-                canvas6Event.addEventListener('click', function(event) {
-                    window.open("./nestedInvolutionRingHuge.html","_blank")
-                });
+            const that = window
+            canvas6Event.addEventListener('click', function(event) {
+                that.open("./nestedInvolutionRingHuge.html","_blank")
+            });
         }
         function initOtherCanvas(aug) {
 	            drawCanvas2(document.getElementById('canvas2'));
