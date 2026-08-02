@@ -529,12 +529,6 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
         function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
         function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
         function drawCanvas7(c) { drawSimpleCanvas(c, '📖', '英语', '#e67e22', '#f1c40f'); }
-        let canvas6Event = document.getElementById("canvas6")
-        canvas6Event.addEventListener('click', function(event) {
-            // 处理点击事件
-            event.preventDefault(); // 阻止双击缩放行为
-            window.open("./nestedInvolutionRingHuge.html","_blank")
-        });
 
         // ==================== 初始化和动画循环 ====================
         function animate() {
@@ -542,14 +536,21 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
             requestAnimationFrame(animate);
         }
         animate();
-
+        function initMath(){
+            //给数学tab绑定跳转事件
+                let canvas6Event = document.getElementById("canvas6")
+                canvas6Event.addEventListener('click', function(event) {
+                    window.open("./nestedInvolutionRingHuge.html","_blank")
+                });
+        }
         function initOtherCanvas(aug) {
-	drawCanvas2(document.getElementById('canvas2'));
+	            drawCanvas2(document.getElementById('canvas2'));
                 drawCanvas3(document.getElementById('canvas3'));
                 drawCanvas4(document.getElementById('canvas4'));
                 drawCanvas5(document.getElementById('canvas5'));
                 drawCanvas6(document.getElementById('canvas6'));
                 drawCanvas7(document.getElementById('canvas7'));
+                initMath()
         }
         initOtherCanvas();
         window.addEventListener('resize', initOtherCanvas);
@@ -562,6 +563,7 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
             drawCanvas5(document.getElementById('canvas5'));
             drawCanvas6(document.getElementById('canvas6'));
             drawCanvas7(document.getElementById('canvas7'));
+            initMath()
         });
     </script>
 </body>
