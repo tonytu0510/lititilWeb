@@ -549,7 +549,8 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
                 // 1. 同步创建一个a标签，设置临时href
                 const link = document.createElement('a');
                 link.href = './nestedInvolutionRingHuge.html';  // 预设一个默认中转地址
-                link.target = '_blank';
+                link.target = '_self';
+                link.rel = 'noopener noreferrer';
                 document.body.appendChild(link);
 
                 // 2. 同步点击（不会被拦截）
