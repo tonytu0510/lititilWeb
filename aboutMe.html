@@ -26,7 +26,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         .info {
-            max-width: 400px;
+            max-width: 940px;
         }
         .info h2 {
             color: var(--primary);
@@ -40,6 +40,7 @@
             border-radius: 8px;
             display: inline-block;
         }
+        .qrCode img{ width: calc(33% - 14px);margin:10px 20px 10px 0;float:left;display: inline-block}
     </style>
 <script src="dino-game.js"></script>
 </head>
@@ -55,7 +56,13 @@
             <h2>关于我</h2>
             <p style="margin-bottom:20px;color:var(--gray);">一个热爱技术与生活的开发者。</p>
             <div class="email" style="border-radius:8px 8px 0 0">📧 tuhonglei@yeah.net</div>
-            <div class="email" style="border-radius:0 8px 8px 8px"><img src="qrCode.png" width='370px' height='370px'/></div>
+            <div class="email qrCode" style="border-radius:0 8px 8px 8px">
+                <img src="images/qrCodeImg.png"/>
+                <img src="images/qrCodeImg1.png"/>
+                <img src="images/qrCodeImg2.png" style="margin-right: 0"/>
+                <img src="images/qrCodeImg3.png" />
+                <img src="images/qrCodeImg4.png" />
+            </div>
         </div>
     </div>
 
