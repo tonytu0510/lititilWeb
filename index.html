@@ -90,7 +90,7 @@
         <div class="slide"><canvas id="canvas3"></canvas></div>
         <div class="slide"><canvas id="canvas4"></canvas></div>
         <div class="slide"><canvas id="canvas5"></canvas></div>
-        <div class="slide"><a href="nestedInvolutionRingHuge.html"><canvas id="canvas6"></canvas></a></div>
+        <div class="slide"><canvas id="canvas6"></canvas></div>
         <div class="slide"><canvas id="canvas7"></canvas></div>
 
         <button class="arrow left" onclick="prevSlide()">❮</button>
@@ -529,6 +529,12 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
         function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
         function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
         function drawCanvas7(c) { drawSimpleCanvas(c, '📖', '英语', '#e67e22', '#f1c40f'); }
+        let canvas6Event = document.getElementById("canvas6")
+        canvas6Event.addEventListener('click', function(event) {
+            // 处理点击事件
+            event.preventDefault(); // 阻止双击缩放行为
+            window.open("nestedInvolutionRingHuge.html","_blank")
+        });
 
         // ==================== 初始化和动画循环 ====================
         function animate() {
