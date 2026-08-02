@@ -122,17 +122,20 @@
             slides[n].classList.add('active');
             dots[n].classList.add('active');
             current = n;
+            if(n === 5){
+                initMath()
+            }
         }
 
         function nextSlide() {
             showSlide((current + 1) % 7);
         }
         function isIndexTime(){
-	console.log('current=>',current)
-           if(current == 0){
-	time = indexTime
+            console.log('current=>',current)
+           if(current === 0){
+	            time = indexTime
             }else{
-	time = otherTime
+	            time = otherTime
             }
            return time;
         }
