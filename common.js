@@ -11,7 +11,7 @@
                     <a href="index.html">首页</a>
                     <a href="tools.html">工具</a>
 	                <a href="qrCode.html">二维码</a>
-	                <a href="namePairing.html">姓名配对</a>
+	                <a href="namePairing.html" target="_blank">姓名配对</a>
                     <a href="aboutMe.html">关于我</a>
                 </nav>
             </div>
