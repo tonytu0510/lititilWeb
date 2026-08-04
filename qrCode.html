@@ -2,10 +2,17 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="Tony.tu">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
     <title>🔳 纯手写二维码生成器</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
     <style>
-        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); font-family: "Segoe UI", Roboto, sans-serif; min-height: 100vh; color: #e0e0e0; margin: 0; padding: 20px; }
+        body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); font-family: "Segoe UI", Roboto, sans-serif; min-height: 100vh; color: #e0e0e0; margin: 0; padding:0; }
         .container { max-width: 900px; margin: 20px auto; }
         h1 { text-align: center; font-size: 1.8rem; margin-bottom: 0.3rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 1.5rem; }
@@ -36,6 +43,7 @@
     </style>
 </head>
 <body>
+    <div id="topBarContainer"></div>
     <div class="container">
         <h1>🔳 纯手写二维码生成器</h1>
         <p class="subtitle">标准QR码 · 手机可扫 · 去掉定位点 · 中间加Logo</p>
@@ -70,7 +78,7 @@
             <div class="card" style="flex: 1.5;"><div class="section-title">🔍 解析日志</div><div class="result" id="resultDisplay">等待生成...</div><div class="log-box" id="logBox"></div></div>
         </div>
     </div>
-
+    <script src="common.js"></script>
     <script>
         const GF = (() => {
             const exp = new Int32Array(512), log = new Int32Array(256);

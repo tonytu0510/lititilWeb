@@ -2,8 +2,15 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="Tony.tu">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
     <title>对合环姓名配对 - 纯属娱乐</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
     <style>
         :root {
             --bg: #0a0000;
@@ -29,10 +36,6 @@
             background: var(--bg);
             color: var(--text);
             font-family: "Noto Serif SC", "SimSun", "STSong", serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background-image:
                 radial-gradient(ellipse at 50% 0%, rgba(212, 160, 23, 0.10) 0%, transparent 60%),
                 radial-gradient(ellipse at 50% 100%, rgba(196, 30, 58, 0.08) 0%, transparent 60%);
@@ -42,6 +45,11 @@
             width: 100%;
             max-width: 520px;
             padding: 20px;
+            min-height: calc(100vh - 55px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* 使得子元素垂直排列 */
         }
 
         .header {
@@ -352,9 +360,8 @@
     </style>
 </head>
 <body>
-
     <div class="stars-bg" id="starsBg"></div>
-
+    <div id="topBarContainer"></div>
     <div class="container">
         <div class="header">
             <div class="icon">★</div>
@@ -407,7 +414,7 @@
             ★ 纯属娱乐 · 切勿当真 · 对合环加密系统 V9.0 ★
         </div>
     </div>
-
+    <script src="common.js"></script>
     <script>
         // 背景星星
         (function() {
