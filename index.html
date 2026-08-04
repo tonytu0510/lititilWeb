@@ -155,13 +155,13 @@
 
         let TimeOutTimer = null;
         function initTimer(time){
-	console.log('time=>',time)
-	clearTimeout(TimeOutTimer)
-	TimeOutTimer = setTimeout(function(time){
-	      nextSlide()
-	      time = isIndexTime()
-	      initTimer(time)
-	},time)
+            console.log('time=>',time)
+            clearTimeout(TimeOutTimer)
+            TimeOutTimer = setTimeout(function(time){
+                  nextSlide()
+                  time = isIndexTime()
+                  initTimer(time)
+            },time)
         }
         initTimer(time)
 
