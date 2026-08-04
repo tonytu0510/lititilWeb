@@ -19,7 +19,7 @@
             min-height: 100vh;
             gap: 80px;
             flex-wrap: wrap;
-            padding:100px 0
+            padding:100px 10px
         }
         .avatar {
             flex-shrink: 0;
@@ -41,9 +41,19 @@
             background: var(--light-gray);
             padding: 15px 25px;
             border-radius: 8px;
-            display: inline-block;
         }
-        .qrCode img{ width: calc(33% - 14px);margin:10px 20px 10px 0;float:left;display: inline-block}
+        .qrCode {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap:10px
+        }
+        .qrCode img{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width: 100%;
+
+        }
     </style>
 </head>
 <body>
@@ -61,10 +71,10 @@
             <div class="email qrCode" style="border-radius:0 8px 8px 8px">
                 <img src="images/qrCodeImg.png"/>
                 <img src="images/qrCodeImg1.png"/>
-                <img src="images/qrCodeImg2.png" style="margin-right: 0"/>
+                <img src="images/qrCodeImg2.png"/>
                 <img src="images/qrCodeImg3.png" />
                 <img src="images/qrCodeImg4.png" />
-                <img src="images/qrCodeImg5.png" style="margin-right: 0"/>
+                <img src="images/qrCodeImg5.png"/>
                 <img src="images/qrCodeImg6.png" />
             </div>
         </div>

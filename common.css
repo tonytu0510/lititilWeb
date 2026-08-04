@@ -19,7 +19,7 @@ body {
     font-family: 'Microsoft YaHei', sans-serif;
     background: var(--bg);
     color: var(--text);
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* 全局滚动条 */
@@ -44,7 +44,13 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
+    width: 100vw;
+    min-height: calc(100vh - 50px);
     padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* 使得子元素垂直排列 */
 }
 
 /* ========== 图标组（右上角固定） ========== */
