@@ -43,9 +43,10 @@
             border-radius: 8px;
         }
         .qrCode {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap:10px
+              display: grid;
+              grid-auto-flow: row;
+              grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+              gap: 1rem;
         }
         .qrCode img{
             display:flex;
