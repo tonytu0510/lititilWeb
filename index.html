@@ -122,7 +122,7 @@
     <script>
         // ==================== 轮播逻辑 ====================
         let current = 0;
-        let indexTime = 8700;
+        let indexTime = 9000;
         let otherTime = 4500;
         let time = indexTime
         const slides = document.querySelectorAll('.slide');
@@ -1307,7 +1307,7 @@
         // ==================== 初始化和动画循环 ====================
         function animate() {
             const activeCanvas = document.querySelector('.slide.active canvas');
-            if (activeCanvas && activeCanvas.id === 'canvas1') {
+            if (activeCanvas && activeCanvas.id === 'canvas1' && canvas._textTimer !=0 ) {
                 drawCanvas1(activeCanvas);
             }
             requestAnimationFrame(animate);
