@@ -1190,8 +1190,8 @@
             const size = Math.min(W, H) * SCALE;
             const cx = W * 0.5;
             const cy = H * 0.42;
-            const letterH = size * 0.8;
-            const letterW = size * 0.45;
+            const letterH = size * 0.75;
+            const letterW = size * 0.55;
             const gap = size * 0.15;
 
             if (!canvas._ljPoints) {
@@ -1199,50 +1199,50 @@
                 const ljWords = ['Love', 'Joy', 'Life', 'Laugh', 'Learn', 'Light', 'Luck', 'Loyal', 'Justice', 'Journey', 'Jazz', 'Jump', 'Join', 'Joke', 'Jewel', 'Lemon', 'Lake', 'Lion', 'Lily', 'Lotus'];
 
                 // ===== L =====
-                const lx = cx - letterW * 0.6;
+                const lx = cx - letterW * 0.65;
                 const ly = cy - letterH / 2;
-                // 竖线——减少点数，增大间距
+                // 竖线
                 for (let i = 0; i < 10; i++) {
                     canvas._ljPoints.push({
-                        x: lx - letterW * 0.35,
+                        x: lx - letterW * 0.38,
                         y: ly + i * letterH / 9,
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 横线——减少点数
+                // 横线
                 for (let i = 0; i < 7; i++) {
                     canvas._ljPoints.push({
-                        x: lx - letterW * 0.35 + i * letterW * 0.75 / 6,
+                        x: lx - letterW * 0.38 + i * letterW * 0.9 / 6,
                         y: ly + letterH,
                         text: ljWords[(i + 5) % ljWords.length]
                     });
                 }
 
                 // ===== J =====
-                const jx = cx + letterW * 0.6;
+                const jx = cx + letterW * 0.65;
                 const jy = ly;
-                // 顶部横线——减少点数
+                // 顶部横线
                 for (let i = 0; i < 6; i++) {
                     canvas._ljPoints.push({
-                        x: jx - letterW * 0.3 + i * letterW * 0.65 / 5,
+                        x: jx - letterW * 0.35 + i * letterW * 0.8 / 5,
                         y: jy,
                         text: ljWords[(i + 10) % ljWords.length]
                     });
                 }
-                // 竖线——减少点数
+                // 竖线
                 for (let i = 0; i < 8; i++) {
                     canvas._ljPoints.push({
-                        x: jx + letterW * 0.28,
+                        x: jx + letterW * 0.3,
                         y: jy + i * letterH * 0.7 / 7,
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 底部弯钩——减少点数
+                // 底部弯钩
                 for (let i = 0; i < 5; i++) {
-                    const angle = Math.PI * 0.1 + Math.PI * 0.8 * i / 4;
+                    const angle = Math.PI * 0.05 + Math.PI * 0.85 * i / 4;
                     canvas._ljPoints.push({
-                        x: jx + letterW * 0.22 + Math.cos(angle) * letterW * 0.28,
-                        y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.22,
+                        x: jx + letterW * 0.24 + Math.cos(angle) * letterW * 0.3,
+                        y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.24,
                         text: ljWords[(i + 15) % ljWords.length]
                     });
                 }
