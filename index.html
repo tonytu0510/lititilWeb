@@ -855,9 +855,13 @@
             const W = canvas.width = canvas.parentElement.clientWidth;
             const H = canvas.height = canvas.parentElement.clientHeight;
 
+            // ===== 修改这个变量控制整体大小：0.3~0.45 =====
+            const SCALE = 0.38;
+            // =============================================
+
             const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#1a0a1e');
-            grad.addColorStop(1, '#3a1a4e');
+            grad.addColorStop(0, '#f5f0e8');
+            grad.addColorStop(1, '#ede4d3');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
@@ -889,23 +893,19 @@
 
             canvas._particles.forEach(p => {
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
-                if (p.alpha >= 0.85) p.twinkleDir = -1;
-                if (p.alpha <= 0.12) p.twinkleDir = 1;
-                const isMusic = ['♩','♪','♫','♬','♭','♯','🎵','🎶','🎼'].includes(p.text);
-                const r = isMusic ? 255 : 200;
-                const g = isMusic ? 200 : 120;
-                const b = isMusic ? 60 : 200;
-                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                if (p.alpha >= 0.5) p.twinkleDir = -1;
+                if (p.alpha <= 0.08) p.twinkleDir = 1;
+                ctx.fillStyle = `rgba(40,30,20,${p.alpha})`;
                 ctx.font = `${p.size}px 'Georgia', serif`;
                 ctx.fillText(p.text, p.x, p.y);
             });
 
+            const size = Math.min(W, H) * SCALE;
+            const cx = W * 0.48;
+            const cy = H * 0.38;
+
             if (!canvas._notePoints) {
                 canvas._notePoints = [];
-                const cx = W * 0.48;
-                const cy = H * 0.38;
-                const size = Math.min(W, H) * 0.38;
-
                 // 符头
                 const headSymbols = ['do', 'C', '♫', '🎵', '道', '音', '乐', '♪'];
                 for (let i = 0; i < 25; i++) {
@@ -925,7 +925,6 @@
                         text: ['do', '♫', '🎵', '♪'][i % 4]
                     });
                 }
-
                 // 符干
                 const stemSymbols = ['|', '♪', '♩', '♬', '🎶', '♭', '♯', '🎼'];
                 for (let i = 0; i < 25; i++) {
@@ -935,7 +934,6 @@
                         text: stemSymbols[i % 8]
                     });
                 }
-
                 // 符尾
                 for (let i = 0; i < 15; i++) {
                     const t = i / 14;
@@ -953,7 +951,6 @@
                         text: ['♪', '♫', '🎵'][i % 3]
                     });
                 }
-
                 // 五线谱
                 for (let line = 0; line < 5; line++) {
                     for (let i = 0; i < 18; i++) {
@@ -968,13 +965,13 @@
 
             canvas._notePoints.forEach((p, index) => {
                 const isCore = index < 15;
-                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.8)';
+                ctx.fillStyle = isCore ? 'rgba(30,20,10,0.95)' : 'rgba(50,35,20,0.8)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Georgia', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#2a1a0a';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
             ctx.fillText('🎨 艺术', W / 2, H * 0.92);
