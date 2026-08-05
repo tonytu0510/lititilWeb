@@ -438,7 +438,7 @@
             drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
 
             // "I LOVE LJ" 打字机效果
-            const text = 'I LOVE LJ,AILI没有惧怕！';
+            const text = 'I LOVE LJ,AI LI No fear！';
 
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
@@ -459,14 +459,14 @@
                 2.3,
                 (i) => {
                     if (i === 0 || i === 1 || i === 2) return transSize(0.3,W);
-                    if(i === 12 || i === 13) return transSize(0.3,W);
+                    if(i === 13 || i === 14) return transSize(0.3,W);
                     if (i === text.length - 1) return transSize(0.2,W);
                     return transSize(0.164,W);
                 },
                 (i) => {
                     if (i === 0 || i === 1 || i === 2) return { x: 0, y: transPosition(-1.6,W) };
-                    if (i === 12) return { x: 0, y: transPosition(-3.2,W) };
                     if (i === 13) return { x: 0, y: transPosition(-3.2,W) };
+                    if (i === 14) return { x: 0, y: transPosition(-3.2,W) };
                     if (i === text.length - 1) return { x: 0, y: transPosition(-0.24,W) };
                     return { x: 0, y: 0 };
                 }
