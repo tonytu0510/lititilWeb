@@ -569,16 +569,6 @@
             const W = canvas.width = canvas.parentElement.clientWidth;
             const H = canvas.height = canvas.parentElement.clientHeight;
 
-            // 背景
-            /*
-            const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#2a1a0f');
-            grad.addColorStop(0.5, '#2a1a12');
-            grad.addColorStop(1, '#2a1a15');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
-            */
-
             const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
             grad.addColorStop(0, '#2a1a0f');
             grad.addColorStop(0.5, '#2a1a12');
@@ -726,7 +716,7 @@
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('🏠 亲情', W / 2, H * 0.9);
+            ctx.fillText('家是港湾，爱是归途。', W / 2, H * 0.9);
         }
         //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
         function drawCanvas3(canvas) {
@@ -735,43 +725,38 @@
             const H = canvas.height = canvas.parentElement.clientHeight;
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
-            const SCALE = 0.6;
+            const SCALE = 0.38;
             // =============================================
 
-            const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#0a1a2e');
-            grad.addColorStop(0.5, '#1a2a4e');
-            grad.addColorStop(1, '#0a1a3e');
+            const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
+            grad.addColorStop(0, '#2a1a0f');
+            grad.addColorStop(0.5, '#2a1a12');
+            grad.addColorStop(1, '#2a1a15');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
             if (!canvas._particles) {
-                const friendSymbols = [
-                    '🎒', '📚', '📖', '📝', '✏️', '📏', '📐', '✂️', '🖊️', '📓',
-                    '书包', '课本', '作业', '考试', '试卷', '铅笔', '橡皮', '尺子',
-                    '上课', '下课', '自习', '晨读', '晚修', '早操', '课间', '同桌',
-                    '语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理',
-                    '黑板', '讲台', '粉笔', '课桌', '操场',
-                    '🍔', '🍕', '🍜', '🍻', '🥤', '🍚', '🍗', '🍖', '🍺', '🍵',
-                    '吃饭', '食堂', '泡面', '火锅', '撸串', '喝酒', '干杯',
-                    '🎮', '🎯', '🎱', '🎳', '🀄', '♠️', '🎪', '🎤', '🎧', '🎸',
-                    '开黑', '通宵', '网吧', '游戏', '王者', '吃鸡',
-                    '篮球', '足球', '乒乓', '羽毛', '跑步', '游泳',
-                    '兄弟', '哥们', '闺蜜', '死党', '老铁', '同窗', '室友', '校友',
-                    '牵手', '并肩', '陪伴', '温暖', '信任', '支持', '懂你', '默契',
-                    '🏫', '🚌', '🚲', '🚶', '🏃',
-                    '校车', '单车', '宿舍', '教室', '图书馆',
-                    '军训', '运动会', '毕业', '散伙饭', '合影',
-                    '😂', '😭', '😡', '😤', '🥰', '😎',
-                    '哭过', '笑过', '闹过', '想过', '念过'
+                const familySymbols = [
+                    '🍳', '🥘', '🍲', '🥟', '🥢', '🥄', '🔪', '🍽️', '🥣', '🍚',
+                    '锅', '碗', '瓢', '盆', '筷', '勺', '铲', '灶', '炉', '煲',
+                    '米', '油', '盐', '酱', '醋', '茶', '面', '菜', '肉', '汤',
+                    '📺', '📻', '📞', '☎️', '🛋️', '💡', '🪑', '📰', '🖼️', '🚪',
+                    '电视', '电话', '沙发', '茶几', '台灯', '遥控', '空调', '窗帘',
+                    '地毯', '时钟', '花瓶', '相框', '书架', '报纸',
+                    '🌸', '🌺', '🌻', '🌹', '🌷', '🌼', '💐', '🥀', '🌾', '🌿',
+                    '康乃馨', '玫瑰', '百合', '菊花', '牡丹', '荷花', '梅花', '兰花',
+                    '桃花', '杏花', '茉莉', '桂花', '水仙', '杜鹃', '月季',
+                    '🏠', '🏡', '👨', '👩', '👧', '👦', '👶', '👴', '👵',
+                    '❤️', '💕', '💗', '💖', '💝', '💞', '💓', '🫶',
+                    '爸', '妈', '儿', '女', '家', '爱', '暖', '归', '盼', '等'
                 ];
                 canvas._particles = [];
-                for (let i = 0; i < 180; i++) {
+                for (let i = 0; i < 170; i++) {
                     canvas._particles.push({
                         x: Math.random() * W,
                         y: Math.random() * H,
-                        text: friendSymbols[Math.floor(Math.random() * friendSymbols.length)],
-                        size: Math.random() * 12 + 7,
+                        text: familySymbols[Math.floor(Math.random() * familySymbols.length)],
+                        size: Math.random() * 13 + 7,
                         alpha: Math.random(),
                         twinkleSpeed: Math.random() * 0.012 + 0.004,
                         twinkleDir: 1
@@ -782,13 +767,12 @@
             canvas._particles.forEach(p => {
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
                 if (p.alpha >= 0.85) p.twinkleDir = -1;
-                if (p.alpha <= 0.08) p.twinkleDir = 1;
-                const isStudy = /[🎒📚📖📝✏️📏📐✂️🖊️📓书包课本作业考试试卷铅笔橡皮尺子上课下课自习晨读晚修早操课间同桌语文数学英语物理化学生物历史地理黑板讲台粉笔课桌操场校车单车宿舍教室图书馆军训运动会毕业]/.test(p.text);
-                const isFood = /[🍔🍕🍜🍻🥤🍚🍗🍖🍺🍵吃饭食堂泡面火锅撸串喝酒干杯]/.test(p.text);
-                const isFun = /[🎮🎯🎱🎳🀄♠️🎪🎤🎧🎸开黑通宵网吧游戏王者吃鸡篮球足球乒乓羽毛跑步游泳]/.test(p.text);
-                const r = isFood ? 255 : (isFun ? 100 : (isStudy ? 100 : 255));
-                const g = isFood ? 180 : (isFun ? 220 : (isStudy ? 180 : 100));
-                const b = isFood ? 60 : (isFun ? 140 : (isStudy ? 255 : 100));
+                if (p.alpha <= 0.1) p.twinkleDir = 1;
+                const isFlower = /[🌸🌺🌻🌹🌷🌼💐🥀🌾🌿康乃馨玫瑰百合菊花牡丹荷花梅花兰花桃花杏花茉莉桂花水仙杜鹃月季]/.test(p.text);
+                const isKitchen = /[🍳🥘🍲🥟🥢🥄🔪🍽️🥣🍚锅碗瓢盆筷勺铲灶炉煲米油盐酱醋茶面菜肉汤]/.test(p.text);
+                const r = isFlower ? 255 : (isKitchen ? 255 : 255);
+                const g = isFlower ? 140 : (isKitchen ? 160 : 200);
+                const b = isFlower ? 180 : (isKitchen ? 80 : 120);
                 ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
@@ -796,104 +780,78 @@
 
             const size = Math.min(W, H) * SCALE;
             const cx = W * 0.5;
-            const cy = H * 0.42;
+            const cy = H * 0.4;
 
-            function getBezierPoints(x0, y0, cp1x, cp1y, cp2x, cp2y, x1, y1, count) {
-                const points = [];
-                for (let i = 0; i < count; i++) {
-                    const t = i / (count - 1);
-                    const mt = 1 - t;
-                    const x = mt * mt * mt * x0 + 3 * mt * mt * t * cp1x + 3 * mt * t * t * cp2x + t * t * t * x1;
-                    const y = mt * mt * mt * y0 + 3 * mt * mt * t * cp1y + 3 * mt * t * t * cp2y + t * t * t * y1;
-                    points.push({ x, y });
-                }
-                return points;
-            }
-
-            if (!canvas._handPoints) {
-                canvas._handPoints = [];
-                const words = ['牵手', '并肩', '陪伴', '温暖', '信任', '支持', '懂你', '默契', '一起', '永远', '友谊', '真心', '朋友', '知己', '依靠'];
-
-                // 手掌轮廓——用贝塞尔曲线画出一个手掌形状，单词沿轮廓排列
-                // 手掌主体是一个椭圆，上方伸出5根手指
-
-                // 手腕（底部）
-                for (let i = 0; i < 8; i++) {
-                    canvas._handPoints.push({
-                        x: cx - size * 0.12 + i * size * 0.03,
-                        y: cy + size * 0.4 + i * 3,
-                        text: words[i % words.length]
-                    });
-                }
-
-                // 手掌（椭圆填充）
-                for (let row = 0; row < 6; row++) {
-                    const rowWidth = size * 0.25 + Math.sin(row / 5 * Math.PI) * size * 0.1;
-                    for (let col = 0; col < 6; col++) {
-                        const px = cx - rowWidth + (rowWidth * 2 * col) / 5;
-                        const py = cy + size * 0.1 + row * size * 0.05;
-                        canvas._handPoints.push({ x: px, y: py, text: words[(row * 6 + col) % words.length] });
+            if (!canvas._flowerPoints) {
+                canvas._flowerPoints = [];
+                const petalSymbols = ['❤️', '💕', '💗', '💖', '💝', '家', '爱', '暖', '妈', '爸', '归', '盼'];
+                for (let layer = 0; layer < 5; layer++) {
+                    const layerR = size * (0.35 + layer * 0.15);
+                    const petals = 8 + layer * 3;
+                    for (let i = 0; i < petals; i++) {
+                        const angle = (Math.PI * 2 * i) / petals + layer * 0.2;
+                        const dist = layerR + Math.sin(i * 3) * size * 0.06;
+                        canvas._flowerPoints.push({
+                            x: cx + Math.cos(angle) * dist,
+                            y: cy + Math.sin(angle) * dist,
+                            text: petalSymbols[(i + layer * 3) % petalSymbols.length]
+                        });
                     }
                 }
-
-                // 拇指（左侧，弯曲）
-                const thumb = getBezierPoints(
-                    cx - size * 0.22, cy + size * 0.12,
-                    cx - size * 0.35, cy - size * 0.08,
-                    cx - size * 0.3, cy - size * 0.28,
-                    cx - size * 0.15, cy - size * 0.2, 10
-                );
-                thumb.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 5) % words.length] }));
-
-                // 食指
-                const index = getBezierPoints(
-                    cx - size * 0.1, cy - size * 0.05,
-                    cx - size * 0.12, cy - size * 0.3,
-                    cx - size * 0.06, cy - size * 0.4,
-                    cx, cy - size * 0.38, 8
-                );
-                index.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 8) % words.length] }));
-
-                // 中指
-                const middle = getBezierPoints(
-                    cx - size * 0.02, cy - size * 0.05,
-                    cx + size * 0.02, cy - size * 0.32,
-                    cx + size * 0.06, cy - size * 0.44,
-                    cx + size * 0.1, cy - size * 0.42, 8
-                );
-                middle.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 3) % words.length] }));
-
-                // 无名指
-                const ring = getBezierPoints(
-                    cx + size * 0.06, cy - size * 0.05,
-                    cx + size * 0.12, cy - size * 0.28,
-                    cx + size * 0.16, cy - size * 0.36,
-                    cx + size * 0.2, cy - size * 0.32, 8
-                );
-                ring.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 10) % words.length] }));
-
-                // 小指
-                const pinky = getBezierPoints(
-                    cx + size * 0.12, cy - size * 0.02,
-                    cx + size * 0.2, cy - size * 0.2,
-                    cx + size * 0.26, cy - size * 0.25,
-                    cx + size * 0.28, cy - size * 0.18, 7
-                );
-                pinky.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 12) % words.length] }));
-
-                // 手掌中心牵手图标——放大
-                canvas._handPoints.push({ x: cx, y: cy + size * 0.1, text: '🤝', isBig: true });
+                const coreSymbols = ['🌺', '康乃馨', '🏠', '❤️', '💗'];
+                for (let i = 0; i < 12; i++) {
+                    const angle = (Math.PI * 2 * i) / 12;
+                    const dist = size * 0.12 + Math.random() * size * 0.08;
+                    canvas._flowerPoints.push({
+                        x: cx + Math.cos(angle) * dist,
+                        y: cy + Math.sin(angle) * dist,
+                        text: coreSymbols[i % coreSymbols.length]
+                    });
+                }
+                const sepalSymbols = ['🌸', '🌿', '🌾', '💚'];
+                for (let i = 0; i < 8; i++) {
+                    canvas._flowerPoints.push({
+                        x: cx - size * 0.3 + (size * 0.6 * i) / 7,
+                        y: cy + size * 0.7 + Math.abs(i - 3.5) * size * 0.1,
+                        text: sepalSymbols[i % 4]
+                    });
+                }
+                const stemSymbols = ['🌿', '🌾', '💚', '家', '爱', '根'];
+                for (let i = 0; i < 12; i++) {
+                    canvas._flowerPoints.push({
+                        x: cx + Math.sin(i * 0.3) * 6,
+                        y: cy + size * 0.78 + i * (H * 0.35 / 11),
+                        text: stemSymbols[i % 6]
+                    });
+                }
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let i = 0; i < 6; i++) {
+                        canvas._flowerPoints.push({
+                            x: cx + side * (size * 0.2 + i * 4),
+                            y: cy + size * 0.85 + i * 10,
+                            text: side === -1 ? '🍃' : '🌿'
+                        });
+                    }
+                }
+                const potSymbols = ['锅', '碗', '瓢', '盆', '🍳', '🥘', '🍲', '🥣'];
+                for (let row = 0; row < 4; row++) {
+                    const potW = size * 0.5 + row * size * 0.05;
+                    const potY = cy + size * 1.05 + row * 8;
+                    const count = 8 + row;
+                    for (let i = 0; i < count; i++) {
+                        canvas._flowerPoints.push({
+                            x: cx - potW + (potW * 2 * i) / (count - 1),
+                            y: potY,
+                            text: potSymbols[(i + row * 2) % potSymbols.length]
+                        });
+                    }
+                }
             }
 
-            canvas._handPoints.forEach((p, index) => {
-                if (p.isBig) {
-                    ctx.font = `${size * 0.6}px serif`;
-                    ctx.fillStyle = 'rgba(255,200,80,0.95)';
-                } else {
-                    const isCore = index < 20;
-                    ctx.fillStyle = isCore ? 'rgba(255,200,80,0.85)' : 'rgba(255,170,60,0.55)';
-                    ctx.font = `bold ${isCore ? 14 : 11}px 'Microsoft YaHei', serif`;
-                }
+            canvas._flowerPoints.forEach((p, index) => {
+                const isCore = index < 15;
+                ctx.fillStyle = isCore ? 'rgba(255,200,100,0.95)' : 'rgba(255,160,80,0.8)';
+                ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
@@ -901,7 +859,7 @@
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('🤝 一起走过的路，比终点更珍贵。', W / 2, H * 0.92);
+            ctx.fillText('一起走过的路，比终点更珍贵。', W / 2, H * 0.92);
         }
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas4(canvas) {
