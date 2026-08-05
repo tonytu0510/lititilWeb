@@ -9,7 +9,7 @@
                 <canvas id="menuIcon" width="50" height="50"></canvas>
                 <nav id="subNav">
                     <a href="index.html">首页</a>
-                    <a href="tools.html">工具</a>
+                    <a href="tools.html">工具箱</a>
 	                <a href="qrCode.html">二维码</a>
 	                <a href="nestedInvolutionRingHuge.html">对合环</a>
 	                <a href="namePairing.html">缘分测试</a>
