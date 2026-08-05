@@ -131,7 +131,7 @@
         const slider = document.getElementById('slider');
         function getScaleByDevice() {
             // H5触屏端缩小到0.4，PC端保持1
-            return ('ontouchstart' in document) ? 0.4 : 1;
+            return ('ontouchstart' in window) ? 0.4 : 1;
         }
 
         function showSlide(n) {
@@ -413,7 +413,7 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             const radio = 1
-
+            console.log('getScaleByDevice=>',getScaleByDevice)
             const img1W = 942 * radio * getScaleByDevice;
             const img1H = 1032 * radio * getScaleByDevice;
             const img1X = W/2 - img1W/2;
