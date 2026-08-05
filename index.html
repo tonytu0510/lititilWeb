@@ -1313,6 +1313,8 @@
             const activeCanvas = document.querySelector('.slide.active canvas');
             if (activeCanvas && (activeCanvas.id === 'canvas1') && !printEndFlag) {
                 drawCanvas1(activeCanvas);
+            }else{
+                printEndFlag = false
             }
             requestAnimationFrame(animate);
         }
