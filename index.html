@@ -427,14 +427,14 @@
                 H * 0.25,
                 45,
                 (i) => {
-                    if (i === 0 || i === 2 || i === 11 || i === 12) return transPosition(90);
-                    if (i === text.length - 1) return transPosition(40);
+                    if (i === 0 || i === 2 || i === 11 || i === 12) return transPosition(90,W);
+                    if (i === text.length - 1) return transPosition(40,W);
                     return 45;
                 },
                 (i) => {
-                    if (i === 11) return { x: 0, y: transPosition(-27) };
-                    if (i === 12) return { x: 0, y: transPosition(-27) };
-                    if (i === text.length - 1) return { x: 0, y: transPosition(10) };
+                    if (i === 11) return { x: 0, y: transPosition(-27,W) };
+                    if (i === 12) return { x: 0, y: transPosition(-27,W) };
+                    if (i === text.length - 1) return { x: 0, y: transPosition(10,W) };
                     return { x: 0, y: 0 };
                 },
                 canvas,
@@ -470,7 +470,7 @@
              drawImageSafe('svg/3.svg', img3X, img3Y, img3W, img3H,ctx)
              drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
         }
-        function transPosition(num){
+        function transPosition(num,W){
             return Math.ceil(num * 0.4) * (W / 100) +'px'
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
