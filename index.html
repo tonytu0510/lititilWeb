@@ -570,10 +570,20 @@
             const H = canvas.height = canvas.parentElement.clientHeight;
 
             // 背景
+            /*
             const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#2a1a0a');
-            grad.addColorStop(0.5, '#3a2010');
-            grad.addColorStop(1, '#2a1508');
+            grad.addColorStop(0, '#2a1a0f');
+            grad.addColorStop(0.5, '#2a1a12');
+            grad.addColorStop(1, '#2a1a15');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+            */
+             */
+
+            const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
+            grad.addColorStop(0, '#2a1a0f');
+            grad.addColorStop(0.5, '#2a1a12');
+            grad.addColorStop(1, '#2a1a15');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
