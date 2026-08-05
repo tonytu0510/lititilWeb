@@ -411,7 +411,6 @@
             ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
-            console.log('H5Scal=>',H5Scal)
             let radio = 1 * H5Scal;
             let img1W = 942 * radio;
             let img1H = 1032 * radio;
@@ -487,23 +486,35 @@
         function transPositionH(num,H){
             return num * (H / 100)
         }
+        // 全局缓存对象
+        const imageCache = {};
+
         function drawImageSafe(url, x, y, w, h, ctx) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            if (img.decode) {
-                img.src = url;
-                img.decode().then(() => {
-                    ctx.drawImage(img, x, y, w, h);
-                }).catch(() => {
+            if (imageCache[url]) {
+                // 已缓存，直接绘制
+                ctx.drawImage(imageCache[url], x, y, w, h);
+            } else {
+                // 首次加载，缓存起来
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                if (img.decode) {
+                    img.src = url;
+                    img.decode().then(() => {
+                        imageCache[url] = img;
+                        ctx.drawImage(img, x, y, w, h);
+                    }).catch(() => {
+                        img.onload = () => {
+                            imageCache[url] = img;
+                            ctx.drawImage(img, x, y, w, h);
+                        };
+                    });
+                } else {
                     img.onload = () => {
+                        imageCache[url] = img;
                         ctx.drawImage(img, x, y, w, h);
                     };
-                });
-            } else {
-                img.onload = () => {
-                    ctx.drawImage(img, x, y, w, h);
-                };
-                img.src = url;
+                    img.src = url;
+                }
             }
         }
 
