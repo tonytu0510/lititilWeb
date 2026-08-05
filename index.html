@@ -1143,9 +1143,10 @@
             const SCALE = 0.38;
             // =============================================
 
-            const grad = ctx.createLinearGradient(0, 0, W, H);
+            const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
             grad.addColorStop(0, '#1a0a2e');
-            grad.addColorStop(1, '#2a1a4e');
+            grad.addColorStop(0.5, '#1a0a35');
+            grad.addColorStop(1, '#1a0a3a');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
@@ -1179,9 +1180,9 @@
 
             canvas._particles.forEach(p => {
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
-                if (p.alpha >= 0.85) p.twinkleDir = -1;
+                if (p.alpha >= 0.7) p.twinkleDir = -1;
                 if (p.alpha <= 0.12) p.twinkleDir = 1;
-                ctx.fillStyle = `rgba(180,160,255,${p.alpha})`;
+                ctx.fillStyle = `rgba(180,160,255,${p.alpha * 0.55})`;
                 ctx.font = `${p.size}px 'Georgia', serif`;
                 ctx.fillText(p.text, p.x, p.y);
             });
@@ -1189,79 +1190,83 @@
             const size = Math.min(W, H) * SCALE;
             const cx = W * 0.5;
             const cy = H * 0.42;
-            const letterH = size * 0.75;
-            const letterW = size * 0.5;
-            const gap = size * 0.1;
+            const letterH = size * 0.8;
+            const letterW = size * 0.45;
+            const gap = size * 0.15;
 
             if (!canvas._ljPoints) {
                 canvas._ljPoints = [];
                 const ljWords = ['Love', 'Joy', 'Life', 'Laugh', 'Learn', 'Light', 'Luck', 'Loyal', 'Justice', 'Journey', 'Jazz', 'Jump', 'Join', 'Joke', 'Jewel', 'Lemon', 'Lake', 'Lion', 'Lily', 'Lotus'];
 
                 // ===== L =====
-                const lx = cx - letterW * 0.55;
+                const lx = cx - letterW * 0.6;
                 const ly = cy - letterH / 2;
-                // 竖线
-                for (let i = 0; i < 16; i++) {
+                // 竖线——减少点数，增大间距
+                for (let i = 0; i < 10; i++) {
                     canvas._ljPoints.push({
                         x: lx - letterW * 0.35,
-                        y: ly + i * letterH / 15,
+                        y: ly + i * letterH / 9,
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 横线
-                for (let i = 0; i < 12; i++) {
+                // 横线——减少点数
+                for (let i = 0; i < 7; i++) {
                     canvas._ljPoints.push({
-                        x: lx - letterW * 0.35 + i * letterW * 0.7 / 11,
+                        x: lx - letterW * 0.35 + i * letterW * 0.75 / 6,
                         y: ly + letterH,
-                        text: ljWords[(i + 8) % ljWords.length]
+                        text: ljWords[(i + 5) % ljWords.length]
                     });
                 }
 
                 // ===== J =====
-                const jx = cx + letterW * 0.55;
+                const jx = cx + letterW * 0.6;
                 const jy = ly;
-                // 顶部横线
-                for (let i = 0; i < 10; i++) {
+                // 顶部横线——减少点数
+                for (let i = 0; i < 6; i++) {
                     canvas._ljPoints.push({
-                        x: jx - letterW * 0.3 + i * letterW * 0.6 / 9,
+                        x: jx - letterW * 0.3 + i * letterW * 0.65 / 5,
                         y: jy,
-                        text: ljWords[(i + 14) % ljWords.length]
+                        text: ljWords[(i + 10) % ljWords.length]
                     });
                 }
-                // 竖线（中间偏右）
-                for (let i = 0; i < 12; i++) {
+                // 竖线——减少点数
+                for (let i = 0; i < 8; i++) {
                     canvas._ljPoints.push({
-                        x: jx + letterW * 0.25,
-                        y: jy + i * letterH * 0.7 / 11,
+                        x: jx + letterW * 0.28,
+                        y: jy + i * letterH * 0.7 / 7,
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 底部弯钩
-                for (let i = 0; i < 8; i++) {
-                    const angle = Math.PI * 0.1 + Math.PI * 0.8 * i / 7;
+                // 底部弯钩——减少点数
+                for (let i = 0; i < 5; i++) {
+                    const angle = Math.PI * 0.1 + Math.PI * 0.8 * i / 4;
                     canvas._ljPoints.push({
-                        x: jx + letterW * 0.2 + Math.cos(angle) * letterW * 0.25,
-                        y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.2,
-                        text: ljWords[(i + 12) % ljWords.length]
+                        x: jx + letterW * 0.22 + Math.cos(angle) * letterW * 0.28,
+                        y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.22,
+                        text: ljWords[(i + 15) % ljWords.length]
                     });
                 }
             }
 
             canvas._ljPoints.forEach((p, index) => {
-                const isL = index < 28;
-                const isCore = (isL && index < 10) || (!isL && index >= 28 && index < 40);
+                const isL = index < 17;
+                const isCore = (isL && index < 6) || (!isL && index >= 17 && index < 23);
                 ctx.fillStyle = isL
                     ? (isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.6)')
                     : (isCore ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.55)');
-                ctx.font = `bold ${isCore ? 15 : 12}px 'Georgia', serif`;
+                ctx.font = `bold ${isCore ? 16 : 13}px 'Georgia', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            ctx.fillStyle = '#fff';
-            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.fillStyle = 'rgba(200,180,255,0.8)';
+            ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('You are my everything', W / 2, H * 0.92);
+            ctx.fillText('You are my everything.', W / 2, H * 0.78);
+
+            ctx.fillStyle = '#d0c8f0';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.fillText('📖 You are my everything.', W / 2, H * 0.9);
         }
 
         // ==================== 初始化和动画循环 ====================
