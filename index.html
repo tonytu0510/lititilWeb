@@ -457,8 +457,8 @@
             const img1W = transPositionWH(0.22*100,W,H);
             const img1H = transPositionWH(0.22*100,W,H);
 
-            const img2X = transPositionWH(W/2*H,W,H);
-            const img2Y = transPositionWH(H/2*W-20,W,H);
+            const img2X = transPositionWH(0.45*100,W,H);
+            const img2Y = transPositionWH(0.45*100,W,H);
             const img2W =  transPositionWH(942*radio,W,H);
             const img2H =  transPositionWH(1032*radio,W,H);
             console.log('img2X=>',img2X)
@@ -491,7 +491,13 @@
             return num * (H / 100)
         }
         function transPositionWH(num,W,H){
-            return num * (W*H / 100 / 100 ) + 'px'
+            let a
+            if( W > H ){
+                a= num * (W / 100) + 'px'
+            }else{
+                a= num * (H / 100) + 'px'
+            }
+            return a
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
