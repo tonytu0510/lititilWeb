@@ -1232,10 +1232,7 @@
             ctx.textAlign = 'center';
             ctx.fillText('📐 数学', W / 2, H * 0.88);
         }
-        // ==================== Canvas 7: 英语 ABC ====================
-        // ==================== Canvas 7: 英语 ABC ====================
-        // ==================== Canvas 7: 英语 ABC ====================
-        // ==================== Canvas 7: 英语 good ====================
+        // ==================== Canvas 7: 英语 LJ ====================
         function drawCanvas7(canvas) {
             const ctx = canvas.getContext('2d');
             const W = canvas.width = canvas.parentElement.clientWidth;
@@ -1291,89 +1288,70 @@
             const size = Math.min(W, H) * SCALE;
             const cx = W * 0.5;
             const cy = H * 0.42;
-            const letterH = size * 0.7;
-            const letterW = size * 0.35;
-            const gap = size * 0.08;
+            const letterH = size * 0.75;
+            const letterW = size * 0.5;
+            const gap = size * 0.1;
 
-            if (!canvas._wordPoints) {
-                canvas._wordPoints = [];
-                const words = ['good', 'great', 'nice', 'fine', 'well', 'best', 'happy', 'lucky', 'sweet', 'kind', 'warm', 'soft', 'glad', 'cool', 'calm', 'hope', 'love', 'wish', 'gift', 'gold'];
+            if (!canvas._ljPoints) {
+                canvas._ljPoints = [];
+                const ljWords = ['Love', 'Joy', 'Life', 'Laugh', 'Learn', 'Light', 'Luck', 'Loyal', 'Justice', 'Journey', 'Jazz', 'Jump', 'Join', 'Joke', 'Jewel', 'Lemon', 'Lake', 'Lion', 'Lily', 'Lotus'];
 
-                // ===== g =====
-                const gx = cx - letterW * 1.6;
-                // 上半圆
-                for (let i = 0; i < 14; i++) {
-                    const angle = Math.PI * 0.15 + Math.PI * 1.7 * i / 13;
-                    canvas._wordPoints.push({
-                        x: gx + Math.cos(angle) * letterW * 0.4,
-                        y: cy - letterH * 0.12 + Math.sin(angle) * letterH * 0.28,
-                        text: words[i % words.length]
+                // ===== L =====
+                const lx = cx - letterW * 0.55;
+                const ly = cy - letterH / 2;
+                // 竖线
+                for (let i = 0; i < 16; i++) {
+                    canvas._ljPoints.push({
+                        x: lx - letterW * 0.35,
+                        y: ly + i * letterH / 15,
+                        text: ljWords[i % ljWords.length]
                     });
                 }
-                // 竖线向下
-                for (let i = 0; i < 8; i++) {
-                    canvas._wordPoints.push({
-                        x: gx + letterW * 0.2,
-                        y: cy + letterH * 0.1 + i * letterH * 0.08,
-                        text: words[(i + 10) % words.length]
+                // 横线
+                for (let i = 0; i < 12; i++) {
+                    canvas._ljPoints.push({
+                        x: lx - letterW * 0.35 + i * letterW * 0.7 / 11,
+                        y: ly + letterH,
+                        text: ljWords[(i + 8) % ljWords.length]
+                    });
+                }
+
+                // ===== J =====
+                const jx = cx + letterW * 0.55;
+                const jy = ly;
+                // 顶部横线
+                for (let i = 0; i < 10; i++) {
+                    canvas._ljPoints.push({
+                        x: jx - letterW * 0.3 + i * letterW * 0.6 / 9,
+                        y: jy,
+                        text: ljWords[(i + 14) % ljWords.length]
+                    });
+                }
+                // 竖线（中间偏右）
+                for (let i = 0; i < 12; i++) {
+                    canvas._ljPoints.push({
+                        x: jx + letterW * 0.25,
+                        y: jy + i * letterH * 0.7 / 11,
+                        text: ljWords[i % ljWords.length]
                     });
                 }
                 // 底部弯钩
-                for (let i = 0; i < 6; i++) {
-                    const angle = -Math.PI * 0.3 + Math.PI * 0.6 * i / 5;
-                    canvas._wordPoints.push({
-                        x: gx + letterW * 0.15 + Math.cos(angle) * letterW * 0.15,
-                        y: cy + letterH * 0.55 + Math.sin(angle) * letterH * 0.1,
-                        text: words[(i + 16) % words.length]
-                    });
-                }
-
-                // ===== o =====
-                const ox = cx - letterW * 0.5;
-                for (let i = 0; i < 16; i++) {
-                    const angle = Math.PI * 2 * i / 15;
-                    canvas._wordPoints.push({
-                        x: ox + Math.cos(angle) * letterW * 0.38,
-                        y: cy - letterH * 0.12 + Math.sin(angle) * letterH * 0.28,
-                        text: words[i % words.length]
-                    });
-                }
-
-                // ===== o =====
-                const o2x = cx + letterW * 0.6;
-                for (let i = 0; i < 16; i++) {
-                    const angle = Math.PI * 2 * i / 15;
-                    canvas._wordPoints.push({
-                        x: o2x + Math.cos(angle) * letterW * 0.38,
-                        y: cy - letterH * 0.12 + Math.sin(angle) * letterH * 0.28,
-                        text: words[(i + 5) % words.length]
-                    });
-                }
-
-                // ===== d =====
-                const dx = cx + letterW * 1.7;
-                // 竖线
-                for (let i = 0; i < 14; i++) {
-                    canvas._wordPoints.push({
-                        x: dx + letterW * 0.35,
-                        y: cy - letterH * 0.35 + i * letterH * 0.055,
-                        text: words[(i + 10) % words.length]
-                    });
-                }
-                // 圆
-                for (let i = 0; i < 16; i++) {
-                    const angle = Math.PI * 2 * i / 15;
-                    canvas._wordPoints.push({
-                        x: dx + Math.cos(angle) * letterW * 0.38,
-                        y: cy - letterH * 0.12 + Math.sin(angle) * letterH * 0.28,
-                        text: words[i % words.length]
+                for (let i = 0; i < 8; i++) {
+                    const angle = Math.PI * 0.1 + Math.PI * 0.8 * i / 7;
+                    canvas._ljPoints.push({
+                        x: jx + letterW * 0.2 + Math.cos(angle) * letterW * 0.25,
+                        y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.2,
+                        text: ljWords[(i + 12) % ljWords.length]
                     });
                 }
             }
 
-            canvas._wordPoints.forEach((p, index) => {
-                const isCore = index < 20 || (index >= 50 && index < 70);
-                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.9)' : 'rgba(255,170,60,0.6)';
+            canvas._ljPoints.forEach((p, index) => {
+                const isL = index < 28;
+                const isCore = (isL && index < 10) || (!isL && index >= 28 && index < 40);
+                ctx.fillStyle = isL
+                    ? (isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.6)')
+                    : (isCore ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.55)');
                 ctx.font = `bold ${isCore ? 15 : 12}px 'Georgia', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
