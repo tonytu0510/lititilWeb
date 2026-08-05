@@ -684,8 +684,144 @@
             ctx.textAlign = 'center';
             ctx.fillText('🎨 艺术', W / 2, H * 0.88);
         }
-        function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
+        //function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
         //function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
+        function drawCanvas5(canvas) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = canvas.parentElement.clientWidth;
+            const H = canvas.height = canvas.parentElement.clientHeight;
+
+            // 背景
+            const grad = ctx.createLinearGradient(0, 0, W, H);
+            grad.addColorStop(0, '#0a1a1a');
+            grad.addColorStop(1, '#0a2a3a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 初始化闪烁粒子
+            if (!canvas._particles) {
+                const csSymbols = [
+                    // 二进制
+                    '0', '1', '10', '11', '100', '101', '110', '111',
+                    '0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111',
+                    '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111',
+                    // 八进制
+                    '0o7', '0o10', '0o17', '0o20', '0o77', '0o377', '0o777',
+                    // 十进制
+                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                    '10', '100', '255', '1024', '65535',
+                    // 十六进制
+                    '0x0', '0x1', '0xA', '0xF', '0xFF', '0xFFFF',
+                    '0xDEAD', '0xBEEF', '0xCAFE', '0xFEED', '0xDEADBEEF',
+                    'A', 'B', 'C', 'D', 'E', 'F',
+                    // 三十二进制
+                    '0v0', '0vF', '0vZ', '0v10',
+                    // 六十四进制
+                    '0w0', '0w_', '0w10',
+                    // 编程关键词
+                    'if', 'for', 'int', 'var', 'let', 'const', 'func',
+                    'class', 'void', 'return', 'break', 'true', 'false', 'null',
+                    '&&', '||', '<<', '>>', '>>>', '&', '|', '^', '~',
+                    'HTTP', 'TCP', 'IP', 'DNS', 'SSL', 'API', 'JSON', 'XML', 'SQL',
+                    'CPU', 'RAM', 'SSD', 'GPU', 'BIOS', 'OS', 'VM', 'Docker',
+                    'Linux', 'Unix', 'macOS', 'Windows', 'Android', 'iOS',
+                    'C', 'C++', 'Java', 'Python', 'Rust', 'Go', 'JS', 'TS', 'PHP',
+                    'HTML', 'CSS', 'React', 'Vue', 'Node', 'Deno', 'Git', 'SSH'
+                ];
+                canvas._particles = [];
+                for (let i = 0; i < 160; i++) {
+                    canvas._particles.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        text: csSymbols[Math.floor(Math.random() * csSymbols.length)],
+                        size: Math.random() * 11 + 7,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.015 + 0.005,
+                        twinkleDir: 1
+                    });
+                }
+            }
+
+            // 绘制闪烁粒子
+            canvas._particles.forEach(p => {
+                p.alpha += p.twinkleSpeed * p.twinkleDir;
+                if (p.alpha >= 0.85) p.twinkleDir = -1;
+                if (p.alpha <= 0.1) p.twinkleDir = 1;
+                // 十六进制用绿色，二进制用青色，其余蓝白
+                const isHex = /^0x/.test(p.text) || /^[A-F]$/.test(p.text);
+                const isBin = /^[01]+$/.test(p.text) && p.text.length >= 3;
+                const r = isHex ? 100 : (isBin ? 80 : 120);
+                const g = isHex ? 255 : (isBin ? 220 : 200);
+                const b = isHex ? 120 : (isBin ? 160 : 255);
+                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                ctx.font = `${p.size}px 'Courier New', monospace`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 大脑轮廓
+            const brainSymbols = ['0', '1', '0x', 'if', 'for', 'func', 'CPU', 'RAM', 'API', '{ }', '< / >', '//', 'git'];
+            const centerX = W * 0.5;
+            const centerY = H * 0.42;
+            const brainW = W * 0.55;
+            const brainH = H * 0.45;
+
+            if (!canvas._brainPoints) {
+                canvas._brainPoints = [];
+                // 左半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = Math.PI * 0.7 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX - brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 右半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = -Math.PI * 0.1 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX + brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 胼胝体
+                for (let i = 0; i < 8; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 14 + i * 4,
+                        y: centerY - 8 + Math.sin(i) * 6,
+                        text: '='
+                    });
+                }
+                // 脑干（用进制表示）
+                const stems = ['0b0','0b1','0o7','0xA','0xFF','0xFFFF','0xDEAD','0xBEEF','0xCAFE','0xFEED'];
+                for (let i = 0; i < 10; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 5 + Math.sin(i * 0.7) * 7,
+                        y: centerY + brainH * 0.5 + i * 10,
+                        text: stems[i]
+                    });
+                }
+            }
+
+            // 绘制大脑
+            canvas._brainPoints.forEach((p, index) => {
+                const isCore = index < 10;
+                ctx.fillStyle = isCore ? 'rgba(100,255,180,0.95)' : 'rgba(80,220,150,0.8)';
+                ctx.font = `bold ${isCore ? 15 : 12}px 'Courier New', monospace`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 标题
+            ctx.fillStyle = '#fff';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('💻 计算机', W / 2, H * 0.88);
+        }
         function drawCanvas6(canvas) {
             const ctx = canvas.getContext('2d');
             const W = canvas.width = canvas.parentElement.clientWidth;
