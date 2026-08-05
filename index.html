@@ -613,12 +613,8 @@
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
                 if (p.alpha >= 0.85) p.twinkleDir = -1;
                 if (p.alpha <= 0.1) p.twinkleDir = 1;
-                const isFlower = /[🌸🌺🌻🌹🌷🌼💐🥀🌾🌿康乃馨玫瑰百合菊花牡丹荷花梅花兰花桃花杏花茉莉桂花水仙杜鹃月季]/.test(p.text);
-                const isKitchen = /[🍳🥘🍲🥟🥢🥄🔪🍽️🥣🍚锅碗瓢盆筷勺铲灶炉煲米油盐酱醋茶面菜肉汤]/.test(p.text);
-                const r = isFlower ? 255 : (isKitchen ? 255 : 255);
-                const g = isFlower ? 190 : (isKitchen ? 200 : 210);
-                const b = isFlower ? 210 : (isKitchen ? 180 : 210);
-                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                // 白色闪烁，配合红底
+                ctx.fillStyle = `rgba(255,255,255,${p.alpha * 0.7})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
             });
@@ -695,19 +691,20 @@
 
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
-                ctx.fillStyle = isCore ? 'rgba(255,190,210,0.95)' : 'rgba(255,175,200,0.8)';
+                // 白色文字，配合红底更干净
+                ctx.fillStyle = isCore ? 'rgba(255,255,255,0.95)' : 'rgba(255,240,245,0.75)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
             // 点题话
-            ctx.fillStyle = 'rgba(255,200,220,0.8)';
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
             ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
             ctx.fillText('家是港湾，爱是归途。', W / 2, H * 0.82);
 
-            ctx.fillStyle = '#ffd0e0';
+            ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.fillText('🏠 家是港湾，爱是归途。', W / 2, H * 0.92);
         }
