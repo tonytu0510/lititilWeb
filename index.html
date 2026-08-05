@@ -613,8 +613,8 @@
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
                 if (p.alpha >= 0.85) p.twinkleDir = -1;
                 if (p.alpha <= 0.1) p.twinkleDir = 1;
-                // 白色闪烁，配合红底
-                ctx.fillStyle = `rgba(255,255,255,${p.alpha * 0.7})`;
+                // 深玫红，和浅粉背景有区分但不刺眼
+                ctx.fillStyle = `rgba(190,60,80,${p.alpha * 0.6})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
             });
@@ -691,20 +691,20 @@
 
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
-                // 白色文字，配合红底更干净
-                ctx.fillStyle = isCore ? 'rgba(255,255,255,0.95)' : 'rgba(255,240,245,0.75)';
+                // 深玫红色，和浅粉背景形成层次
+                ctx.fillStyle = isCore ? 'rgba(180,50,70,0.95)' : 'rgba(160,40,60,0.7)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
             // 点题话
-            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillStyle = 'rgba(140,30,50,0.85)';
             ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
             ctx.fillText('家是港湾，爱是归途。', W / 2, H * 0.82);
 
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#8a1a30';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.fillText('🏠 家是港湾，爱是归途。', W / 2, H * 0.92);
         }
