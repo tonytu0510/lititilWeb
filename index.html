@@ -907,7 +907,6 @@
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
                 if (p.alpha >= 0.85) p.twinkleDir = -1;
                 if (p.alpha <= 0.12) p.twinkleDir = 1;
-                // 音符用金色，其他用紫粉色
                 const isMusic = ['♩','♪','♫','♬','♭','♯','🎵','🎶','🎼'].includes(p.text);
                 const r = isMusic ? 255 : 200;
                 const g = isMusic ? 200 : 120;
@@ -917,61 +916,82 @@
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            // 大脑轮廓
-            const brainSymbols = ['♫', '♪', '🎨', '♬', '🎭', '★', '●', '▲', '◆', '莫奈', 'C', 'E', 'G'];
-            const centerX = W * 0.5;
-            const centerY = H * 0.42;
-            const brainW = W * 0.55;
-            const brainH = H * 0.45;
+            // 音符♪（do）形状
+            if (!canvas._notePoints) {
+                canvas._notePoints = [];
+                const cx = W * 0.45;
+                const cy = H * 0.5;
+                const noteH = H * 0.45;
 
-            if (!canvas._brainPoints) {
-                canvas._brainPoints = [];
-                // 左半球
-                for (let i = 0; i < 30; i++) {
-                    const angle = Math.PI * 0.7 + (Math.PI * 1.6 * i / 29);
-                    const rx = brainW * 0.48;
-                    const ry = brainH * 0.5;
-                    canvas._brainPoints.push({
-                        x: centerX - brainW * 0.12 + Math.cos(angle) * rx,
-                        y: centerY + Math.sin(angle) * ry,
-                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                // 符头（实心椭圆）
+                const headSymbols = ['do', 'C', '♫', '🎵', '道', '音', '乐'];
+                for (let i = 0; i < 20; i++) {
+                    const angle = (Math.PI * 2 * i) / 20;
+                    const rx = noteH * 0.2;
+                    const ry = noteH * 0.14;
+                    canvas._notePoints.push({
+                        x: cx + Math.cos(angle) * rx,
+                        y: cy + noteH * 0.25 + Math.sin(angle) * ry,
+                        text: headSymbols[i % 7]
                     });
                 }
-                // 右半球
-                for (let i = 0; i < 30; i++) {
-                    const angle = -Math.PI * 0.1 + (Math.PI * 1.6 * i / 29);
-                    const rx = brainW * 0.48;
-                    const ry = brainH * 0.5;
-                    canvas._brainPoints.push({
-                        x: centerX + brainW * 0.12 + Math.cos(angle) * rx,
-                        y: centerY + Math.sin(angle) * ry,
-                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
-                    });
-                }
-                // 胼胝体
+                // 符头填充
                 for (let i = 0; i < 8; i++) {
-                    canvas._brainPoints.push({
-                        x: centerX - 12 + i * 3.5,
-                        y: centerY - 8 + Math.sin(i) * 6,
-                        text: '♫'
+                    canvas._notePoints.push({
+                        x: cx - noteH * 0.1 + (noteH * 0.2 * i) / 7,
+                        y: cy + noteH * 0.2 + Math.random() * noteH * 0.08,
+                        text: ['do', '♫', '🎵'][i % 3]
                     });
                 }
-                // 脑干
-                const notes = ['C','D','E','F','G','A','B','♪','♩','♬'];
-                for (let i = 0; i < 10; i++) {
-                    canvas._brainPoints.push({
-                        x: centerX - 5 + Math.sin(i * 0.7) * 7,
-                        y: centerY + brainH * 0.5 + i * 10,
-                        text: notes[i]
+
+                // 符干（竖线）
+                const stemSymbols = ['|', '♪', '♩', '♬', '🎶', '♭', '♯', '🎼'];
+                for (let i = 0; i < 20; i++) {
+                    canvas._notePoints.push({
+                        x: cx + noteH * 0.18,
+                        y: cy - noteH * 0.2 + (noteH * 0.7 * i) / 19,
+                        text: stemSymbols[i % 8]
                     });
+                }
+
+                // 符尾（弯曲线）
+                const tailSymbols = ['~', '♪', '♫', '🎵', '🎶', '♬', '♩', '♭'];
+                for (let i = 0; i < 12; i++) {
+                    const t = i / 11;
+                    canvas._notePoints.push({
+                        x: cx + noteH * 0.18 + t * noteH * 0.25,
+                        y: cy - noteH * 0.2 + t * noteH * 0.15 + Math.sin(t * Math.PI) * noteH * 0.1,
+                        text: tailSymbols[i % 8]
+                    });
+                }
+                // 第二条符尾
+                for (let i = 0; i < 10; i++) {
+                    const t = i / 9;
+                    canvas._notePoints.push({
+                        x: cx + noteH * 0.18 + t * noteH * 0.2,
+                        y: cy - noteH * 0.15 + t * noteH * 0.12 + Math.sin(t * Math.PI) * noteH * 0.08,
+                        text: ['♪', '♫', '🎵'][i % 3]
+                    });
+                }
+
+                // 五线谱线条
+                for (let line = 0; line < 5; line++) {
+                    for (let i = 0; i < 15; i++) {
+                        canvas._notePoints.push({
+                            x: cx - noteH * 0.3 + (noteH * 0.9 * i) / 14,
+                            y: cy + noteH * 0.35 + line * noteH * 0.06,
+                            text: '—'
+                        });
+                    }
                 }
             }
 
-            // 绘制大脑
-            canvas._brainPoints.forEach((p, index) => {
-                const isCore = index < 10;
-                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,180,60,0.8)';
-                ctx.font = `bold ${isCore ? 18 : 14}px 'Georgia', serif`;
+            // 绘制音符
+            canvas._notePoints.forEach((p, index) => {
+                const isCore = index < 15;
+                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.8)';
+                ctx.font = `bold ${isCore ? 18 : 13}px 'Georgia', serif`;
+                ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
@@ -979,7 +999,7 @@
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('🎨 艺术', W / 2, H * 0.88);
+            ctx.fillText('🎨 艺术', W / 2, H * 0.9);
         }
         //function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
         //function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
