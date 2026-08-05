@@ -12,7 +12,7 @@
                     <a href="tools.html">工具</a>
 	                <a href="qrCode.html">二维码</a>
 	                <a href="nestedInvolutionRingHuge.html">对合环</a>
-	                <a href="namePairing.html">姓名配对</a>
+	                <a href="namePairing.html">缘分测试</a>
                     <a href="aboutMe.html">关于我</a>
                 </nav>
             </div>
