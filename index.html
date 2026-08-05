@@ -777,96 +777,145 @@
             const cx = W * 0.5;
             const cy = H * 0.42;
 
-            // 画左手
-            ctx.save();
-            ctx.fillStyle = 'rgba(255,180,100,0.18)';
-            ctx.strokeStyle = 'rgba(255,200,120,0.5)';
-            ctx.lineWidth = size * 0.03;
-            ctx.beginPath();
-            // 左手腕
-            ctx.moveTo(cx - size * 0.65, cy + size * 0.25);
-            ctx.lineTo(cx - size * 0.4, cy + size * 0.1);
-            // 左手掌底部
-            ctx.lineTo(cx - size * 0.35, cy - size * 0.05);
-            // 左手拇指
-            ctx.quadraticCurveTo(cx - size * 0.3, cy - size * 0.25, cx - size * 0.15, cy - size * 0.2);
-            ctx.quadraticCurveTo(cx - size * 0.1, cy - size * 0.15, cx - size * 0.05, cy - size * 0.08);
-            // 左手食指
-            ctx.moveTo(cx - size * 0.3, cy - size * 0.15);
-            ctx.quadraticCurveTo(cx - size * 0.25, cy - size * 0.35, cx - size * 0.1, cy - size * 0.32);
-            ctx.quadraticCurveTo(cx, cy - size * 0.28, cx + size * 0.05, cy - size * 0.15);
-            // 左手中指
-            ctx.moveTo(cx - size * 0.25, cy - size * 0.12);
-            ctx.quadraticCurveTo(cx - size * 0.18, cy - size * 0.38, cx, cy - size * 0.35);
-            ctx.quadraticCurveTo(cx + size * 0.1, cy - size * 0.3, cx + size * 0.15, cy - size * 0.2);
-            // 左手无名指
-            ctx.moveTo(cx - size * 0.2, cy - size * 0.1);
-            ctx.quadraticCurveTo(cx - size * 0.12, cy - size * 0.32, cx + size * 0.08, cy - size * 0.28);
-            ctx.quadraticCurveTo(cx + size * 0.18, cy - size * 0.22, cx + size * 0.2, cy - size * 0.12);
-            // 左手小指
-            ctx.moveTo(cx - size * 0.15, cy - size * 0.05);
-            ctx.quadraticCurveTo(cx - size * 0.05, cy - size * 0.25, cx + size * 0.12, cy - size * 0.2);
-            ctx.quadraticCurveTo(cx + size * 0.2, cy - size * 0.15, cx + size * 0.22, cy - size * 0.05);
-            ctx.stroke();
-            ctx.fill();
+            // 生成贝塞尔曲线上的点
+            function getBezierPoints(x0, y0, cp1x, cp1y, cp2x, cp2y, x1, y1, count) {
+                const points = [];
+                for (let i = 0; i < count; i++) {
+                    const t = i / (count - 1);
+                    const mt = 1 - t;
+                    const x = mt * mt * mt * x0 + 3 * mt * mt * t * cp1x + 3 * mt * t * t * cp2x + t * t * t * x1;
+                    const y = mt * mt * mt * y0 + 3 * mt * mt * t * cp1y + 3 * mt * t * t * cp2y + t * t * t * y1;
+                    points.push({ x, y });
+                }
+                return points;
+            }
 
-            // 画右手（镜像）
-            ctx.fillStyle = 'rgba(255,180,100,0.18)';
-            ctx.strokeStyle = 'rgba(255,200,120,0.5)';
-            ctx.lineWidth = size * 0.03;
-            ctx.beginPath();
-            // 右手腕
-            ctx.moveTo(cx + size * 0.65, cy + size * 0.25);
-            ctx.lineTo(cx + size * 0.4, cy + size * 0.1);
-            // 右手掌底部
-            ctx.lineTo(cx + size * 0.35, cy - size * 0.05);
-            // 右手拇指
-            ctx.quadraticCurveTo(cx + size * 0.3, cy - size * 0.25, cx + size * 0.15, cy - size * 0.2);
-            ctx.quadraticCurveTo(cx + size * 0.1, cy - size * 0.15, cx + size * 0.05, cy - size * 0.08);
-            // 右手食指
-            ctx.moveTo(cx + size * 0.3, cy - size * 0.15);
-            ctx.quadraticCurveTo(cx + size * 0.25, cy - size * 0.35, cx + size * 0.1, cy - size * 0.32);
-            ctx.quadraticCurveTo(cx, cy - size * 0.28, cx - size * 0.05, cy - size * 0.15);
-            // 右手中指
-            ctx.moveTo(cx + size * 0.25, cy - size * 0.12);
-            ctx.quadraticCurveTo(cx + size * 0.18, cy - size * 0.38, cx, cy - size * 0.35);
-            ctx.quadraticCurveTo(cx - size * 0.1, cy - size * 0.3, cx - size * 0.15, cy - size * 0.2);
-            // 右手无名指
-            ctx.moveTo(cx + size * 0.2, cy - size * 0.1);
-            ctx.quadraticCurveTo(cx + size * 0.12, cy - size * 0.32, cx - size * 0.08, cy - size * 0.28);
-            ctx.quadraticCurveTo(cx - size * 0.18, cy - size * 0.22, cx - size * 0.2, cy - size * 0.12);
-            // 右手小指
-            ctx.moveTo(cx + size * 0.15, cy - size * 0.05);
-            ctx.quadraticCurveTo(cx + size * 0.05, cy - size * 0.25, cx - size * 0.12, cy - size * 0.2);
-            ctx.quadraticCurveTo(cx - size * 0.2, cy - size * 0.15, cx - size * 0.22, cy - size * 0.05);
-            ctx.stroke();
-            ctx.fill();
-            ctx.restore();
+            if (!canvas._handPoints) {
+                canvas._handPoints = [];
+                const words = ['🤝', '兄弟', '闺蜜', '死党', '老铁', '同窗', '室友', '友谊', '一起', '永远', '握手', '并肩', '和好', '拥抱', '陪伴'];
 
-            // 文字符号撒在握手形状内部
-            if (!canvas._handTexts) {
-                canvas._handTexts = [];
-                const handSymbols = ['🤝', '兄弟', '闺蜜', '死党', '老铁', '同窗', '室友', '友谊', '一起', '永远', '握手', '并肩', '和好', '拥抱'];
-                for (let i = 0; i < 60; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = Math.random() * size * 0.45;
-                    canvas._handTexts.push({
-                        x: cx + Math.cos(angle) * dist * 0.8,
-                        y: cy - size * 0.05 + Math.sin(angle) * dist * 0.6,
-                        text: handSymbols[Math.floor(Math.random() * handSymbols.length)]
-                    });
+                // 左手拇指
+                const leftThumb = getBezierPoints(
+                    cx - size * 0.35, cy + size * 0.05,
+                    cx - size * 0.3, cy - size * 0.25,
+                    cx - size * 0.15, cy - size * 0.28,
+                    cx - size * 0.02, cy - size * 0.12, 12
+                );
+                leftThumb.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[i % words.length] }));
+
+                // 左手食指
+                const leftIndex = getBezierPoints(
+                    cx - size * 0.28, cy - size * 0.05,
+                    cx - size * 0.2, cy - size * 0.35,
+                    cx - size * 0.05, cy - size * 0.35,
+                    cx + size * 0.08, cy - size * 0.15, 12
+                );
+                leftIndex.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 3) % words.length] }));
+
+                // 左手中指
+                const leftMiddle = getBezierPoints(
+                    cx - size * 0.22, cy - size * 0.05,
+                    cx - size * 0.12, cy - size * 0.4,
+                    cx + size * 0.05, cy - size * 0.38,
+                    cx + size * 0.15, cy - size * 0.18, 12
+                );
+                leftMiddle.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 6) % words.length] }));
+
+                // 左手无名指
+                const leftRing = getBezierPoints(
+                    cx - size * 0.15, cy - size * 0.05,
+                    cx - size * 0.05, cy - size * 0.33,
+                    cx + size * 0.1, cy - size * 0.3,
+                    cx + size * 0.2, cy - size * 0.12, 10
+                );
+                leftRing.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 9) % words.length] }));
+
+                // 左手小指
+                const leftPinky = getBezierPoints(
+                    cx - size * 0.1, cy - size * 0.02,
+                    cx + size * 0.02, cy - size * 0.25,
+                    cx + size * 0.15, cy - size * 0.22,
+                    cx + size * 0.25, cy - size * 0.05, 8
+                );
+                leftPinky.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 12) % words.length] }));
+
+                // 右手拇指（镜像）
+                const rightThumb = getBezierPoints(
+                    cx + size * 0.35, cy + size * 0.05,
+                    cx + size * 0.3, cy - size * 0.25,
+                    cx + size * 0.15, cy - size * 0.28,
+                    cx + size * 0.02, cy - size * 0.12, 12
+                );
+                rightThumb.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 5) % words.length] }));
+
+                // 右手食指
+                const rightIndex = getBezierPoints(
+                    cx + size * 0.28, cy - size * 0.05,
+                    cx + size * 0.2, cy - size * 0.35,
+                    cx + size * 0.05, cy - size * 0.35,
+                    cx - size * 0.08, cy - size * 0.15, 12
+                );
+                rightIndex.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 8) % words.length] }));
+
+                // 右手中指
+                const rightMiddle = getBezierPoints(
+                    cx + size * 0.22, cy - size * 0.05,
+                    cx + size * 0.12, cy - size * 0.4,
+                    cx - size * 0.05, cy - size * 0.38,
+                    cx - size * 0.15, cy - size * 0.18, 12
+                );
+                rightMiddle.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 11) % words.length] }));
+
+                // 右手无名指
+                const rightRing = getBezierPoints(
+                    cx + size * 0.15, cy - size * 0.05,
+                    cx + size * 0.05, cy - size * 0.33,
+                    cx - size * 0.1, cy - size * 0.3,
+                    cx - size * 0.2, cy - size * 0.12, 10
+                );
+                rightRing.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 1) % words.length] }));
+
+                // 右手小指
+                const rightPinky = getBezierPoints(
+                    cx + size * 0.1, cy - size * 0.02,
+                    cx - size * 0.02, cy - size * 0.25,
+                    cx - size * 0.15, cy - size * 0.22,
+                    cx - size * 0.25, cy - size * 0.05, 8
+                );
+                rightPinky.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 4) % words.length] }));
+
+                // 手掌（椭圆填充）
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let row = 0; row < 6; row++) {
+                        for (let col = 0; col < 5; col++) {
+                            const px = cx + side * (size * 0.25 + col * size * 0.06);
+                            const py = cy - size * 0.02 + row * size * 0.07;
+                            canvas._handPoints.push({ x: px, y: py, text: words[(row * 5 + col) % words.length] });
+                        }
+                    }
+                }
+
+                // 手腕
+                for (let side = -1; side <= 1; side += 2) {
+                    for (let i = 0; i < 12; i++) {
+                        canvas._handPoints.push({
+                            x: cx + side * (size * 0.38 + i * size * 0.025),
+                            y: cy + size * 0.12 + Math.sin(i * 0.5) * 4,
+                            text: side === -1 ? '友谊' : '永远'
+                        });
+                    }
                 }
             }
 
-            canvas._handTexts.forEach((p, index) => {
-                const isCore = index < 8;
+            canvas._handPoints.forEach((p, index) => {
+                const isCore = index < 30;
                 ctx.fillStyle = isCore ? 'rgba(255,200,80,0.9)' : 'rgba(255,170,60,0.65)';
-                ctx.font = `bold ${isCore ? 15 : 11}px 'Microsoft YaHei', serif`;
+                ctx.font = `bold ${isCore ? 14 : 11}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            // 中心🤝
+            // 中心握手
             ctx.font = `${size * 0.35}px serif`;
             ctx.textAlign = 'center';
             ctx.fillText('🤝', cx, cy - size * 0.02);
