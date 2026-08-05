@@ -571,15 +571,17 @@
         }
         async function isH5(){
             //当H5加载CANVAS是缩放人物剪影
+            let a
             if ('ontouchstart' in window) {
-                H5radio = 0.4
+                a = 0.4
             } else {
-                H5radio = 1
+                a = 1
             }
-            return H5radio
+            return a
         }
         function initCanvas() {
-            isH5().then(()=>{
+            isH5().then((result)=>{
+                H5radio = result
                 console.log('H5radio=>',H5radio)
                 drawCanvas1(document.getElementById('canvas1'));
                 animate();
