@@ -507,7 +507,7 @@
             for (let i = 0; i < displayText.length; i++) {
                 const char = displayText[i];
                 const fontSize = getCharSize(i);
-                ctx.font= 'bold '+ fontSize +' 微软雅黑,Georgia,serif'
+                ctx.font= 'bold '+ fontSize +' Georgia,serif'
                 const offset = getCharOffset(i);
                 ctx.fillText(char, currentX + offset.x, y + offset.y);
                 currentX += ctx.measureText(char).width;
