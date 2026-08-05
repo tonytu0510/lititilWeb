@@ -574,8 +574,8 @@
             // =============================================
 
             const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#fb7185');
-            grad.addColorStop(0.5, '#fca5a5');
+            grad.addColorStop(0, '#ffe4e6');
+            grad.addColorStop(0.5, '#fb7185');
             grad.addColorStop(1, '#ffe4e6');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
@@ -692,7 +692,7 @@
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
                 // 深玫红色，和浅粉背景形成层次
-                ctx.fillStyle = isCore ? 'rgba(180,50,70,0.95)' : 'rgba(160,40,60,0.7)';
+                ctx.fillStyle = isCore ? 'rgba(180,50,70,0.95)' : 'rgba(0,0,0,0.7)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
