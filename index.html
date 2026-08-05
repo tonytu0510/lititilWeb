@@ -266,8 +266,14 @@
             radioY = ('ontouchstart' in window) ? 0.98 : 1
             H5PrintFont = ('ontouchstart' in window) ? 2.3 : 1
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // 星空背景
             const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
@@ -714,8 +720,14 @@
         //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
         function drawCanvas3(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -927,8 +939,14 @@
         // ==================== Canvas 5: 计算机 DNA螺旋 ====================
         function drawCanvas5(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -1036,8 +1054,14 @@
 
         function drawCanvas6(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // 背景
             const grad = ctx.createLinearGradient(0, 0, W, H);
@@ -1149,8 +1173,14 @@
         // ==================== Canvas 7: 英语 LJ ====================
         function drawCanvas7(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
