@@ -482,7 +482,7 @@
             return num * (H / 100)
         }
         function transPositionWH(num,W,H){
-            return num * (W*H / 100)
+            return num * (W*H / 100 / 100)
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
