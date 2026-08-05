@@ -1233,6 +1233,7 @@
             ctx.fillText('📐 数学', W / 2, H * 0.88);
         }
         // ==================== Canvas 7: 英语 ABC ====================
+        // ==================== Canvas 7: 英语 ABC ====================
         function drawCanvas7(canvas) {
             const ctx = canvas.getContext('2d');
             const W = canvas.width = canvas.parentElement.clientWidth;
@@ -1288,39 +1289,51 @@
             const size = Math.min(W, H) * SCALE;
             const cx = W * 0.5;
             const cy = H * 0.42;
-            const letterH = size * 0.8;
-            const letterW = size * 0.55;
-            const gap = size * 0.1;
+            const letterH = size * 0.75;
+            const letterW = size * 0.5;
+            const gap = size * 0.08;
 
             if (!canvas._abcPoints) {
                 canvas._abcPoints = [];
-                const abcWords = ['Apple', 'Book', 'Cat', 'read', 'write', 'speak', 'learn', 'think', 'know', 'dream', 'hope', 'love', 'hello', 'world', 'word', 'story', 'poem', 'song', 'ABC', 'English'];
+                const abcWords = ['Apple', 'Book', 'Cat', 'read', 'write', 'speak', 'learn', 'think', 'know', 'dream', 'hope', 'love', 'hello', 'world', 'word', 'story', 'poem', 'song', 'English', 'letter'];
 
-                // A —— 左斜线 + 右斜线 + 横线
-                const aLeft = [];
-                const aRight = [];
-                const aCross = [];
+                // A：左斜线 + 右斜线 + 中间横线（横线在中间偏下）
                 const ax = cx - letterW - gap;
                 const ay = cy - letterH / 2;
-                for (let i = 0; i < 12; i++) { aLeft.push({ x: ax - letterW / 2 + (letterW / 2 * i / 11), y: ay + letterH - (letterH * i / 11) }); }
-                for (let i = 0; i < 12; i++) { aRight.push({ x: ax + (letterW / 2 * i / 11), y: ay + letterH - (letterH * i / 11) }); }
-                for (let i = 0; i < 8; i++) { aCross.push({ x: ax - letterW / 3 + (letterW * 2 / 3 * i / 7), y: ay + letterH * 0.5 }); }
-                [...aLeft, ...aRight, ...aCross].forEach((p, i) => canvas._abcPoints.push({ x: p.x, y: p.y, text: abcWords[i % abcWords.length] }));
+                for (let i = 0; i < 12; i++) {
+                    canvas._abcPoints.push({ x: ax - letterW * 0.45 + (letterW * 0.45 * i / 11), y: ay + letterH - (letterH * i / 11), text: abcWords[i % abcWords.length] });
+                }
+                for (let i = 0; i < 12; i++) {
+                    canvas._abcPoints.push({ x: ax + letterW * 0.05 + (letterW * 0.4 * i / 11), y: ay + letterH - (letterH * i / 11), text: abcWords[(i + 6) % abcWords.length] });
+                }
+                for (let i = 0; i < 8; i++) {
+                    canvas._abcPoints.push({ x: ax - letterW * 0.25 + (letterW * 0.5 * i / 7), y: ay + letterH * 0.55, text: abcWords[(i + 12) % abcWords.length] });
+                }
 
-                // B —— 竖线 + 两个半圆
+                // B：竖线 + 上半圆 + 下半圆（半圆比之前小）
                 const bx = cx;
                 const by = ay;
-                for (let i = 0; i < 10; i++) { canvas._abcPoints.push({ x: bx - letterW * 0.35, y: by + (letterH * i / 9), text: abcWords[i % abcWords.length] }); }
-                for (let i = 0; i < 8; i++) { const t = i / 7; const angle = -Math.PI / 2 + Math.PI * t; canvas._abcPoints.push({ x: bx + Math.cos(angle) * letterW * 0.35, y: by + letterH * 0.25 + Math.sin(angle) * letterH * 0.25, text: abcWords[(i + 5) % abcWords.length] }); }
-                for (let i = 0; i < 8; i++) { const t = i / 7; const angle = -Math.PI / 2 + Math.PI * t; canvas._abcPoints.push({ x: bx + Math.cos(angle) * letterW * 0.35, y: by + letterH * 0.75 + Math.sin(angle) * letterH * 0.25, text: abcWords[(i + 10) % abcWords.length] }); }
+                for (let i = 0; i < 10; i++) {
+                    canvas._abcPoints.push({ x: bx - letterW * 0.32, y: by + (letterH * i / 9), text: abcWords[i % abcWords.length] });
+                }
+                for (let i = 0; i < 7; i++) {
+                    const t = i / 6;
+                    const angle = -Math.PI / 2 + Math.PI * t;
+                    canvas._abcPoints.push({ x: bx + letterW * 0.08 + Math.cos(angle) * letterW * 0.28, y: by + letterH * 0.22 + Math.sin(angle) * letterH * 0.22, text: abcWords[(i + 5) % abcWords.length] });
+                }
+                for (let i = 0; i < 7; i++) {
+                    const t = i / 6;
+                    const angle = -Math.PI / 2 + Math.PI * t;
+                    canvas._abcPoints.push({ x: bx + letterW * 0.08 + Math.cos(angle) * letterW * 0.28, y: by + letterH * 0.72 + Math.sin(angle) * letterH * 0.22, text: abcWords[(i + 10) % abcWords.length] });
+                }
 
-                // C —— 半圆
+                // C：开口弧线（不闭合，留缺口）
                 const cx2 = cx + letterW + gap;
                 for (let i = 0; i < 18; i++) {
-                    const angle = Math.PI * 0.6 + (Math.PI * 1.8 * i / 17);
+                    const angle = Math.PI * 0.55 + (Math.PI * 1.9 * i / 17);
                     canvas._abcPoints.push({
-                        x: cx2 + Math.cos(angle) * letterW * 0.4,
-                        y: cy + Math.sin(angle) * letterH * 0.5,
+                        x: cx2 + Math.cos(angle) * letterW * 0.38,
+                        y: cy + Math.sin(angle) * letterH * 0.48,
                         text: abcWords[i % abcWords.length]
                     });
                 }
