@@ -130,13 +130,6 @@
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
         let H5radio = 1
-        //当H5加载CANVAS是缩放人物剪影
-
-        if ('ontouchstart' in window) {
-            H5radio = 0.4
-        } else {
-            H5radio = 1
-        }
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -578,9 +571,16 @@
                 document.body.removeChild(link);
             });
         }
-
+        function isH5(){
+            //当H5加载CANVAS是缩放人物剪影
+            if ('ontouchstart' in window) {
+                H5radio = 0.4
+            } else {
+                H5radio = 1
+            }
+        }
         function initOtherCanvas(aug) {
-            H5radio = 1
+            isH5()
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
@@ -593,7 +593,7 @@
 
         window.addEventListener('resize', initOtherCanvas);
         window.addEventListener('resize', function() {
-            H5radio = 1
+            isH5()
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
