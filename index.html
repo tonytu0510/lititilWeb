@@ -1314,7 +1314,7 @@
             }
             if ((activeCanvas.id === 'canvas1') && !printEndFlag) {
                 drawCanvas1(activeCanvas);
-            }else{
+            }else if(activeCanvas.id !== 'canvas1'){
                 printEndFlag = false
             }
             requestAnimationFrame(animate);
