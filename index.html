@@ -150,7 +150,7 @@
         }
         function isIndexTime(){
             console.log('current=>',current)
-           if(current === (0 || 5 || 6)){
+           if(current === (0 || 4 || 5 || 6)){
                 time = indexTime
             }else{
                 time = otherTime
@@ -565,7 +565,125 @@
 
         function drawCanvas2(c) { drawSimpleCanvas(c, '🏠', '亲情', '#ffa502', '#ff6348'); }
         function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
-        function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
+        //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
+        function drawCanvas4(canvas) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = canvas.parentElement.clientWidth;
+            const H = canvas.height = canvas.parentElement.clientHeight;
+
+            // 背景
+            const grad = ctx.createLinearGradient(0, 0, W, H);
+            grad.addColorStop(0, '#1a0a1e');
+            grad.addColorStop(1, '#3a1a4e');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 初始化闪烁粒子
+            if (!canvas._particles) {
+                const artSymbols = [
+                    '♩', '♪', '♫', '♬', '♭', '♯', '🎵', '🎶', '🎼',
+                    '🎨', '🖌️', '🎭', '🎪', '🎬', '🎤', '🎧', '🎷', '🎸',
+                    '♠', '♣', '♥', '♦', '●', '▲', '■', '◆', '★', '☆',
+                    '○', '□', '△', '◇', '⬤', '⬧', '⬩', '⬪', '⬫',
+                    '莫奈', '梵高', '毕加索', '达芬奇', '米开朗基罗',
+                    'C', 'D', 'E', 'F', 'G', 'A', 'B',
+                    'do', 're', 'mi', 'fa', 'sol', 'la', 'si',
+                    '油画', '水墨', '素描', '雕塑', '建筑', '舞蹈', '戏剧',
+                    '巴洛克', '洛可可', '印象派', '抽象', '写实', '浪漫'
+                ];
+                canvas._particles = [];
+                for (let i = 0; i < 140; i++) {
+                    canvas._particles.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        text: artSymbols[Math.floor(Math.random() * artSymbols.length)],
+                        size: Math.random() * 14 + 8,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.015 + 0.005,
+                        twinkleDir: 1
+                    });
+                }
+            }
+
+            // 绘制闪烁粒子
+            canvas._particles.forEach(p => {
+                p.alpha += p.twinkleSpeed * p.twinkleDir;
+                if (p.alpha >= 0.85) p.twinkleDir = -1;
+                if (p.alpha <= 0.12) p.twinkleDir = 1;
+                // 音符用金色，其他用紫粉色
+                const isMusic = ['♩','♪','♫','♬','♭','♯','🎵','🎶','🎼'].includes(p.text);
+                const r = isMusic ? 255 : 200;
+                const g = isMusic ? 200 : 120;
+                const b = isMusic ? 60 : 200;
+                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                ctx.font = `${p.size}px 'Georgia', serif`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 大脑轮廓
+            const brainSymbols = ['♫', '♪', '🎨', '♬', '🎭', '★', '●', '▲', '◆', '莫奈', 'C', 'E', 'G'];
+            const centerX = W * 0.5;
+            const centerY = H * 0.42;
+            const brainW = W * 0.55;
+            const brainH = H * 0.45;
+
+            if (!canvas._brainPoints) {
+                canvas._brainPoints = [];
+                // 左半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = Math.PI * 0.7 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX - brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 右半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = -Math.PI * 0.1 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX + brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 胼胝体
+                for (let i = 0; i < 8; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 12 + i * 3.5,
+                        y: centerY - 8 + Math.sin(i) * 6,
+                        text: '♫'
+                    });
+                }
+                // 脑干
+                const notes = ['C','D','E','F','G','A','B','♪','♩','♬'];
+                for (let i = 0; i < 10; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 5 + Math.sin(i * 0.7) * 7,
+                        y: centerY + brainH * 0.5 + i * 10,
+                        text: notes[i]
+                    });
+                }
+            }
+
+            // 绘制大脑
+            canvas._brainPoints.forEach((p, index) => {
+                const isCore = index < 10;
+                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,180,60,0.8)';
+                ctx.font = `bold ${isCore ? 18 : 14}px 'Georgia', serif`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 标题
+            ctx.fillStyle = '#fff';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🎨 艺术', W / 2, H * 0.88);
+        }
         function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
         //function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
         function drawCanvas6(canvas) {
