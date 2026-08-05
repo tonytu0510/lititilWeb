@@ -447,25 +447,25 @@
                 canvas._textIndex = 0;
             }
 
-            const img1X = transPositionH(0.05*100,H);
-            const img1Y = transPositionH(0.45*100,H);
-            const img1W = transPositionH(0.22*100,H);
-            const img1H = transPositionH(0.22*100,H);
+            const img1X = transPositionWH(0.05*100,W,H);
+            const img1Y = transPositionWH(0.45*100,W,H);
+            const img1W = transPositionWH(0.22*100,W,H);
+            const img1H = transPositionWH(0.22*100,W,H);
 
-            const img2X = transPositionH(0.3*100,H);
-            const img2Y = transPositionH(0.12*100,H);
-            const img2W =  transPositionH(0.46*100,H);
-            const img2H =  transPositionH(0.46*100,H);
+            const img2X = transPositionWH(0.3*100,W,H);
+            const img2Y = transPositionWH(0.12*100,W,H);
+            const img2W =  transPositionWH(0.46*100,W,H);
+            const img2H =  transPositionWH(0.46*100,W,H);
 
-            const img3X = transPositionH(0.63*100,H);
-            const img3Y = transPositionH(0.5*100,H);
-            const img3W =  transPositionH(0.15*100,H);
-            const img3H =  transPositionH(0.22*100,H);
+            const img3X = transPositionWH(0.63*100,W,H);
+            const img3Y = transPositionWH(0.5*100,W,H);
+            const img3W =  transPositionWH(0.15*100,W,H);
+            const img3H =  transPositionWH(0.22*100,W,H);
 
-            const img4X = transPositionH(0.82*100,H);
-            const img4Y = transPositionH(0.6*100,H);
-            const img4W =  transPositionH(0.22*100,H);
-            const img4H =  transPositionH(0.22*100,H);
+            const img4X = transPositionWH(0.82*100,W,H);
+            const img4Y = transPositionWH(0.6*100,W,H);
+            const img4W =  transPositionWH(0.22*100,W,H);
+            const img4H =  transPositionWH(0.22*100,W,H);
 
              drawImageSafe('svg/2.svg', img1X, img1Y, img1W, img1H,ctx)
              drawImageSafe('svg/1.svg', img2X, img2Y, img2W, img2H,ctx)
@@ -480,6 +480,9 @@
         }
         function transPositionH(num,H){
             return num * (H / 100)
+        }
+        function transPositionWH(num,W,H){
+            return num * (W*H / 100)
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
