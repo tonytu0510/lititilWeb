@@ -408,6 +408,20 @@
             ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
+            console.log('000')
+            const radio = 1
+
+            const img1W = 942 * radio;
+            const img1H = 1032 * radio;
+            const img1X = W/2 - img1W/2;
+            const img1Y = H - img1H + 130;
+            console.log('img1X=>',img1X)
+            console.log('img1Y=>',img1Y)
+            console.log('img1W=>',img1W)
+            console.log('img1H=>',img1H)
+
+             drawImageSafe('svg/1.svg', img1X, img1Y, img1W, img1H,ctx)
+
             // "I LOVE LJ" 打字机效果
             const text = 'I LOVE LJ,爱LI没有惧怕！';
 
@@ -446,19 +460,6 @@
             if (canvas._textIndex > text.length) {
                 canvas._textIndex = 0;
             }
-            console.log('000')
-            const radio = 1
-
-            const img1W = 942 * radio;
-            const img1H = 1032 * radio;
-            const img1X = W/2 - img1W/2;
-            const img1Y = H - img1H + 130;
-            console.log('img1X=>',img1X)
-            console.log('img1Y=>',img1Y)
-            console.log('img1W=>',img1W)
-            console.log('img1H=>',img1H)
-
-             drawImageSafe('svg/1.svg', img1X, img1Y, img1W, img1H,ctx)
 
         }
         function transSize(num,W){
