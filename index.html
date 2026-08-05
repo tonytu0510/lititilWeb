@@ -574,9 +574,9 @@
             // =============================================
 
             const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#2a1020');
-            grad.addColorStop(0.5, '#3a1530');
-            grad.addColorStop(1, '#2a1025');
+            grad.addColorStop(0, '#2a1525');
+            grad.addColorStop(0.5, '#3a2035');
+            grad.addColorStop(1, '#2a1528');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
@@ -616,8 +616,8 @@
                 const isFlower = /[🌸🌺🌻🌹🌷🌼💐🥀🌾🌿康乃馨玫瑰百合菊花牡丹荷花梅花兰花桃花杏花茉莉桂花水仙杜鹃月季]/.test(p.text);
                 const isKitchen = /[🍳🥘🍲🥟🥢🥄🔪🍽️🥣🍚锅碗瓢盆筷勺铲灶炉煲米油盐酱醋茶面菜肉汤]/.test(p.text);
                 const r = isFlower ? 255 : (isKitchen ? 255 : 255);
-                const g = isFlower ? 150 : (isKitchen ? 180 : 200);
-                const b = isFlower ? 200 : (isKitchen ? 160 : 200);
+                const g = isFlower ? 190 : (isKitchen ? 200 : 210);
+                const b = isFlower ? 210 : (isKitchen ? 180 : 210);
                 ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
@@ -695,15 +695,20 @@
 
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
-                ctx.fillStyle = isCore ? 'rgba(255,150,180,0.95)' : 'rgba(240,130,160,0.8)';
+                ctx.fillStyle = isCore ? 'rgba(255,190,210,0.95)' : 'rgba(255,175,200,0.8)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            ctx.fillStyle = '#ffc0d0';
-            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            // 点题话
+            ctx.fillStyle = 'rgba(255,200,220,0.8)';
+            ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
+            ctx.fillText('家是港湾，爱是归途。', W / 2, H * 0.82);
+
+            ctx.fillStyle = '#ffd0e0';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.fillText('🏠 家是港湾，爱是归途。', W / 2, H * 0.92);
         }
         //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
