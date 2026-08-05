@@ -1309,7 +1309,10 @@
         // ==================== 初始化和动画循环 ====================
         function animate() {
             const activeCanvas = document.querySelector('.slide.active canvas');
-            if (activeCanvas && (activeCanvas.id === 'canvas1') && !printEndFlag) {
+            if(!activeCanvas){
+                return
+            }
+            if ((activeCanvas.id === 'canvas1') && !printEndFlag) {
                 drawCanvas1(activeCanvas);
             }else{
                 printEndFlag = false
