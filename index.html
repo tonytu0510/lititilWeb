@@ -129,6 +129,7 @@
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
+        let TimeOutTimer = null;
         // H5触屏端缩小到0.4，PC端保持1
         let H5Scal = null
         let radioY = null
@@ -136,6 +137,7 @@
         let printEndFlag = false
 
         function showSlide(n) {
+            clearTimeout(TimeOutTimer);
             slides.forEach(s => s.classList.remove('active'));
             dots.forEach(d => d.classList.remove('active'));
             slides[n].classList.add('active');
@@ -168,7 +170,6 @@
             resetTimer();
         }
 
-        let TimeOutTimer = null;
         function initTimer(time){
             console.log('time=>',time)
             clearTimeout(TimeOutTimer)
