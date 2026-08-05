@@ -471,7 +471,7 @@
              drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
         }
         function transPosition(num,W){
-            return Math.ceil(num * 0.4) * (W / 100)
+            return Math.ceil(num * 3) * (W / 100) + 'px'
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
