@@ -130,6 +130,7 @@
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
         // H5触屏端缩小到0.4，PC端保持1
+        console.log('(\'ontouchstart\' in window)=>',('ontouchstart' in window))
         let H5Scal = ('ontouchstart' in window) ? 0.4 : 1;
 
         function showSlide(n) {
