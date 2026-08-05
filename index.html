@@ -423,22 +423,24 @@
                 ctx,
                 text,
                 canvas._textIndex,
+                W,
+                H,
                 W * 0.09,
                 H * 0.25,
-                transSize(0.2,W),
+                2.3,
                 (i) => {
-                    if (i === 0 || i === 1 || i === 2) return transSize(0.3,W);
+                    if (i === 0 || i === 1 || i === 2) return transSize(0.4,W);
                     if(i === 11 || i === 12) return transSize(0.4,W);
                     if (i === text.length - 1) return transSize(0.3,W);
                     return transSize(0.2,W);
                 },
                 (i) => {
-                    if (i === 11) return { x: 0, y: transPosition(-0.4,W) };
-                    if (i === 12) return { x: 0, y: transPosition(-0.4,W) };
-                    if (i === text.length - 1) return { x: 0, y: transPosition(-0.02,W) };
+                    if (i === 0 || i === 1 || i === 2) return { x: 0, y: transPosition(-1.7,W) };
+                    if (i === 11) return { x: 0, y: transPosition(-4.8,W) };
+                    if (i === 12) return { x: 0, y: transPosition(-4.8,W) };
+                    if (i === text.length - 1) return { x: 0, y: transPosition(-0.24,W) };
                     return { x: 0, y: 0 };
-                },
-                canvas,
+                }
             );
 
             if (canvas._textIndex > text.length) {
@@ -474,7 +476,7 @@
             return Math.ceil(num * 12) * (W / 100) +'px'
         }
         function transPosition(num,W){
-            return Math.ceil(num * 12) * (W / 100)
+            return num * (W / 100)
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
@@ -496,7 +498,7 @@
             }
         }
 
-        function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas) {
+        function typewriterDraw(ctx, text, index,W,H,x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas) {
             if (index <= 0) return;
             const displayText = text.substring(0, index);
             ctx.save();
@@ -514,7 +516,7 @@
             }
             if (index < text.length) {
                 ctx.fillStyle = '#fff';
-                ctx.fillRect(currentX + 5, y,3, transPosition(baseSize,x))
+                ctx.fillRect(currentX + 5, y , 3 , transPosition(baseSize,W))
             }
             ctx.restore();
         }
