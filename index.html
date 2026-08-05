@@ -1307,7 +1307,7 @@
         // ==================== 初始化和动画循环 ====================
         function animate() {
             const activeCanvas = document.querySelector('.slide.active canvas');
-            if (activeCanvas && activeCanvas.id === 'canvas1' && activeCanvas._textTimer !== 0 ) {
+            if (activeCanvas && activeCanvas.id === 'canvas1' && activeCanvas._textIndex !== 0 ) {
                 drawCanvas1(activeCanvas);
             }
             requestAnimationFrame(animate);
