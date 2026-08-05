@@ -569,29 +569,31 @@
                 document.body.removeChild(link);
             });
         }
-        function isH5(){
+        async function isH5(){
             //当H5加载CANVAS是缩放人物剪影
             if ('ontouchstart' in window) {
                 H5radio = 0.4
             } else {
                 H5radio = 1
             }
+            return H5radio
         }
-        function initOtherCanvas(aug) {
-            isH5()
-            drawCanvas1(document.getElementById('canvas1'));
-            animate();
-            drawCanvas2(document.getElementById('canvas2'));
-            drawCanvas3(document.getElementById('canvas3'));
-            drawCanvas4(document.getElementById('canvas4'));
-            drawCanvas5(document.getElementById('canvas5'));
-            drawCanvas6(document.getElementById('canvas6'));
-            drawCanvas7(document.getElementById('canvas7'));
-            initMath()
+        function initCanvas() {
+            isH5().then(()=>{
+                drawCanvas1(document.getElementById('canvas1'));
+                animate();
+                drawCanvas2(document.getElementById('canvas2'));
+                drawCanvas3(document.getElementById('canvas3'));
+                drawCanvas4(document.getElementById('canvas4'));
+                drawCanvas5(document.getElementById('canvas5'));
+                drawCanvas6(document.getElementById('canvas6'));
+                drawCanvas7(document.getElementById('canvas7'));
+                initMath()
+            })
         }
-        initOtherCanvas();
+        initCanvas();
 
-        window.addEventListener('resize', initOtherCanvas);
+        window.addEventListener('resize', initCanvas);
     </script>
 </body>
 </html>
