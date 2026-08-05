@@ -580,6 +580,7 @@
         }
 
         function initOtherCanvas(aug) {
+            H5radio = 1
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
@@ -592,6 +593,7 @@
 
         window.addEventListener('resize', initOtherCanvas);
         window.addEventListener('resize', function() {
+            H5radio = 1
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
