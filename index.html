@@ -412,25 +412,24 @@
             ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
-            const radio = 1
-            console.log('getScaleByDevice=>',getScaleByDevice)
-            const img1W = 942 * radio * getScaleByDevice;
-            const img1H = 1032 * radio * getScaleByDevice;
+            const radio = 1 * getScaleByDevice;
+            const img1W = 942 * radio;
+            const img1H = 1032 * radio;
             const img1X = W/2 - img1W/2;
             const img1Y = H - img1H + 130;
 
-            const img2W = 430 * radio * getScaleByDevice;
-            const img2H = 430 * radio * getScaleByDevice;
+            const img2W = 430 * radio;
+            const img2H = 430 * radio;
             const img2X = img2W/2 - 100;
             const img2Y = H - img2H - 70;
 
-            const img3W = 280 * radio * getScaleByDevice;
-            const img3H = 280 * radio * getScaleByDevice;
+            const img3W = 280 * radio;
+            const img3H = 280 * radio;
             const img3X = W/2 - img3W/2 + 340;
             const img3Y = H - img3H  - 70;
 
-            const img4W = 300 * radio * getScaleByDevice;
-            const img4H = 340 * radio * getScaleByDevice;
+            const img4W = 300 * radio;
+            const img4H = 340 * radio;
             const img4X = W - img4W + 50;
             const img4Y = H - img4H + 30;
 
