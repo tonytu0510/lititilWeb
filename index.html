@@ -557,7 +557,6 @@
         function animate() {
             requestAnimationFrame(animate);
         }
-        animate();
 
         function initMath(){
             canvas6Event.addEventListener('click', () => {
@@ -581,6 +580,7 @@
         function initOtherCanvas(aug) {
             isH5()
             drawCanvas1(document.getElementById('canvas1'));
+            animate();
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
