@@ -447,7 +447,7 @@
                 canvas._textIndex = 0;
             }
             console.log('000')
-            const radio = 0.5
+            const radio = 1
             let img1X2 = transPositionWH(0.05*100,W,H);
             console.log('img1X2=>',img1X2)
             const img1X = transPositionWH(0.05*100,W,H);
@@ -490,7 +490,7 @@
             return num * (H / 100)
         }
         function transPositionWH(num,W,H){
-            return num * (W*H / 100 / 100 ) +'px'
+            return num * (W*H / 100 / 100 ) + 'px'
         }
         function drawImageSafe(url, x, y, w, h, ctx) {
             const img = new Image();
