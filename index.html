@@ -765,10 +765,9 @@
                 const isStudy = /[🎒📚📖📝✏️📏📐✂️🖊️📓书包课本作业考试试卷铅笔橡皮尺子上课下课自习晨读晚修早操课间同桌语文数学英语物理化学生物历史地理黑板讲台粉笔课桌操场校车单车宿舍教室图书馆军训运动会毕业]/.test(p.text);
                 const isFood = /[🍔🍕🍜🍻🥤🍚🍗🍖🍺🍵吃饭食堂泡面火锅撸串喝酒干杯]/.test(p.text);
                 const isFun = /[🎮🎯🎱🎳🀄♠️🎪🎤🎧🎸开黑通宵网吧游戏王者吃鸡篮球足球乒乓羽毛跑步游泳]/.test(p.text);
-                const isFight = /[👊✊🤝💪🥊兄弟哥们闺蜜死党老铁同窗室友校友打架吵架和好道歉拥抱击掌握手并肩]/.test(p.text);
-                const r = isFight ? 255 : (isFood ? 255 : (isStudy ? 100 : 100));
-                const g = isFight ? 100 : (isFood ? 180 : (isStudy ? 180 : 220));
-                const b = isFight ? 100 : (isFood ? 60 : (isStudy ? 255 : 140));
+                const r = isFood ? 255 : (isFun ? 100 : (isStudy ? 100 : 255));
+                const g = isFood ? 180 : (isFun ? 220 : (isStudy ? 180 : 100));
+                const b = isFood ? 60 : (isFun ? 140 : (isStudy ? 255 : 100));
                 ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
@@ -778,99 +777,102 @@
             const cx = W * 0.5;
             const cy = H * 0.42;
 
-            if (!canvas._handPoints) {
-                canvas._handPoints = [];
-                const handSymbols = ['🤝', '兄弟', '闺蜜', '死党', '老铁', '同窗', '室友', '友谊', '一起', '永远'];
+            // 画左手
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,180,100,0.18)';
+            ctx.strokeStyle = 'rgba(255,200,120,0.5)';
+            ctx.lineWidth = size * 0.03;
+            ctx.beginPath();
+            // 左手腕
+            ctx.moveTo(cx - size * 0.65, cy + size * 0.25);
+            ctx.lineTo(cx - size * 0.4, cy + size * 0.1);
+            // 左手掌底部
+            ctx.lineTo(cx - size * 0.35, cy - size * 0.05);
+            // 左手拇指
+            ctx.quadraticCurveTo(cx - size * 0.3, cy - size * 0.25, cx - size * 0.15, cy - size * 0.2);
+            ctx.quadraticCurveTo(cx - size * 0.1, cy - size * 0.15, cx - size * 0.05, cy - size * 0.08);
+            // 左手食指
+            ctx.moveTo(cx - size * 0.3, cy - size * 0.15);
+            ctx.quadraticCurveTo(cx - size * 0.25, cy - size * 0.35, cx - size * 0.1, cy - size * 0.32);
+            ctx.quadraticCurveTo(cx, cy - size * 0.28, cx + size * 0.05, cy - size * 0.15);
+            // 左手中指
+            ctx.moveTo(cx - size * 0.25, cy - size * 0.12);
+            ctx.quadraticCurveTo(cx - size * 0.18, cy - size * 0.38, cx, cy - size * 0.35);
+            ctx.quadraticCurveTo(cx + size * 0.1, cy - size * 0.3, cx + size * 0.15, cy - size * 0.2);
+            // 左手无名指
+            ctx.moveTo(cx - size * 0.2, cy - size * 0.1);
+            ctx.quadraticCurveTo(cx - size * 0.12, cy - size * 0.32, cx + size * 0.08, cy - size * 0.28);
+            ctx.quadraticCurveTo(cx + size * 0.18, cy - size * 0.22, cx + size * 0.2, cy - size * 0.12);
+            // 左手小指
+            ctx.moveTo(cx - size * 0.15, cy - size * 0.05);
+            ctx.quadraticCurveTo(cx - size * 0.05, cy - size * 0.25, cx + size * 0.12, cy - size * 0.2);
+            ctx.quadraticCurveTo(cx + size * 0.2, cy - size * 0.15, cx + size * 0.22, cy - size * 0.05);
+            ctx.stroke();
+            ctx.fill();
 
-                // 左手（从左侧伸过来）
-                for (let i = 0; i < 20; i++) {
-                    const t = i / 19;
-                    const x = cx - size * 0.5 + t * size * 0.3;
-                    const y = cy - size * 0.1 + Math.sin(t * Math.PI) * size * 0.15;
-                    canvas._handPoints.push({ x, y, text: handSymbols[i % 10] });
-                }
-                // 左手掌
-                for (let row = 0; row < 4; row++) {
-                    for (let col = 0; col < 5; col++) {
-                        canvas._handPoints.push({
-                            x: cx - size * 0.25 + col * (size * 0.08),
-                            y: cy - size * 0.15 + row * (size * 0.1),
-                            text: handSymbols[(row * 5 + col) % 10]
-                        });
-                    }
-                }
-                // 左手手指
-                for (let finger = 0; finger < 5; finger++) {
-                    for (let i = 0; i < 6; i++) {
-                        canvas._handPoints.push({
-                            x: cx - size * 0.2 + finger * (size * 0.07) + i * (size * 0.02),
-                            y: cy - size * 0.22 - i * (size * 0.06),
-                            text: ['👆', '👍', '✊', '👊', '💪'][finger]
-                        });
-                    }
-                }
+            // 画右手（镜像）
+            ctx.fillStyle = 'rgba(255,180,100,0.18)';
+            ctx.strokeStyle = 'rgba(255,200,120,0.5)';
+            ctx.lineWidth = size * 0.03;
+            ctx.beginPath();
+            // 右手腕
+            ctx.moveTo(cx + size * 0.65, cy + size * 0.25);
+            ctx.lineTo(cx + size * 0.4, cy + size * 0.1);
+            // 右手掌底部
+            ctx.lineTo(cx + size * 0.35, cy - size * 0.05);
+            // 右手拇指
+            ctx.quadraticCurveTo(cx + size * 0.3, cy - size * 0.25, cx + size * 0.15, cy - size * 0.2);
+            ctx.quadraticCurveTo(cx + size * 0.1, cy - size * 0.15, cx + size * 0.05, cy - size * 0.08);
+            // 右手食指
+            ctx.moveTo(cx + size * 0.3, cy - size * 0.15);
+            ctx.quadraticCurveTo(cx + size * 0.25, cy - size * 0.35, cx + size * 0.1, cy - size * 0.32);
+            ctx.quadraticCurveTo(cx, cy - size * 0.28, cx - size * 0.05, cy - size * 0.15);
+            // 右手中指
+            ctx.moveTo(cx + size * 0.25, cy - size * 0.12);
+            ctx.quadraticCurveTo(cx + size * 0.18, cy - size * 0.38, cx, cy - size * 0.35);
+            ctx.quadraticCurveTo(cx - size * 0.1, cy - size * 0.3, cx - size * 0.15, cy - size * 0.2);
+            // 右手无名指
+            ctx.moveTo(cx + size * 0.2, cy - size * 0.1);
+            ctx.quadraticCurveTo(cx + size * 0.12, cy - size * 0.32, cx - size * 0.08, cy - size * 0.28);
+            ctx.quadraticCurveTo(cx - size * 0.18, cy - size * 0.22, cx - size * 0.2, cy - size * 0.12);
+            // 右手小指
+            ctx.moveTo(cx + size * 0.15, cy - size * 0.05);
+            ctx.quadraticCurveTo(cx + size * 0.05, cy - size * 0.25, cx - size * 0.12, cy - size * 0.2);
+            ctx.quadraticCurveTo(cx - size * 0.2, cy - size * 0.15, cx - size * 0.22, cy - size * 0.05);
+            ctx.stroke();
+            ctx.fill();
+            ctx.restore();
 
-                // 右手（从右侧伸过来）
-                for (let i = 0; i < 20; i++) {
-                    const t = i / 19;
-                    const x = cx + size * 0.5 - t * size * 0.3;
-                    const y = cy - size * 0.1 + Math.sin(t * Math.PI) * size * 0.15;
-                    canvas._handPoints.push({ x, y, text: handSymbols[(i + 5) % 10] });
-                }
-                // 右手掌
-                for (let row = 0; row < 4; row++) {
-                    for (let col = 0; col < 5; col++) {
-                        canvas._handPoints.push({
-                            x: cx + size * 0.05 + col * (size * 0.08),
-                            y: cy - size * 0.15 + row * (size * 0.1),
-                            text: handSymbols[(row * 5 + col + 5) % 10]
-                        });
-                    }
-                }
-                // 右手指
-                for (let finger = 0; finger < 5; finger++) {
-                    for (let i = 0; i < 6; i++) {
-                        canvas._handPoints.push({
-                            x: cx + size * 0.15 + finger * (size * 0.07) + i * (size * 0.02),
-                            y: cy - size * 0.22 - i * (size * 0.06),
-                            text: ['👆', '👍', '✊', '👊', '💪'][finger]
-                        });
-                    }
-                }
-
-                // 握手处（中间重叠）
-                for (let i = 0; i < 15; i++) {
-                    const angle = (Math.PI * 2 * i) / 15;
-                    canvas._handPoints.push({
-                        x: cx + Math.cos(angle) * size * 0.08,
-                        y: cy - size * 0.05 + Math.sin(angle) * size * 0.06,
-                        text: '🤝'
+            // 文字符号撒在握手形状内部
+            if (!canvas._handTexts) {
+                canvas._handTexts = [];
+                const handSymbols = ['🤝', '兄弟', '闺蜜', '死党', '老铁', '同窗', '室友', '友谊', '一起', '永远', '握手', '并肩', '和好', '拥抱'];
+                for (let i = 0; i < 60; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * size * 0.45;
+                    canvas._handTexts.push({
+                        x: cx + Math.cos(angle) * dist * 0.8,
+                        y: cy - size * 0.05 + Math.sin(angle) * dist * 0.6,
+                        text: handSymbols[Math.floor(Math.random() * handSymbols.length)]
                     });
-                }
-
-                // 手腕
-                for (let side = -1; side <= 1; side += 2) {
-                    for (let i = 0; i < 10; i++) {
-                        canvas._handPoints.push({
-                            x: cx + side * (size * 0.35 + i * (size * 0.03)),
-                            y: cy + size * 0.05 + Math.sin(i * 0.5) * 5,
-                            text: side === -1 ? '友谊' : '永远'
-                        });
-                    }
                 }
             }
 
-            canvas._handPoints.forEach((p, index) => {
-                const isCore = index < 10;
-                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.8)';
-                ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
+            canvas._handTexts.forEach((p, index) => {
+                const isCore = index < 8;
+                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.9)' : 'rgba(255,170,60,0.65)';
+                ctx.font = `bold ${isCore ? 15 : 11}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
+            // 中心🤝
+            ctx.font = `${size * 0.35}px serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🤝', cx, cy - size * 0.02);
+
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
-            ctx.textAlign = 'center';
             ctx.fillText('🤝 友情', W / 2, H * 0.92);
         }
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
