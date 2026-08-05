@@ -569,10 +569,11 @@
                 document.body.removeChild(link);
             });
         }
+        let that = window
         async function isH5(){
             //当H5加载CANVAS是缩放人物剪影
             let a
-            if ('ontouchstart' in window) {
+            if ('ontouchstart' in that) {
                 a = 0.4
             } else {
                 a = 1
