@@ -150,7 +150,7 @@
         }
         function isIndexTime(){
             console.log('current=>',current)
-           if(current === (0 || 4 || 5 || 6)){
+           if(current === (0 || 1 || 2 || 3 || 4 || 5 || 6)){
                 time = indexTime
             }else{
                 time = otherTime
@@ -695,7 +695,149 @@
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.fillText('🏠 亲情', W / 2, H * 0.88);
         }
-        function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
+        //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
+        function drawCanvas3(canvas) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = canvas.parentElement.clientWidth;
+            const H = canvas.height = canvas.parentElement.clientHeight;
+
+            // 背景：青春活力渐变
+            const grad = ctx.createLinearGradient(0, 0, W, H);
+            grad.addColorStop(0, '#0a1a2e');
+            grad.addColorStop(0.5, '#1a2a4e');
+            grad.addColorStop(1, '#0a1a3e');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 初始化闪烁粒子
+            if (!canvas._particles) {
+                const friendSymbols = [
+                    // 上学相关
+                    '🎒', '📚', '📖', '📝', '✏️', '📏', '📐', '✂️', '🖊️', '📓',
+                    '书包', '课本', '作业', '考试', '试卷', '铅笔', '橡皮', '尺子', '圆规',
+                    '上课', '下课', '自习', '晨读', '晚修', '早操', '课间', '同桌',
+                    '语文', '数学', '英语', '物理', '化学', '生物', '历史', '地理',
+                    '黑板', '讲台', '粉笔', '课桌', '椅子', '窗帘', '走廊', '操场',
+                    // 一起做的事
+                    '🍔', '🍕', '🍜', '🍻', '🥤', '🍚', '🍗', '🍖', '🍺', '🍵',
+                    '吃饭', '食堂', '泡面', '火锅', '撸串', '喝酒', '干杯', '碰杯',
+                    // 泡吧/玩乐
+                    '🎮', '🎯', '🎱', '🎳', '🀄', '♠️', '🎪', '🎤', '🎧', '🎸',
+                    '开黑', '通宵', '网吧', '游戏', '王者', '吃鸡', 'LOL', 'DOTA',
+                    '篮球', '足球', '乒乓', '羽毛', '跑步', '游泳', '健身', '操场',
+                    // 打架/兄弟情
+                    '👊', '✊', '🤝', '💪', '🥊', '👊🏻', '👊🏼', '👊🏽', '🤜', '🤛',
+                    '兄弟', '哥们', '闺蜜', '死党', '老铁', '同窗', '室友', '校友',
+                    '打架', '吵架', '和好', '道歉', '拥抱', '击掌', '握手', '并肩',
+                    // 校园场景
+                    '🏫', '🏢', '🚌', '🚲', '🚶', '🏃', '🛴', '🚇',
+                    '校车', '单车', '步行', '宿舍', '教室', '图书馆', '实验室', '小卖部',
+                    '军训', '运动会', '文艺汇演', '毕业', '散伙饭', '合影', '留言',
+                    // 情感
+                    '😂', '😭', '😡', '😤', '🥰', '😎', '🤪', '😏',
+                    '哭过', '笑过', '闹过', '打过', '骂过', '想过', '念过', '忘不了'
+                ];
+                canvas._particles = [];
+                for (let i = 0; i < 180; i++) {
+                    canvas._particles.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        text: friendSymbols[Math.floor(Math.random() * friendSymbols.length)],
+                        size: Math.random() * 12 + 7,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.012 + 0.004,
+                        twinkleDir: 1
+                    });
+                }
+            }
+
+            // 绘制闪烁粒子
+            canvas._particles.forEach(p => {
+                p.alpha += p.twinkleSpeed * p.twinkleDir;
+                if (p.alpha >= 0.85) p.twinkleDir = -1;
+                if (p.alpha <= 0.08) p.twinkleDir = 1;
+                // 学习用品蓝色，吃喝橙色，玩乐绿色，打架红色
+                const isStudy = /[🎒📚📖📝✏️📏📐✂️🖊️📓书包课本作业考试试卷铅笔橡皮尺子上课下课自习晨读晚修早操课间同桌语文数学英语物理化学生物历史地理黑板讲台粉笔课桌椅子操场校车单车步行宿舍教室图书馆实验室军训运动会毕业]/.test(p.text);
+                const isFood = /[🍔🍕🍜🍻🥤🍚🍗🍖🍺🍵吃饭食堂泡面火锅撸串喝酒干杯碰杯]/.test(p.text);
+                const isFun = /[🎮🎯🎱🎳🀄♠️🎪🎤🎧🎸开黑通宵网吧游戏王者吃鸡LOL篮球足球乒乓羽毛跑步游泳健身]/.test(p.text);
+                const isFight = /[👊✊🤝💪🥊兄弟哥们闺蜜死党老铁同窗室友校友打架吵架和好道歉拥抱击掌握手并肩]/.test(p.text);
+
+                const r = isFight ? 255 : (isFood ? 255 : (isStudy ? 100 : 100));
+                const g = isFight ? 100 : (isFood ? 180 : (isStudy ? 180 : 220));
+                const b = isFight ? 100 : (isFood ? 60 : (isStudy ? 255 : 140));
+                ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 大脑轮廓
+            const brainSymbols = ['🤝', '兄弟', '闺蜜', '同窗', '室友', '老铁', '死党', '一起', '陪伴', '青春', '友谊', '永远', '回忆'];
+            const centerX = W * 0.5;
+            const centerY = H * 0.42;
+            const brainW = W * 0.55;
+            const brainH = H * 0.45;
+
+            if (!canvas._brainPoints) {
+                canvas._brainPoints = [];
+                // 左半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = Math.PI * 0.7 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX - brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 右半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = -Math.PI * 0.1 + (Math.PI * 1.6 * i / 29);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX + brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 胼胝体（握手符号）
+                for (let i = 0; i < 8; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 14 + i * 4,
+                        y: centerY - 8 + Math.sin(i) * 6,
+                        text: '🤝'
+                    });
+                }
+                // 脑干：校园场景串
+                const stems = ['上课','下课','吃饭','开黑','打架','和好','毕业','散伙','回忆','永远'];
+                for (let i = 0; i < 10; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 5 + Math.sin(i * 0.7) * 7,
+                        y: centerY + brainH * 0.5 + i * 10,
+                        text: stems[i]
+                    });
+                }
+            }
+
+            // 绘制大脑
+            canvas._brainPoints.forEach((p, index) => {
+                const isCore = index < 10;
+                ctx.fillStyle = isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.8)';
+                ctx.font = `bold ${isCore ? 16 : 13}px 'Microsoft YaHei', serif`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 中央握手
+            ctx.font = `${Math.min(H * 0.1, 55)}px serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('🤝', centerX, centerY);
+
+            // 标题
+            ctx.fillStyle = '#fff';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.fillText('🤝 友情', W / 2, H * 0.88);
+        }
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas4(canvas) {
             const ctx = canvas.getContext('2d');
