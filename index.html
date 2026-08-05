@@ -130,7 +130,6 @@
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
         // H5触屏端缩小到0.4，PC端保持1
-        console.log('(\'ontouchstart\' in window)=>',('ontouchstart' in window))
         let H5Scal = null
 
         function showSlide(n) {
@@ -561,7 +560,6 @@
             drawCanvas1(document.getElementById('canvas1'));
             requestAnimationFrame(animate);
         }
-        animate();
 
         function initMath(){
             canvas6Event.addEventListener('click', () => {
@@ -575,6 +573,7 @@
             });
         }
         function initCanvas() {
+                animate();
                 drawCanvas2(document.getElementById('canvas2'));
                 drawCanvas3(document.getElementById('canvas3'));
                 drawCanvas4(document.getElementById('canvas4'));
