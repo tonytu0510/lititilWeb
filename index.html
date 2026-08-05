@@ -419,7 +419,10 @@
                 canvas._textIndex++;
                 canvas._textTimer = 0;
             }
-
+            let H290 = Math.ceil(90 * 0.04) * (w / 100) +'px'
+            let H240 = Math.ceil(40 * 0.04) * (w / 100) +'px'
+            let H227 = Math.ceil(27 * 0.04) * (w / 100) +'px'
+            let H210 = Math.ceil(10 * 0.04) * (w / 100) +'px'
             typewriterDraw(
                 ctx,
                 text,
@@ -428,14 +431,14 @@
                 H * 0.25,
                 45,
                 (i) => {
-                    if (i === 0 || i === 2 || i === 11 || i === 12) return 90;
-                    if (i === text.length - 1) return 40;
+                    if (i === 0 || i === 2 || i === 11 || i === 12) return H290;
+                    if (i === text.length - 1) return H240;
                     return 45;
                 },
                 (i) => {
-                    if (i === 11) return { x: 0, y: -27 };
-                    if (i === 12) return { x: 0, y: -27 };
-                    if (i === text.length - 1) return { x: 0, y: 10 };
+                    if (i === 11) return { x: 0, y: -H227 };
+                    if (i === 12) return { x: 0, y: -H227 };
+                    if (i === text.length - 1) return { x: 0, y: H210 };
                     return { x: 0, y: 0 };
                 },
                 canvas,
