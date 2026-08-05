@@ -359,50 +359,51 @@
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
             // "I LOVE LJ" 打字机效果
-const text = 'I LOVE LJ,爱LI没有惧怕！';
+            const text = 'I LOVE LJ,爱LI没有惧怕！';
 
-// 2. 在渲染循环 (Update 或 Tick) 中：
-// (假设你的画布上挂载了自定义属性 `_textIndex` 和 `_textTimer`)
-if (!canvas._textIndex) canvas._textIndex = 0;
-if (!canvas._textTimer) canvas._textTimer = 0;
+            // 2. 在渲染循环 (Update 或 Tick) 中：
+            // (假设你的画布上挂载了自定义属性 `_textIndex` 和 `_textTimer`)
+            if (!canvas._textIndex) canvas._textIndex = 0;
+            if (!canvas._textTimer) canvas._textTimer = 0;
 
-canvas._textTimer++;
-if (canvas._textTimer >= 20) { // 控制打字速度
-    canvas._textIndex++;
-    canvas._textTimer = 0;
-}
+            canvas._textTimer++;
+            if (canvas._textTimer >= 20) { // 控制打字速度
+                canvas._textIndex++;
+                canvas._textTimer = 0;
+            }
 
-// 3. 调用封装后的引擎绘制！
-// 2. 在每一帧的渲染里调用：
-typewriterDraw(
-    ctx,
-    text,
-    canvas._textIndex,
-    W * 0.09,
-    H * 0.25,
-    45,
-    // 参数1: 每个字的大小控制
-    (i) => {
-        if (i === 0 || i === 2 || i === 11 || i === 12) return 90; // 大字母
-        if (i === text.length - 1) return 40;
-        return 45;
-    },
-    // 参数2: 【新功能】每个字的位置微调控制
-    (i) => {
-        // 如果索引是 11 (爱) 和 12 (L)，把它们稍微往下错开一点，或者往右挪
-        if (i === 11) return { x: 0, y: -27 };  // 把 '爱' 往下微调 5px
-        if (i === 12) return { x: 0, y: -27 };  // 把 'L' 也往下微调 5px，和前面的大字对齐视觉
-         if (i === text.length - 1) return { x: 0, y: 10 };;
-        // 其它所有字符，没有任何偏移
-        return { x: 0, y: 0 };
-    },
-    canvas
-);
+            // 3. 调用封装后的引擎绘制！
+            // 2. 在每一帧的渲染里调用：
+            typewriterDraw(
+                ctx,
+                text,
+                canvas._textIndex,
+                W * 0.09,
+                H * 0.25,
+                45,
+                // 参数1: 每个字的大小控制
+                (i) => {
+                    if (i === 0 || i === 2 || i === 11 || i === 12) return 90; // 大字母
+                    if (i === text.length - 1) return 40;
+                    return 45;
+                },
+                // 参数2: 【新功能】每个字的位置微调控制
+                (i) => {
+                    // 如果索引是 11 (爱) 和 12 (L)，把它们稍微往下错开一点，或者往右挪
+                    if (i === 11) return { x: 0, y: -27 };  // 把 '爱' 往下微调 5px
+                    if (i === 12) return { x: 0, y: -27 };  // 把 'L' 也往下微调 5px，和前面的大字对齐视觉
+                     if (i === text.length - 1) return { x: 0, y: 10 };;
+                    // 其它所有字符，没有任何偏移
+                    return { x: 0, y: 0 };
+                },
+                canvas,
+                W
+            );
 
-// 4. 循环重置逻辑
-if (canvas._textIndex > text.length) {
-    canvas._textIndex = 0; // 循环播放
-}
+            // 4. 循环重置逻辑
+            if (canvas._textIndex > text.length) {
+                canvas._textIndex = 0; // 循环播放
+            }
         // --- 2. 等图片加载完成后，再画到 Canvas 上 ---
             const img1X = W * 0.05;
             const img1Y = H * 0.45;
@@ -478,10 +479,10 @@ function drawImageSafe(url, x, y, w, h, ctx) {
  * @param {number} baseSize - 基础字号
  * @param {function} getCharSize - 返回每个字的大小
  * @param {object} getCharOffset - 【新增】返回每个字的 { x, y } 偏移量
+ * @param {number} w - canvas宽度
  */
-function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas) {
+function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas,w) {
     if (index <= 0) return;
-    const W = canvas.width = canvas.parentElement.clientWidth;
     const displayText = text.substring(0, index);
 
     ctx.save();
@@ -496,7 +497,7 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
 
         // 1. 获取当前字的大小
         const fontSize = getCharSize(i);
-        const fontSize2= Math.ceil(fontSize * 0.05) * (W / 100) +'px'
+        const fontSize2= Math.ceil(fontSize * 0.05) * (w / 100) +'px'
 
         ctx.font= 'bold '+fontSize2+' 微软雅黑,Georgia,serif'
 
@@ -508,11 +509,11 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
 
         // 4. 计算下一个字的 X 坐标 (依然按照正常宽度累加)
         currentX += ctx.measureText(char).width;
-        // 光标逻辑
-        if (index < text.length) {
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(currentX + 5, y,3, Math.ceil(fontSize * baseSize * 0.01) * (W / 100))
-        }
+    }
+    // 光标逻辑
+    if (index < text.length) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(currentX + 5, y,3, Math.ceil(baseSize * 0.02) * (w / 100))
     }
 
     ctx.restore();
