@@ -457,14 +457,20 @@
             const img1W = transPositionWH(0.22*100,W,H);
             const img1H = transPositionWH(0.22*100,W,H);
 
-            const img2X = transPositionWH(W/2,W,H);
-            const img2Y = transPositionWH(H-20,W,H);
+            const img2X = transPositionWH(W/2*H,W,H);
+            const img2Y = transPositionWH(H/2*W-20,W,H);
             const img2W =  transPositionWH(942*radio,W,H);
             const img2H =  transPositionWH(1032*radio,W,H);
             console.log('img2X=>',img2X)
             console.log('img2Y=>',img2Y)
             console.log('img2W=>',img2W)
             console.log('img2H=>',img2H)
+
+            img2X=> 60781.7952px
+            (index):465 img2Y=> 88795.17360000001px
+            (index):466 img2W=> 97374.9168px
+            (index):467 img2H=> 106678.2528px
+
             const img3X = transPositionWH(0.63*100,W,H);
             const img3Y = transPositionWH(0.5*100,W,H);
             const img3W =  transPositionWH(0.15*100,W,H);
