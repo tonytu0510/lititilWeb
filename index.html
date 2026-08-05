@@ -186,6 +186,16 @@
         }
 
         initTimer(time)
+        //鼠标滑过计时器暂停
+        const slideElements = document.getElementsByClassName('slide')
+        for(let i=0;i<slideEle.length;i++){
+            slideElements[i].onmouseover = function(){
+                clearTimeout(TimeOutTimer);
+            }
+            slideElements[i].onmouseout = function(){
+                initTimer(time)
+            }
+        }
 
         // ==================== H5触屏手势 ====================
         let touchStartX = 0;
