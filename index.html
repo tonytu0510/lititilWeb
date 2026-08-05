@@ -473,9 +473,9 @@
         function transPositionWH(num,W,H){
             let a
             if( W > H ){
-                a= num * (W / 100)
+                a= num / W
             }else{
-                a= num * (H / 100)
+                a= num / H
             }
             return a
         }
