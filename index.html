@@ -580,6 +580,7 @@
         }
         function initCanvas() {
             isH5().then(()=>{
+                console.log('H5radio=>',H5radio)
                 drawCanvas1(document.getElementById('canvas1'));
                 animate();
                 drawCanvas2(document.getElementById('canvas2'));
