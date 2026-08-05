@@ -395,7 +395,8 @@ typewriterDraw(
          if (i === text.length - 1) return { x: 0, y: 10 };;
         // 其它所有字符，没有任何偏移
         return { x: 0, y: 0 };
-    }
+    },
+    canvas
 );
 
 // 4. 循环重置逻辑
@@ -468,6 +469,7 @@ function drawImageSafe(url, x, y, w, h, ctx) {
 }
 /**
  * 打字机引擎 (支持每个字独立设置大小 + 独立设置 x/y 坐标偏移)
+ * @param {HTMLCanvasElement} canvas - 要绘制的画布元素。
  * @param {CanvasRenderingContext2D} ctx
  * @param {string} text - 完整文本
  * @param {number} index - 当前打字进度
@@ -477,9 +479,9 @@ function drawImageSafe(url, x, y, w, h, ctx) {
  * @param {function} getCharSize - 返回每个字的大小
  * @param {object} getCharOffset - 【新增】返回每个字的 { x, y } 偏移量
  */
-function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0})) {
+function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas) {
     if (index <= 0) return;
-
+    const W = canvas.width = canvas.parentElement.clientWidth;
     const displayText = text.substring(0, index);
 
     ctx.save();
@@ -494,7 +496,9 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
 
         // 1. 获取当前字的大小
         const fontSize = getCharSize(i);
-        ctx.font = `bold ${fontSize}px '微软雅黑', 'Georgia', serif`;
+        const fontSize2= Math.ceil(fontSize * 0.05) * (W / 100) +'px'
+
+        ctx.font= 'bold '+fontSize2+' 微软雅黑,Georgia,serif'
 
         // 2. 【新增核心修改】获取当前字的 X 和 Y 坐标偏移
         const offset = getCharOffset(i);
@@ -504,12 +508,11 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
 
         // 4. 计算下一个字的 X 坐标 (依然按照正常宽度累加)
         currentX += ctx.measureText(char).width;
-    }
-
-    // 光标逻辑
-    if (index < text.length) {
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(currentX + 5, y, 3, baseSize * 0.8);
+        // 光标逻辑
+        if (index < text.length) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(currentX + 5, y,3, Math.ceil(fontSize * baseSize * 0.01) * (W / 100))
+        }
     }
 
     ctx.restore();
