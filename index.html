@@ -123,7 +123,7 @@
         // ==================== 轮播逻辑 ====================
         let current = 0;
         let indexTime = 8600;
-        let otherTime = 2000;
+        let otherTime = 4300;
         let time = indexTime
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
@@ -150,7 +150,7 @@
         }
         function isIndexTime(){
             console.log('current=>',current)
-           if(current === (0 || 1 || 2 || 3 || 4 || 5 || 6)){
+           if(current === 0){
                 time = indexTime
             }else{
                 time = otherTime
