@@ -129,6 +129,14 @@
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
+        let H5radio = 1
+        //当H5加载CANVAS是缩放人物剪影
+
+        if ('ontouchstart' in window) {
+            H5radio = 0.5
+        } else {
+            H5radio = 1
+        }
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -410,23 +418,23 @@
 
             const radio = 1
 
-            const img1W = 942 * radio;
-            const img1H = 1032 * radio;
+            const img1W = 942 * radio * H5radio;
+            const img1H = 1032 * radio * H5radio;
             const img1X = W/2 - img1W/2;
             const img1Y = H - img1H + 130;
 
-            const img2W = 430 * radio;
-            const img2H = 430 * radio;
+            const img2W = 430 * radio * H5radio;
+            const img2H = 430 * radio * H5radio;
             const img2X = img2W/2 - 100;
             const img2Y = H - img2H - 70;
 
-            const img3W = 280 * radio;
-            const img3H = 280 * radio;
+            const img3W = 280 * radio * H5radio;
+            const img3H = 280 * radio * H5radio;
             const img3X = W/2 - img3W/2 + 340;
             const img3Y = H - img3H  - 70;
 
-            const img4W = 300 * radio;
-            const img4H = 340 * radio;
+            const img4W = 300 * radio * H5radio;
+            const img4H = 340 * radio * H5radio;
             const img4X = W - img4W + 50;
             const img4Y = H - img4H + 30;
 
