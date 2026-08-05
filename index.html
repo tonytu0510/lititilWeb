@@ -131,7 +131,7 @@
         const slider = document.getElementById('slider');
         function getScaleByDevice() {
             // H5触屏端缩小到0.4，PC端保持1
-            return ('ontouchstart' in window) ? 0.4 : 1;
+            return ('ontouchstart' in document) ? 0.4 : 1;
         }
 
         function showSlide(n) {
