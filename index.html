@@ -482,13 +482,13 @@
                 1.7,
                 (i) => {
                     if (i === 0 || i === 1 || i === 2) return transSize(0.3,W);
-                    if(i === 12 || i === 13) return transSize(0.3,W);
+                    if(i === 12 || i === 13|| i === 14|| i === 15|| i === 16) return transSize(0.3,W);
                     if (i === text.length - 1) return transSize(0.2,W);
                     return transSize(0.164,W);
                 },
                 (i) => {
                     if (i === 0 || i === 1 || i === 2) return { x: 0, y: transPosition(-1.6,W) };
-                    if (i === 12 || i === 13) return { x: 0, y: transPosition(-2.9,W) };
+                    if(i === 12 || i === 13|| i === 14|| i === 15|| i === 16) return { x: 0, y: transPosition(-2.9,W) };
                     if (i === text.length - 1) return { x: 0, y: transPosition(-0.24,W) };
                     return { x: 0, y: 0 };
                 }
