@@ -569,7 +569,10 @@
             const W = canvas.width = canvas.parentElement.clientWidth;
             const H = canvas.height = canvas.parentElement.clientHeight;
 
-            // 背景
+            // ===== 修改这个变量控制整体大小：0.3~0.45 =====
+            const SCALE = 0.38;
+            // =============================================
+
             const grad = ctx.createLinearGradient(0, 0, W, H);
             grad.addColorStop(0, '#2a1a0a');
             grad.addColorStop(0.5, '#3a2010');
@@ -577,7 +580,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
-            // 初始化闪烁粒子
             if (!canvas._particles) {
                 const familySymbols = [
                     '🍳', '🥘', '🍲', '🥟', '🥢', '🥄', '🔪', '🍽️', '🥣', '🍚',
@@ -607,7 +609,6 @@
                 }
             }
 
-            // 绘制闪烁粒子
             canvas._particles.forEach(p => {
                 p.alpha += p.twinkleSpeed * p.twinkleDir;
                 if (p.alpha >= 0.85) p.twinkleDir = -1;
@@ -622,21 +623,19 @@
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            // 康乃馨花形状
+            const size = Math.min(W, H) * SCALE;
+            const cx = W * 0.5;
+            const cy = H * 0.4;
+
             if (!canvas._flowerPoints) {
                 canvas._flowerPoints = [];
-                const cx = W * 0.5;
-                const cy = H * 0.42;
-                const r = Math.min(W, H) * 0.28;
-
-                // 多层花瓣（锯齿边）
                 const petalSymbols = ['❤️', '💕', '💗', '💖', '💝', '家', '爱', '暖', '妈', '爸', '归', '盼'];
                 for (let layer = 0; layer < 5; layer++) {
-                    const layerR = r * (0.35 + layer * 0.15);
+                    const layerR = size * (0.35 + layer * 0.15);
                     const petals = 8 + layer * 3;
                     for (let i = 0; i < petals; i++) {
                         const angle = (Math.PI * 2 * i) / petals + layer * 0.2;
-                        const dist = layerR + Math.sin(i * 3) * r * 0.06;
+                        const dist = layerR + Math.sin(i * 3) * size * 0.06;
                         canvas._flowerPoints.push({
                             x: cx + Math.cos(angle) * dist,
                             y: cy + Math.sin(angle) * dist,
@@ -644,55 +643,45 @@
                         });
                     }
                 }
-
-                // 花蕊（中心密集）
                 const coreSymbols = ['🌺', '康乃馨', '🏠', '❤️', '💗'];
                 for (let i = 0; i < 12; i++) {
                     const angle = (Math.PI * 2 * i) / 12;
-                    const dist = r * 0.12 + Math.random() * r * 0.08;
+                    const dist = size * 0.12 + Math.random() * size * 0.08;
                     canvas._flowerPoints.push({
                         x: cx + Math.cos(angle) * dist,
                         y: cy + Math.sin(angle) * dist,
                         text: coreSymbols[i % coreSymbols.length]
                     });
                 }
-
-                // 花萼（底部）
                 const sepalSymbols = ['🌸', '🌿', '🌾', '💚'];
                 for (let i = 0; i < 8; i++) {
                     canvas._flowerPoints.push({
-                        x: cx - r * 0.3 + (r * 0.6 * i) / 7,
-                        y: cy + r * 0.7 + Math.abs(i - 3.5) * r * 0.1,
+                        x: cx - size * 0.3 + (size * 0.6 * i) / 7,
+                        y: cy + size * 0.7 + Math.abs(i - 3.5) * size * 0.1,
                         text: sepalSymbols[i % 4]
                     });
                 }
-
-                // 花茎
                 const stemSymbols = ['🌿', '🌾', '💚', '家', '爱', '根'];
                 for (let i = 0; i < 12; i++) {
                     canvas._flowerPoints.push({
                         x: cx + Math.sin(i * 0.3) * 6,
-                        y: cy + r * 0.78 + i * (H * 0.35 / 11),
+                        y: cy + size * 0.78 + i * (H * 0.35 / 11),
                         text: stemSymbols[i % 6]
                     });
                 }
-
-                // 叶子
                 for (let side = -1; side <= 1; side += 2) {
                     for (let i = 0; i < 6; i++) {
                         canvas._flowerPoints.push({
-                            x: cx + side * (r * 0.2 + i * 4),
-                            y: cy + r * 0.85 + i * 10,
+                            x: cx + side * (size * 0.2 + i * 4),
+                            y: cy + size * 0.85 + i * 10,
                             text: side === -1 ? '🍃' : '🌿'
                         });
                     }
                 }
-
-                // 花盆（底部容器，用厨房元素）
                 const potSymbols = ['锅', '碗', '瓢', '盆', '🍳', '🥘', '🍲', '🥣'];
                 for (let row = 0; row < 4; row++) {
-                    const potW = r * 0.5 + row * r * 0.05;
-                    const potY = cy + r * 1.05 + row * 8;
+                    const potW = size * 0.5 + row * size * 0.05;
+                    const potY = cy + size * 1.05 + row * 8;
                     const count = 8 + row;
                     for (let i = 0; i < count; i++) {
                         canvas._flowerPoints.push({
@@ -704,7 +693,6 @@
                 }
             }
 
-            // 绘制康乃馨
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
                 ctx.fillStyle = isCore ? 'rgba(255,200,100,0.95)' : 'rgba(255,160,80,0.8)';
@@ -713,11 +701,10 @@
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            // 标题
             ctx.fillStyle = '#fff';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('🏠 亲情', W / 2, H * 0.9);
+            ctx.fillText('🏠 亲情', W / 2, H * 0.92);
         }
         //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
         function drawCanvas3(canvas) {
