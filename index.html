@@ -17,6 +17,7 @@
             position: relative;
             overflow: hidden;
             transition: height 0.3s;
+            touch-action: pan-y;
         }
         #slider.full {
             height: 100vh;
@@ -54,6 +55,12 @@
             cursor: pointer;
             z-index: 10;
             border-radius: 4px;
+            display: none;
+        }
+        @media (min-width: 768px) {
+            .arrow {
+                display: block;
+            }
         }
         .arrow:hover {
             background: rgba(255,255,255,0.4);
@@ -121,6 +128,7 @@
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
+        const slider = document.getElementById('slider');
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -139,9 +147,9 @@
         function isIndexTime(){
             console.log('current=>',current)
            if(current === 0){
-	            time = indexTime
+                time = indexTime
             }else{
-	            time = otherTime
+                time = otherTime
             }
            return time;
         }
@@ -152,6 +160,7 @@
 
         function goTo(n) {
             showSlide(n);
+            resetTimer();
         }
 
         let TimeOutTimer = null;
@@ -164,11 +173,52 @@
                   initTimer(time)
             },time)
         }
+
+        function resetTimer() {
+            clearTimeout(TimeOutTimer);
+            time = isIndexTime();
+            initTimer(time);
+        }
+
         initTimer(time)
+
+        // ==================== H5触屏手势 ====================
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchMoved = false;
+
+        slider.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchMoved = false;
+        }, { passive: true });
+
+        slider.addEventListener('touchmove', function(e) {
+            touchMoved = true;
+        }, { passive: true });
+
+        slider.addEventListener('touchend', function(e) {
+            if (!touchMoved) return;
+
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = touchStartX - endX;
+            const diffY = touchStartY - endY;
+
+            // 横向滑动超过30px且大于纵向滑动
+            if (Math.abs(diffX) > 30 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+                resetTimer();
+            }
+            touchMoved = false;
+        });
 
         function updateSliderHeight() {
             const dinoBar = document.getElementById('dinoBar');
-            const slider = document.getElementById('slider');
             if (dinoBar && slider) {
                 if (dinoBar.style.display === 'none') {
                     slider.classList.add('full');
@@ -361,19 +411,15 @@
             // "I LOVE LJ" 打字机效果
             const text = 'I LOVE LJ,爱LI没有惧怕！';
 
-            // 2. 在渲染循环 (Update 或 Tick) 中：
-            // (假设你的画布上挂载了自定义属性 `_textIndex` 和 `_textTimer`)
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
 
             canvas._textTimer++;
-            if (canvas._textTimer >= 20) { // 控制打字速度
+            if (canvas._textTimer >= 20) {
                 canvas._textIndex++;
                 canvas._textTimer = 0;
             }
 
-            // 3. 调用封装后的引擎绘制！
-            // 2. 在每一帧的渲染里调用：
             typewriterDraw(
                 ctx,
                 text,
@@ -381,30 +427,25 @@
                 W * 0.09,
                 H * 0.25,
                 45,
-                // 参数1: 每个字的大小控制
                 (i) => {
-                    if (i === 0 || i === 2 || i === 11 || i === 12) return 90; // 大字母
+                    if (i === 0 || i === 2 || i === 11 || i === 12) return 90;
                     if (i === text.length - 1) return 40;
                     return 45;
                 },
-                // 参数2: 【新功能】每个字的位置微调控制
                 (i) => {
-                    // 如果索引是 11 (爱) 和 12 (L)，把它们稍微往下错开一点，或者往右挪
-                    if (i === 11) return { x: 0, y: -27 };  // 把 '爱' 往下微调 5px
-                    if (i === 12) return { x: 0, y: -27 };  // 把 'L' 也往下微调 5px，和前面的大字对齐视觉
-                     if (i === text.length - 1) return { x: 0, y: 10 };;
-                    // 其它所有字符，没有任何偏移
+                    if (i === 11) return { x: 0, y: -27 };
+                    if (i === 12) return { x: 0, y: -27 };
+                    if (i === text.length - 1) return { x: 0, y: 10 };
                     return { x: 0, y: 0 };
                 },
                 canvas,
                 W
             );
 
-            // 4. 循环重置逻辑
             if (canvas._textIndex > text.length) {
-                canvas._textIndex = 0; // 循环播放
+                canvas._textIndex = 0;
             }
-        // --- 2. 等图片加载完成后，再画到 Canvas 上 ---
+
             const img1X = W * 0.05;
             const img1Y = H * 0.45;
             const img1W = W * 0.22;
@@ -429,95 +470,52 @@
              drawImageSafe('svg/1.svg', img2X, img2Y, img2W, img2H,ctx)
              drawImageSafe('svg/3.svg', img3X, img3Y, img3W, img3H,ctx)
              drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
-}
-/**
- * 极速安全的图片绘制函数 (铁壁版)
- * 核心逻辑：优先使用 decode()，失败则 fallback 到 onload，并处理跨域和缓存问题
- * @param {string} url    图片路径
- * @param {number} x      画布 X 坐标
- * @param {number} y      画布 Y 坐标
- * @param {number} w      宽度
- * @param {number} h      高度
- * @param {CanvasRenderingContext2D} ctx  Canvas 上下文
- */
-function drawImageSafe(url, x, y, w, h, ctx) {
-    const img = new Image();
+        }
 
-    // 关键点：如果是在线服务器（非本地 file://），且图片与 HTML 不同域，加上这行防止 Canvas 被污染
-    // 如果在本地双击打开，这行可以忽略。
-    img.crossOrigin = "anonymous";
+        function drawImageSafe(url, x, y, w, h, ctx) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            if (img.decode) {
+                img.src = url;
+                img.decode().then(() => {
+                    ctx.drawImage(img, x, y, w, h);
+                }).catch(() => {
+                    img.onload = () => {
+                        ctx.drawImage(img, x, y, w, h);
+                    };
+                });
+            } else {
+                img.onload = () => {
+                    ctx.drawImage(img, x, y, w, h);
+                };
+                img.src = url;
+            }
+        }
 
-    // 逻辑 1: 使用现代浏览器的 decode() 异步解码技术
-    // 这会让浏览器在后台静默解图，绝不阻塞主线程渲染
-    if (img.decode) {
-        img.src = url;
-        img.decode().then(() => {
-            ctx.drawImage(img, x, y, w, h);
-        }).catch(() => {
-            // 逻辑 2: 兜底方案，如果 decode() 因为某些奇怪原因失败了，
-            // 立刻退回到传统的 onload 方式
-            img.onload = () => {
-                ctx.drawImage(img, x, y, w, h);
-            };
-        });
-    } else {
-        // 逻辑 3: 终极兜底（针对远古浏览器）
-        img.onload = () => {
-            ctx.drawImage(img, x, y, w, h);
-        };
-        img.src = url;
-    }
-}
-/**
- * 打字机引擎 (支持每个字独立设置大小 + 独立设置 x/y 坐标偏移)
- * @param {HTMLCanvasElement} canvas - 要绘制的画布元素。
- * @param {CanvasRenderingContext2D} ctx
- * @param {string} text - 完整文本
- * @param {number} index - 当前打字进度
- * @param {number} x - 起始 X 坐标
- * @param {number} y - 起始 Y 坐标
- * @param {number} baseSize - 基础字号
- * @param {function} getCharSize - 返回每个字的大小
- * @param {object} getCharOffset - 【新增】返回每个字的 { x, y } 偏移量
- * @param {number} w - canvas宽度
- */
-function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas,w) {
-    if (index <= 0) return;
-    const displayText = text.substring(0, index);
+        function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOffset = (i) => ({x:0, y:0}),canvas,w) {
+            if (index <= 0) return;
+            const displayText = text.substring(0, index);
+            ctx.save();
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#fff';
+            let currentX = x;
+            for (let i = 0; i < displayText.length; i++) {
+                const char = displayText[i];
+                const fontSize = getCharSize(i);
+                const fontSize2= Math.ceil(fontSize * 0.04) * (w / 100) +'px'
+                ctx.font= 'bold '+fontSize2+' 微软雅黑,Georgia,serif'
+                const offset = getCharOffset(i);
+                ctx.fillText(char, currentX + offset.x, y + offset.y);
+                currentX += ctx.measureText(char).width;
+            }
+            if (index < text.length) {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(currentX + 5, y,3, Math.ceil(baseSize * 0.02) * (w / 100))
+            }
+            ctx.restore();
+        }
 
-    ctx.save();
-    ctx.textBaseline = 'top';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#fff';
-
-    let currentX = x;
-
-    for (let i = 0; i < displayText.length; i++) {
-        const char = displayText[i];
-
-        // 1. 获取当前字的大小
-        const fontSize = getCharSize(i);
-        const fontSize2= Math.ceil(fontSize * 0.04) * (w / 100) +'px'
-
-        ctx.font= 'bold '+fontSize2+' 微软雅黑,Georgia,serif'
-
-        // 2. 【新增核心修改】获取当前字的 X 和 Y 坐标偏移
-        const offset = getCharOffset(i);
-
-        // 3. 画字的时候，加入偏移量
-        ctx.fillText(char, currentX + offset.x, y + offset.y);
-
-        // 4. 计算下一个字的 X 坐标 (依然按照正常宽度累加)
-        currentX += ctx.measureText(char).width;
-    }
-    // 光标逻辑
-    if (index < text.length) {
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(currentX + 5, y,3, Math.ceil(baseSize * 0.02) * (w / 100))
-    }
-
-    ctx.restore();
-}
         // ==================== Canvas 2-7: 简化版 ====================
         function drawSimpleCanvas(canvas, emoji, label, color1, color2) {
             const ctx = canvas.getContext('2d');
@@ -549,33 +547,31 @@ function typewriterDraw(ctx, text, index, x, y, baseSize, getCharSize, getCharOf
             requestAnimationFrame(animate);
         }
         animate();
+
         function initMath(){
             canvas6Event.addEventListener('click', () => {
-                // 1. 同步创建一个a标签，设置临时href
                 const link = document.createElement('a');
-                link.href = './nestedInvolutionRingHuge.html';  // 预设一个默认中转地址
+                link.href = './nestedInvolutionRingHuge.html';
                 link.target = '_self';
                 link.rel = 'noopener noreferrer';
                 document.body.appendChild(link);
-
-                // 2. 同步点击（不会被拦截）
                 link.click();
                 document.body.removeChild(link);
             });
         }
+
         function initOtherCanvas(aug) {
-	            drawCanvas2(document.getElementById('canvas2'));
-                drawCanvas3(document.getElementById('canvas3'));
-                drawCanvas4(document.getElementById('canvas4'));
-                drawCanvas5(document.getElementById('canvas5'));
-                drawCanvas6(document.getElementById('canvas6'));
-                drawCanvas7(document.getElementById('canvas7'));
-                initMath()
+            drawCanvas2(document.getElementById('canvas2'));
+            drawCanvas3(document.getElementById('canvas3'));
+            drawCanvas4(document.getElementById('canvas4'));
+            drawCanvas5(document.getElementById('canvas5'));
+            drawCanvas6(document.getElementById('canvas6'));
+            drawCanvas7(document.getElementById('canvas7'));
+            initMath()
         }
         initOtherCanvas();
-        window.addEventListener('resize', initOtherCanvas);
 
-        // 窗口缩放时重绘 Canvas 2-7
+        window.addEventListener('resize', initOtherCanvas);
         window.addEventListener('resize', function() {
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
