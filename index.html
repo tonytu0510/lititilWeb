@@ -312,8 +312,8 @@
             ctx.fillRect(0, H * 0.92, W, H * 1);
 
             // 长椅
-            const benchX = W * 0.3;
-            const benchY = H * 0.9;
+            const benchX = transPosition(0.3*100,W);
+            const benchY = transPositionH(0.9*100,H);
             const bw = 220;
             // 椅背
             ctx.fillStyle = '#4a2c14';
@@ -333,8 +333,8 @@
 
 
             // 长椅
-            const benchX2 = W * 0.83;
-            const benchY2 = H * 0.92;
+            const benchX2 = transPosition(0.83*100,W);
+            const benchY2 = transPositionH(0.92*100,H);
             const bw2 = 220;
             // 椅背
             ctx.fillStyle = '#4a2c14';
