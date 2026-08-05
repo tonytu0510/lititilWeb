@@ -415,22 +415,22 @@
             let img1W = 942 * radio;
             let img1H = 1032 * radio;
             let img1X = W/2 - img1W/2;
-            let img1Y = H - img1H + 150;
+            let img1Y = H - img1H + 150*radio;
 
             let img2W = 430 * radio;
             let img2H = 430 * radio;
-            let img2X = img2W/2 - 100;
-            let img2Y = H - img2H - 40;
+            let img2X = img2W/2 - 100*radio;
+            let img2Y = H - img2H - 40*radio;
 
             let img3W = 180 * radio;
             let img3H = 280 * radio;
             let img3X = W/2 - img3W/2 + (W/2 - img3W/2)/2;
-            let img3Y = H - img3H - 30;
+            let img3Y = H - img3H - 30*radio;
 
             let img4W = 300 * radio;
             let img4H = 340 * radio;
-            let img4X = W - img4W + 50;
-            let img4Y = H - img4H + 30;
+            let img4X = W - img4W + 50*radio;
+            let img4Y = H - img4H + 30*radio;
 
             drawImageSafe('svg/1.svg', img1X, img1Y, img1W, img1H,ctx)
             drawImageSafe('svg/2.svg', img2X, img2Y, img2W, img2H,ctx)
