@@ -129,6 +129,10 @@
         const dots = document.querySelectorAll('#dots span');
         const canvas6Event = document.getElementById("canvas6")
         const slider = document.getElementById('slider');
+        function getScaleByDevice() {
+            // H5触屏端缩小到0.4，PC端保持1
+            return ('ontouchstart' in window) ? 0.4 : 1;
+        }
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -569,10 +573,6 @@
                 link.click();
                 document.body.removeChild(link);
             });
-        }
-        function getScaleByDevice() {
-            // H5触屏端缩小到0.4，PC端保持1
-            return ('ontouchstart' in window) ? 0.4 : 1;
         }
         function initCanvas() {
                 drawCanvas2(document.getElementById('canvas2'));
