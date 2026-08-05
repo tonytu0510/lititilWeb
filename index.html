@@ -569,16 +569,7 @@
                 document.body.removeChild(link);
             });
         }
-        let that = window
-        async function getScaleByDevice() {
-            const isH5 = 'ontouchstart' in window;
-            return isH5 ? 0.4 : 1;
-        }
         function initCanvas() {
-            getScaleByDevice().then((result)=>{
-                console.log('result=>',result)
-                H5radio = result
-                console.log('H5radio=>',H5radio)
                 drawCanvas1(document.getElementById('canvas1'));
                 animate();
                 drawCanvas2(document.getElementById('canvas2'));
@@ -588,7 +579,6 @@
                 drawCanvas6(document.getElementById('canvas6'));
                 drawCanvas7(document.getElementById('canvas7'));
                 initMath()
-            })
         }
         initCanvas();
 
