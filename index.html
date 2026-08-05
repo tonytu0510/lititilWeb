@@ -567,7 +567,119 @@
         function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
         function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
-        function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
+        //function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
+        function drawCanvas6(canvas) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width = canvas.parentElement.clientWidth;
+            const H = canvas.height = canvas.parentElement.clientHeight;
+
+            // 背景
+            const grad = ctx.createLinearGradient(0, 0, W, H);
+            grad.addColorStop(0, '#0a1628');
+            grad.addColorStop(1, '#1a2a4a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 初始化闪烁粒子（只初始化一次）
+            if (!canvas._particles) {
+                // 全画布随机散布的符号（闪烁的小符号）
+                const allSymbols = [
+                    '+', '-', '×', '÷', '=', '±', '√', '²', '³', 'π', '∞', '≈', '≠', '≤', '≥',
+                    '∠', '°', '%', '∑', '∫', '∂', '∇', '∈', '⊆', '∪', '∩', '∅',
+                    '∀', '∃', '⇒', '⇔', '∧', '∨', '¬', 'lim', 'log', 'sin', 'cos', 'tan',
+                    'α', 'β', 'γ', 'δ', 'ε', 'θ', 'λ', 'μ', 'σ', 'φ', 'ω',
+                    'Γ', 'Δ', 'Θ', 'Λ', 'Π', 'Σ', 'Φ', 'Ψ', 'Ω',
+                    'dx', 'dy', 'f(x)', '→∞', '||', '⌊⌋', '⌈⌉',
+                    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+                    '⅓', '⅔', '⅛', '⅜', '⅝', '⅞'
+                ];
+                canvas._particles = [];
+                for (let i = 0; i < 150; i++) {
+                    canvas._particles.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        symbol: allSymbols[Math.floor(Math.random() * allSymbols.length)],
+                        size: Math.random() * 14 + 8,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.015 + 0.005,
+                        twinkleDir: 1
+                    });
+                }
+            }
+
+            // 绘制闪烁粒子
+            canvas._particles.forEach(p => {
+                p.alpha += p.twinkleSpeed * p.twinkleDir;
+                if (p.alpha >= 0.9) p.twinkleDir = -1;
+                if (p.alpha <= 0.15) p.twinkleDir = 1;
+                ctx.fillStyle = `rgba(100,180,255,${p.alpha})`;
+                ctx.font = `${p.size}px 'Courier New', monospace`;
+                ctx.fillText(p.symbol, p.x, p.y);
+            });
+
+            // 大脑轮廓（由重要符号组成）
+            const brainSymbols = ['∑', '∫', 'π', '∞', '√', 'Δ', 'α', 'β', 'θ', 'λ', 'σ', 'Ω', 'f(x)', 'dx'];
+            const centerX = W * 0.5;
+            const centerY = H * 0.42;
+            const brainW = W * 0.55;
+            const brainH = H * 0.45;
+
+            if (!canvas._brainPoints) {
+                canvas._brainPoints = [];
+                // 大脑左半球
+                for (let i = 0; i < 35; i++) {
+                    const angle = Math.PI * 0.7 + (Math.PI * 1.6 * i / 34);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX - brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        symbol: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 大脑右半球
+                for (let i = 0; i < 35; i++) {
+                    const angle = -Math.PI * 0.1 + (Math.PI * 1.6 * i / 34);
+                    const rx = brainW * 0.48;
+                    const ry = brainH * 0.5;
+                    canvas._brainPoints.push({
+                        x: centerX + brainW * 0.12 + Math.cos(angle) * rx,
+                        y: centerY + Math.sin(angle) * ry,
+                        symbol: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 胼胝体（中间连接）
+                for (let i = 0; i < 8; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 15 + i * 4,
+                        y: centerY - 10 + Math.sin(i) * 8,
+                        symbol: '='
+                    });
+                }
+                // 脑干
+                for (let i = 0; i < 10; i++) {
+                    canvas._brainPoints.push({
+                        x: centerX - 6 + Math.sin(i * 0.8) * 8,
+                        y: centerY + brainH * 0.5 + i * 10,
+                        symbol: '|'
+                    });
+                }
+            }
+
+            // 绘制大脑
+            canvas._brainPoints.forEach((p, index) => {
+                const isCore = index < 12; // 核心符号更亮
+                ctx.fillStyle = isCore ? 'rgba(255,220,100,0.95)' : 'rgba(255,200,80,0.8)';
+                ctx.font = `bold ${isCore ? 22 : 16}px 'Georgia', serif`;
+                ctx.fillText(p.symbol, p.x, p.y);
+            });
+
+            // 标题
+            ctx.fillStyle = '#fff';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('📐 数学', W / 2, H * 0.88);
+        }
         function drawCanvas7(c) { drawSimpleCanvas(c, '📖', '英语', '#e67e22', '#f1c40f'); }
 
         // ==================== 初始化和动画循环 ====================
