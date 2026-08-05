@@ -566,8 +566,14 @@
         //function drawCanvas2(c) { drawSimpleCanvas(c, '🏠', '亲情', '#ffa502', '#ff6348'); }
         function drawCanvas2(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -785,16 +791,23 @@
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas4(canvas) {
             const ctx = canvas.getContext('2d');
-            const W = canvas.width = canvas.parentElement.clientWidth;
-            const H = canvas.height = canvas.parentElement.clientHeight;
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
-            const SCALE = 0.58;
+            const SCALE = 0.38;
             // =============================================
 
-            const grad = ctx.createLinearGradient(0, 0, W, H);
+            const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
             grad.addColorStop(0, '#f5f0e8');
-            grad.addColorStop(1, '#ede4d3');
+            grad.addColorStop(0.5, '#ede4d3');
+            grad.addColorStop(1, '#f5f0e8');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
@@ -839,7 +852,6 @@
 
             if (!canvas._notePoints) {
                 canvas._notePoints = [];
-                // 符头
                 const headSymbols = ['do', 'C', '♫', '🎵', '道', '音', '乐', '♪'];
                 for (let i = 0; i < 25; i++) {
                     const angle = (Math.PI * 2 * i) / 25;
@@ -858,7 +870,6 @@
                         text: ['do', '♫', '🎵', '♪'][i % 4]
                     });
                 }
-                // 符干
                 const stemSymbols = ['|', '♪', '♩', '♬', '🎶', '♭', '♯', '🎼'];
                 for (let i = 0; i < 25; i++) {
                     canvas._notePoints.push({
@@ -867,7 +878,6 @@
                         text: stemSymbols[i % 8]
                     });
                 }
-                // 符尾
                 for (let i = 0; i < 15; i++) {
                     const t = i / 14;
                     canvas._notePoints.push({
@@ -884,7 +894,6 @@
                         text: ['♪', '♫', '🎵'][i % 3]
                     });
                 }
-                // 五线谱
                 for (let line = 0; line < 5; line++) {
                     for (let i = 0; i < 18; i++) {
                         canvas._notePoints.push({
@@ -904,9 +913,13 @@
                 ctx.fillText(p.text, p.x, p.y);
             });
 
+            ctx.fillStyle = 'rgba(40,30,20,0.8)';
+            ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('Every stroke tells a love story', W / 2, H * 0.82);
+
             ctx.fillStyle = '#2a1a0a';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
-            ctx.textAlign = 'center';
             ctx.fillText('Every stroke tells a love story', W / 2, H * 0.92);
         }
         //function drawCanvas5(c) { drawSimpleCanvas(c, '💻', '计算机', '#2c3e50', '#3498db'); }
