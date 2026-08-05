@@ -574,9 +574,9 @@
             // =============================================
 
             const grad = ctx.createLinearGradient(0, 0, W, H);
-            grad.addColorStop(0, '#2a1a0a');
-            grad.addColorStop(0.5, '#3a2010');
-            grad.addColorStop(1, '#2a1508');
+            grad.addColorStop(0, '#2a1020');
+            grad.addColorStop(0.5, '#3a1530');
+            grad.addColorStop(1, '#2a1025');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
@@ -616,8 +616,8 @@
                 const isFlower = /[🌸🌺🌻🌹🌷🌼💐🥀🌾🌿康乃馨玫瑰百合菊花牡丹荷花梅花兰花桃花杏花茉莉桂花水仙杜鹃月季]/.test(p.text);
                 const isKitchen = /[🍳🥘🍲🥟🥢🥄🔪🍽️🥣🍚锅碗瓢盆筷勺铲灶炉煲米油盐酱醋茶面菜肉汤]/.test(p.text);
                 const r = isFlower ? 255 : (isKitchen ? 255 : 255);
-                const g = isFlower ? 140 : (isKitchen ? 160 : 200);
-                const b = isFlower ? 180 : (isKitchen ? 80 : 120);
+                const g = isFlower ? 150 : (isKitchen ? 180 : 200);
+                const b = isFlower ? 200 : (isKitchen ? 160 : 200);
                 ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
                 ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
                 ctx.fillText(p.text, p.x, p.y);
@@ -695,13 +695,13 @@
 
             canvas._flowerPoints.forEach((p, index) => {
                 const isCore = index < 15;
-                ctx.fillStyle = isCore ? 'rgba(255,200,100,0.95)' : 'rgba(255,160,80,0.8)';
+                ctx.fillStyle = isCore ? 'rgba(255,150,180,0.95)' : 'rgba(240,130,160,0.8)';
                 ctx.font = `bold ${isCore ? 18 : 13}px 'Microsoft YaHei', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
 
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#ffc0d0';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
             ctx.fillText('🏠 亲情', W / 2, H * 0.92);
