@@ -1234,6 +1234,7 @@
         }
         // ==================== Canvas 7: 英语 ABC ====================
         // ==================== Canvas 7: 英语 ABC ====================
+        // ==================== Canvas 7: 英语 ABC ====================
         function drawCanvas7(canvas) {
             const ctx = canvas.getContext('2d');
             const W = canvas.width = canvas.parentElement.clientWidth;
@@ -1291,58 +1292,111 @@
             const cy = H * 0.42;
             const letterH = size * 0.75;
             const letterW = size * 0.5;
-            const gap = size * 0.08;
+            const gap = size * 0.06;
 
             if (!canvas._abcPoints) {
                 canvas._abcPoints = [];
-                const abcWords = ['Apple', 'Book', 'Cat', 'read', 'write', 'speak', 'learn', 'think', 'know', 'dream', 'hope', 'love', 'hello', 'world', 'word', 'story', 'poem', 'song', 'English', 'letter'];
+                const abcWords = ['Apple', 'Book', 'Cat', 'read', 'write', 'speak', 'learn', 'think', 'know', 'dream', 'hope', 'love', 'hello', 'world', 'word', 'story', 'poem', 'song', 'English', 'letter', 'alphabet', 'spell', 'grammar', 'vocab'];
 
-                // A：左斜线 + 右斜线 + 中间横线（横线在中间偏下）
+                // ===== A =====
                 const ax = cx - letterW - gap;
                 const ay = cy - letterH / 2;
-                for (let i = 0; i < 12; i++) {
-                    canvas._abcPoints.push({ x: ax - letterW * 0.45 + (letterW * 0.45 * i / 11), y: ay + letterH - (letterH * i / 11), text: abcWords[i % abcWords.length] });
-                }
-                for (let i = 0; i < 12; i++) {
-                    canvas._abcPoints.push({ x: ax + letterW * 0.05 + (letterW * 0.4 * i / 11), y: ay + letterH - (letterH * i / 11), text: abcWords[(i + 6) % abcWords.length] });
-                }
-                for (let i = 0; i < 8; i++) {
-                    canvas._abcPoints.push({ x: ax - letterW * 0.25 + (letterW * 0.5 * i / 7), y: ay + letterH * 0.55, text: abcWords[(i + 12) % abcWords.length] });
-                }
-
-                // B：竖线 + 上半圆 + 下半圆（半圆比之前小）
-                const bx = cx;
-                const by = ay;
-                for (let i = 0; i < 10; i++) {
-                    canvas._abcPoints.push({ x: bx - letterW * 0.32, y: by + (letterH * i / 9), text: abcWords[i % abcWords.length] });
-                }
-                for (let i = 0; i < 7; i++) {
-                    const t = i / 6;
-                    const angle = -Math.PI / 2 + Math.PI * t;
-                    canvas._abcPoints.push({ x: bx + letterW * 0.08 + Math.cos(angle) * letterW * 0.28, y: by + letterH * 0.22 + Math.sin(angle) * letterH * 0.22, text: abcWords[(i + 5) % abcWords.length] });
-                }
-                for (let i = 0; i < 7; i++) {
-                    const t = i / 6;
-                    const angle = -Math.PI / 2 + Math.PI * t;
-                    canvas._abcPoints.push({ x: bx + letterW * 0.08 + Math.cos(angle) * letterW * 0.28, y: by + letterH * 0.72 + Math.sin(angle) * letterH * 0.22, text: abcWords[(i + 10) % abcWords.length] });
-                }
-
-                // C：开口弧线（不闭合，留缺口）
-                const cx2 = cx + letterW + gap;
-                for (let i = 0; i < 18; i++) {
-                    const angle = Math.PI * 0.55 + (Math.PI * 1.9 * i / 17);
+                // 左斜线：从左上到右下
+                for (let i = 0; i < 14; i++) {
+                    const t = i / 13;
                     canvas._abcPoints.push({
-                        x: cx2 + Math.cos(angle) * letterW * 0.38,
-                        y: cy + Math.sin(angle) * letterH * 0.48,
+                        x: ax - letterW * 0.5 + t * letterW * 0.48,
+                        y: ay + letterH * 0.05 + t * letterH * 0.9,
                         text: abcWords[i % abcWords.length]
                     });
                 }
+                // 右斜线：从右上到左下
+                for (let i = 0; i < 14; i++) {
+                    const t = i / 13;
+                    canvas._abcPoints.push({
+                        x: ax + letterW * 0.05 + t * letterW * 0.45,
+                        y: ay + letterH * 0.05 + t * letterH * 0.9,
+                        text: abcWords[(i + 7) % abcWords.length]
+                    });
+                }
+                // 中间横线：在中间偏下位置，从左到右
+                for (let i = 0; i < 10; i++) {
+                    const t = i / 9;
+                    canvas._abcPoints.push({
+                        x: ax - letterW * 0.28 + t * letterW * 0.56,
+                        y: ay + letterH * 0.52,
+                        text: abcWords[(i + 14) % abcWords.length]
+                    });
+                }
+                // A顶端顶点加强
+                canvas._abcPoints.push({ x: ax, y: ay + letterH * 0.05, text: 'A' });
+                // A底端两个脚加强
+                canvas._abcPoints.push({ x: ax - letterW * 0.48, y: ay + letterH * 0.95, text: 'A' });
+                canvas._abcPoints.push({ x: ax + letterW * 0.48, y: ay + letterH * 0.95, text: 'A' });
+
+                // ===== B =====
+                const bx = cx;
+                const by = ay;
+                // 竖线
+                for (let i = 0; i < 12; i++) {
+                    canvas._abcPoints.push({
+                        x: bx - letterW * 0.3,
+                        y: by + letterH * 0.05 + (letterH * 0.9 * i / 11),
+                        text: abcWords[i % abcWords.length]
+                    });
+                }
+                // 上半圆——饱满
+                for (let i = 0; i < 10; i++) {
+                    const t = i / 9;
+                    const angle = -Math.PI / 2 + Math.PI * t;
+                    canvas._abcPoints.push({
+                        x: bx + letterW * 0.05 + Math.cos(angle) * letterW * 0.4,
+                        y: by + letterH * 0.22 + Math.sin(angle) * letterH * 0.28,
+                        text: abcWords[(i + 5) % abcWords.length]
+                    });
+                }
+                // 下半圆——饱满
+                for (let i = 0; i < 10; i++) {
+                    const t = i / 9;
+                    const angle = -Math.PI / 2 + Math.PI * t;
+                    canvas._abcPoints.push({
+                        x: bx + letterW * 0.05 + Math.cos(angle) * letterW * 0.4,
+                        y: by + letterH * 0.72 + Math.sin(angle) * letterH * 0.28,
+                        text: abcWords[(i + 12) % abcWords.length]
+                    });
+                }
+                // B顶端和底端加强
+                canvas._abcPoints.push({ x: bx - letterW * 0.25, y: by + letterH * 0.05, text: 'B' });
+                canvas._abcPoints.push({ x: bx - letterW * 0.25, y: by + letterH * 0.95, text: 'B' });
+
+                // ===== C =====
+                const cx2 = cx + letterW + gap;
+                // 开口弧线：从右上开始，到右下结束，左边留缺口
+                for (let i = 0; i < 20; i++) {
+                    const angle = Math.PI * 0.5 + (Math.PI * 2.0 * i / 19);
+                    const x = cx2 + Math.cos(angle) * letterW * 0.4;
+                    const y = cy + Math.sin(angle) * letterH * 0.48;
+                    // 跳过最左侧的点（缺口处）
+                    if (angle > Math.PI * 1.4 && angle < Math.PI * 1.7) continue;
+                    canvas._abcPoints.push({ x, y, text: abcWords[i % abcWords.length] });
+                }
+                // C缺口两端加强
+                canvas._abcPoints.push({ x: cx2, y: cy - letterH * 0.46, text: 'C' });
+                canvas._abcPoints.push({ x: cx2, y: cy + letterH * 0.46, text: 'C' });
             }
 
             canvas._abcPoints.forEach((p, index) => {
-                const isCore = index < 25;
-                ctx.fillStyle = isCore ? 'rgba(255,180,80,0.9)' : 'rgba(255,160,60,0.6)';
-                ctx.font = `bold ${isCore ? 15 : 12}px 'Georgia', serif`;
+                const isA = index < 38;
+                const isB = index >= 38 && index < 74;
+                const isC = index >= 74;
+                if (isA) {
+                    ctx.fillStyle = index < 10 ? 'rgba(255,200,80,0.95)' : 'rgba(255,180,60,0.65)';
+                } else if (isB) {
+                    ctx.fillStyle = index < 48 ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.6)';
+                } else {
+                    ctx.fillStyle = index < 84 ? 'rgba(255,150,180,0.9)' : 'rgba(240,130,160,0.6)';
+                }
+                ctx.font = `bold ${(index < 10 || (index >= 38 && index < 48) || (index >= 74 && index < 84)) ? 15 : 12}px 'Georgia', serif`;
                 ctx.textAlign = 'center';
                 ctx.fillText(p.text, p.x, p.y);
             });
