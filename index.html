@@ -1209,26 +1209,18 @@
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 横线
-                for (let i = 0; i < 7; i++) {
-                    canvas._ljPoints.push({
-                        x: lx - letterW * 0.38 + i * letterW * 0.9 / 6,
-                        y: ly + letterH,
-                        text: ljWords[(i + 5) % ljWords.length]
-                    });
-                }
+                // 横线——只放3个单词，首尾各一个，中间一个
+                canvas._ljPoints.push({ x: lx - letterW * 0.38, y: ly + letterH, text: ljWords[5] });
+                canvas._ljPoints.push({ x: lx + letterW * 0.07, y: ly + letterH, text: ljWords[6] });
+                canvas._ljPoints.push({ x: lx + letterW * 0.5, y: ly + letterH, text: ljWords[7] });
 
                 // ===== J =====
                 const jx = cx + letterW * 0.65;
                 const jy = ly;
-                // 顶部横线
-                for (let i = 0; i < 6; i++) {
-                    canvas._ljPoints.push({
-                        x: jx - letterW * 0.35 + i * letterW * 0.8 / 5,
-                        y: jy,
-                        text: ljWords[(i + 10) % ljWords.length]
-                    });
-                }
+                // 顶部横线——只放3个单词
+                canvas._ljPoints.push({ x: jx - letterW * 0.35, y: jy, text: ljWords[10] });
+                canvas._ljPoints.push({ x: jx + letterW * 0.05, y: jy, text: ljWords[11] });
+                canvas._ljPoints.push({ x: jx + letterW * 0.45, y: jy, text: ljWords[12] });
                 // 竖线
                 for (let i = 0; i < 8; i++) {
                     canvas._ljPoints.push({
@@ -1237,9 +1229,9 @@
                         text: ljWords[i % ljWords.length]
                     });
                 }
-                // 底部弯钩
-                for (let i = 0; i < 5; i++) {
-                    const angle = Math.PI * 0.05 + Math.PI * 0.85 * i / 4;
+                // 底部弯钩——只放3个单词
+                for (let i = 0; i < 3; i++) {
+                    const angle = Math.PI * 0.05 + Math.PI * 0.85 * i / 2;
                     canvas._ljPoints.push({
                         x: jx + letterW * 0.24 + Math.cos(angle) * letterW * 0.3,
                         y: jy + letterH * 0.7 + Math.sin(angle) * letterH * 0.24,
@@ -1249,8 +1241,8 @@
             }
 
             canvas._ljPoints.forEach((p, index) => {
-                const isL = index < 17;
-                const isCore = (isL && index < 6) || (!isL && index >= 17 && index < 23);
+                const isL = index < 13;
+                const isCore = (isL && index < 6) || (!isL && index >= 13 && index < 17);
                 ctx.fillStyle = isL
                     ? (isCore ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.6)')
                     : (isCore ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.55)');
@@ -1262,11 +1254,11 @@
             ctx.fillStyle = 'rgba(200,180,255,0.8)';
             ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
             ctx.textAlign = 'center';
-            ctx.fillText('You are my everything.', W / 2, H * 0.78);
+            ctx.fillText('You are my everything', W / 2, H * 0.78);
 
             ctx.fillStyle = '#d0c8f0';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
-            ctx.fillText('📖 You are my everything.', W / 2, H * 0.9);
+            ctx.fillText('You are my everything', W / 2, H * 0.9);
         }
 
         // ==================== 初始化和动画循环 ====================
