@@ -769,129 +769,18 @@
             const cx = W * 0.5;
             const cy = H * 0.42;
 
-            function getBezierPoints(x0, y0, cp1x, cp1y, cp2x, cp2y, x1, y1, count) {
-                const points = [];
-                for (let i = 0; i < count; i++) {
-                    const t = i / (count - 1);
-                    const mt = 1 - t;
-                    const x = mt * mt * mt * x0 + 3 * mt * mt * t * cp1x + 3 * mt * t * t * cp2x + t * t * t * x1;
-                    const y = mt * mt * mt * y0 + 3 * mt * mt * t * cp1y + 3 * mt * t * t * cp2y + t * t * t * y1;
-                    points.push({ x, y });
-                }
-                return points;
-            }
-
-            if (!canvas._handPoints) {
-                canvas._handPoints = [];
-                const words = ['牵手', '并肩', '陪伴', '温暖', '信任', '支持', '懂你', '默契', '一起', '永远', '友谊', '真心', '朋友', '知己', '依靠'];
-
-                // 左手腕
-                for (let i = 0; i < 10; i++) {
-                    canvas._handPoints.push({
-                        x: cx - size * 0.55 + i * size * 0.025,
-                        y: cy + size * 0.15 + Math.sin(i * 0.4) * 3,
-                        text: words[i % words.length]
-                    });
-                }
-                // 左手掌
-                for (let row = 0; row < 5; row++) {
-                    for (let col = 0; col < 4; col++) {
-                        canvas._handPoints.push({
-                            x: cx - size * 0.3 + col * size * 0.06,
-                            y: cy - size * 0.05 + row * size * 0.06,
-                            text: words[(row * 4 + col) % words.length]
-                        });
-                    }
-                }
-                // 左手拇指
-                const leftThumb = getBezierPoints(
-                    cx - size * 0.25, cy + size * 0.02,
-                    cx - size * 0.15, cy - size * 0.22,
-                    cx - size * 0.05, cy - size * 0.18,
-                    cx + size * 0.05, cy - size * 0.08, 10
-                );
-                leftThumb.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 5) % words.length] }));
-                // 左手四指
-                for (let finger = 0; finger < 4; finger++) {
-                    const baseY = cy - size * 0.1 - finger * size * 0.06;
-                    const pts = getBezierPoints(
-                        cx - size * 0.25, baseY,
-                        cx - size * 0.1, baseY - size * 0.2,
-                        cx + size * 0.08, baseY - size * 0.18,
-                        cx + size * 0.2, baseY - size * 0.02, 8
-                    );
-                    pts.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + finger * 2) % words.length] }));
-                }
-
-                // 右手腕
-                for (let i = 0; i < 10; i++) {
-                    canvas._handPoints.push({
-                        x: cx + size * 0.55 - i * size * 0.025,
-                        y: cy + size * 0.15 + Math.sin(i * 0.4) * 3,
-                        text: words[(i + 7) % words.length]
-                    });
-                }
-                // 右手掌
-                for (let row = 0; row < 5; row++) {
-                    for (let col = 0; col < 4; col++) {
-                        canvas._handPoints.push({
-                            x: cx + size * 0.3 - col * size * 0.06,
-                            y: cy - size * 0.05 + row * size * 0.06,
-                            text: words[(row * 4 + col + 10) % words.length]
-                        });
-                    }
-                }
-                // 右手拇指
-                const rightThumb = getBezierPoints(
-                    cx + size * 0.25, cy + size * 0.02,
-                    cx + size * 0.15, cy - size * 0.22,
-                    cx + size * 0.05, cy - size * 0.18,
-                    cx - size * 0.05, cy - size * 0.08, 10
-                );
-                rightThumb.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + 12) % words.length] }));
-                // 右手四指
-                for (let finger = 0; finger < 4; finger++) {
-                    const baseY = cy - size * 0.1 - finger * size * 0.06;
-                    const pts = getBezierPoints(
-                        cx + size * 0.25, baseY,
-                        cx + size * 0.1, baseY - size * 0.2,
-                        cx - size * 0.08, baseY - size * 0.18,
-                        cx - size * 0.2, baseY - size * 0.02, 8
-                    );
-                    pts.forEach((p, i) => canvas._handPoints.push({ x: p.x, y: p.y, text: words[(i + finger * 2 + 3) % words.length] }));
-                }
-
-                // 手指交叉处
-                for (let i = 0; i < 20; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = Math.random() * size * 0.15;
-                    canvas._handPoints.push({
-                        x: cx + Math.cos(angle) * dist,
-                        y: cy - size * 0.1 + Math.sin(angle) * dist * 0.6,
-                        text: '🤝'
-                    });
-                }
-            }
-
-            canvas._handPoints.forEach((p, index) => {
-                const isCore = index < 30;
-                ctx.fillStyle = isCore ? 'rgba(180,210,240,0.9)' : 'rgba(160,190,220,0.6)';
-                ctx.font = `bold ${isCore ? 14 : 11}px 'Microsoft YaHei', serif`;
-                ctx.textAlign = 'center';
-                ctx.fillText(p.text, p.x, p.y);
-            });
-
-            ctx.font = `${size * 0.3}px serif`;
+            // 中间握手图标
+            ctx.font = `${size * 0.8}px serif`;
             ctx.textAlign = 'center';
-            ctx.fillText('🤝', cx, cy - size * 0.08);
+            ctx.fillText('🤝', cx, cy);
 
             ctx.fillStyle = 'rgba(180,210,240,0.8)';
             ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
-            ctx.fillText('一起走过的路，比终点更珍贵。', W / 2, H * 0.82);
+            ctx.fillText('一起走过的路，比终点更珍贵', W / 2, H * 0.78);
 
             ctx.fillStyle = '#c8ddf0';
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
-            ctx.fillText('一起走过的路，比终点更珍贵', W / 2, H * 0.92);
+            ctx.fillText('一起走过的路，比终点更珍贵', W / 2, H * 0.9);
         }
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas4(canvas) {
