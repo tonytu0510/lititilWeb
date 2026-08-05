@@ -132,6 +132,7 @@
         // H5触屏端缩小到0.4，PC端保持1
         let H5Scal = null
         let radioY = null
+        let H5PrintFont = null
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -263,6 +264,7 @@
         function drawCanvas1(canvas) {
             H5Scal = ('ontouchstart' in window) ? 0.3 : 1;
             radioY = ('ontouchstart' in window) ? 0.98 : 1
+            H5PrintFont = ('ontouchstart' in window) ? 1.4 : 1
             const ctx = canvas.getContext('2d');
             const W = canvas.width = canvas.parentElement.clientWidth;
             const H = canvas.height = canvas.parentElement.clientHeight;
@@ -480,13 +482,13 @@
 
         }
         function transSize(num,W){
-            return Math.ceil(num * 12) * (W / 100) +'px'
+            return H5PrintFont * Math.ceil(num * 12) * (W / 100) +'px'
         }
         function transPosition(num,W){
-            return num * (W / 100)
+            return H5PrintFont * num * (W / 100)
         }
         function transPositionH(num,H){
-            return num * (H / 100)
+            return H5PrintFont * num * (H / 100)
         }
         // 全局缓存对象
         const imageCache = {};
