@@ -188,7 +188,7 @@
         initTimer(time)
         //鼠标滑过计时器暂停
         const slideElements = document.getElementsByClassName('slide')
-        for(let i=0;i<slideEle.length;i++){
+        for(let i=0;i<slideElements.length;i++){
             slideElements[i].onmouseover = function(){
                 clearTimeout(TimeOutTimer);
             }
