@@ -555,7 +555,6 @@
 
         // ==================== 初始化和动画循环 ====================
         function animate() {
-            drawCanvas1(document.getElementById('canvas1'));
             requestAnimationFrame(animate);
         }
         animate();
@@ -581,6 +580,7 @@
         }
         function initOtherCanvas(aug) {
             isH5()
+            drawCanvas1(document.getElementById('canvas1'));
             drawCanvas2(document.getElementById('canvas2'));
             drawCanvas3(document.getElementById('canvas3'));
             drawCanvas4(document.getElementById('canvas4'));
@@ -592,17 +592,6 @@
         initOtherCanvas();
 
         window.addEventListener('resize', initOtherCanvas);
-        window.addEventListener('resize', function() {
-            isH5()
-            drawCanvas1(document.getElementById('canvas1'));
-            drawCanvas2(document.getElementById('canvas2'));
-            drawCanvas3(document.getElementById('canvas3'));
-            drawCanvas4(document.getElementById('canvas4'));
-            drawCanvas5(document.getElementById('canvas5'));
-            drawCanvas6(document.getElementById('canvas6'));
-            drawCanvas7(document.getElementById('canvas7'));
-            initMath()
-        });
     </script>
 </body>
 </html>
