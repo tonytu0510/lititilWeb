@@ -410,14 +410,10 @@
 
             const radio = 1
 
-            const img1W = transPosition(942 * radio,W)/W;
-            const img1H = transPositionH(1032 * radio,H)/H;
-            const img1X = 0 //transPosition(W/2 - img1W/2,W);
-            const img1Y = 0 //transPositionH(H - img1H + 130,H);
-            console.log("img1W=>",img1W)
-            console.log("img1H=>",img1H)
-            console.log("img1X=>",img1X)
-            console.log("img1Y=>",img1Y)
+            const img1W = 942 * radio;
+            const img1H = 1032 * radio;
+            const img1X = W/2 - img1W/2;
+            const img1Y = H - img1H + 130;
 
             const img2W = 430 * radio;
             const img2H = 430 * radio;
