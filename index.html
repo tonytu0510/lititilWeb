@@ -137,7 +137,6 @@
         let printEndFlag = false
 
         function showSlide(n) {
-            clearTimeout(TimeOutTimer);
             slides.forEach(s => s.classList.remove('active'));
             dots.forEach(d => d.classList.remove('active'));
             slides[n].classList.add('active');
@@ -146,6 +145,7 @@
             if(n === 5){
                 initMath()
             }
+            resetTimer();
         }
 
         function nextSlide() {
@@ -167,7 +167,6 @@
 
         function goTo(n) {
             showSlide(n);
-            resetTimer();
         }
 
         function initTimer(time){
@@ -181,9 +180,21 @@
         }
 
         function resetTimer() {
-            clearTimeout(TimeOutTimer);
+            clearTimer()
             time = isIndexTime();
             initTimer(time);
+            //index = 0 打印机效果FLAG
+            if(current === 0){
+                printEndFlag= true
+            }
+        }
+        function clearTimer(){
+            clearTimeout(TimeOutTimer);
+            TimeOutTimer = null
+            //index = 0 打印机效果FLAG
+            if(current === 0){
+                printEndFlag= false
+            }
         }
 
         initTimer(time)
@@ -191,12 +202,10 @@
         const slideElements = document.getElementsByClassName('slide')
         for(let i=0;i<slideElements.length;i++){
             slideElements[i].onmouseover = function(){
-                printEndFlag= false
-                clearTimeout(TimeOutTimer);
+                clearTimer(TimeOutTimer);
             }
             slideElements[i].onmouseout = function(){
-                printEndFlag= true
-                initTimer(time)
+                resetTimer(time)
             }
         }
 
@@ -498,7 +507,7 @@
 
             if (canvas._textIndex > text.length) {
                 canvas._textIndex = 0;
-                printEndFlag= true
+                printEndFlag = !TimeOutTimer
             }
 
         }
