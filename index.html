@@ -192,9 +192,11 @@
         for(let i=0;i<slideElements.length;i++){
             slideElements[i].onmouseover = function(){
                 clearTimeout(TimeOutTimer);
+                printEndFlag= true
             }
             slideElements[i].onmouseout = function(){
                 initTimer(time)
+                printEndFlag= false
             }
         }
 
