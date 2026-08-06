@@ -183,18 +183,10 @@
             clearTimer()
             time = isIndexTime();
             initTimer(time);
-            //index = 0 打印机效果FLAG
-            if(current === 0){
-                printEndFlag= true
-            }
         }
         function clearTimer(){
             clearTimeout(TimeOutTimer);
             TimeOutTimer = null
-            //index = 0 打印机效果FLAG
-            if(current === 0){
-                printEndFlag= false
-            }
         }
 
         initTimer(time)
@@ -507,7 +499,7 @@
 
             if (canvas._textIndex > text.length) {
                 canvas._textIndex = 0;
-                printEndFlag = TimeOutTimer
+                printEndFlag = true
             }
 
         }
@@ -1342,6 +1334,7 @@
                 return
             }
             if ((activeCanvas.id === 'canvas1') && !printEndFlag) {
+                canvas._textIndex = 0
                 drawCanvas1(activeCanvas);
             }else if(activeCanvas.id !== 'canvas1'){
                 printEndFlag = false
