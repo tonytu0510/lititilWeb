@@ -22,8 +22,8 @@
         <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative">
        <!-- 关闭按钮（最左边） -->
-       <button class="close-btn" id="topPlaceholder" onclick="toggleDino()">✕</button>
-    <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 230px)" id='dinoGameChangeWidth'></dino-game>
+       <button class="close-btn" id="topPlaceholder">✕</button>
+       <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 230px)" id='dinoGameChangeWidth'></dino-game>
     
     <!-- 开始游戏按钮（最右边） -->
     <button id="startGameBtn" onclick="startDinoGame()" style="position:absolute;right:90px;top:13px;z-index:10;background:#fff;color:#c4334c;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;width:80px">开始游戏</button>
@@ -114,47 +114,6 @@
             subNav.classList.remove('show');
         }
     });
-
-    // ==================== 小恐龙显示/隐藏 ====================
-window.toggleDino = function() {
-    const bar = document.getElementById('dinoBar');
-    const icon = document.getElementById('dinoIcon');
-    const iconGroup = document.getElementById('iconGroup');
-    const placeholder = document.getElementById('topPlaceholder');
-    const startBtn = document.getElementById('startGameBtn');
-    const dinoGameChangeWidth=document.getElementById('dinoGameChangeWidth')
-    
-    if (bar.style.display === 'none') {
-        // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
-        bar.style.display = 'block';
-        icon.classList.remove('show');
-        iconGroup.classList.remove('move-up');
-        placeholder.style.height = '50px';
-    } else {
-        // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
-        bar.style.display = 'none';
-        icon.classList.add('show');
-        iconGroup.classList.add('move-up');
-        placeholder.style.height = '0px';
-        
-        // 重置游戏到初始状态
-        const dinoGame = document.querySelector('dino-game');
-        if (dinoGame && dinoGame.resetGamePublic) {
-            dinoGame.resetGamePublic();
-        }
-        // 显示开始按钮
-        if (startBtn) {
-	 dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
-	startBtn.style.display = 'block';
-        }
-    }
-};
-
-    // 小恐龙图标点击
-    const dinoIconEl = document.getElementById('dinoIcon');
-    if (dinoIconEl) {
-        dinoIconEl.addEventListener('click', toggleDino);
-    }
 // 开始游戏（触发小恐龙的点击事件）
 window.startDinoGame =  function () {
     const dinoGame = document.querySelector('dino-game');

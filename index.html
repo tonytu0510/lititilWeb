@@ -14,34 +14,33 @@
         #slider {
             width: 100%;
             height: calc(100vh - 50px);
-            position: relative;
             overflow: hidden;
             transition: height 0.3s;
             touch-action: pan-y;
+            position: relative;
         }
         #slider.full {
             height: 100vh;
         }
         .slide {
             width: 100%;
-            height: calc(100vh - 50px);
+            height:100%;
             position: absolute;
-            top: 0;
-            left: 0;
+            top:0;
+            left:0;
             opacity: 0;
             transition: opacity 0.6s;
-            z-index: 1;
         }
         .slide.active {
             opacity: 1;
-            z-index: 2;
+            height: 100%;
+            width: 100%;
         }
         .slide.active:nth-child(6){
             cursor: pointer!important;
         }
         .slide canvas {
-            width: 100%;
-            height: 100%;
+            display: block;
         }
         .arrow {
             position: absolute;
@@ -94,7 +93,6 @@
     </style>
 </head>
 <body>
-
     <div id="topBarContainer"></div>
 
     <div id="slider">
@@ -235,7 +233,52 @@
             }
             touchMoved = false;
         });
+        // ==================== 小恐龙显示/隐藏 ====================
+        function toggleDino(callback) {
+            const bar = document.getElementById('dinoBar');
+            const icon = document.getElementById('dinoIcon');
+            const iconGroup = document.getElementById('iconGroup');
+            const placeholder = document.getElementById('topPlaceholder');
+            const startBtn = document.getElementById('startGameBtn');
+            const dinoGameChangeWidth=document.getElementById('dinoGameChangeWidth')
 
+            if (bar.style.display === 'none') {
+                // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
+                bar.style.display = 'block';
+                icon.classList.remove('show');
+                iconGroup.classList.remove('move-up');
+                placeholder.style.height = '50px';
+            } else {
+                // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
+                bar.style.display = 'none';
+                icon.classList.add('show');
+                iconGroup.classList.add('move-up');
+                placeholder.style.height = '0px';
+
+                // 重置游戏到初始状态
+                const dinoGame = document.querySelector('dino-game');
+                if (dinoGame && dinoGame.resetGamePublic) {
+                    dinoGame.resetGamePublic();
+                }
+                // 显示开始按钮
+                if (startBtn) {
+                    dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
+                    startBtn.style.display = 'block';
+                }
+            }
+            // 等最慢的那个过渡动画完成
+            const onTransitionEnd = () => {
+                iconGroup.removeEventListener('transitionend', onTransitionEnd);
+                if (callback) callback();
+            };
+            iconGroup.addEventListener('transitionend', onTransitionEnd);
+
+            // 兜底：如果过渡动画没触发（比如元素被隐藏了），200ms后强制执行
+            setTimeout(() => {
+                iconGroup.removeEventListener('transitionend', onTransitionEnd);
+                if (callback) callback();
+            }, 300);
+        }
         function updateSliderHeight() {
             const dinoBar = document.getElementById('dinoBar');
             if (dinoBar && slider) {
@@ -245,6 +288,13 @@
                     slider.classList.remove('full');
                 }
             }
+            // 头部关闭/打开时重绘Canvas 2-7
+            drawCanvas2(document.getElementById('canvas2'));
+            drawCanvas3(document.getElementById('canvas3'));
+            drawCanvas4(document.getElementById('canvas4'));
+            drawCanvas5(document.getElementById('canvas5'));
+            drawCanvas6(document.getElementById('canvas6'));
+            drawCanvas7(document.getElementById('canvas7'));
         }
 
         const dinoBar = document.getElementById('dinoBar');
@@ -264,31 +314,41 @@
             const dinoIcon = document.getElementById('dinoIcon');
             if (dinoIcon) {
                 dinoIcon.addEventListener('click', function() {
-                    setTimeout(updateSliderHeight, 100);
+                    toggleDino(() => {
+                        updateSliderHeight();
+                    });
                 });
             }
             const closeBtn = document.querySelector('#dinoBar .close-btn');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function() {
-                    setTimeout(updateSliderHeight, 100);
+                    toggleDino(() => {
+                        updateSliderHeight();
+                    });
                 });
             }
         });
+        function setupCanvas(canvas) {
+            const sliderEl = document.getElementById('slider');
+            const rect = sliderEl.getBoundingClientRect();
+            const W = rect.width;   // 浮点数，精确
+            const H = rect.height;
 
-        // ==================== Canvas 1: 星空爱情 ====================
-        function drawCanvas1(canvas) {
-            H5Scal = ('ontouchstart' in window) ? 0.3 : 1;
-            radioY = ('ontouchstart' in window) ? 0.98 : 1
-            H5PrintFont = ('ontouchstart' in window) ? 2.3 : 1
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
             const dpr = window.devicePixelRatio || 1;
             canvas.width = W * dpr;
             canvas.height = H * dpr;
             canvas.style.width = W + 'px';
             canvas.style.height = H + 'px';
+            const ctx = canvas.getContext('2d');
             ctx.scale(dpr, dpr);
+            return { ctx, W, H };
+        }
+        // ==================== Canvas 1: 星空爱情 ====================
+        function drawCanvas1(canvas) {
+            H5Scal = ('ontouchstart' in window) ? 0.3 : 1;
+            radioY = ('ontouchstart' in window) ? 0.98 : 1
+            H5PrintFont = ('ontouchstart' in window) ? 2.3 : 1
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // 星空背景
             const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
@@ -593,15 +653,7 @@
 
         //function drawCanvas2(c) { drawSimpleCanvas(c, '🏠', '亲情', '#ffa502', '#ff6348'); }
         function drawCanvas2(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -741,15 +793,7 @@
         }
         //function drawCanvas3(c) { drawSimpleCanvas(c, '🤝', '友情', '#1e90ff', '#00bfff'); }
         function drawCanvas3(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -824,15 +868,7 @@
         }
         //function drawCanvas4(c) { drawSimpleCanvas(c, '🎨', '艺术', '#7b2d8b', '#e056a0'); }
         function drawCanvas4(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.6;
@@ -960,15 +996,7 @@
         //function drawCanvas6(c) { drawSimpleCanvas(c, '📐', '数学', '#16a085', '#2ecc71'); }
         // ==================== Canvas 5: 计算机 DNA螺旋 ====================
         function drawCanvas5(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
@@ -1075,16 +1103,7 @@
         }
 
         function drawCanvas6(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
-
+            const { ctx, W, H } = setupCanvas(canvas);
             // 背景
             const grad = ctx.createLinearGradient(0, 0, W, H);
             grad.addColorStop(0, '#0a1628');
@@ -1194,15 +1213,7 @@
         }
         // ==================== Canvas 7: 英语 LJ ====================
         function drawCanvas7(canvas) {
-            const ctx = canvas.getContext('2d');
-            const W = canvas.parentElement.clientWidth;
-            const H = canvas.parentElement.clientHeight;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            canvas.style.width = W + 'px';
-            canvas.style.height = H + 'px';
-            ctx.scale(dpr, dpr);
+            const { ctx, W, H } = setupCanvas(canvas);
 
             // ===== 修改这个变量控制整体大小：0.3~0.45 =====
             const SCALE = 0.38;
