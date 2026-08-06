@@ -102,7 +102,8 @@
         <div class="slide"><canvas id="canvas4"></canvas></div>
         <div class="slide"><canvas id="canvas5"></canvas></div>
         <div class="slide"><canvas id="canvas6"></canvas></div>
-        <div class="slide" onclick="canvas7ClickFun()"><canvas id="canvas7"></canvas></div>
+        <div class="slide"><canvas id="canvas7"></canvas></div>
+        <div class="slide" onclick="canvas8ClickFun()"><canvas id="canvas8"></canvas></div>
 
         <button class="arrow left" onclick="prevSlide()">❮</button>
         <button class="arrow right" onclick="nextSlide()">❯</button>
@@ -114,6 +115,7 @@
             <span onclick="goTo(4)"></span>
             <span onclick="goTo(5)"></span>
             <span onclick="goTo(6)"></span>
+            <span onclick="goTo(7)"></span>
         </div>
     </div>
     <script src="common.js"></script>
@@ -144,7 +146,7 @@
         }
 
         function nextSlide() {
-            showSlide((current + 1) % 7);
+            showSlide((current + 1) % 8);
         }
         function isIndexTime(){
             console.log('current=>',current)
@@ -157,7 +159,7 @@
         }
 
         function prevSlide() {
-            showSlide((current - 1 + 7) % 7);
+            showSlide((current - 1 + 8) % 8);
         }
 
         function goTo(n) {
@@ -246,6 +248,7 @@
             drawCanvas5(document.getElementById('canvas5'));
             drawCanvas6(document.getElementById('canvas6'));
             drawCanvas7(document.getElementById('canvas7'));
+            drawCanvas8(document.getElementById('canvas8'));
         }
 
         const dinoBar = document.getElementById('dinoBar');
@@ -1287,7 +1290,122 @@
             ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
             ctx.fillText('You are my everything', W / 2, H * 0.9);
         }
+        // ==================== Canvas 8: 心理学 ====================
+        function drawCanvas8(canvas) {
+            const { ctx, W, H } = setupCanvas(canvas);
 
+            // 背景
+            const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
+            grad.addColorStop(0, '#1a1a2e');
+            grad.addColorStop(0.5, '#16213e');
+            grad.addColorStop(1, '#0f3460');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 初始化闪烁粒子
+            if (!canvas._particles) {
+                const psychologySymbols = [
+                    '🧠', '💭', '💬', '🗣️', '👁️', '👂', '🤝', '💔', '❤️‍🩹', '🌱',
+                    '自我', '本我', '超我', '意识', '潜意识', '梦境', '记忆', '情绪',
+                    '焦虑', '抑郁', '压力', '创伤', '疗愈', '成长', '认知', '行为',
+                    '人格', '性格', '内向', '外向', '共情', '依恋', '安全感', '边界',
+                    'MBTI', '九型', '大五', 'DSM', 'CBT', 'ACT', '正念', '冥想',
+                    '弗洛伊德', '荣格', '阿德勒', '马斯洛', '罗杰斯', '皮亚杰',
+                    '需求', '动机', '冲突', '防御', '投射', '移情', '阻抗', '释梦',
+                    '爱', '恨', '喜', '怒', '哀', '惧', '耻', '罪'
+                ];
+                canvas._particles = [];
+                for (let i = 0; i < 160; i++) {
+                    canvas._particles.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        text: psychologySymbols[Math.floor(Math.random() * psychologySymbols.length)],
+                        size: Math.random() * 12 + 7,
+                        alpha: Math.random(),
+                        twinkleSpeed: Math.random() * 0.012 + 0.004,
+                        twinkleDir: 1
+                    });
+                }
+            }
+
+            // 绘制闪烁粒子
+            canvas._particles.forEach(p => {
+                p.alpha += p.twinkleSpeed * p.twinkleDir;
+                if (p.alpha >= 0.75) p.twinkleDir = -1;
+                if (p.alpha <= 0.1) p.twinkleDir = 1;
+                ctx.fillStyle = `rgba(180,160,220,${p.alpha * 0.6})`;
+                ctx.font = `${p.size}px 'Microsoft YaHei', serif`;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            const size = Math.min(W, H) * 0.35;
+            const cx = W * 0.5;
+            const cy = H * 0.42;
+
+            // 大脑轮廓（左右半球）
+            const brainSymbols = ['自我', '本我', '超我', '意识', '潜意识', '记忆', '情绪', '人格', '认知', '行为', '共情', '依恋', '正念', '成长'];
+            if (!canvas._brainPoints) {
+                canvas._brainPoints = [];
+                // 左半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = Math.PI * 0.65 + (Math.PI * 1.7 * i / 29);
+                    const rx = size * 0.5;
+                    const ry = size * 0.5;
+                    canvas._brainPoints.push({
+                        x: cx - size * 0.1 + Math.cos(angle) * rx,
+                        y: cy + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 右半球
+                for (let i = 0; i < 30; i++) {
+                    const angle = -Math.PI * 0.05 + (Math.PI * 1.7 * i / 29);
+                    const rx = size * 0.5;
+                    const ry = size * 0.5;
+                    canvas._brainPoints.push({
+                        x: cx + size * 0.1 + Math.cos(angle) * rx,
+                        y: cy + Math.sin(angle) * ry,
+                        text: brainSymbols[Math.floor(Math.random() * brainSymbols.length)]
+                    });
+                }
+                // 胼胝体
+                for (let i = 0; i < 8; i++) {
+                    canvas._brainPoints.push({
+                        x: cx - 12 + i * 3.5,
+                        y: cy - 5 + Math.sin(i) * 5,
+                        text: '🧠'
+                    });
+                }
+                // 脑干
+                const stems = ['需求', '动机', '冲突', '防御', '投射', '移情', '疗愈', '成长', '爱', '恨'];
+                for (let i = 0; i < 10; i++) {
+                    canvas._brainPoints.push({
+                        x: cx - 5 + Math.sin(i * 0.7) * 6,
+                        y: cy + size * 0.5 + i * 10,
+                        text: stems[i]
+                    });
+                }
+            }
+
+            // 绘制大脑
+            canvas._brainPoints.forEach((p, index) => {
+                const isCore = index < 12;
+                ctx.fillStyle = isCore ? 'rgba(200,180,255,0.9)' : 'rgba(170,150,230,0.7)';
+                ctx.font = `bold ${isCore ? 16 : 12}px 'Microsoft YaHei', serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText(p.text, p.x, p.y);
+            });
+
+            // 点题话
+            ctx.fillStyle = 'rgba(200,180,240,0.8)';
+            ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`;
+            ctx.textAlign = 'center';
+            ctx.fillText('认识自己，是终身的修行', W / 2, H * 0.82);
+
+            ctx.fillStyle = '#c8c0e8';
+            ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`;
+            ctx.fillText('认识自己，是终身的修行', W / 2, H * 0.92);
+        }
         // ==================== 初始化和动画循环 ====================
         function animate() {
             const activeCanvas = document.querySelector('.slide.active canvas');
@@ -1313,7 +1431,7 @@
             document.body.removeChild(link);
         }
         //处理所有的banner点击逻辑
-        function canvas7ClickFun(){
+        function canvas8ClickFun(){
             if(current === 5){
                 canvas7Event.style.cursor = 'pointer'
                 createAlink()
@@ -1328,6 +1446,7 @@
                 drawCanvas5(document.getElementById('canvas5'));
                 drawCanvas6(document.getElementById('canvas6'));
                 drawCanvas7(document.getElementById('canvas7'));
+                drawCanvas8(document.getElementById('canvas8'));
         }
         initCanvas();
 
