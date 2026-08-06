@@ -81,22 +81,22 @@
         ctx.clearRect(0, 0, 50, 50);
         
         // 背景圆
-        ctx.fillStyle = '#c4334c';
+        ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(25, 25, 25, 0, Math.PI * 2);
         ctx.fill();
         
         // 小恐龙（白色）
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#871F78';
         // 身体
         ctx.fillRect(12, 18, 16, 18);
         // 头
         ctx.fillRect(24, 8, 12, 12);
         // 眼睛
-        ctx.fillStyle = '#c4334c';
+        ctx.fillStyle = '#fff';
         ctx.fillRect(32, 10, 3, 3);
         // 腿
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#871F78';
         ctx.fillRect(14, 34, 5, 8);
         ctx.fillRect(21, 34, 5, 8);
     }
