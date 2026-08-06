@@ -103,7 +103,7 @@
         <div class="slide"><canvas id="canvas5"></canvas></div>
         <div class="slide"><canvas id="canvas6"></canvas></div>
         <div class="slide"><canvas id="canvas7"></canvas></div>
-        <div class="slide" onclick="canvas8ClickFun()"><canvas id="canvas8"></canvas></div>
+        <div class="slide" onclick="canvas8ClickFun()" onmouseover="canvas8MouseoverFun()"><canvas id="canvas8"></canvas></div>
 
         <button class="arrow left" onclick="prevSlide()">❮</button>
         <button class="arrow right" onclick="nextSlide()">❯</button>
@@ -1433,10 +1433,13 @@
         //处理所有的banner点击逻辑
         function canvas8ClickFun(){
             if(current === 5){
-                canvas8Event.style.cursor = 'pointer'
                 createAlink()
-            }else{
-                canvas8Event.style.cursor= 'auto'
+            }
+        }
+        function canvas8MouseoverFun(){
+            canvas8Event.style.cursor='auto'
+            if(current === 5){
+                canvas8Event.style.cursor='pointer'
             }
         }
         function initCanvas() {
