@@ -460,8 +460,8 @@
             drawImageSafe('svg/4.svg', img4X, img4Y, img4W, img4H,ctx)
 
             // "I LOVE LJ" 打字机效果
-            //const text = "I LOVE LJ,AI LI'On fear！";
-            const text = "while(life){love++;}";
+            const text = "I LOVE LJ,AI LI'On fear！";
+            //const text = "while(life){love++;}";
 
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
@@ -479,7 +479,7 @@
                 H,
                 W * 0.09,
                 H * 0.25,
-                1.7,
+                0.3,
                 (i) => {
                     if (i === 0 || i === 1 || i === 2) return transSize(0.3,W);
                     if(i === 12 || i === 13|| i === 14|| i === 15|| i === 16) return transSize(0.3,W);
@@ -549,6 +549,8 @@
             ctx.textAlign = 'left';
             ctx.fillStyle = '#fff';
             let currentX = x;
+            let currentY = y
+            let mouseHeight = null
             for (let i = 0; i < displayText.length; i++) {
                 const char = displayText[i];
                 const fontSize = getCharSize(i);
@@ -556,10 +558,15 @@
                 const offset = getCharOffset(i);
                 ctx.fillText(char, currentX + offset.x, y + offset.y);
                 currentX += ctx.measureText(char).width;
+                currentY = y + offset.y;
+                // 获取文本的宽度和高度
+                const { actualBoundingBoxAscent, actualBoundingBoxDescent } = ctx.measureText(text);
+                // 计算文本高度
+                mouseHeight = parseInt(actualBoundingBoxAscent) + parseInt(actualBoundingBoxDescent)
             }
             if (index < text.length) {
                 ctx.fillStyle = '#fff';
-                ctx.fillRect(currentX + 5, y , 3 , transPosition(baseSize,W))
+                ctx.fillRect(currentX + 5, currentY,transPosition(baseSize,W),mouseHeight - 7)
             }
             ctx.restore();
         }
