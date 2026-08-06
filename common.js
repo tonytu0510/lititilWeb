@@ -155,3 +155,82 @@ document.addEventListener('click', function(e) {
     }
 });
 })();
+// ==================== 小恐龙显示/隐藏 ====================
+function toggleDino(callback) {
+    const bar = document.getElementById('dinoBar');
+    const icon = document.getElementById('dinoIcon');
+    const iconGroup = document.getElementById('iconGroup');
+    const placeholder = document.getElementById('topPlaceholder');
+    const startBtn = document.getElementById('startGameBtn');
+    const dinoGameChangeWidth = document.getElementById('dinoGameChangeWidth');
+
+    // 监听slider的DOM变化，最后一次变化后触发回调
+    const observer = new MutationObserver((mutations, obs) => {
+        obs.disconnect();
+        requestAnimationFrame(() => {
+            if (callback) callback();
+        });
+    });
+    observer.observe(document.getElementById('slider'), {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
+
+    if (bar.style.display === 'none') {
+        bar.style.display = 'block';
+        icon.classList.remove('show');
+        iconGroup.classList.remove('move-up');
+        placeholder.style.height = '50px';
+    } else {
+        bar.style.display = 'none';
+        icon.classList.add('show');
+        iconGroup.classList.add('move-up');
+        placeholder.style.height = '0px';
+
+        const dinoGame = document.querySelector('dino-game');
+        if (dinoGame && dinoGame.resetGamePublic) {
+            dinoGame.resetGamePublic();
+        }
+        if (startBtn) {
+            dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
+            startBtn.style.display = 'block';
+        }
+    }
+
+    // 兜底：300ms后如果observer还没触发，强制执行
+    setTimeout(() => {
+        observer.disconnect();
+        if (callback) callback();
+    }, 300);
+}
+function toggleDinoOther(callback) {
+    const bar = document.getElementById('dinoBar');
+    const icon = document.getElementById('dinoIcon');
+    const iconGroup = document.getElementById('iconGroup');
+    const placeholder = document.getElementById('topPlaceholder');
+    const startBtn = document.getElementById('startGameBtn');
+    const dinoGameChangeWidth = document.getElementById('dinoGameChangeWidth');
+
+    if (bar.style.display === 'none') {
+        bar.style.display = 'block';
+        icon.classList.remove('show');
+        iconGroup.classList.remove('move-up');
+        placeholder.style.height = '50px';
+    } else {
+        bar.style.display = 'none';
+        icon.classList.add('show');
+        iconGroup.classList.add('move-up');
+        placeholder.style.height = '0px';
+
+        const dinoGame = document.querySelector('dino-game');
+        if (dinoGame && dinoGame.resetGamePublic) {
+            dinoGame.resetGamePublic();
+        }
+        if (startBtn) {
+            dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
+            startBtn.style.display = 'block';
+        }
+    }
+}
