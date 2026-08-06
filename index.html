@@ -102,7 +102,7 @@
         <div class="slide"><canvas id="canvas4"></canvas></div>
         <div class="slide"><canvas id="canvas5"></canvas></div>
         <div class="slide"><canvas id="canvas6"></canvas></div>
-        <div class="slide"><canvas id="canvas7"></canvas></div>
+        <div class="slide" onclick="canvas7ClickFun()"><canvas id="canvas7"></canvas></div>
 
         <button class="arrow left" onclick="prevSlide()">❮</button>
         <button class="arrow right" onclick="nextSlide()">❯</button>
@@ -1294,14 +1294,6 @@
             if(!activeCanvas){
                 return
             }
-            if (activeCanvas.id === 'canvas6') {
-                initMath()
-            }
-            if (activeCanvas.id === 'canvas6') {
-                canvas7Event.style.cursor = 'pointer'
-            }else{
-                 canvas7Event.style.cursor= 'auto'
-            }
             if (activeCanvas.id === 'canvas1') {
                 drawCanvas1(activeCanvas);
             }else{
@@ -1311,17 +1303,23 @@
             requestAnimationFrame(animate);
         }
         animate();
-
-        function initMath(){
-            canvas7Event.addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.href = './nestedInvolutionRingHuge.html';
-                link.target = '_self';
-                link.rel = 'noopener noreferrer';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
+        function createAlink(){
+            const link = document.createElement('a');
+            link.href = './nestedInvolutionRingHuge.html';
+            link.target = '_self';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        //处理所有的banner点击逻辑
+        function canvas7ClickFun(){
+            if(current === 5){
+                canvas7Event.style.cursor = 'pointer'
+                createAlink()
+            }else{
+                canvas7Event.style.cursor= 'auto'
+            }
         }
         function initCanvas() {
                 drawCanvas2(document.getElementById('canvas2'));
@@ -1330,7 +1328,6 @@
                 drawCanvas5(document.getElementById('canvas5'));
                 drawCanvas6(document.getElementById('canvas6'));
                 drawCanvas7(document.getElementById('canvas7'));
-                initMath()
         }
         initCanvas();
 
