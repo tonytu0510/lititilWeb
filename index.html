@@ -240,42 +240,46 @@
             const iconGroup = document.getElementById('iconGroup');
             const placeholder = document.getElementById('topPlaceholder');
             const startBtn = document.getElementById('startGameBtn');
-            const dinoGameChangeWidth=document.getElementById('dinoGameChangeWidth')
+            const dinoGameChangeWidth = document.getElementById('dinoGameChangeWidth');
+
+            // 监听slider的DOM变化，最后一次变化后触发回调
+            const observer = new MutationObserver((mutations, obs) => {
+                obs.disconnect();
+                requestAnimationFrame(() => {
+                    if (callback) callback();
+                });
+            });
+            observer.observe(document.getElementById('slider'), {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['style', 'class']
+            });
 
             if (bar.style.display === 'none') {
-                // 显示跑酷条，隐藏小恐龙图标，图标组回到 top:60px
                 bar.style.display = 'block';
                 icon.classList.remove('show');
                 iconGroup.classList.remove('move-up');
                 placeholder.style.height = '50px';
             } else {
-                // 隐藏跑酷条，显示小恐龙图标，图标组移到 top:10px
                 bar.style.display = 'none';
                 icon.classList.add('show');
                 iconGroup.classList.add('move-up');
                 placeholder.style.height = '0px';
 
-                // 重置游戏到初始状态
                 const dinoGame = document.querySelector('dino-game');
                 if (dinoGame && dinoGame.resetGamePublic) {
                     dinoGame.resetGamePublic();
                 }
-                // 显示开始按钮
                 if (startBtn) {
                     dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
                     startBtn.style.display = 'block';
                 }
             }
-            // 等最慢的那个过渡动画完成
-            const onTransitionEnd = () => {
-                iconGroup.removeEventListener('transitionend', onTransitionEnd);
-                if (callback) callback();
-            };
-            iconGroup.addEventListener('transitionend', onTransitionEnd);
 
-            // 兜底：如果过渡动画没触发（比如元素被隐藏了），200ms后强制执行
+            // 兜底：300ms后如果observer还没触发，强制执行
             setTimeout(() => {
-                iconGroup.removeEventListener('transitionend', onTransitionEnd);
+                observer.disconnect();
                 if (callback) callback();
             }, 300);
         }
