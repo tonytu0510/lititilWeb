@@ -125,7 +125,7 @@
         let time = indexTime
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('#dots span');
-        const canvas6Event = document.getElementById("canvas6")
+        const canvas7Event = document.getElementById("canvas7")
         const slider = document.getElementById('slider');
         let TimeOutTimer = null;
         // H5触屏端缩小到0.4，PC端保持1
@@ -140,9 +140,6 @@
             slides[n].classList.add('active');
             dots[n].classList.add('active');
             current = n;
-            if(n === 5){
-                initMath()
-            }
             resetTimer();
         }
 
@@ -1297,6 +1294,14 @@
             if(!activeCanvas){
                 return
             }
+            if (activeCanvas.id === 'canvas6') {
+                initMath()
+            }
+            if (activeCanvas.id === 'canvas6') {
+                canvas7Event.style.cursor = 'pointer'
+            }else{
+                 canvas7Event.style.cursor= 'auto'
+            }
             if (activeCanvas.id === 'canvas1') {
                 drawCanvas1(activeCanvas);
             }else{
@@ -1308,7 +1313,7 @@
         animate();
 
         function initMath(){
-            canvas6Event.addEventListener('click', () => {
+            canvas7Event.addEventListener('click', () => {
                 const link = document.createElement('a');
                 link.href = './nestedInvolutionRingHuge.html';
                 link.target = '_self';
