@@ -134,6 +134,7 @@
         let H5Scal = null
         let radioY = null
         let H5PrintFont = null
+        const canvas1 = document.getElementById('canvas1')
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -496,7 +497,7 @@
                 }
             );
 
-            if (canvas._textIndex > text.length) {
+            if ((canvas._textIndex > text.length) && TimeOutTimer) {
                 canvas._textIndex = 0;
             }
 
@@ -1328,7 +1329,6 @@
         // ==================== 初始化和动画循环 ====================
         function animate() {
             const activeCanvas = document.querySelector('.slide.active canvas');
-            const canvas1 = document.getElementById('canvas1')
             if(!activeCanvas){
                 return
             }
