@@ -271,29 +271,14 @@
         // 只清当前显示的banner缓存
         if (canvas.id !== 'canvas1' && (canvas._lastW !== W || canvas._lastH !== H)) {
             const activeSlide = document.querySelector('.slide.active canvas');
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            if (activeSlide && (activeSlide.id === canvas.id)) {
-                 if(canvas.id === 'canvas2'){
-                    canvas._particles = null;
-                    canvas._flowerPoints = null;
-                }else if(canvas.id === 'canvas3'){
-                    canvas._particles = null;
-                }else if(canvas.id === 'canvas4'){
-                    canvas._particles = null;
-                    canvas._notePoints = null;
-                }else if(canvas.id === 'canvas5'){
-                    canvas._particles = null;
-                    canvas._dnaPoints = null;
-                }else if(canvas.id === 'canvas6'){
-                    canvas._particles = null;
-                    canvas._brainPoints = null;
-                }else if(canvas.id === 'canvas7'){
-                    canvas._particles = null;
-                    canvas._ljPoints = null;
-                }else if(canvas.id === 'canvas8'){
-                    canvas._particles = null;
-                    canvas._brainPoints = null;
-                }
+            if (activeSlide && activeSlide.id === canvas.id) {
+                canvas._particles = null;
+                canvas._flowerPoints = null;
+                canvas._notePoints = null;
+                canvas._dnaPoints = null;
+                canvas._brainPoints = null;
+                canvas._ljPoints = null;
+                canvas._handPoints = null;
             }
             canvas._lastW = W;
             canvas._lastH = H;
@@ -1019,9 +1004,23 @@
     }
 
     function animate() {
-        const ac = document.querySelector('.slide.active canvas');
-        if (!ac) return;
-        if (ac.id === 'canvas1') drawCanvas1(ac);
+        const activeCanvas = document.querySelector('.slide.active canvas');
+        if (!activeCanvas) {
+            requestAnimationFrame(animate);
+            return;
+        }
+
+        switch (activeCanvas.id) {
+            case 'canvas1': drawCanvas1(activeCanvas); break;
+            case 'canvas2': drawCanvas2(activeCanvas); break;
+            case 'canvas3': drawCanvas3(activeCanvas); break;
+            case 'canvas4': drawCanvas4(activeCanvas); break;
+            case 'canvas5': drawCanvas5(activeCanvas); break;
+            case 'canvas6': drawCanvas6(activeCanvas); break;
+            case 'canvas7': drawCanvas7(activeCanvas); break;
+            case 'canvas8': drawCanvas8(activeCanvas); break;
+        }
+
         requestAnimationFrame(animate);
     }
 
