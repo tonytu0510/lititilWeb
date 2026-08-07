@@ -272,13 +272,27 @@
         if (canvas.id !== 'canvas1' && (canvas._lastW !== W || canvas._lastH !== H)) {
             const activeSlide = document.querySelector('.slide.active canvas');
             if (activeSlide && activeSlide.id === canvas.id) {
-                canvas._particles = null;
-                canvas._flowerPoints = null;
-                canvas._notePoints = null;
-                canvas._dnaPoints = null;
-                canvas._brainPoints = null;
-                canvas._ljPoints = null;
-                canvas._handPoints = null;
+                 if(canvas.id === 'canvas2'){
+                    canvas._particles = null;
+                    canvas._flowerPoints = null;
+                }else if(canvas.id === 'canvas3'){
+                    canvas._particles = null;
+                }else if(canvas.id === 'canvas4'){
+                    canvas._particles = null;
+                    canvas._notePoints = null;
+                }else if(canvas.id === 'canvas5'){
+                    canvas._particles = null;
+                    canvas._dnaPoints = null;
+                }else if(canvas.id === 'canvas6'){
+                    canvas._particles = null;
+                    canvas._brainPoints = null;
+                }else if(canvas.id === 'canvas7'){
+                    canvas._particles = null;
+                    canvas._ljPoints = null;
+                }else if(canvas.id === 'canvas8'){
+                    canvas._particles = null;
+                    canvas._brainPoints = null;
+                }
             }
             canvas._lastW = W;
             canvas._lastH = H;
