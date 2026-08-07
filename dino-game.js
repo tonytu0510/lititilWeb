@@ -202,14 +202,14 @@ class DinoGame extends HTMLElement {
         ctx.fillStyle = '#fff';
         ctx.font = '12px sans-serif';
         ctx.fillText('分数: ' + Math.floor(this.score / 10), 10, 15);
-        
+
         // 开始按钮（最右边）
         //if (!this.gameStarted) {
         //    const btnWidth = 120;
         //    const btnHeight = 30;
         //    const btnX = cw - btnWidth - 10;
         //    const btnY = ch / 2 - btnHeight / 2;
-            
+
         //    ctx.fillStyle = '#c4334c';
         //    ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
         //    ctx.fillStyle = '#fff';

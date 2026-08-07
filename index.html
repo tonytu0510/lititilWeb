@@ -158,6 +158,7 @@
         dots.forEach(d => d.classList.remove('active'));
         slides[n].classList.add('active');
         dots[n].classList.add('active');
+
         current = n;
         if (n === 0) {
             canvas1._textIndex = 0;
@@ -165,6 +166,7 @@
         }
         canvas8Event.style.cursor = current === 5 ? 'pointer' : 'auto';
         resetTimer();
+        redrawAllCanvas();
     }
 
     function nextSlide() {
@@ -254,25 +256,34 @@
     }
 
     function setupCanvas(canvas) {
-        const W = slider.offsetWidth, H = slider.offsetHeight, dpr = Math.max(window.devicePixelRatio || 1, 1);
+        console.log('33333333333')
+        const sliderEl = document.getElementById('slider');
+        const W = sliderEl.offsetWidth;
+        const H = sliderEl.offsetHeight;
+        const dpr = Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         canvas.style.width = W + 'px';
         canvas.style.height = H + 'px';
-        const ctx = canvas.getContext('2d');
+        let ctx = canvas.getContext('2d');
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // 只清当前显示的banner缓存
         if (canvas.id !== 'canvas1' && (canvas._lastW !== W || canvas._lastH !== H)) {
-            canvas._particles = null;
-            canvas._flowerPoints = null;
-            canvas._notePoints = null;
-            canvas._dnaPoints = null;
-            canvas._brainPoints = null;
-            canvas._ljPoints = null;
-            canvas._handPoints = null;
+            const activeSlide = document.querySelector('.slide.active canvas');
+            if (activeSlide && activeSlide.id === canvas.id) {
+                canvas._particles = null;
+                canvas._flowerPoints = null;
+                canvas._notePoints = null;
+                canvas._dnaPoints = null;
+                canvas._brainPoints = null;
+                canvas._ljPoints = null;
+                canvas._handPoints = null;
+            }
             canvas._lastW = W;
             canvas._lastH = H;
         }
-        return {ctx, W, H};
+        return { ctx, W, H };
     }
 
     function drawCanvas1(canvas) {
@@ -1015,8 +1026,29 @@
         if (current === 5) createAlink();
     }
 
-    function initCanvas() {
-        updateSliderHeight();
+    function resizeCanvas() {
+        const activeSlide = document.querySelector('.slide.active canvas');
+        const W = slider.offsetWidth;
+        const H = slider.offsetHeight;
+        if(activeSlide._lastW !== W || activeSlide._lastH !== H) {
+            if (activeSlide.id === 'canvas2') {
+                drawCanvas2(document.getElementById('canvas2'));
+            } else if (activeSlide.id === 'canvas3') {
+                drawCanvas3(document.getElementById('canvas3'));
+            } else if (activeSlide.id === 'canvas4') {
+                drawCanvas4(document.getElementById('canvas4'));
+            } else if (activeSlide.id === 'canvas5') {
+                drawCanvas5(document.getElementById('canvas5'));
+            } else if (activeSlide.id === 'canvas6') {
+                drawCanvas6(document.getElementById('canvas6'));
+            } else if (activeSlide.id === 'canvas7') {
+                drawCanvas7(document.getElementById('canvas7'));
+            } else if (activeSlide.id === 'canvas8') {
+                drawCanvas8(document.getElementById('canvas8'));
+            }
+        }
+    }
+    function initCanvas(){
         drawCanvas2(document.getElementById('canvas2'));
         drawCanvas3(document.getElementById('canvas3'));
         drawCanvas4(document.getElementById('canvas4'));
@@ -1025,8 +1057,7 @@
         drawCanvas7(document.getElementById('canvas7'));
         drawCanvas8(document.getElementById('canvas8'));
     }
-
-    initCanvas();
+    initCanvas()
 
     function waitForDomStable(el, cb, to = 300) {
         let t = null;
@@ -1045,25 +1076,9 @@
     }
 
     function redrawAllCanvas() {
-        waitForDomStable(slider, () => {
-            for (let i = 1; i <= 8; i++) {
-                const cv = document.getElementById('canvas' + i);
-                if (cv) {
-                    const ctx = cv.getContext('2d'), rect = slider.getBoundingClientRect();
-                    ctx.clearRect(0, 0, rect.width, rect.height);
-                    if (cv.id !== 'canvas1') {
-                        cv._particles = null;
-                        cv._flowerPoints = null;
-                        cv._notePoints = null;
-                        cv._dnaPoints = null;
-                        cv._brainPoints = null;
-                        cv._ljPoints = null;
-                        cv._handPoints = null;
-                    }
-                }
-            }
-            initCanvas();
-        }, 200);
+        waitForDomStable(slider, function(){
+            resizeCanvas()
+        }, 400)
     }
 
     window.addEventListener('resize', () => {
