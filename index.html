@@ -352,63 +352,50 @@
             const benchX = transPosition(0.3*100,W);
             const benchY = transPositionH(0.9*100,H);
             const bw = 220;
-            // 椅背
             ctx.fillStyle = '#4a2c14';
             ctx.fillRect(benchX, benchY - 30, bw, 18);
             ctx.fillRect(benchX, benchY - 36, bw, 8);
-            // 椅座
             ctx.fillStyle = '#5d3a1a';
             ctx.fillRect(benchX, benchY - 12, bw, 14);
-            // 椅腿
             ctx.fillStyle = '#3e2515';
             ctx.fillRect(benchX + 20, benchY + 2, 14, 30);
             ctx.fillRect(benchX + bw - 34, benchY + 2, 14, 30);
-            // 扶手
             ctx.fillStyle = '#4a2c14';
             ctx.fillRect(benchX, benchY - 28, 18, 70);
             ctx.fillRect(benchX + bw - 18, benchY - 28, 18, 70);
 
-
-            // 长椅
             const benchX2 = transPosition(0.83*100,W);
             const benchY2 = transPositionH(0.92*100,H);
             const bw2 = 220;
-            // 椅背
             ctx.fillStyle = '#4a2c14';
             ctx.fillRect(benchX2, benchY2 - 30, bw2, 18);
             ctx.fillRect(benchX2, benchY2 - 36, bw2, 8);
-            // 椅座
             ctx.fillStyle = '#5d3a1a';
             ctx.fillRect(benchX2, benchY2 - 12, bw2, 14);
-            // 椅腿
             ctx.fillStyle = '#3e2515';
             ctx.fillRect(benchX2 + 20, benchY2 + 2, 14, 30);
             ctx.fillRect(benchX2 + bw2 - 34, benchY2 + 2, 14, 30);
-            // 扶手
             ctx.fillStyle = '#4a2c14';
             ctx.fillRect(benchX2, benchY2 - 28, 18, 70);
             ctx.fillRect(benchX2 + bw2 - 18, benchY2 - 28, 18, 70);
 
-            // 情侣剪影（左侧女性，右侧男性）
+            // 情侣剪影
             const cx = benchX + bw / 2;
             const cy = benchY - 30;
-            // 女性
             ctx.fillStyle = '#1a1a2e';
             ctx.beginPath();
-            ctx.arc(cx - 25, cy - 30, 14, 0, Math.PI * 2); // 头
+            ctx.arc(cx - 25, cy - 30, 14, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillRect(cx - 35, cy - 16, 20, 30); // 身体
+            ctx.fillRect(cx - 35, cy - 16, 20, 30);
             ctx.fillStyle = '#2a2a4e';
             ctx.beginPath();
-            ctx.arc(cx - 25, cy - 50, 18, Math.PI, 0); // 长发
+            ctx.arc(cx - 25, cy - 50, 18, Math.PI, 0);
             ctx.fill();
-            // 男性
             ctx.fillStyle = '#1a1a2e';
             ctx.beginPath();
-            ctx.arc(cx + 25, cy - 35, 16, 0, Math.PI * 2); // 头
+            ctx.arc(cx + 25, cy - 35, 16, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillRect(cx + 15, cy - 19, 22, 34); // 身体
-            // 手臂（相拥）
+            ctx.fillRect(cx + 15, cy - 19, 22, 34);
             ctx.strokeStyle = '#1a1a2e';
             ctx.lineWidth = 6;
             ctx.beginPath();
@@ -421,30 +408,31 @@
             const dogY = benchY + 7;
             ctx.fillStyle = '#1a1a1a';
             ctx.beginPath();
-            ctx.ellipse(dogX, dogY - 10, 22, 14, 0, 0, Math.PI * 2); // 身体
+            ctx.ellipse(dogX, dogY - 10, 22, 14, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(dogX + 18, dogY - 22, 10, 0, Math.PI * 2); // 头
+            ctx.arc(dogX + 18, dogY - 22, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(dogX + 26, dogY - 26, 4, 0, Math.PI * 2); // 鼻子
+            ctx.arc(dogX + 26, dogY - 26, 4, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillRect(dogX + 5, dogY, 6, 10); // 前腿
-            ctx.fillRect(dogX - 12, dogY, 6, 10); // 后腿
+            ctx.fillRect(dogX + 5, dogY, 6, 10);
+            ctx.fillRect(dogX - 12, dogY, 6, 10);
             ctx.fillStyle = '#0a0a0a';
-            ctx.fillRect(dogX + 20, dogY - 30, 6, 8); // 耳朵
+            ctx.fillRect(dogX + 20, dogY - 30, 6, 8);
 
             // 孩子玩耍
             const childX = W * 0.15;
             const childY = benchY - 5;
             ctx.fillStyle = '#2a1a3e';
             ctx.beginPath();
-            ctx.arc(childX, childY - 18, 10, 0, Math.PI * 2); // 头
+            ctx.arc(childX, childY - 18, 10, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillRect(childX - 8, childY - 8, 16, 20); // 身体
-            ctx.fillRect(childX - 10, childY + 10, 6, 12); // 腿
+            ctx.fillRect(childX - 8, childY - 8, 16, 20);
+            ctx.fillRect(childX - 10, childY + 10, 6, 12);
             ctx.fillRect(childX + 4, childY + 10, 6, 12);
 
+            // SVG图片
             let radio = 1 * H5Scal;
             let img1W = 942 * radio;
             let img1H = 1032 * radio;
@@ -473,10 +461,10 @@
 
             // "I LOVE LJ" 打字机效果
             const text = "I LOVE LJ,AI LI'On fear！";
-            const printTime = 6
-            // 把全局的 textIndex、textTimer 删掉，改成用 canvas 属性
+            const printTime = 6;
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
+            canvas._textLength = text.length;
 
             const speed = canvas._textIndex < canvas._textLength ? text.length / (printTime * 60) : 0;
             canvas._textTimer += speed;
@@ -486,7 +474,6 @@
                 canvas._textTimer = canvas._textTimer % 1;
             }
             if (canvas._textIndex > text.length) canvas._textIndex = text.length;
-            canvas._textLength = text.length;
 
             typewriterDraw(
                 ctx,
@@ -510,6 +497,11 @@
                     return { x: 0, y: 0 };
                 }
             );
+
+            if ((canvas._textIndex >= text.length) && !TimeOutTimer) {
+                canvas._textIndex = 0;
+                canvas._textTimer = 0;
+            }
         }
         function transSize(num,W){
             return H5PrintFont * Math.ceil(num * 12) * (W / 100) +'px'
