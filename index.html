@@ -138,8 +138,6 @@
         let radioY = null
         let H5PrintFont = null
         const canvas1 = document.getElementById('canvas1')
-        let textIndex = null
-        let textTimer = null
 
         function showSlide(n) {
             slides.forEach(s => s.classList.remove('active'));
@@ -476,19 +474,24 @@
             // "I LOVE LJ" 打字机效果
             const text = "I LOVE LJ,AI LI'On fear！";
             const printTime = 6
-            //const text = "while(life){love++;}";
+            // 把全局的 textIndex、textTimer 删掉，改成用 canvas 属性
+            if (!canvas._textIndex) canvas._textIndex = 0;
+            if (!canvas._textTimer) canvas._textTimer = 0;
 
-            const speed = text.length / (printTime * 60);  // 每帧该打几个字，60fps基准
-            textTimer += speed;
-            if (textTimer >= 1) {
-                textIndex += Math.floor(textTimer);
-                textTimer = textTimer % 1;
+            const speed = canvas._textIndex < canvas._textLength ? text.length / (printTime * 60) : 0;
+            canvas._textTimer += speed;
+
+            if (canvas._textTimer >= 1) {
+                canvas._textIndex += Math.floor(canvas._textTimer);
+                canvas._textTimer = canvas._textTimer % 1;
             }
-            if (textIndex > text.length) textIndex = text.length; // 上限保护
+            if (canvas._textIndex > text.length) canvas._textIndex = text.length;
+            canvas._textLength = text.length;
+
             typewriterDraw(
                 ctx,
                 text,
-                textIndex,
+                canvas._textIndex,
                 W,
                 H,
                 W * 0.09,
