@@ -154,7 +154,6 @@ document.addEventListener('click', function(e) {
         }
     }
 });
-})();
 // ==================== 小恐龙显示/隐藏 ====================
 function toggleDino(callback) {
     const bar = document.getElementById('dinoBar');
@@ -186,26 +185,30 @@ function toggleDino(callback) {
     }
     if (callback) callback()
 }
-    window.addEventListener('load', function() {
-        if (typeof updateSliderHeight === 'function') {
-            updateSliderHeight();
-        }
-        const dinoIcon = document.getElementById('dinoIcon');
-        if (dinoIcon) {
+
+    if (typeof updateSliderHeight === 'function') {
+        updateSliderHeight();
+    }
+    const dinoIcon = document.getElementById('dinoIcon');
+    if (dinoIcon) {
+        setTimeout(function() {
             dinoIcon.addEventListener('click', function() {
                 toggleDino()
                 if (typeof updateSliderHeight === 'function') {
                     updateSliderHeight();
                 }
             });
-        }
-        const closeBtn = document.querySelector('#dinoBar .close-btn');
-        if (closeBtn) {
+        }, 500);
+    }
+    const closeBtn = document.querySelector('#dinoBar .close-btn');
+    if (closeBtn) {
+        setTimeout(function() {
             closeBtn.addEventListener('click', function() {
                 toggleDino()
                 if (typeof updateSliderHeight === 'function') {
                     updateSliderHeight();
                 }
             });
-        }
-    });
+        }, 500);
+    }
+})()
