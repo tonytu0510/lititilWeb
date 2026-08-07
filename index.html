@@ -271,8 +271,8 @@
         // 只清当前显示的banner缓存
         if (canvas.id !== 'canvas1' && (canvas._lastW !== W || canvas._lastH !== H)) {
             const activeSlide = document.querySelector('.slide.active canvas');
-            if (activeSlide && activeSlide.id === canvas.id) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            if (activeSlide && (activeSlide.id === canvas.id)) {
                  if(canvas.id === 'canvas2'){
                     canvas._particles = null;
                     canvas._flowerPoints = null;
