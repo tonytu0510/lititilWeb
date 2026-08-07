@@ -1,7 +1,7 @@
 const closeBtn = document.querySelector('#dinoBar .close-btn');
 if (closeBtn) {
     closeBtn.addEventListener('click', function() {
-        toggleDinoOther()
+        toggleDino()
     });
 }
 const dinoIcon = document.getElementById('dinoIcon');

@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="common.css">
     <script src="dino-game.js"></script>
     <style>
+        body{
+            overflow: hidden;
+        }
         #slider {
             width: 100%;
             height: calc(100vh - 50px);
@@ -247,14 +250,7 @@
                     slider.classList.remove('full');
                 }
             }
-            // 头部关闭/打开时重绘Canvas 2-7
-            drawCanvas2(document.getElementById('canvas2'));
-            drawCanvas3(document.getElementById('canvas3'));
-            drawCanvas4(document.getElementById('canvas4'));
-            drawCanvas5(document.getElementById('canvas5'));
-            drawCanvas6(document.getElementById('canvas6'));
-            drawCanvas7(document.getElementById('canvas7'));
-            drawCanvas8(document.getElementById('canvas8'));
+            redrawAllCanvas()
         }
 
         const dinoBar = document.getElementById('dinoBar');
@@ -268,47 +264,38 @@
             });
             observer.observe(dinoBar, { attributes: true });
         }
-
-        window.addEventListener('load', function() {
-            updateSliderHeight();
-            const dinoIcon = document.getElementById('dinoIcon');
-            if (dinoIcon) {
-                dinoIcon.addEventListener('click', function() {
-                    toggleDino(() => {
-                        updateSliderHeight();
-                    });
-                });
-            }
-            const closeBtn = document.querySelector('#dinoBar .close-btn');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    toggleDino(() => {
-                        updateSliderHeight();
-                    });
-                });
-            }
-        });
         function setupCanvas(canvas) {
             const sliderEl = document.getElementById('slider');
-            const rect = sliderEl.getBoundingClientRect();
-            const W = rect.width;   // 浮点数，精确
-            const H = rect.height;
-
-            const dpr = window.devicePixelRatio || 1;
+            const W = sliderEl.offsetWidth;
+            const H = sliderEl.offsetHeight;
+            const dpr = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = W * dpr;
             canvas.height = H * dpr;
             canvas.style.width = W + 'px';
             canvas.style.height = H + 'px';
             const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // resize时清掉所有缓存
+            if (canvas._lastW !== W || canvas._lastH !== H) {
+                canvas._particles = null;
+                canvas._flowerPoints = null;
+                canvas._notePoints = null;
+                canvas._dnaPoints = null;
+                canvas._brainPoints = null;
+                canvas._ljPoints = null;
+                canvas._handPoints = null;
+                canvas._lastW = W;
+                canvas._lastH = H;
+            }
             return { ctx, W, H };
         }
         // ==================== Canvas 1: 星空爱情 ====================
         function drawCanvas1(canvas) {
+            const { ctx, W, H } = setupCanvas(canvas);
             H5Scal = ('ontouchstart' in window) ? 0.3 : 1;
             radioY = ('ontouchstart' in window) ? 0.98 : 1
             H5PrintFont = ('ontouchstart' in window) ? 2.3 : 1
-            const { ctx, W, H } = setupCanvas(canvas);
 
             // 星空背景
             const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
@@ -1442,10 +1429,11 @@
                 createAlink()
             }
         }
-        function styleCursor(){
-              return (current === 5) ? "cursor:pointer" : "cursor:auto"
-        }
         function initCanvas() {
+                console.log('initCanvas called');
+                const c2 = document.getElementById('canvas2');
+                console.log('canvas2 element:', c2, 'width:', c2?.width);
+                if (c2) drawCanvas2(c2);
                 drawCanvas2(document.getElementById('canvas2'));
                 drawCanvas3(document.getElementById('canvas3'));
                 drawCanvas4(document.getElementById('canvas4'));
@@ -1456,7 +1444,52 @@
         }
         initCanvas();
 
-        window.addEventListener('resize', initCanvas);
+        function waitForDomStable(element, callback, timeout = 300) {
+            let timer = null;
+
+            const observer = new MutationObserver(() => {
+                // 每次变化就重置计时器
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    observer.disconnect();
+                    callback();
+                }, timeout);
+            });
+
+            observer.observe(element, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['style', 'class']
+            });
+
+            // 立即启动第一次计时（万一DOM已经稳定）
+            timer = setTimeout(() => {
+                observer.disconnect();
+                callback();
+            }, timeout);
+        }
+        function redrawAllCanvas() {
+            waitForDomStable(slider, () => {
+                // 先清空所有Canvas
+                for (let i = 1; i <= 8; i++) {
+                    const canvas = document.getElementById('canvas' + i);
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        const rect = slider.getBoundingClientRect();
+                        ctx.clearRect(0, 0, rect.width, rect.height);
+                    }
+                }
+                // 再重绘
+                initCanvas();
+            }, 200);
+        }
+        window.addEventListener('resize',function(){
+            console.log('resize触发')
+                redrawAllCanvas()
+            }
+        )
+
     </script>
 </body>
 </html>
