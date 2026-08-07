@@ -52,20 +52,21 @@ class DinoGame extends HTMLElement {
         this.resizeObserver.observe(container);
         
         this.gameLoop();
-// 公开方法：重置游戏到初始状态
-this.resetGamePublic = function() {
-    this.gameStarted = false;
-    this.gameOver = false;
-    this.score = 0;
-    this.obstacles = [];
-    this.gameSpeed = 3;
-    this.spawnInterval = 80;
-    this.player.y = this.groundY - this.player.height;
-    this.player.vy = 0;
-};
+        // 公开方法：重置游戏到初始状态
+        this.resetGamePublic = function() {
+            this.gameStarted = false;
+            this.gameOver = false;
+            this.score = 0;
+            this.obstacles = [];
+            this.gameSpeed = 3;
+            this.spawnInterval = 80;
+            this.player.y = this.groundY - this.player.height;
+            this.player.vy = 0;
+        }
     }
     
     resize() {
+
         const rect = this.canvas.parentElement.getBoundingClientRect();
         this.canvas.width = rect.width;
         this.canvas.height = 50;//rect.height
