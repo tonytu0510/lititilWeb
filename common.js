@@ -185,30 +185,30 @@ function toggleDino(callback) {
     }
     if (callback) callback()
 }
-
-    if (typeof updateSliderHeight === 'function') {
-        updateSliderHeight();
-    }
-    const dinoIcon = document.getElementById('dinoIcon');
-    if (dinoIcon) {
-        setTimeout(function() {
-            dinoIcon.addEventListener('click', function() {
-                toggleDino()
-                if (typeof updateSliderHeight === 'function') {
-                    updateSliderHeight();
-                }
-            });
-        }, 500);
-    }
-    const closeBtn = document.querySelector('#dinoBar .close-btn');
-    if (closeBtn) {
-        setTimeout(function() {
-            closeBtn.addEventListener('click', function() {
-                toggleDino()
-                if (typeof updateSliderHeight === 'function') {
-                    updateSliderHeight();
-                }
-            });
-        }, 500);
-    }
+//点击头部左侧关闭按钮
+if (typeof updateSliderHeight === 'function') {
+    updateSliderHeight();
+}
+const dinoIcon = document.getElementById('dinoIcon');
+if (dinoIcon) {
+    setTimeout(function() {
+        dinoIcon.addEventListener('click', function() {
+            toggleDino()
+            if (typeof updateSliderHeight === 'function') {
+                updateSliderHeight();
+            }
+        });
+    }, 500);
+}
+const closeBtn = document.querySelector('#dinoBar .close-btn');
+if (closeBtn) {
+    setTimeout(function() {
+        closeBtn.addEventListener('click', function() {
+            toggleDino()
+            if (typeof updateSliderHeight === 'function') {
+                updateSliderHeight();
+            }
+        });
+    }, 500);
+}
 })()
