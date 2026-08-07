@@ -392,7 +392,8 @@
         drawImageSafe('svg/2.svg', 430 * r / 2 - 100, (H - 430 * r - 40) * radioY, 430 * r, 430 * r, ctx);
         drawImageSafe('svg/3.svg', W / 2 - 90 * r + (W / 2 - 90 * r) / 2, (H - 280 * r - 30) * radioY, 180 * r, 280 * r, ctx);
         drawImageSafe('svg/4.svg', W - 300 * r + 50, (H - 340 * r + 30) * radioY, 300 * r, 340 * r, ctx);
-        const text = "I LOVE LJ,AI LI'On fear！", msPerChar = 400;
+        const text = "I LOVE LJ,AI LI'On fear！";
+        const msPerChar = ('ontouchstart' in window) ? 350 : 280;
         if (!canvas._textIndex) canvas._textIndex = 0;
         if (!canvas._textTimer) canvas._textTimer = performance.now();
         canvas._textLength = text.length;
