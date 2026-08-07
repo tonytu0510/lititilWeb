@@ -277,16 +277,18 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             // resize时清掉所有缓存
-            if (canvas._lastW !== W || canvas._lastH !== H) {
-                canvas._particles = null;
-                canvas._flowerPoints = null;
-                canvas._notePoints = null;
-                canvas._dnaPoints = null;
-                canvas._brainPoints = null;
-                canvas._ljPoints = null;
-                canvas._handPoints = null;
-                canvas._lastW = W;
-                canvas._lastH = H;
+            if (canvas.id !== 'canvas1') {
+                if (canvas._lastW !== W || canvas._lastH !== H) {
+                    canvas._particles = null;
+                            canvas._flowerPoints = null;
+                            canvas._notePoints = null;
+                            canvas._dnaPoints = null;
+                            canvas._brainPoints = null;
+                            canvas._ljPoints = null;
+                            canvas._handPoints = null;
+                            canvas._lastW = W;
+                            canvas._lastH = H;
+                }
             }
             return { ctx, W, H };
         }
