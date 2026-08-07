@@ -280,14 +280,14 @@
             if (canvas.id !== 'canvas1') {
                 if (canvas._lastW !== W || canvas._lastH !== H) {
                     canvas._particles = null;
-                            canvas._flowerPoints = null;
-                            canvas._notePoints = null;
-                            canvas._dnaPoints = null;
-                            canvas._brainPoints = null;
-                            canvas._ljPoints = null;
-                            canvas._handPoints = null;
-                            canvas._lastW = W;
-                            canvas._lastH = H;
+                    canvas._flowerPoints = null;
+                    canvas._notePoints = null;
+                    canvas._dnaPoints = null;
+                    canvas._brainPoints = null;
+                    canvas._ljPoints = null;
+                    canvas._handPoints = null;
+                    canvas._lastW = W;
+                    canvas._lastH = H;
                 }
             }
             return { ctx, W, H };
@@ -473,13 +473,14 @@
 
             // "I LOVE LJ" 打字机效果
             const text = "I LOVE LJ,AI LI'On fear！";
+            const printTime = 1000
             //const text = "while(life){love++;}";
 
             if (!canvas._textIndex) canvas._textIndex = 0;
             if (!canvas._textTimer) canvas._textTimer = 0;
 
-            canvas._textTimer++;
-            if (canvas._textTimer >= 20) {
+            canvas._textTimer += text.length/printTime;
+            if (canvas._textTimer >= text.length) {
                 canvas._textIndex++;
                 canvas._textTimer = 0;
             }
@@ -1478,7 +1479,9 @@
                         const rect = slider.getBoundingClientRect();
                         ctx.clearRect(0, 0, rect.width, rect.height);
                         // resize时清掉所有缓存
-                        canvas._particles = null;
+                        if (canvas.id !== 'canvas1') {
+                            canvas._particles = null;
+                        }
                     }
                 }
                 // 再重绘
