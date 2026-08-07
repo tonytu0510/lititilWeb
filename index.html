@@ -393,19 +393,20 @@
         drawImageSafe('svg/3.svg', W / 2 - 90 * r + (W / 2 - 90 * r) / 2, (H - 280 * r - 30) * radioY, 180 * r, 280 * r, ctx);
         drawImageSafe('svg/4.svg', W - 300 * r + 50, (H - 340 * r + 30) * radioY, 300 * r, 340 * r, ctx);
         const text = "I LOVE LJ,AI LI'On fear！";
-        const framesPerChar = ('ontouchstart' in window) ? 0.06 : 1; // 60fps下18帧=300ms一个字
+        
+        const msPerChar = 300;
 
         if (!canvas._textIndex) canvas._textIndex = 0;
-        if (!canvas._textFrame) canvas._textFrame = 0;
+        if (!canvas._textTimer) canvas._textTimer = performance.now();
         canvas._textLength = text.length;
 
         if (canvas._textIndex < text.length) {
-            canvas._textFrame++;
-            if (canvas._textFrame >= framesPerChar) {
+            const elapsed = performance.now() - canvas._textTimer;
+            if (elapsed >= (canvas._textIndex + 1) * msPerChar) {
                 canvas._textIndex++;
-                canvas._textFrame = 0;
             }
         }
+
         typewriterDraw(ctx, text, canvas._textIndex, W, H, W * 0.09, H * 0.25, 0.3, i => (i === 0 || i === 1 || i === 2 ? transSize(0.3, W) : i === 12 || i === 13 || i === 14 || i === 15 || i === 16 ? transSize(0.3, W) : i === text.length - 1 ? transSize(0.2, W) : transSize(0.164, W)), i => (i === 0 || i === 1 || i === 2 ? {
             x: 0,
             y: transPosition(-1.6, W)
