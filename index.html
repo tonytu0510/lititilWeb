@@ -145,11 +145,16 @@
             slides[n].classList.add('active');
             dots[n].classList.add('active');
             current = n;
-            //处理banner切换时的鼠标样式
-            if(current === 5){
-                canvas8Event.style.cursor='pointer'
-            }else{
-                canvas8Event.style.cursor='auto'
+
+            // 切到banner1时从头播放
+            if (n === 0) {
+                resetTypewriter(canvas1);
+            }
+
+            if (current === 5) {
+                canvas8Event.style.cursor = 'pointer';
+            } else {
+                canvas8Event.style.cursor = 'auto';
             }
             resetTimer();
         }
@@ -461,47 +466,46 @@
 
             // "I LOVE LJ" 打字机效果
             const text = "I LOVE LJ,AI LI'On fear！";
-            const printTime = 6;
+            const msPerChar = 280;
+
             if (!canvas._textIndex) canvas._textIndex = 0;
-            if (!canvas._textTimer) canvas._textTimer = 0;
+            if (!canvas._textTimer) canvas._textTimer = performance.now();
             canvas._textLength = text.length;
 
-            const speed = canvas._textIndex < canvas._textLength ? text.length / (printTime * 60) : 0;
-            canvas._textTimer += speed;
-
-            if (canvas._textTimer >= 1) {
-                canvas._textIndex += Math.floor(canvas._textTimer);
-                canvas._textTimer = canvas._textTimer % 1;
+            const elapsed = performance.now() - canvas._textTimer;
+            if (TimeOutTimer) {
+                // TimeOutTimer有值 = 没悬停 = 定时器在跑 = 打一遍就停
+                canvas._textIndex = Math.min(Math.floor(elapsed / msPerChar), text.length);
+            } else {
+                // TimeOutTimer为null = 鼠标悬停 = 定时器被清除 = 无限循环
+                canvas._textIndex = Math.floor(elapsed / msPerChar) % (text.length + 1);
             }
-            if (canvas._textIndex > text.length) canvas._textIndex = text.length;
 
             typewriterDraw(
                 ctx,
                 text,
                 canvas._textIndex,
-                W,
-                H,
-                W * 0.09,
-                H * 0.25,
+                W, H,
+                W * 0.09, H * 0.25,
                 0.3,
                 (i) => {
-                    if (i === 0 || i === 1 || i === 2) return transSize(0.3,W);
-                    if(i === 12 || i === 13|| i === 14|| i === 15|| i === 16) return transSize(0.3,W);
-                    if (i === text.length - 1) return transSize(0.2,W);
-                    return transSize(0.164,W);
+                    if (i === 0 || i === 1 || i === 2) return transSize(0.3, W);
+                    if (i === 12 || i === 13 || i === 14 || i === 15 || i === 16) return transSize(0.3, W);
+                    if (i === text.length - 1) return transSize(0.2, W);
+                    return transSize(0.164, W);
                 },
                 (i) => {
-                    if (i === 0 || i === 1 || i === 2) return { x: 0, y: transPosition(-1.6,W) };
-                    if(i === 12 || i === 13|| i === 14|| i === 15|| i === 16) return { x: 0, y: transPosition(-2.9,W) };
-                    if (i === text.length - 1) return { x: 0, y: transPosition(-0.24,W) };
+                    if (i === 0 || i === 1 || i === 2) return { x: 0, y: transPosition(-1.6, W) };
+                    if (i === 12 || i === 13 || i === 14 || i === 15 || i === 16) return { x: 0, y: transPosition(-2.9, W) };
+                    if (i === text.length - 1) return { x: 0, y: transPosition(-0.24, W) };
                     return { x: 0, y: 0 };
                 }
             );
-
-            if ((canvas._textIndex >= text.length) && !TimeOutTimer) {
-                canvas._textIndex = 0;
-                canvas._textTimer = 0;
-            }
+        }
+        // 切回banner1时从头播放
+        function resetTypewriter(canvas) {
+            canvas._textIndex = 0;
+            canvas._textTimer = performance.now();
         }
         function transSize(num,W){
             return H5PrintFont * Math.ceil(num * 12) * (W / 100) +'px'
