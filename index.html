@@ -279,16 +279,18 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             // resize时清掉所有缓存
-            if (canvas._lastW !== W || canvas._lastH !== H) {
-                canvas._particles = null;
-                canvas._flowerPoints = null;
-                canvas._notePoints = null;
-                canvas._dnaPoints = null;
-                canvas._brainPoints = null;
-                canvas._ljPoints = null;
-                canvas._handPoints = null;
-                canvas._lastW = W;
-                canvas._lastH = H;
+            if (canvas.id !== 'canvas1') {
+                if (canvas._lastW !== W || canvas._lastH !== H) {
+                    canvas._particles = null;
+                    canvas._flowerPoints = null;
+                    canvas._notePoints = null;
+                    canvas._dnaPoints = null;
+                    canvas._brainPoints = null;
+                    canvas._ljPoints = null;
+                    canvas._handPoints = null;
+                    canvas._lastW = W;
+                    canvas._lastH = H;
+                }
             }
             return { ctx, W, H };
         }
@@ -482,6 +484,7 @@
                 textIndex += Math.floor(textTimer);
                 textTimer = textTimer % 1;
             }
+            if (textIndex > text.length) textIndex = text.length; // 上限保护
             typewriterDraw(
                 ctx,
                 text,
@@ -504,7 +507,6 @@
                     return { x: 0, y: 0 };
                 }
             );
-            if (textIndex > text.length) textIndex = text.length; // 上限保护
         }
         function transSize(num,W){
             return H5PrintFont * Math.ceil(num * 12) * (W / 100) +'px'
@@ -1470,13 +1472,15 @@
                         const rect = slider.getBoundingClientRect();
                         ctx.clearRect(0, 0, rect.width, rect.height);
                         // resize时清掉所有缓存
-                        canvas._particles = null;
-                        canvas._flowerPoints = null;
-                        canvas._notePoints = null;
-                        canvas._dnaPoints = null;
-                        canvas._brainPoints = null;
-                        canvas._ljPoints = null;
-                        canvas._handPoints = null;
+                        if (canvas.id !== 'canvas1') {
+                            canvas._particles = null;
+                            canvas._flowerPoints = null;
+                            canvas._notePoints = null;
+                            canvas._dnaPoints = null;
+                            canvas._brainPoints = null;
+                            canvas._ljPoints = null;
+                            canvas._handPoints = null;
+                        }
                     }
                 }
                 // 再重绘
