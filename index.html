@@ -1430,10 +1430,7 @@
             }
         }
         function initCanvas() {
-                console.log('initCanvas called');
-                const c2 = document.getElementById('canvas2');
-                console.log('canvas2 element:', c2, 'width:', c2?.width);
-                if (c2) drawCanvas2(c2);
+                updateSliderHeight()
                 drawCanvas2(document.getElementById('canvas2'));
                 drawCanvas3(document.getElementById('canvas3'));
                 drawCanvas4(document.getElementById('canvas4'));
@@ -1478,6 +1475,8 @@
                         const ctx = canvas.getContext('2d');
                         const rect = slider.getBoundingClientRect();
                         ctx.clearRect(0, 0, rect.width, rect.height);
+                        // resize时清掉所有缓存
+                        canvas._particles = null;
                     }
                 }
                 // 再重绘
@@ -1485,7 +1484,6 @@
             }, 200);
         }
         window.addEventListener('resize',function(){
-            console.log('resize触发')
                 redrawAllCanvas()
             }
         )
