@@ -10,10 +10,11 @@
 
     function autoPlayOnClick() {
         play();
+        document.addEventListener("load", autoPlayOnClick);
         document.removeEventListener('click', autoPlayOnClick);
         document.removeEventListener('touchstart', autoPlayOnClick);
     }
-
+    document.addEventListener("load", autoPlayOnClick);
     document.addEventListener('click', autoPlayOnClick);
     document.addEventListener('touchstart', autoPlayOnClick);
 
