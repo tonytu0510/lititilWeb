@@ -1,6 +1,5 @@
 // play-audio.js
 (function() {
-    localStorage.setItem('playFlag', '0')
     let audio = null;
     function play() {
         if (audio) { audio.pause(); audio.currentTime = 0; }
@@ -14,8 +13,8 @@
         document.removeEventListener('touchstart', autoPlayOnClick);
         localStorage.setItem('playFlag', '1')
     }
-    let getPlayFlag = localStorage.getItem('playFlag')
-    if(getPlayFlag === '0') {
+    let getPlayFlag = !!!localStorage.getItem('playFlag')
+    if(getPlayFlag) {
         document.addEventListener('click', autoPlayOnClick);
         document.addEventListener('touchstart', autoPlayOnClick);
     }
@@ -23,7 +22,7 @@
         // 取消事件的默认行为
         e.preventDefault();
         // Chrome 需要返回非空字符串才会显示确认对话框
-        localStorage.setItem('playFlag', '0')
+        localStorage.setItem('playFlag', null)
     });
 
 
