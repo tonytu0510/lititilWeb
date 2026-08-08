@@ -13,7 +13,7 @@
         document.removeEventListener('click', autoPlayOnClick);
         document.removeEventListener('touchstart', autoPlayOnClick);
     }
-    let getPlayFlag = !!flag
+    let getPlayFlag = !flag
     if(getPlayFlag) {
         document.addEventListener('click', autoPlayOnClick);
         document.addEventListener('touchstart', autoPlayOnClick);
