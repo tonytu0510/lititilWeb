@@ -8,13 +8,13 @@
             <div id="menuWrapper">
                 <canvas id="menuIcon" width="50" height="50"></canvas>
                 <nav id="subNav">
-                    <a href="index.html">首页</a>
-                    <a href="tools.html">工具箱</a>
-	                <a href="qrCode.html">二维码</a>
-	                <a href="nestedInvolutionRingHuge.html">对合环</a>
-	                <a href="chinaClock.html">RSTUV</a>
-	                <a href="namePairing.html">缘分测试</a>
-                    <a href="aboutMe.html">关于我</a>
+                    <a href="index.html?playFlag=1">首页</a>
+                    <a href="tools.html?playFlag=1">工具箱</a>
+	                <a href="qrCode.html?playFlag=1">二维码</a>
+	                <a href="nestedInvolutionRingHuge.html?playFlag=1">对合环</a>
+	                <a href="chinaClock.html?playFlag=1">RSTUV</a>
+	                <a href="namePairing.html?playFlag=1">缘分测试</a>
+                    <a href="aboutMe.html?playFlag=1">关于我</a>
                 </nav>
             </div>
             <canvas id="dinoIcon" width="50" height="50"></canvas>

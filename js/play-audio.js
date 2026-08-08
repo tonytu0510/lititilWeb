@@ -1,6 +1,7 @@
 // play-audio.js
 (function() {
     let audio = null;
+    let flag = getUrlParams().playFlag || null
     function play() {
         if (audio) { audio.pause(); audio.currentTime = 0; }
         audio = new Audio('audio/people-long-live.mp3');
@@ -11,20 +12,24 @@
         play();
         document.removeEventListener('click', autoPlayOnClick);
         document.removeEventListener('touchstart', autoPlayOnClick);
-        localStorage.setItem('playFlag', '1')
     }
-    let getPlayFlag = !!localStorage.getItem('playFlag')
+    let getPlayFlag = !!flag
     if(getPlayFlag) {
         document.addEventListener('click', autoPlayOnClick);
         document.addEventListener('touchstart', autoPlayOnClick);
     }
-    window.addEventListener('beforeunload', function (e) {
-        // 取消事件的默认行为
-        e.preventDefault();
-        // Chrome 需要返回非空字符串才会显示确认对话框
-        localStorage.setItem('playFlag', null)
-    });
-
 
     window.playAudio = play;
+
+    function getUrlParams(url) {
+        const params = {};
+        const queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+        if (!queryString) return params;
+
+        queryString.split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+        });
+        return params;
+    }
 })();
