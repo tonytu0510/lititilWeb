@@ -7,8 +7,7 @@
         audio = new Audio('audio/people-long-live.mp3');
         audio.play();
     }
-    play();
-    
+
     function autoPlayOnClick() {
         play();
         document.removeEventListener('click', autoPlayOnClick);
