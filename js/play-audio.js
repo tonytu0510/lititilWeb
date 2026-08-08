@@ -13,6 +13,10 @@
         document.removeEventListener('click', autoPlayOnClick);
         document.removeEventListener('touchstart', autoPlayOnClick);
     }
+    
+    document.addEventListener('click', autoPlayOnClick);
+    document.addEventListener('touchstart', autoPlayOnClick);
+
     autoPlayOnClick()
 
     window.playAudio = play;
