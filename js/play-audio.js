@@ -13,7 +13,7 @@
         document.removeEventListener('touchstart', autoPlayOnClick);
         localStorage.setItem('playFlag', '1')
     }
-    let getPlayFlag = !!!localStorage.getItem('playFlag')
+    let getPlayFlag = !!localStorage.getItem('playFlag')
     if(getPlayFlag) {
         document.addEventListener('click', autoPlayOnClick);
         document.addEventListener('touchstart', autoPlayOnClick);
