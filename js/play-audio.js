@@ -1,13 +1,22 @@
 // play-audio.js
 (function() {
+    // 自动加参数 M=0
+    if (!location.search.includes('M=')) {
+        location.replace(location.pathname + '?M=0' + location.hash);
+        return; // 跳转时退出，等新URL加载后再执行
+    }
+
+    // 只有URL已经有M参数时，才执行以下逻辑
     let audio = null;
     let isBound = false;
-    let flag = getUrlParams().M || null
+    let flag = getUrlParams().M;
+
     function play() {
         if (audio) { audio.pause(); audio.currentTime = 0; }
         audio = new Audio('audio/people-long-live.mp3');
         audio.play();
     }
+
     function bindClick() {
         if (isBound) return;
         isBound = true;
@@ -23,23 +32,24 @@
     }
 
     function autoPlay() {
-        let getPlayFlag = !!!flag;
-        if (getPlayFlag) {
+        // M=0 触发，M=1 不触发
+        if (flag === '0') {
             bindClick();
         }
         document.addEventListener('keydown', keyHandler);
     }
 
-    autoPlay()
+    autoPlay();
 
     window.playAudio = play;
 
     function keyHandler(e) {
         if (e.code === 'KeyM') {
             e.preventDefault();
-            play(); // 直接播放
+            play();
         }
     }
+
     function getUrlParams(url) {
         const params = {};
         const queryString = url ? url.split('?')[1] : window.location.search.slice(1);
