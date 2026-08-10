@@ -2,7 +2,7 @@
 (function() {
     let audio = null;
     let isBound = false;
-    let flag = getUrlParams().playFlag || null
+    let flag = getUrlParams().M || null
     function play() {
         if (audio) { audio.pause(); audio.currentTime = 0; }
         audio = new Audio('audio/people-long-live.mp3');
