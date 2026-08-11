@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Tony.tu">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>goodme 镜像效果</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="common.css">
+    <script src="dino-game.js"></script>
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #1a1a2e;
+            font-family: 'Georgia', serif;
+        }
+        .container {
+            text-align: center;
+            color: #fff;
+        }
+        .mirror-box {
+            display: inline-block;
+            padding: 40px 60px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .text {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+        }
+        .text.original {
+            color: #f0d060;
+        }
+        .text.mirrored {
+            color: #60d0f0;
+        }
+        .arrow {
+            font-size: 28px;
+            color: #888;
+            margin: 15px 0;
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-5px); }
+        }
+        .note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .glass {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="container">
+        <div class="mirror-box">
+            <div class="glass"></div>
+            <div class="label">外面看到（贴膜正面）</div>
+            <div class="text original">goodme</div>
+            <div class="arrow">↕</div>
+            <div class="label">里面看到（贴膜背面 · 镜像）</div>
+            <div class="text mirrored">əmbooϱ</div>
+        </div>
+        <div class="note">单个字母左右镜像 + 整体顺序颠倒</div>
+    </div>
+<script src="common.js"></script>
+</body>
+</html>
