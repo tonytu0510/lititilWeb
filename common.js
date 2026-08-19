@@ -214,3 +214,11 @@ if (closeBtn) {
     }, 500);
 }
 })()
+
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?726197c7cdeb238883e13623049915fa";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
