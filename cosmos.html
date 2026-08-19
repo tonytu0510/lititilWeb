@@ -12,6 +12,14 @@
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./common.css">
     <script src="./dino-game.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -46,8 +54,8 @@
     <div class="tip">九大太阳系 · 对合环 | 鼠标拖动旋转视角</div>
     <script src="./common.js"></script>
     <script type="module">
-        import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-        import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+        import * as THREE from "three";
+        import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0000);
