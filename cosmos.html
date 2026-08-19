@@ -38,11 +38,14 @@
 <body>
     <div class="tip">九大太阳系 · 对合环 | 鼠标拖动旋转视角</div>
 
-    <!-- CDN 引用 Three.js 和 OrbitControls -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- CDN 引入 Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+        // ================================================
+        // 场景、相机、渲染器
+        // ================================================
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0000);
 
@@ -60,6 +63,9 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
+        // ================================================
+        // 轨道控制器
+        // ================================================
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -68,7 +74,9 @@
         controls.maxDistance = 180;
         controls.minDistance = 30;
 
+        // ================================================
         // 中心发光体
+        // ================================================
         const centerGeo = new THREE.SphereGeometry(5, 64, 64);
         const centerMat = new THREE.MeshBasicMaterial({ color: 0xf0d060 });
         const centerCore = new THREE.Mesh(centerGeo, centerMat);
@@ -83,7 +91,9 @@
         const glow = new THREE.Mesh(glowGeo, glowMat);
         scene.add(glow);
 
-        // 九个太阳系
+        // ================================================
+        // 九大太阳系
+        // ================================================
         const colors = [
             0xc41e3a, 0xd4a017, 0xf0d060, 0x8b0000,
             0x4a7c59, 0x88aacc, 0xcc8899, 0x00aaaa, 0xddaa88
@@ -153,7 +163,9 @@
             };
         });
 
+        // ================================================
         // 背景星星
+        // ================================================
         const starsGeo = new THREE.BufferGeometry();
         const starsCount = 2500;
         const positions = new Float32Array(starsCount * 3);
@@ -170,7 +182,9 @@
         const stars = new THREE.Points(starsGeo, starsMat);
         scene.add(stars);
 
+        // ================================================
         // 轨道线
+        // ================================================
         systems.forEach(sys => {
             const orbitCurve = new THREE.EllipseCurve(
                 0, 0,
@@ -191,7 +205,9 @@
             scene.add(orbitLine);
         });
 
+        // ================================================
         // 光照
+        // ================================================
         const ambientLight = new THREE.AmbientLight(0x604030, 1.2);
         scene.add(ambientLight);
 
@@ -202,7 +218,9 @@
         pointLight2.position.set(0, 30, 0);
         scene.add(pointLight2);
 
+        // ================================================
         // 动画循环
+        // ================================================
         function animate() {
             requestAnimationFrame(animate);
 
@@ -230,6 +248,9 @@
 
         animate();
 
+        // ================================================
+        // 窗口大小自适应
+        // ================================================
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
