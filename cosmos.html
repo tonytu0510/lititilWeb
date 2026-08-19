@@ -7,36 +7,28 @@
     <meta name="keywords" content="个人网站,弘扬正能量">
     <meta name="description" content="这是一个个人网站,弘扬正能量">
     <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>九大太阳系 · 对合环</title>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./common.css">
-    <script src="./dino-game.js"></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        html,
         body {
-            background: #0a0000;
-            height: 100vh;
-            width: 100vw;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background: #0a0000;
         }
         canvas {
             display: block;
         }
         .tip {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             left: 0;
             right: 0;
@@ -46,13 +38,22 @@
             font-size: 13px;
             letter-spacing: 4px;
             pointer-events: none;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
-    <div id="topBarContainer"></div>
     <div class="tip">九大太阳系 · 对合环 | 鼠标拖动旋转视角</div>
-    <script src="./common.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
     <script type="module">
         import * as THREE from "three";
         import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -60,7 +61,12 @@
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0000);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
         camera.position.set(0, 40, 90);
         camera.lookAt(0, 0, 0);
 
@@ -114,7 +120,7 @@
             const sphere = new THREE.Mesh(geo, mat);
             group.add(sphere);
 
-            // 星环
+            // 第一层星环
             const ringGeo = new THREE.TorusGeometry(radius + 2.5, 0.35, 16, 64);
             const ringMat = new THREE.MeshStandardMaterial({
                 color: color,
@@ -130,6 +136,7 @@
             ring.rotation.y = Math.PI / 4;
             group.add(ring);
 
+            // 第二层星环
             const radius2 = radius + 5;
             const ring2Geo = new THREE.TorusGeometry(radius2, 0.18, 16, 64);
             const ring2Mat = new THREE.MeshStandardMaterial({
