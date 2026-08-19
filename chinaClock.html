@@ -9,7 +9,7 @@
     <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
     <title>中国时区钟 - RSTUV</title>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="./common.css">
     <style>
         body { background: #1a1a2e;  height: 100vh; margin: 0; font-family: 'Microsoft YaHei',sans-serif; overflow: hidden}
         .clock-container-wrap{display: grid;place-items: center; /* 同时垂直和水平居中 */ height: 100vh;/* 或者具体的高度 */position: absolute;width: 100vw;top:0;left:0}
@@ -26,7 +26,7 @@
         .zone .letter { font-size: 24px; font-weight: bold; color: #f0d060; }
         .zone .time { font-size: 12px; color: #aaa; margin-top: 4px; }
     </style>
-    <script src="dino-game.js"></script>
+    <script src="./dino-game.js"></script>
 </head>
 <body>
     <div id="topBarContainer"></div>
@@ -42,7 +42,7 @@
             <div class="zones" id="zoneList"></div>
         </div>
     </div>
-    <script src="common.js"></script>
+    <script src="./common.js"></script>
     <script>
         const canvas = document.getElementById('clock');
         const ctx = canvas.getContext('2d');

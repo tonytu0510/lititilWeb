@@ -9,8 +9,8 @@
     <meta name="description" content="这是一个个人网站,弘扬正能量">
     <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
     <title>首页</title>
-    <link rel="stylesheet" href="common.css">
-    <script src="dino-game.js"></script>
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
     <style>
         body { overflow: hidden; }
         #slider { width: 100%; height: calc(100vh - 50px); overflow: hidden; transition: height 0.3s; touch-action: pan-y; position: relative; }
@@ -46,7 +46,7 @@
         <span class="active" onclick="goTo(0)"></span><span onclick="goTo(1)"></span><span onclick="goTo(2)"></span><span onclick="goTo(3)"></span><span onclick="goTo(4)"></span><span onclick="goTo(5)"></span><span onclick="goTo(6)"></span><span onclick="goTo(7)"></span>
     </div>
 </div>
-<script src="common.js"></script>
+<script src="./common.js"></script>
 <script>
     let current = 0, indexTime = 10000, otherTime = 4200, time = indexTime;
     const slides = document.querySelectorAll('.slide'), dots = document.querySelectorAll('#dots span');
@@ -139,6 +139,6 @@
     function redrawAllCanvas() { waitForDomStable(slider, function () { resizeCanvas(); }, 400); }
     window.addEventListener('resize', () => { redrawAllCanvas(); });
 </script>
-<script src="js/play-audio.js"></script>
+<script src="./js/play-audio.js"></script>
 </body>
 </html>
