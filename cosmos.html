@@ -2,15 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>九大太阳系 · 对合环</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-
     <style>
         * {
             margin: 0;
@@ -45,20 +38,11 @@
 <body>
     <div class="tip">九大太阳系 · 对合环 | 鼠标拖动旋转视角</div>
 
-    <!-- 使用 import map 引用 three.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+    <!-- CDN 引用 Three.js 和 OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
-    <script type="module">
-        import * as THREE from "three";
-        import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
+    <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0000);
 
@@ -76,7 +60,7 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.autoRotate = true;
