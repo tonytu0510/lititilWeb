@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私人推演存档</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #111111;
+            --gold: #c9a962;
+            --text: #e0dcd3;
+            --muted: #9a9386;
+            --line: #2a2a2a;
+            --red: #a63c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+            padding: 3rem 1.5rem;
+            line-height: 1.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: 0.4rem;
+            color: var(--gold);
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.95rem;
+            letter-spacing: 0.2rem;
+        }
+
+        .warning {
+            text-align: center;
+            color: var(--red);
+            font-size: 0.85rem;
+            margin-bottom: 3rem;
+        }
+
+        .chain {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 4rem;
+            padding: 1.5rem;
+            border: 1px solid var(--line);
+            background: #111;
+            letter-spacing: 0.15rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--line);
+            padding: 1.8rem 1.5rem;
+            transition: border-color 0.25s ease;
+        }
+
+        .card:hover {
+            border-color: var(--gold);
+        }
+
+        .character {
+            font-size: 3rem;
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .breakdown {
+            text-align: center;
+            color: var(--text);
+            font-size: 1.05rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.1rem;
+        }
+
+        .meaning {
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-align: center;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.6rem;
+                letter-spacing: 0.25rem;
+            }
+            .character {
+                font-size: 2.4rem;
+            }
+            .chain {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>私 人 推 演 存 档</h1>
+            <p class="subtitle">不公开 · 不引用 · 谁发现谁看</p>
+        </header>
+
+        <p class="warning">※ 民间拆字游戏，仅供娱乐，切勿当真 ※</p>
+
+        <div class="chain">
+            无 → 一 → 天 → 日 → 月 → 星 → 辰 → 生 → 王 → 圣 → 道 → 无
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="character">天</div>
+                <div class="breakdown">一 + 大</div>
+                <div class="meaning">至高之上，人形所立。天子管生，也管死。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">火</div>
+                <div class="breakdown">天少一横</div>
+                <div class="meaning">天塌了一层，落到人间，就是火。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">雨</div>
+                <div class="breakdown">天 + 门 + 点</div>
+                <div class="meaning">天开一门，龙从门过，水从门落。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">水</div>
+                <div class="breakdown">坎为水</div>
+                <div class="meaning">文人就是坎，文人就是水。地有缺口，水聚其中。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">土</div>
+                <div class="breakdown">天在下，地在上</div>
+                <div class="meaning">天地倒悬，百姓住在里面。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">士</div>
+                <div class="breakdown">天在上，地在下</div>
+                <div class="meaning">土倒过来就是士。读书人，就是倒过来的土。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">王</div>
+                <div class="breakdown">三横一竖</div>
+                <div class="meaning">贯通天地人者，为王。王就是天地中间站个人。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">山</div>
+                <div class="breakdown">王的一半</div>
+                <div class="meaning">山是竖起来的王。皇帝封禅，就为把另一半接上。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">出</div>
+                <div class="breakdown">两山相叠</div>
+                <div class="meaning">两个王的一半合起来，就是另一个不常见的王。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">至</div>
+                <div class="breakdown">天 + 匕首 + 土</div>
+                <div class="meaning">天子的军队到了地上。成了就是入土，败了就是埋土。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">云</div>
+                <div class="breakdown">天 + 厶 + 地</div>
+                <div class="meaning">匕首悬在天地之间，没落下来。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">星</div>
+                <div class="breakdown">日 + 人 + 天</div>
+                <div class="meaning">星就是天上的王。将星下凡，就是天命落地。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">辰</div>
+                <div class="breakdown">山中之龙</div>
+                <div class="meaning">龙王的一半，生下来是王的一半，还没成为王。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">日</div>
+                <div class="breakdown">天之子</div>
+                <div class="meaning">日就是天子，管白天，也管人命。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">月</div>
+                <div class="breakdown">日之阴面</div>
+                <div class="meaning">月是日翻过来的脸。日管生，月管死。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">明</div>
+                <div class="breakdown">日 + 月</div>
+                <div class="meaning">两个日，就是两个人说话。明朝这个名字，注定多口舌。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">命</div>
+                <div class="breakdown">天 + 口 + 令</div>
+                <div class="meaning">天开口，下命令。命不是自己的，是天上发下来的。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">令</div>
+                <div class="breakdown">天 + 跪人</div>
+                <div class="meaning">天说一句，人跪下接令。命令就是天口加跪人。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">皇</div>
+                <div class="breakdown">白 + 王</div>
+                <div class="meaning">卜卦说是王，就是皇。姓白的，最早就是干这个的。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">帝</div>
+                <div class="breakdown">卜天曰一半</div>
+                <div class="meaning">知道天意一半的人，才能称帝。另一半，皇帝也不知道。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">圣</div>
+                <div class="breakdown">又 + 土</div>
+                <div class="meaning">地上又出现一个天。所以皇帝叫圣上。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">道</div>
+                <div class="breakdown">首 + 辶</div>
+                <div class="meaning">日、月、天全倒过来了，然后走了。他走之后留下的，就是道。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">巫</div>
+                <div class="breakdown">天 + 地 + 两人</div>
+                <div class="meaning">天子与巫师，共坐天地之间。一个管人，一个管天。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">祝</div>
+                <div class="breakdown">礻 + 兄</div>
+                <div class="meaning">兄是天变的，祝就是祭天开口的师兄。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">灵</div>
+                <div class="breakdown">山 + 天</div>
+                <div class="meaning">山天相接，就是灵。所以祭天都在山上。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">神</div>
+                <div class="breakdown">礻 + 申</div>
+                <div class="meaning">天伸下来一道闪电，插进田里。古人跪下拜，就是神。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">鬼</div>
+                <div class="breakdown">卜卦说天有武器</div>
+                <div class="meaning">天上有刀，掉下来杀人。人受天罚，就是鬼。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">祖</div>
+                <div class="breakdown">礻 + 且</div>
+                <div class="meaning">日月入土，后人祭拜，就是祖。皇帝死后才叫祖。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">生</div>
+                <div class="breakdown">土上生</div>
+                <div class="meaning">天之气入土，生出万物。天子让人生，人就生。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">死</div>
+                <div class="breakdown">歹 + 匕</div>
+                <div class="meaning">生了一半，被人拿匕首挂了。天子让人死，人就死。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">龙</div>
+                <div class="breakdown">天在东边挂宝剑</div>
+                <div class="meaning">天威落地，行风动雨。龙就是天子的兽形。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">凤</div>
+                <div class="breakdown">风中玄鸟</div>
+                <div class="meaning">鸟借风力，飞成王权信使。凤求凰，就是门内求皇。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">鸟</div>
+                <div class="breakdown">勺 + 与</div>
+                <div class="meaning">下取地食，上通天气。玄鸟生商，鸟就是祖先。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">文</div>
+                <div class="breakdown">天之所变</div>
+                <div class="meaning">文人如水，水由天变。皇帝又用文人，又防文人。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">一</div>
+                <div class="breakdown">通天</div>
+                <div class="meaning">一为天，也为地，万物从它开始。</div>
+            </div>
+
+            <div class="card">
+                <div class="character">无</div>
+                <div class="breakdown">通天</div>
+                <div class="meaning">天地未分，无中生有。最后一切又回到无。</div>
+            </div>
+        </div>
+
+        <footer>
+            私人存档 · 当彩蛋用 · 不挂链接 · 不公开<br>
+            谁发现谁看，看完别当真
+        </footer>
+    </div>
+</body>
+</html>
