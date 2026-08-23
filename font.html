@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+     <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>民间拆字推演系统</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --gold: #c9a962;
+            --text: #e0dcd3;
+            --muted: #9a9386;
+            --line: #2a2a2a;
+            --red: #a63c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+            padding: 3rem 1.5rem;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            letter-spacing: 0.5rem;
+            color: var(--gold);
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.95rem;
+            letter-spacing: 0.2rem;
+        }
+
+        .notice {
+            text-align: center;
+            color: var(--red);
+            font-size: 0.85rem;
+            margin-bottom: 3rem;
+            letter-spacing: 0.1rem;
+        }
+
+        .chain {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-bottom: 4rem;
+            padding: 1.5rem;
+            border: 1px solid var(--line);
+            background: #111;
+            letter-spacing: 0.15rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--line);
+            padding: 1.8rem 1.5rem;
+            transition: border-color 0.25s ease;
+        }
+
+        .card:hover {
+            border-color: var(--gold);
+        }
+
+        .character {
+            font-size: 3rem;
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .breakdown {
+            text-align: center;
+            color: var(--text);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.1rem;
+        }
+
+        .meaning {
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-align: center;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 0.3rem;
+            }
+            .character {
+                font-size: 2.4rem;
+            }
+            .chain {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <script src="./dino-game.js"></script>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="container">
+        <header>
+            <h1>民 间 拆 字 推 演 系 统</h1>
+            <p class="subtitle">以字为符 · 以天为根 · 以王为枢</p>
+        </header>
+
+        <p class="notice">※ 民间拆字，仅供娱乐，不作学术依据 ※</p>
+
+        <div class="chain">
+            无 → 一 → 天 → 日 → 月 → 星 → 辰 → 生 → 土 → 士 → 王 → 山 → 出 → 圣 → 道 → 无
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="character">天</div>
+                <div class="breakdown">一 + 大</div>
+                <div class="meaning">至高之上，人形所立，是为天</div>
+            </div>
+
+            <div class="card">
+                <div class="character">火</div>
+                <div class="breakdown">天少一横</div>
+                <div class="meaning">天损一层，落地为火</div>
+            </div>
+
+            <div class="card">
+                <div class="character">雨</div>
+                <div class="breakdown">天 + 门 + 点</div>
+                <div class="meaning">天开一门，龙行其中，水落人间</div>
+            </div>
+
+            <div class="card">
+                <div class="character">水</div>
+                <div class="breakdown">坎为水</div>
+                <div class="meaning">地有缺口，水聚其中，为地之陷</div>
+            </div>
+
+            <div class="card">
+                <div class="character">土</div>
+                <div class="breakdown">天在下，地在上</div>
+                <div class="meaning">天地倒悬，民之所居</div>
+            </div>
+
+            <div class="card">
+                <div class="character">士</div>
+                <div class="breakdown">天在上，地在下</div>
+                <div class="meaning">土之倒转，顶天立地者</div>
+            </div>
+
+            <div class="card">
+                <div class="character">王</div>
+                <div class="breakdown">三横一竖</div>
+                <div class="meaning">贯通天地人者，为王</div>
+            </div>
+
+            <div class="card">
+                <div class="character">山</div>
+                <div class="breakdown">王的一半</div>
+                <div class="meaning">王字横转，地气上冲</div>
+            </div>
+
+            <div class="card">
+                <div class="character">出</div>
+                <div class="breakdown">两山相叠</div>
+                <div class="meaning">两半相合，另一个不常见的王</div>
+            </div>
+
+            <div class="card">
+                <div class="character">至</div>
+                <div class="breakdown">天 + 匕首 + 土</div>
+                <div class="meaning">天子之兵，插入土中，王权已到</div>
+            </div>
+
+            <div class="card">
+                <div class="character">云</div>
+                <div class="breakdown">天 + 厶 + 地</div>
+                <div class="meaning">匕首悬于天地之间，未落未决</div>
+            </div>
+
+            <div class="card">
+                <div class="character">星</div>
+                <div class="breakdown">日 + 人 + 天</div>
+                <div class="meaning">日生日，天之子，天上的王</div>
+            </div>
+
+            <div class="card">
+                <div class="character">辰</div>
+                <div class="breakdown">山中之龙</div>
+                <div class="meaning">龙王的一半，尚未成王</div>
+            </div>
+
+            <div class="card">
+                <div class="character">日</div>
+                <div class="breakdown">天之子</div>
+                <div class="meaning">白昼之权，帝王之象</div>
+            </div>
+
+            <div class="card">
+                <div class="character">月</div>
+                <div class="breakdown">日之阴面</div>
+                <div class="meaning">日之反照，夜之主</div>
+            </div>
+
+            <div class="card">
+                <div class="character">明</div>
+                <div class="breakdown">日 + 月</div>
+                <div class="meaning">两个日，两个人说话</div>
+            </div>
+
+            <div class="card">
+                <div class="character">命</div>
+                <div class="breakdown">天 + 口 + 令</div>
+                <div class="meaning">天开口，下命令，人不可违</div>
+            </div>
+
+            <div class="card">
+                <div class="character">令</div>
+                <div class="breakdown">天 + 跪人</div>
+                <div class="meaning">天说，人跪着接</div>
+            </div>
+
+            <div class="card">
+                <div class="character">皇</div>
+                <div class="breakdown">白 + 王</div>
+                <div class="meaning">卜卦说是王，就是皇</div>
+            </div>
+
+            <div class="card">
+                <div class="character">帝</div>
+                <div class="breakdown">卜天曰一半</div>
+                <div class="meaning">知道天意一半的人，才能称帝</div>
+            </div>
+
+            <div class="card">
+                <div class="character">圣</div>
+                <div class="breakdown">又 + 土</div>
+                <div class="meaning">地上又出现一个天，是为圣</div>
+            </div>
+
+            <div class="card">
+                <div class="character">道</div>
+                <div class="breakdown">首 + 辶</div>
+                <div class="meaning">头顶天日月的人，走出来的路</div>
+            </div>
+
+            <div class="card">
+                <div class="character">巫</div>
+                <div class="breakdown">天 + 地 + 两人</div>
+                <div class="meaning">天子与巫师，共坐天地之间</div>
+            </div>
+
+            <div class="card">
+                <div class="character">祝</div>
+                <div class="breakdown">礻 + 兄</div>
+                <div class="meaning">天变之兄，祭天开口之人</div>
+            </div>
+
+            <div class="card">
+                <div class="character">灵</div>
+                <div class="breakdown">山 + 天</div>
+                <div class="meaning">山天相接，王半通天</div>
+            </div>
+
+            <div class="card">
+                <div class="character">神</div>
+                <div class="breakdown">礻 + 申</div>
+                <div class="meaning">天伸入田，祭之以为神</div>
+            </div>
+
+            <div class="card">
+                <div class="character">鬼</div>
+                <div class="breakdown">卜卦说天有武器</div>
+                <div class="meaning">天罚落地，人受之为鬼</div>
+            </div>
+
+            <div class="card">
+                <div class="character">祖</div>
+                <div class="breakdown">礻 + 且</div>
+                <div class="meaning">日月入土，后人祭之，是为祖</div>
+            </div>
+
+            <div class="card">
+                <div class="character">生</div>
+                <div class="breakdown">土上生</div>
+                <div class="meaning">天之气入土，万物由此生</div>
+            </div>
+
+            <div class="card">
+                <div class="character">死</div>
+                <div class="breakdown">歹 + 匕</div>
+                <div class="meaning">生了一半，被人拿匕首挂了</div>
+            </div>
+
+            <div class="card">
+                <div class="character">龙</div>
+                <div class="breakdown">天在东边挂宝剑</div>
+                <div class="meaning">天威落地，行风动雨者</div>
+            </div>
+
+            <div class="card">
+                <div class="character">凤</div>
+                <div class="breakdown">风中玄鸟</div>
+                <div class="meaning">鸟借风力，化为王权信使</div>
+            </div>
+
+            <div class="card">
+                <div class="character">鸟</div>
+                <div class="breakdown">勺 + 与</div>
+                <div class="meaning">下取地食，上通天气</div>
+            </div>
+
+            <div class="card">
+                <div class="character">文</div>
+                <div class="breakdown">天之所变</div>
+                <div class="meaning">文人如水，水由天变</div>
+            </div>
+
+            <div class="card">
+                <div class="character">一</div>
+                <div class="breakdown">通天</div>
+                <div class="meaning">一为天，也为地，万物之始</div>
+            </div>
+
+            <div class="card">
+                <div class="character">无</div>
+                <div class="breakdown">通天</div>
+                <div class="meaning">天地未分，无中生有</div>
+            </div>
+        </div>
+
+        <footer>
+            民间拆字 · 自我推演 · 不当真 · 不入坑<br>
+            本页内容仅供娱乐
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
