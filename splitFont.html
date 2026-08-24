@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>拆字宇宙 · 天地人日兵戈</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5efe8;
+            font-family: 'Segoe UI', 'Noto Serif SC', 'Times New Roman', serif;
+            color: #1f1a16;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* 标题区 */
+        .header {
+            border-bottom: 3px solid #b8a99a;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #2d241e;
+            line-height: 1.1;
+        }
+        .header h1 small {
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #7b6b5f;
+            display: block;
+            margin-top: 6px;
+        }
+        .header .sub {
+            font-size: 1.05rem;
+            background: #d9cdc0;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            color: #2d241e;
+            font-style: italic;
+        }
+        /* 核心积木 */
+        .bricks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.8rem;
+            background: #e7ddd2;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            margin-bottom: 3rem;
+            justify-content: center;
+            border: 1px solid #c9b9ab;
+        }
+        .brick {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: #1f1a16;
+            letter-spacing: 2px;
+        }
+        .brick span {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #5f4f42;
+            margin-left: 4px;
+        }
+        /* 网格卡片 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem 1.8rem;
+            margin: 2.5rem 0 3.5rem;
+        }
+        .card {
+            background: #fcf9f6;
+            border-radius: 28px;
+            padding: 1.5rem 1.2rem 1.8rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+            border: 1px solid #e5d8cd;
+            transition: 0.15s;
+        }
+        .card:hover {
+            border-color: #b8a18b;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        .card .char {
+            font-size: 3.8rem;
+            font-weight: 500;
+            line-height: 1.1;
+            color: #1f1a16;
+            border-bottom: 2px dashed #dacfc4;
+            padding-bottom: 0.2rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+        .card .char small {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #8b7a6b;
+        }
+        .card .theory {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2d241e;
+            margin: 0.8rem 0 0.4rem;
+        }
+        .card .theory strong {
+            font-weight: 600;
+            color: #5f3f2a;
+        }
+        .card .quote {
+            font-size: 0.95rem;
+            background: #f1ebe5;
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            color: #3f3229;
+            margin-top: 0.8rem;
+            border-left: 4px solid #b8a08b;
+            font-style: italic;
+        }
+        .card .quote::before {
+            content: "“";
+            opacity: 0.6;
+        }
+        .card .quote::after {
+            content: "”";
+            opacity: 0.6;
+        }
+        /* 特别标注 */
+        .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #d1c1b2;
+            padding: 0.1rem 0.8rem;
+            border-radius: 30px;
+            color: #1f1a16;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+        .footer-note {
+            margin-top: 3rem;
+            border-top: 1px solid #dacfc4;
+            padding-top: 1.8rem;
+            font-size: 0.95rem;
+            color: #5f4f42;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-note .code {
+            font-family: 'Courier New', monospace;
+            background: #e7ddd2;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 550px) {
+            .header h1 { font-size: 2.2rem; }
+            .bricks { gap: 0.4rem 1rem; padding: 0.5rem 1.2rem; }
+            .brick { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+<div class="container">
+
+    <!-- 头部 -->
+    <div class="header">
+        <h1>
+            拆字宇宙
+            <small>天地人 · 日兵戈 · 石卜占</small>
+        </h1>
+        <div class="sub">“都是拿天地人日变的”</div>
+    </div>
+
+    <!-- 核心积木 -->
+    <div class="bricks">
+        <span class="brick">天 <span>穹</span></span>
+        <span class="brick">地 <span>基</span></span>
+        <span class="brick">人 <span>立</span></span>
+        <span class="brick">日 <span>光</span></span>
+        <span class="brick">兵戈 <span>丨</span></span>
+        <span class="brick">石 <span>根</span></span>
+        <span class="brick">卜 <span>机</span></span>
+    </div>
+
+    <!-- 卡片区 -->
+    <div class="grid">
+
+        <!-- 占 -->
+        <div class="card">
+            <div class="char">占 <small>卜+口</small></div>
+            <div class="theory"><strong>卜</strong>（戈尖倒刺） + <strong>口</strong>（宣说）</div>
+            <div class="theory">用口传达龟甲灼兆，<strong>掌控天意</strong>。</div>
+            <div class="quote">“竖着是占”——戈贯穿并控制目标</div>
+        </div>
+
+        <!-- 石 -->
+        <div class="card">
+            <div class="char">石 <small>卜+口 · 在下</small></div>
+            <div class="theory"><strong>卜</strong>的突出在下端，扎进大地</div>
+            <div class="theory">兵器插进土石，<strong>成为地基 / 镇压</strong>。</div>
+            <div class="quote">“在下是石”——戈尖扎进地里，稳如泰山</div>
+        </div>
+
+        <!-- 白 · 百 -->
+        <div class="card">
+            <div class="char">白 / 百 <small>卜+日月</small></div>
+            <div class="theory"><strong>白</strong>：米粒/烛火之光，<strong>光明</strong>之象。</div>
+            <div class="theory"><strong>百</strong>：白上加一横，计数单位，亦通“日月同辉之上”。</div>
+            <div class="quote">“卜加日月就是白”——日月同辉，破晓之白</div>
+        </div>
+
+        <!-- 我 -->
+        <div class="card">
+            <div class="char">我 <small>生戈 · 破天</small></div>
+            <div class="theory">一柄戈从地起，<strong>斜刺捅穿天幕</strong>。</div>
+            <div class="theory">天被戈崩碎，碎屑化为丿、丶，<strong>自我觉醒</strong>。</div>
+            <div class="quote">“我 就是生兵戈把天捅破了”</div>
+        </div>
+
+        <!-- 伐 -->
+        <div class="card">
+            <div class="char">伐 <small>人 + 戈</small></div>
+            <div class="theory">戈刃架在“大”（人）的脖子上，<strong>斩首</strong>。</div>
+            <div class="theory">天子没头，仍持戈而战，<strong>刑天之象</strong>。</div>
+            <div class="quote">“天子没头还拿着兵戈”</div>
+        </div>
+
+        <!-- 成 -->
+        <div class="card">
+            <div class="char">成 <small>五千人持戈</small></div>
+            <div class="theory">一万的一半（5000人）<strong>持戈攻城</strong>。</div>
+            <div class="theory">人戈俱在，城破敌灭，<strong>完美胜仗</strong>。</div>
+            <div class="quote">“成就是一万人的一半 5000人拿着戈”</div>
+        </div>
+
+        <!-- 國 -->
+        <div class="card">
+            <div class="char">國 <small>戈 + 石（粮）</small></div>
+            <div class="theory">城墙（囗）内，<strong>戈护着石（粮仓）</strong>。</div>
+            <div class="theory">武装粮仓，立国之本。</div>
+            <div class="quote">“繁体字的国就是兵戈加石 粮食”</div>
+        </div>
+
+        <!-- 卦 -->
+        <div class="card">
+            <div class="char">卦 <small>土·土 · 卜</small></div>
+            <div class="theory">两个“土”（<strong>没头的王</strong>）堆叠高台，插戈（卜）问天。</div>
+            <div class="theory">王位争夺模拟器，<strong>胜者为王</strong>。</div>
+            <div class="quote">“两个不是王的土，在卜卦，想成为王”</div>
+        </div>
+
+        <!-- 共 -->
+        <div class="card">
+            <div class="char">共 <small>天出头</small></div>
+            <div class="theory">“天”字露个头，<strong>没头的天子扛起日月</strong>。</div>
+            <div class="theory">共担天下，虽死不倒。</div>
+            <div class="quote">“共 天字出个头 就是共”</div>
+        </div>
+
+        <!-- 卜 单独 -->
+        <div class="card">
+            <div class="char">卜 <small>戈尖倒刺</small></div>
+            <div class="theory"><strong>兵戈上的突出</strong>，可指天（卜），可扎地（石）。</div>
+            <div class="theory">方位即命运，<strong>预测与杀伐同源</strong>。</div>
+            <div class="quote">“兵戈上一个突出，就是卜”</div>
+        </div>
+
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer-note">
+        <span>⚔️ 天地人日兵戈 · 自洽闭环 · 以字为史</span>
+        <span class="code">“发明东西最快的方式就是拿东西改”</span>
+    </div>
+<script src="./common.js"></script>
+</div>
+</body>
+</html>
