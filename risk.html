@@ -76,7 +76,6 @@
             border: 1px solid var(--line);
             background: #e7ddd2;
             letter-spacing: 0.15rem;
-            width: 700px;
         }
 
         .section {
@@ -84,7 +83,6 @@
             border: 1px solid #cebcae;
             padding: 2rem 1.8rem;
             margin-bottom: 1.5rem;
-            width: 700px;
         }
 
         .section h2 {
@@ -108,7 +106,12 @@
             font-style: italic;
             font-size: 0.95rem;
         }
-
+        .grid{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem 1.8rem;
+            margin: 2.5rem 0 3.5rem;
+        }
         .chain {
             text-align: center;
             font-size: 1.2rem;
@@ -122,7 +125,7 @@
             letter-spacing: 0.15rem;
             border: 1px solid #cebcae;
             color:#2d241e;
-            width: 700px;
+            max-width: 700px;
         }
 
         footer {
@@ -181,6 +184,14 @@
             background: #b8a08b;
             color: #fcf9f6;
         }
+        /* 手机极端小屏优化 */
+        @media (max-width: 420px) {
+            .menu-bar a { font-size: 0.9rem; padding: 0.2rem 0.6rem; }
+            .tab-btn { font-size: 0.95rem; padding: 0.3rem 0.4rem; }
+            .entry .char { font-size: 1.5rem; min-width: 1.8rem; }
+            .entry .def { font-size: 0.85rem; }
+            .menu-bar{margin-top: 4rem;}
+        }
     </style>
 </head>
 <body>
@@ -200,7 +211,8 @@
         </header>
 
         <p class="warning">※ 民间推演 · 仅供娱乐 · 不作决策依据 ※</p>
-
+    <!-- 卡片区 -->
+    <div class="grid">
         <div class="core">
             风险，就是天开风口，地设关口。<br>
             过不去的人叫它风险，过去的人叫它机会。
@@ -212,7 +224,6 @@
             RISK = R + ASK<br>
             带刀去问 = 风险
         </div>
-
         <div class="section">
             <h2>风</h2>
             <p>繁体「風」，里面是「虫」。</p>
@@ -252,6 +263,7 @@
             <h2>一句话</h2>
             <p>问是空手，风险是带刀。</p>
             <p>刀已经架在问题上了，所以风险才等于机会。</p>
+        </div>
         </div>
 
         <footer>
