@@ -16,6 +16,7 @@
                     <a href="cosmos.html">太阳系</a>
                     <a href="font.html">拆字推演</a>
 	                <a href="namePairing.html">缘分测试</a>
+                    <a href="risk.html">风险 · RISK</a>
                     <a href="aboutMe.html">关于我</a>
                 </nav>
             </div>
