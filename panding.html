@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>对合数字协议 · 启蒙演示</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        /* ---------- 全局样式 ---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            height: calc(100vh - 50px);
+        }
+        .container {
+            background: #181818;
+            border-radius: 16px;
+            padding: 30px 32px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
+            max-width: 600px;
+            min-height: 300px;
+            width: 100%;
+        }
+        h1 {
+            color: #d0d0d0;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 14px;
+            margin-bottom: 12px;
+        }
+        h1 span {
+            color: #7cb8b8;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---------- Tab 导航 ---------- */
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 2px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            padding: 6px 18px;
+            cursor: pointer;
+            border-radius: 20px 20px 0 0;
+            transition: 0.2s;
+            letter-spacing: 1px;
+        }
+        .tab-btn:hover {
+            color: #aaa;
+            background: #1a1a1a;
+        }
+        .tab-btn.active {
+            color: #7cb8b8;
+            background: #0f1a1a;
+        }
+
+        /* ---------- Tab 面板 ---------- */
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ---------- 输入区 ---------- */
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .row input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #d0d0d0;
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
+            outline: none;
+        }
+        .row input:focus {
+            border-color: #555;
+        }
+        .row button {
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #d0d0d0;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .row button:hover {
+            background: #3d3d3d;
+        }
+
+        /* ---------- 展示框 ---------- */
+        .box {
+            background: #0f0f0f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2a2a2a;
+        }
+        .box .label {
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .box .value {
+            color: #d0d0d0;
+            font-size: 14px;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        .box .value.highlight {
+            color: #7cb8b8;
+        }
+
+        /* ---------- 状态 ---------- */
+        .badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            padding: 0 2px;
+        }
+        .badge {
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            background: #181818;
+            color: #555;
+        }
+        .badge.ok {
+            background: #142a22;
+            color: #7cb8b8;
+        }
+        .badge.fail {
+            background: #2a1414;
+            color: #c87a7a;
+        }
+
+        /* ---------- 协议展示 ---------- */
+        .proto {
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-top: 6px;
+            color: #888;
+            font-size: 12px;
+            line-height: 1.8;
+            border: 1px solid #1a1a1a;
+            font-family: 'Courier New', monospace;
+        }
+        .proto .highlight {
+            color: #7cb8b8;
+        }
+        .proto .dim {
+            color: #555;
+        }
+
+        /* ---------- 底部 ---------- */
+        .footer {
+            color: #444;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 14px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 14px;
+            letter-spacing: 0.5px;
+        }
+        .footer span {
+            color: #7cb8b8;
+        }
+        .footer .disclaimer {
+            color: #444;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="topBarContainer"></div>
+<div class="wrap">
+<div class="container">
+
+    <!-- 标题 -->
+    <h1>⬡ <span id="titleSpan">对合数字协议</span> · 启蒙演示</h1>
+    <div class="subtitle" id="subtitleSpan">输入任意文本，观察基元计数 → 补位 → 偏移 → 闭合的完整过程</div>
+
+    <!-- Tab 导航 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="tabHeo">⬡ 对合协议</button>
+        <button class="tab-btn" data-tab="tabDecay">⬡ 衰减验证</button>
+    </div>
+
+    <!-- ======== Tab 1: 对合数字协议 ======== -->
+    <div id="tabHeo" class="tab-panel active">
+        <div class="row">
+            <input type="text" id="inputText" value="heo" placeholder="输入文本...">
+            <button id="runBtnHeo">执行</button>
+        </div>
+        <div id="outputHeo">
+            <div class="box">
+                <div class="label">🧩 基元分布（视觉结构）</div>
+                <div class="value" id="primitiveDisplay">——</div>
+            </div>
+            <div class="box">
+                <div class="label">📐 协议过程</div>
+                <div class="value" id="processDisplay">等待执行...</div>
+            </div>
+            <div class="badge-row">
+                <span class="badge" id="statusBadgeHeo">⏳ 就绪</span>
+                <span class="badge" id="resultBadgeHeo">——</span>
+            </div>
+            <div class="proto" id="protocolDisplayHeo">
+                <span class="dim">对合数字协议：</span> 基元计数 → 补位 → 固定偏移 → 闭合
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== Tab 2: 衰减验证 ======== -->
+    <div id="tabDecay" class="tab-panel">
+        <div class="row">
+            <input type="number" id="lastCurrent" value="100" placeholder="上次电流值" step="0.1">
+            <input type="number" id="currentCurrent" value="98" placeholder="本次电流值" step="0.1">
+            <button id="runBtnDecay">验证</button>
+        </div>
+        <div id="outputDecay">
+            <div class="box">
+                <div class="label">📌 上次电流</div>
+                <div class="value highlight" id="lastDisplay">100</div>
+            </div>
+            <div class="box">
+                <div class="label">📌 本次电流</div>
+                <div class="value highlight" id="currentDisplay">98</div>
+            </div>
+            <div class="box">
+                <div class="label">✅ 验证结果</div>
+                <div class="value" id="resultDisplayDecay">——</div>
+            </div>
+            <div class="badge-row">
+                <span class="badge" id="statusBadgeDecay">⏳ 就绪</span>
+                <span class="badge" id="matchBadgeDecay">——</span>
+            </div>
+            <div class="proto" id="protocolDisplayDecay">
+                <strong>验证规则：</strong> 电流不应增大 · 衰减应在合理范围内
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        <span id="footerSpan">对合系统</span> · 补位 + 固定偏移<br>
+        <div class="disclaimer">
+            ⚠️ 本工具仅用于展示原理，不涉及任何实际加密系统或破解功能。
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="./common.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    // ---------- 对合基元计数 ----------
+    function primitiveCount(ch) {
+        const map = {
+            'a':2,'b':2,'c':1,'d':2,'e':1,'f':2,'g':2,'h':2,'i':1,
+            'j':2,'k':2,'l':1,'m':2,'n':2,'o':1,'p':2,'q':2,'r':1,
+            's':1,'t':2,'u':1,'v':1,'w':2,'x':2,'y':2,'z':1
+        };
+        return map[ch.toLowerCase()] || 1;
+    }
+
+    function totalPrimitive(str) {
+        let sum = 0;
+        for (let i = 0; i < str.length; i++) sum += primitiveCount(str[i]);
+        return sum;
+    }
+
+    function applyProtocol(str, targetLen, offset) {
+        const raw = totalPrimitive(str);
+        let padded = raw.toString();
+        while (padded.length < targetLen) padded = '0' + padded;
+        const shifted = parseInt(padded) + offset;
+        return { raw, padded, shifted };
+    }
+
+    function demoCandidate(hash) {
+        const bytes = [];
+        for (let i = 0; i < hash.length; i += 2) bytes.push(parseInt(hash.substr(i, 2), 16));
+        let seed = 0;
+        for (let i = 0; i < 4; i++) seed |= (bytes[i] || 0) << (i * 8);
+        seed >>>= 0;
+        let chars = '';
+        for (let i = 0; i < 4; i++) {
+            let code = ((seed >> (i * 8)) & 0xFF) % 26;
+            chars += String.fromCharCode(97 + code);
+        }
+        return chars;
+    }
+
+    function simpleHash(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+            h = ((h << 5) - h) + str.charCodeAt(i);
+            h = h & h;
+        }
+        return h.toString(16).padStart(8, '0');
+    }
+
+    // ---------- 对合协议逻辑 ----------
+    const inputEl = document.getElementById('inputText');
+    const runBtnHeo = document.getElementById('runBtnHeo');
+    const primitiveDisplay = document.getElementById('primitiveDisplay');
+    const processDisplay = document.getElementById('processDisplay');
+    const statusBadgeHeo = document.getElementById('statusBadgeHeo');
+    const resultBadgeHeo = document.getElementById('resultBadgeHeo');
+    const protocolDisplayHeo = document.getElementById('protocolDisplayHeo');
+
+    function runHeo() {
+        const text = inputEl.value || '';
+        if (text.length === 0) {
+            primitiveDisplay.textContent = '请先输入文本';
+            processDisplay.textContent = '——';
+            statusBadgeHeo.textContent = '⏳ 等待输入';
+            statusBadgeHeo.className = 'badge';
+            resultBadgeHeo.textContent = '——';
+            resultBadgeHeo.className = 'badge';
+            protocolDisplayHeo.innerHTML = '<span class="dim">对合数字协议：</span> 基元计数 → 补位 → 固定偏移 → 闭合';
+            return;
+        }
+
+        let detail = '', total = 0;
+        for (let i = 0; i < text.length; i++) {
+            const ch = text[i];
+            const cnt = primitiveCount(ch);
+            detail += `${ch}(${cnt}) `;
+            total += cnt;
+        }
+        primitiveDisplay.textContent = `${detail}→ 总数 = ${total}`;
+
+        const LEN = 4, OFFSET = 1111;
+        const result = applyProtocol(text, LEN, OFFSET);
+        const hash = simpleHash(text);
+        const candidate = demoCandidate(hash);
+        const candResult = applyProtocol(candidate, LEN, OFFSET);
+
+        let candDetail = '';
+        for (let i = 0; i < candidate.length; i++) {
+            candDetail += `${candidate[i]}(${primitiveCount(candidate[i])}) `;
+        }
+
+        const closed = (result.shifted === candResult.shifted);
+
+        processDisplay.innerHTML = `
+            <div style="color:#888; margin-bottom:4px;">
+                <span style="color:#7cb8b8;">原始输入</span> “${text}” → 基元总数 ${result.raw} → 补位 <span style="color:#7cb8b8;">${result.padded}</span> → 偏移 +${OFFSET} → <span style="color:#7cb8b8;">${result.shifted}</span>
+            </div>
+            <div style="color:#666; border-top:1px dashed #1a1a1a; padding-top:4px;">
+                <span style="color:#7cb8b8;">对合候选</span> “${candidate}” → 基元总数 ${candResult.raw} → 补位 <span style="color:#7cb8b8;">${candResult.padded}</span> → 偏移 +${OFFSET} → <span style="color:#7cb8b8;">${candResult.shifted}</span>
+            </div>
+            <div style="border-top:1px solid #1a1a1a; padding-top:4px; margin-top:4px;">
+                <span style="color:#888;">候选基元分布：</span> ${candDetail}
+            </div>
+        `;
+
+        statusBadgeHeo.textContent = '✅ 完成';
+        statusBadgeHeo.className = 'badge ok';
+        resultBadgeHeo.textContent = closed ? '✅ 闭合' : '⚠️ 未闭合';
+        resultBadgeHeo.className = closed ? 'badge ok' : 'badge fail';
+
+        protocolDisplayHeo.innerHTML = `
+            <span class="dim">对合数字协议：</span><br>
+            输入 “${text}” → 基元数 ${result.raw} → 补位 ${result.padded} → 偏移 +${OFFSET} → ${result.shifted}<br>
+            候选 “${candidate}” → 基元数 ${candResult.raw} → 补位 ${candResult.padded} → 偏移 +${OFFSET} → ${candResult.shifted}<br>
+            <span style="color:#7cb8b8;">闭合状态：${closed ? '✅ 必然相等' : '⚠️ 未闭合（偏移步长固定）'}</span>
+            <br><span style="color:#444; font-size:11px;">💡 当输入与候选的偏移结果相等时，系统达到闭合。</span>
+        `;
+    }
+
+    runBtnHeo.addEventListener('click', runHeo);
+    inputEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') runHeo(); });
+    runHeo();
+
+    // ---------- 衰减验证逻辑 ----------
+    const lastInput = document.getElementById('lastCurrent');
+    const currentInput = document.getElementById('currentCurrent');
+    const runBtnDecay = document.getElementById('runBtnDecay');
+    const lastDisplay = document.getElementById('lastDisplay');
+    const currentDisplay = document.getElementById('currentDisplay');
+    const resultDisplayDecay = document.getElementById('resultDisplayDecay');
+    const statusBadgeDecay = document.getElementById('statusBadgeDecay');
+    const matchBadgeDecay = document.getElementById('matchBadgeDecay');
+    const protocolDisplayDecay = document.getElementById('protocolDisplayDecay');
+
+    function validateDecay(last, current) {
+        if (current > last) {
+            return { ok: false, reason: '电流异常增大（磁铁不会反向增强）' };
+        }
+        const drop = last - current;
+        const dropRatio = drop / last;
+        if (dropRatio > 0.10) {
+            return { ok: false, reason: `衰减过快 (${(dropRatio * 100).toFixed(1)}%)，超出合理范围` };
+        }
+        return { ok: true, reason: `衰减 ${(dropRatio * 100).toFixed(1)}%，在合理范围内` };
+    }
+
+    function runDecay() {
+        const last = parseFloat(lastInput.value);
+        const current = parseFloat(currentInput.value);
+
+        if (isNaN(last) || isNaN(current)) {
+            resultDisplayDecay.textContent = '⚠️ 请输入有效数字';
+            statusBadgeDecay.textContent = '⚠️ 输入无效';
+            statusBadgeDecay.className = 'badge fail';
+            matchBadgeDecay.textContent = '——';
+            matchBadgeDecay.className = 'badge';
+            return;
+        }
+
+        lastDisplay.textContent = last;
+        currentDisplay.textContent = current;
+
+        const result = validateDecay(last, current);
+
+        if (result.ok) {
+            resultDisplayDecay.textContent = `✅ 通过 (${result.reason})`;
+            statusBadgeDecay.textContent = '✅ 验证通过';
+            statusBadgeDecay.className = 'badge ok';
+            matchBadgeDecay.textContent = '✅ 双因子匹配';
+            matchBadgeDecay.className = 'badge ok';
+        } else {
+            resultDisplayDecay.textContent = `❌ 不通过 (${result.reason})`;
+            statusBadgeDecay.textContent = '❌ 验证失败';
+            statusBadgeDecay.className = 'badge fail';
+            matchBadgeDecay.textContent = '❌ 不匹配';
+            matchBadgeDecay.className = 'badge fail';
+        }
+
+        protocolDisplayDecay.innerHTML = `
+            <strong>验证规则：</strong> 电流不应增大 · 衰减应在合理范围内<br>
+            上次电流: <span class="highlight">${last}</span> → 本次电流: <span class="highlight">${current}</span> · 差值: ${(last - current).toFixed(2)}
+        `;
+    }
+
+    runBtnDecay.addEventListener('click', runDecay);
+    lastInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDecay(); });
+    currentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDecay(); });
+    runDecay();
+
+    // ---------- Tab 切换 ----------
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panels = {
+        tabHeo: document.getElementById('tabHeo'),
+        tabDecay: document.getElementById('tabDecay')
+    };
+    const titleSpan = document.getElementById('titleSpan');
+    const subtitleSpan = document.getElementById('subtitleSpan');
+    const footerSpan = document.getElementById('footerSpan');
+
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            tabBtns.forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+
+            const target = this.dataset.tab;
+            Object.keys(panels).forEach(function(key) {
+                panels[key].classList.toggle('active', key === target);
+            });
+
+            // 切换标题/副标题/底部文字
+            if (target === 'tabHeo') {
+                titleSpan.textContent = '对合数字协议';
+                subtitleSpan.textContent = '输入任意文本，观察基元计数 → 补位 → 偏移 → 闭合的完整过程';
+                footerSpan.textContent = '对合系统';
+            } else {
+                titleSpan.textContent = '衰减验证';
+                subtitleSpan.textContent = '上次电流 ↔ 本次电流 · 对比即验证';
+                footerSpan.textContent = '物理验证';
+            }
+        });
+    });
+
+})();
+</script>
+</body>
+</html>
