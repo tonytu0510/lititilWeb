@@ -17,6 +17,8 @@
                     <a href="cosmos.html">太阳系</a>
                     <a href="fontAll.html">拆字</a>
 	                <a href="namePairing.html">缘分测试</a>
+                    <a href="decay.html">衰减验证</a>
+                    decay.html
                     <a href="aboutMe.html">关于我</a>
                 </nav>
             </div>
