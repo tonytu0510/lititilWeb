@@ -40,6 +40,10 @@
                 if (iconGroup) iconGroup.classList.remove('move-up');
                 if (placeholder) placeholder.style.height = '50px';
             });
+        }else{
+            if (typeof updateSliderHeight === 'function') {
+                updateSliderHeight();
+            }
         }
     }
 
