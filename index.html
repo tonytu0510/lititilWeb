@@ -40,10 +40,11 @@
     <div class="slide"><canvas id="canvas6"></canvas></div>
     <div class="slide"><canvas id="canvas7"></canvas></div>
     <div class="slide" onclick="canvas8ClickFun()"><canvas id="canvas8"></canvas></div>
+    <div class="slide" onclick="canvas9ClickFun()"><canvas id="canvas9"></canvas></div>
     <button class="arrow left" onclick="prevSlide()">❮</button>
     <button class="arrow right" onclick="nextSlide()">❯</button>
     <div id="dots">
-        <span class="active" onclick="goTo(0)"></span><span onclick="goTo(1)"></span><span onclick="goTo(2)"></span><span onclick="goTo(3)"></span><span onclick="goTo(4)"></span><span onclick="goTo(5)"></span><span onclick="goTo(6)"></span><span onclick="goTo(7)"></span>
+        <span class="active" onclick="goTo(0)"></span><span onclick="goTo(1)"></span><span onclick="goTo(2)"></span><span onclick="goTo(3)"></span><span onclick="goTo(4)"></span><span onclick="goTo(5)"></span><span onclick="goTo(6)"></span><span onclick="goTo(7)"></span><span onclick="goTo(8)"></span>
     </div>
 </div>
 <script src="./common.js"></script>
@@ -65,9 +66,9 @@
         resetTimer();
         redrawAllCanvas();
     }
-    function nextSlide() { showSlide((current + 1) % 8); }
+    function nextSlide() { showSlide((current + 1) % 9); }
     function isIndexTime() { time = current === 0 ? indexTime : otherTime; return time; }
-    function prevSlide() { showSlide((current - 1 + 8) % 8); }
+    function prevSlide() { showSlide((current - 1 + 9) % 9); }
     function goTo(n) { showSlide(n); }
     function initTimer(time) { clearTimeout(TimeOutTimer); TimeOutTimer = setTimeout(function () { nextSlide(); time = isIndexTime(); initTimer(time); }, time); }
     function resetTimer() { clearTimer(); time = isIndexTime(); initTimer(time); }
@@ -130,11 +131,74 @@
     function drawCanvas7(canvas) { const {ctx, W, H} = setupCanvas(canvas); const SCALE = 0.38; const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7); grad.addColorStop(0, '#1a0a2e'); grad.addColorStop(0.5, '#1a0a35'); grad.addColorStop(1, '#1a0a3a'); ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H); if (!canvas._particles) { const aw = ['a','an','the','is','are','was','were','be','been','have','has','had','do','does','did','will','would','can','could','shall','should','may','might','I','you','he','she','it','we','they','me','him','her','us','them','my','your','his','its','our','their','this','that','these','those','who','whom','whose','which','what','when','where','why','how','and','but','or','so','if','because','although','while','since','until','in','on','at','to','for','from','with','by','about','into','through','love','hope','dream','light','star','moon','wind','rain','fire','snow','hello','world','good','bad','big','small','old','new','high','low','day','night','time','year','life','hand','eye','mind','heart','soul','read','write','speak','listen','learn','teach','think','know','feel','grow']; canvas._particles = []; for (let i = 0; i < 130; i++) canvas._particles.push({ x: Math.random() * W, y: Math.random() * H, text: aw[Math.floor(Math.random() * aw.length)], size: Math.random() * 12 + 8, alpha: Math.random(), twinkleSpeed: Math.random() * 0.015 + 0.005, twinkleDir: 1 }); } canvas._particles.forEach(p => { p.alpha += p.twinkleSpeed * p.twinkleDir; if (p.alpha >= 0.7) p.twinkleDir = -1; if (p.alpha <= 0.12) p.twinkleDir = 1; ctx.fillStyle = `rgba(180,160,255,${p.alpha * 0.55})`; ctx.font = `${p.size}px 'Georgia',serif`; ctx.fillText(p.text, p.x, p.y); }); const size = Math.min(W, H) * SCALE, cx = W * 0.5, cy = H * 0.42, lh = size * 0.75, lw = size * 0.55; if (!canvas._ljPoints) { canvas._ljPoints = []; const lws = ['Love','Joy','Life','Laugh','Learn','Light','Luck','Loyal','Justice','Journey','Jazz','Jump','Join','Joke','Jewel','Lemon','Lake','Lion','Lily','Lotus']; const lx = cx - lw * 0.65, ly = cy - lh / 2; for (let i = 0; i < 10; i++) canvas._ljPoints.push({ x: lx - lw * 0.38, y: ly + i * lh / 9, text: lws[i % lws.length] }); canvas._ljPoints.push({ x: lx - lw * 0.38, y: ly + lh, text: lws[5] }); canvas._ljPoints.push({ x: lx + lw * 0.07, y: ly + lh, text: lws[6] }); canvas._ljPoints.push({ x: lx + lw * 0.5, y: ly + lh, text: lws[7] }); const jx = cx + lw * 0.65, jy = ly; canvas._ljPoints.push({ x: jx - lw * 0.35, y: jy, text: lws[10] }); canvas._ljPoints.push({ x: jx + lw * 0.05, y: jy, text: lws[11] }); canvas._ljPoints.push({ x: jx + lw * 0.45, y: jy, text: lws[12] }); for (let i = 0; i < 8; i++) canvas._ljPoints.push({ x: jx + lw * 0.3, y: jy + i * lh * 0.7 / 7, text: lws[i % lws.length] }); for (let i = 0; i < 3; i++) { const a = Math.PI * 0.05 + Math.PI * 0.85 * i / 2; canvas._ljPoints.push({ x: jx + lw * 0.24 + Math.cos(a) * lw * 0.3, y: jy + lh * 0.7 + Math.sin(a) * lh * 0.24, text: lws[(i + 15) % lws.length] }); } } canvas._ljPoints.forEach((p, i) => { const iL = i < 13, ic = (iL && i < 6) || (!iL && i >= 13 && i < 17); ctx.fillStyle = iL ? (ic ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.6)') : (ic ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.55)'); ctx.font = `bold ${ic ? 16 : 13}px 'Georgia',serif`; ctx.textAlign = 'center'; ctx.fillText(p.text, p.x, p.y); }); ctx.fillStyle = 'rgba(200,180,255,0.8)'; ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`; ctx.textAlign = 'center'; ctx.fillText('You are my everything', W / 2, H * 0.78); ctx.fillStyle = '#d0c8f0'; ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`; ctx.fillText('You are my everything', W / 2, H * 0.9); }
     function drawCanvas8(canvas) { const {ctx, W, H} = setupCanvas(canvas); const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7); grad.addColorStop(0, '#1a1a2e'); grad.addColorStop(0.5, '#16213e'); grad.addColorStop(1, '#0f3460'); ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H); if (!canvas._particles) { const ps = ['🧠','💭','💬','🗣️','👁️','👂','🤝','💔','❤️‍🩹','🌱','自我','本我','超我','意识','潜意识','梦境','记忆','情绪','焦虑','抑郁','压力','创伤','疗愈','成长','认知','行为','人格','性格','内向','外向','共情','依恋','安全感','边界','MBTI','九型','大五','DSM','CBT','ACT','正念','冥想','弗洛伊德','荣格','阿德勒','马斯洛','罗杰斯','皮亚杰','需求','动机','冲突','防御','投射','移情','阻抗','释梦','爱','恨','喜','怒','哀','惧','耻','罪']; canvas._particles = []; for (let i = 0; i < 160; i++) canvas._particles.push({ x: Math.random() * W, y: Math.random() * H, text: ps[Math.floor(Math.random() * ps.length)], size: Math.random() * 12 + 7, alpha: Math.random(), twinkleSpeed: Math.random() * 0.012 + 0.004, twinkleDir: 1 }); } canvas._particles.forEach(p => { p.alpha += p.twinkleSpeed * p.twinkleDir; if (p.alpha >= 0.75) p.twinkleDir = -1; if (p.alpha <= 0.1) p.twinkleDir = 1; ctx.fillStyle = `rgba(180,160,220,${p.alpha * 0.6})`; ctx.font = `${p.size}px 'Microsoft YaHei',serif`; ctx.fillText(p.text, p.x, p.y); }); const size = Math.min(W, H) * 0.35, cx = W * 0.5, cy = H * 0.42, bs = ['自我','本我','超我','意识','潜意识','记忆','情绪','人格','认知','行为','共情','依恋','正念','成长']; if (!canvas._brainPoints) { canvas._brainPoints = []; for (let i = 0; i < 30; i++) { const a = Math.PI * 0.65 + (Math.PI * 1.7 * i / 29); canvas._brainPoints.push({ x: cx - size * 0.1 + Math.cos(a) * size * 0.5, y: cy + Math.sin(a) * size * 0.5, text: bs[Math.floor(Math.random() * bs.length)] }); } for (let i = 0; i < 30; i++) { const a = -Math.PI * 0.05 + (Math.PI * 1.7 * i / 29); canvas._brainPoints.push({ x: cx + size * 0.1 + Math.cos(a) * size * 0.5, y: cy + Math.sin(a) * size * 0.5, text: bs[Math.floor(Math.random() * bs.length)] }); } for (let i = 0; i < 8; i++) canvas._brainPoints.push({ x: cx - 12 + i * 3.5, y: cy - 5 + Math.sin(i) * 5, text: '🧠' }); const sts = ['需求','动机','冲突','防御','投射','移情','疗愈','成长','爱','恨']; for (let i = 0; i < 10; i++) canvas._brainPoints.push({ x: cx - 5 + Math.sin(i * 0.7) * 6, y: cy + size * 0.5 + i * 10, text: sts[i] }); } canvas._brainPoints.forEach((p, i) => { const ic = i < 12; ctx.fillStyle = ic ? 'rgba(200,180,255,0.9)' : 'rgba(170,150,230,0.7)'; ctx.font = `bold ${ic ? 16 : 12}px 'Microsoft YaHei',serif`; ctx.textAlign = 'center'; ctx.fillText(p.text, p.x, p.y); }); ctx.fillStyle = 'rgba(200,180,240,0.8)'; ctx.font = `${Math.min(H * 0.035, 18)}px 'Microsoft YaHei'`; ctx.textAlign = 'center'; ctx.fillText('梦的解析', W / 2, H * 0.82); ctx.fillStyle = '#c8c0e8'; ctx.font = `${Math.min(H * 0.06, 28)}px 'Microsoft YaHei'`; ctx.fillText('梦的解析', W / 2, H * 0.92); }
 
-    function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; } requestAnimationFrame(animate); } animate();
+    function drawCanvas9(canvas) {
+        const { ctx, W, H } = setupCanvas(canvas);
+        const grad = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.7);
+        grad.addColorStop(0, '#0a0a1a');
+        grad.addColorStop(0.5, '#0f1a2e');
+        grad.addColorStop(1, '#1a0a2a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        const symbols = ['⬡', '⊕', '⊖', '⊗', '⊘', '⊙', '⊚', '⊛', '⊝', '◈', '◇', '◆', '⬟', '⟐', '⨁', '⨂', '☯', '⚛'];
+        if (!canvas._sym) {
+            canvas._sym = [];
+            for (let i = 0; i < 80; i++) {
+                canvas._sym.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    s: symbols[Math.floor(Math.random() * symbols.length)],
+                    size: Math.random() * 18 + 10,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.008 + 0.003,
+                    dir: 1
+                });
+            }
+        }
+        canvas._sym.forEach(p => {
+            p.alpha += p.speed * p.dir;
+            if (p.alpha >= 0.5) p.dir = -1;
+            if (p.alpha <= 0.1) p.dir = 1;
+            ctx.fillStyle = `rgba(120, 200, 255, ${p.alpha})`;
+            ctx.font = `${p.size}px 'Georgia', serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(p.s, p.x, p.y);
+        });
+
+        ctx.fillStyle = '#c8e0ff';
+        ctx.font = `bold ${Math.min(W * 0.08, 48)}px 'Courier New', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText('⬡ 对合协议', W / 2, H * 0.38);
+
+        ctx.fillStyle = '#8899bb';
+        ctx.font = `${Math.min(W * 0.025, 18)}px 'Georgia', serif`;
+        ctx.fillText('输入任意文本 · 观察规则的闭合过程', W / 2, H * 0.48);
+
+        const btnX = W / 2 - 80, btnY = H * 0.56, btnW = 160, btnH = 44;
+        ctx.fillStyle = '#2a2a4a';
+        ctx.shadowColor = 'rgba(100, 180, 255, 0.2)';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.roundRect(btnX, btnY, btnW, btnH, 22);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#c8e0ff';
+        ctx.font = `bold ${Math.min(W * 0.022, 16)}px 'Courier New', monospace`;
+        ctx.textAlign = 'center';
+        ctx.fillText('查看演示 →', W / 2, btnY + 28);
+
+        ctx.fillStyle = '#445566';
+        ctx.font = `${Math.min(W * 0.018, 12)}px 'Georgia', serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('密码学 · 启蒙演示', W / 2, H * 0.88);
+    }
+
+    function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; case 'canvas9': drawCanvas9(ac); break; } requestAnimationFrame(animate); } animate();
     function createAlink() { const l = document.createElement('a'); l.href = './nestedInvolutionRingHuge.html'; l.target = '_self'; l.rel = 'noopener noreferrer'; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
     function canvas8ClickFun() { if (current === 5) createAlink(); }
-    function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); } }
-    function initCanvas() { drawCanvas2(document.getElementById('canvas2')); drawCanvas3(document.getElementById('canvas3')); drawCanvas4(document.getElementById('canvas4')); drawCanvas5(document.getElementById('canvas5')); drawCanvas6(document.getElementById('canvas6')); drawCanvas7(document.getElementById('canvas7')); drawCanvas8(document.getElementById('canvas8')); } initCanvas();
+    function canvas9ClickFun() { const l = document.createElement('a'); l.href = './heo_cglt.html'; l.target = '_self'; l.rel = 'noopener noreferrer'; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
+    function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); else if (ac.id === 'canvas9') drawCanvas9(document.getElementById('canvas9')); } }
+    function initCanvas() { drawCanvas2(document.getElementById('canvas2')); drawCanvas3(document.getElementById('canvas3')); drawCanvas4(document.getElementById('canvas4')); drawCanvas5(document.getElementById('canvas5')); drawCanvas6(document.getElementById('canvas6')); drawCanvas7(document.getElementById('canvas7')); drawCanvas8(document.getElementById('canvas8')); drawCanvas9(document.getElementById('canvas9')); } initCanvas();
     function waitForDomStable(el, cb, to = 300) { let t = null; const ob = new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }); ob.observe(el, {childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']}); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }
     function redrawAllCanvas() { waitForDomStable(slider, function () { resizeCanvas(); }, 400); }
     window.addEventListener('resize', () => { redrawAllCanvas(); });
