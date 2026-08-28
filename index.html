@@ -206,13 +206,15 @@
     }
 
     function canvas9ClickFun() {
-        const l = document.createElement('a');
-        l.href = './heo_cglt.html';
-        l.target = '_self';
-        l.rel = 'noopener noreferrer';
-        document.body.appendChild(l);
-        l.click();
-        document.body.removeChild(l);
+        if (current === 9) {
+            const l = document.createElement('a');
+            l.href = './heo_cglt.html';
+            l.target = '_self';
+            l.rel = 'noopener noreferrer';
+            document.body.appendChild(l);
+            l.click();
+            document.body.removeChild(l);
+        }
     }
 
     function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); else if (ac.id === 'canvas9') drawCanvas9(document.getElementById('canvas9')); } }
