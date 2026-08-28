@@ -172,14 +172,20 @@
         ctx.font = `${Math.min(W * 0.025, 18)}px 'Georgia', serif`;
         ctx.fillText('输入任意文本 · 观察规则的闭合过程', W / 2, H * 0.48);
 
-        const btnX = W / 2 - 80, btnY = H * 0.56, btnW = 160, btnH = 44;
+        const btnX = W / 2 - 80, btnY = H * 0.56, btnW = 160, btnH = 44, r = 22;
         ctx.fillStyle = '#2a2a4a';
         ctx.shadowColor = 'rgba(100, 180, 255, 0.2)';
         ctx.shadowBlur = 20;
         ctx.beginPath();
-        ctx.roundRect(btnX, btnY, btnW, btnH, 22);
+        ctx.moveTo(btnX + r, btnY);
+        ctx.arcTo(btnX + btnW, btnY, btnX + btnW, btnY + btnH, r);
+        ctx.arcTo(btnX + btnW, btnY + btnH, btnX, btnY + btnH, r);
+        ctx.arcTo(btnX, btnY + btnH, btnX, btnY, r);
+        ctx.arcTo(btnX, btnY, btnX + btnW, btnY, r);
+        ctx.closePath();
         ctx.fill();
         ctx.shadowBlur = 0;
+
         ctx.fillStyle = '#c8e0ff';
         ctx.font = `bold ${Math.min(W * 0.022, 16)}px 'Courier New', monospace`;
         ctx.textAlign = 'center';
