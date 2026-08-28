@@ -36,10 +36,10 @@
     <div class="slide"><canvas id="canvas3"></canvas></div>
     <div class="slide"><canvas id="canvas4"></canvas></div>
     <div class="slide"><canvas id="canvas5"></canvas></div>
-    <div class="slide"><canvas id="canvas6"></canvas></div>
+    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas6"></canvas></div>
     <div class="slide"><canvas id="canvas7"></canvas></div>
     <div class="slide"><canvas id="canvas8"></canvas></div>
-    <div class="slide"><canvas id="canvas9"></canvas></div>
+    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas9"></canvas></div>
     <button class="arrow left" onclick="prevSlide()">❮</button>
     <button class="arrow right" onclick="nextSlide()">❯</button>
     <div id="dots">
@@ -199,9 +199,7 @@
 
     function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; case 'canvas9': drawCanvas9(ac); break; } requestAnimationFrame(animate); } animate();
 
-    // 事件委托：直接使用 current 判断当前可见的 slide
-    slides.addEventListener('click', function(e) {
-        console.log('current=>',current)
+    function canvasClickFun() {
         if (current === 5) {
             const l = document.createElement('a');
             l.href = './nestedInvolutionRingHuge.html';
@@ -210,7 +208,7 @@
             document.body.appendChild(l);
             l.click();
             document.body.removeChild(l);
-        } else if (current === 8) {
+        }else if (current === 8) {
             const l = document.createElement('a');
             l.href = './heo_cglt.html';
             l.target = '_self';
@@ -219,7 +217,7 @@
             l.click();
             document.body.removeChild(l);
         }
-    });
+    }
 
     function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); else if (ac.id === 'canvas9') drawCanvas9(document.getElementById('canvas9')); } }
     function initCanvas() { drawCanvas2(document.getElementById('canvas2')); drawCanvas3(document.getElementById('canvas3')); drawCanvas4(document.getElementById('canvas4')); drawCanvas5(document.getElementById('canvas5')); drawCanvas6(document.getElementById('canvas6')); drawCanvas7(document.getElementById('canvas7')); drawCanvas8(document.getElementById('canvas8')); drawCanvas9(document.getElementById('canvas9')); } initCanvas();
