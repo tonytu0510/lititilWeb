@@ -12,6 +12,7 @@
                     <a href="tools.html">工具箱</a>
 	                <a href="qrCode.html">二维码</a>
 	                <a href="nestedInvolutionRingHuge.html">对合环</a>
+                    <a href="heo_cglt.html">对合协议</a>
 	                <a href="chinaClock.html">RSTUV</a>
                     <a href="cosmos.html">太阳系</a>
                     <a href="fontAll.html">拆字</a>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>对合数字协议 · 启蒙演示</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        /* ---------- 全局样式 ---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            height: calc(100vh - 50px);
+        }
+        .container {
+            background: #181818;
+            border-radius: 16px;
+            padding: 30px 32px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
+            max-width: 600px;
+            min-height: 300px;
+        }
+        h1 {
+            color: #d0d0d0;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+        h1 span {
+            color: #7cb8b8;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+        }
+        .subtitle a {
+            color: #7cb8b8;
+            text-decoration: none;
+        }
+        .subtitle a:hover {
+            text-decoration: underline;
+        }
+
+        /* ---------- 输入区 ---------- */
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .row input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #d0d0d0;
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
+            outline: none;
+        }
+        .row input:focus {
+            border-color: #555;
+        }
+        .row button {
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            color: #d0d0d0;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .row button:hover {
+            background: #3d3d3d;
+        }
+
+        /* ---------- 展示框 ---------- */
+        .box {
+            background: #0f0f0f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2a2a2a;
+        }
+        .box .label {
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .box .value {
+            color: #d0d0d0;
+            font-size: 14px;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        .box .value.highlight {
+            color: #7cb8b8;
+        }
+
+        /* ---------- 状态 ---------- */
+        .badge-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            padding: 0 2px;
+        }
+        .badge {
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            background: #181818;
+            color: #555;
+        }
+        .badge.ok {
+            background: #142a22;
+            color: #7cb8b8;
+        }
+        .badge.fail {
+            background: #2a1414;
+            color: #c87a7a;
+        }
+
+        /* ---------- 协议展示 ---------- */
+        .proto {
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-top: 6px;
+            color: #888;
+            font-size: 12px;
+            line-height: 1.8;
+            border: 1px solid #1a1a1a;
+            font-family: 'Courier New', monospace;
+        }
+        .proto .highlight {
+            color: #7cb8b8;
+        }
+        .proto .dim {
+            color: #555;
+        }
+        .proto .arrow {
+            color: #444;
+        }
+
+        /* ---------- 底部 ---------- */
+        .footer {
+            color: #444;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 14px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 14px;
+            letter-spacing: 0.5px;
+        }
+        .footer span {
+            color: #7cb8b8;
+        }
+        .footer .disclaimer {
+            color: #444;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="topBarContainer"></div>
+<div class="wrap">
+<div class="container">
+    <!-- 标题 -->
+    <h1>⬡ 对合数字协议 · <span>启蒙演示</span></h1>
+    <div class="subtitle">
+        输入任意文本，观察基元计数 → 补位 → 偏移 → 闭合的完整过程
+    </div>
+
+    <!-- 输入 -->
+    <div class="row">
+        <input type="text" id="inputText" value="heo" placeholder="输入文本...">
+        <button id="runBtn">执行</button>
+    </div>
+
+    <!-- 输出 -->
+    <div id="output">
+        <!-- 基元分布 -->
+        <div class="box">
+            <div class="label">🧩 基元分布（视觉结构）</div>
+            <div class="value" id="primitiveDisplay">——</div>
+        </div>
+
+        <!-- 协议过程 -->
+        <div class="box">
+            <div class="label">📐 协议过程</div>
+            <div class="value" id="processDisplay">等待执行...</div>
+        </div>
+
+        <!-- 结果 -->
+        <div class="badge-row">
+            <span class="badge" id="statusBadge">⏳ 就绪</span>
+            <span class="badge" id="resultBadge">——</span>
+        </div>
+
+        <!-- 对合数字协议详情 -->
+        <div class="proto" id="protocolDisplay">
+            <span class="dim">对合数字协议：</span> 基元计数 → 补位 → 固定偏移 → 闭合
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">
+        <span>对合系统</span> · 补位 + 固定偏移<br>
+        <div class="disclaimer">
+            ⚠️ 本工具仅用于展示对合数字协议的原理，不涉及任何实际加密系统或破解功能。
+        </div>
+    </div>
+</div>
+</div>
+<script src="./common.js"></script>
+<script>
+    (function() {
+        'use strict';
+
+        // ---------- 对合基元计数 ----------
+        function primitiveCount(ch) {
+            // 基于英文字母的视觉结构，统计其构成单元数
+            const map = {
+                'a':2, 'b':2, 'c':1, 'd':2, 'e':1, 'f':2, 'g':2, 'h':2, 'i':1,
+                'j':2, 'k':2, 'l':1, 'm':2, 'n':2, 'o':1, 'p':2, 'q':2, 'r':1,
+                's':1, 't':2, 'u':1, 'v':1, 'w':2, 'x':2, 'y':2, 'z':1
+            };
+            return map[ch.toLowerCase()] || 1;
+        }
+
+        function totalPrimitive(str) {
+            let sum = 0;
+            for (let i = 0; i < str.length; i++) {
+                sum += primitiveCount(str[i]);
+            }
+            return sum;
+        }
+
+        // ---------- 对合数字协议 ----------
+        function applyProtocol(str, targetLen, offset) {
+            const raw = totalPrimitive(str);
+            let padded = raw.toString();
+            while (padded.length < targetLen) {
+                padded = '0' + padded;
+            }
+            const shifted = parseInt(padded) + offset;
+            return { raw, padded, shifted };
+        }
+
+        // ---------- 从哈希生成唯一候选（仅用于演示） ----------
+        function demoCandidate(hash) {
+            // 从哈希前4字节生成一个4字符候选，确保每次输入得到唯一输出
+            const bytes = [];
+            for (let i = 0; i < hash.length; i += 2) {
+                bytes.push(parseInt(hash.substr(i, 2), 16));
+            }
+            let seed = 0;
+            for (let i = 0; i < 4; i++) {
+                seed |= (bytes[i] || 0) << (i * 8);
+            }
+            seed >>>= 0;
+            let chars = '';
+            for (let i = 0; i < 4; i++) {
+                let code = ((seed >> (i * 8)) & 0xFF) % 26;
+                chars += String.fromCharCode(97 + code);
+            }
+            return chars;
+        }
+
+        // ---------- 简单的哈希（用于演示） ----------
+        function simpleHash(str) {
+            // 这是一个轻量级哈希，用于生成候选，不涉及任何加密
+            let h = 0;
+            for (let i = 0; i < str.length; i++) {
+                h = ((h << 5) - h) + str.charCodeAt(i);
+                h = h & h;
+            }
+            return h.toString(16).padStart(8, '0');
+        }
+
+        // ---------- 界面元素 ----------
+        const inputEl = document.getElementById('inputText');
+        const runBtn = document.getElementById('runBtn');
+        const primitiveDisplay = document.getElementById('primitiveDisplay');
+        const processDisplay = document.getElementById('processDisplay');
+        const statusBadge = document.getElementById('statusBadge');
+        const resultBadge = document.getElementById('resultBadge');
+        const protocolDisplay = document.getElementById('protocolDisplay');
+
+        // ---------- 主逻辑 ----------
+        function run() {
+            const text = inputEl.value || '';
+            if (text.length === 0) {
+                primitiveDisplay.textContent = '请先输入文本';
+                processDisplay.textContent = '——';
+                statusBadge.textContent = '⏳ 等待输入';
+                statusBadge.className = 'badge';
+                resultBadge.textContent = '——';
+                resultBadge.className = 'badge';
+                protocolDisplay.innerHTML = '<span class="dim">对合数字协议：</span> 基元计数 → 补位 → 固定偏移 → 闭合';
+                return;
+            }
+
+            // 1. 基元分布
+            let detail = '';
+            let total = 0;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                const cnt = primitiveCount(ch);
+                detail += `${ch}(${cnt}) `;
+                total += cnt;
+            }
+            primitiveDisplay.textContent = `${detail}→ 总数 = ${total}`;
+
+            // 2. 协议参数
+            const LEN = 4;
+            const OFFSET = 1111;
+            const result = applyProtocol(text, LEN, OFFSET);
+
+            // 3. 生成候选（基于哈希，用于演示对合关系）
+            const hash = simpleHash(text);
+            const candidate = demoCandidate(hash);
+            const candResult = applyProtocol(candidate, LEN, OFFSET);
+
+            // 4. 展示过程
+            let candDetail = '';
+            for (let i = 0; i < candidate.length; i++) {
+                const ch = candidate[i];
+                candDetail += `${ch}(${primitiveCount(ch)}) `;
+            }
+
+            // 5. 是否闭合
+            const closed = (result.shifted === candResult.shifted);
+
+            // 6. 构建显示
+            processDisplay.innerHTML = `
+                <div style="color:#888; margin-bottom:4px;">
+                    <span style="color:#7cb8b8;">原始输入</span> “${text}” → 基元总数 ${result.raw} → 补位 <span style="color:#7cb8b8;">${result.padded}</span> → 偏移 +${OFFSET} → <span style="color:#7cb8b8;">${result.shifted}</span>
+                </div>
+                <div style="color:#666; border-top:1px dashed #1a1a1a; padding-top:4px;">
+                    <span style="color:#7cb8b8;">对合候选</span> “${candidate}” → 基元总数 ${candResult.raw} → 补位 <span style="color:#7cb8b8;">${candResult.padded}</span> → 偏移 +${OFFSET} → <span style="color:#7cb8b8;">${candResult.shifted}</span>
+                </div>
+                <div style="border-top:1px solid #1a1a1a; padding-top:4px; margin-top:4px;">
+                    <span style="color:#888;">候选基元分布：</span> ${candDetail}
+                </div>
+            `;
+
+            // 7. 状态
+            statusBadge.textContent = '✅ 完成';
+            statusBadge.className = 'badge ok';
+            resultBadge.textContent = closed ? '✅ 闭合' : '⚠️ 未闭合';
+            resultBadge.className = closed ? 'badge ok' : 'badge fail';
+
+            // 8. 协议详情
+            protocolDisplay.innerHTML = `
+                <span class="dim">对合数字协议：</span><br>
+                输入 “${text}” → 基元数 ${result.raw} → 补位 ${result.padded} → 偏移 +${OFFSET} → ${result.shifted}<br>
+                候选 “${candidate}” → 基元数 ${candResult.raw} → 补位 ${candResult.padded} → 偏移 +${OFFSET} → ${candResult.shifted}<br>
+                <span style="color:#7cb8b8;">闭合状态：${closed ? '✅ 必然相等' : '⚠️ 未闭合（偏移步长固定）'}</span>
+                <br><span style="color:#444; font-size:11px;">💡 当输入与候选的偏移结果相等时，系统达到闭合。</span>
+            `;
+        }
+
+        // ---------- 绑定事件 ----------
+        runBtn.addEventListener('click', run);
+        inputEl.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') run();
+        });
+
+        // 默认执行
+        run();
+    })();
+</script>
+</body>
+</html>
