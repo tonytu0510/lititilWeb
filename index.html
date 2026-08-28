@@ -200,7 +200,7 @@
     function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; case 'canvas9': drawCanvas9(ac); break; } requestAnimationFrame(animate); } animate();
 
     // 事件委托：直接使用 current 判断当前可见的 slide
-    slider.addEventListener('click', function(e) {
+    slides.addEventListener('click', function(e) {
         if (current === 5) {
             const l = document.createElement('a');
             l.href = './nestedInvolutionRingHuge.html';
