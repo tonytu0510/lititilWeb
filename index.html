@@ -201,6 +201,7 @@
 
     // 事件委托：直接使用 current 判断当前可见的 slide
     slides.addEventListener('click', function(e) {
+        console.log('current=>',current)
         if (current === 5) {
             const l = document.createElement('a');
             l.href = './nestedInvolutionRingHuge.html';
