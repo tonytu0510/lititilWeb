@@ -36,10 +36,10 @@
     <div class="slide"><canvas id="canvas3"></canvas></div>
     <div class="slide"><canvas id="canvas4"></canvas></div>
     <div class="slide"><canvas id="canvas5"></canvas></div>
-    <div class="slide" onclick="canvas5ClickFun()"><canvas id="canvas6"></canvas></div>
+    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas6"></canvas></div>
     <div class="slide"><canvas id="canvas7"></canvas></div>
     <div class="slide"><canvas id="canvas8"></canvas></div>
-    <div class="slide" onclick="canvas9ClickFun()"><canvas id="canvas9"></canvas></div>
+    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas9"></canvas></div>
     <button class="arrow left" onclick="prevSlide()">❮</button>
     <button class="arrow right" onclick="nextSlide()">❯</button>
     <div id="dots">
@@ -199,8 +199,7 @@
 
     function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; case 'canvas9': drawCanvas9(ac); break; } requestAnimationFrame(animate); } animate();
 
-    function canvas5ClickFun() {
-        console.log('current=>5',current)
+    function canvasClickFun() {
         if (current === 5) {
             const l = document.createElement('a');
             l.href = './nestedInvolutionRingHuge.html';
@@ -209,12 +208,7 @@
             document.body.appendChild(l);
             l.click();
             document.body.removeChild(l);
-        }
-    }
-
-    function canvas9ClickFun() {
-        console.log('current=>8',current)
-        if (current === 8) {
+        }else if (current === 8) {
             const l = document.createElement('a');
             l.href = './heo_cglt.html';
             l.target = '_self';
