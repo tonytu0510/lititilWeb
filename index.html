@@ -17,7 +17,6 @@
         #slider.full { height: 100vh; }
         .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.6s; }
         .slide.active { opacity: 1; height: 100%; width: 100%; }
-        .slide.active:nth-child(6) { cursor: pointer !important; }
         .slide canvas { display: block; }
         .arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); color: #fff; border: none; font-size: 30px; padding: 10px 15px; cursor: pointer; z-index: 10; border-radius: 4px; display: none; }
         @media (min-width: 768px) { .arrow { display: block; } }
@@ -37,9 +36,9 @@
     <div class="slide"><canvas id="canvas3"></canvas></div>
     <div class="slide"><canvas id="canvas4"></canvas></div>
     <div class="slide"><canvas id="canvas5"></canvas></div>
-    <div class="slide"><canvas id="canvas6"></canvas></div>
+    <div class="slide" onclick="canvas8ClickFun()"><canvas id="canvas6"></canvas></div>
     <div class="slide"><canvas id="canvas7"></canvas></div>
-    <div class="slide" onclick="canvas8ClickFun()"><canvas id="canvas8"></canvas></div>
+    <div class="slide"><canvas id="canvas8"></canvas></div>
     <div class="slide" onclick="canvas9ClickFun()"><canvas id="canvas9"></canvas></div>
     <button class="arrow left" onclick="prevSlide()">❮</button>
     <button class="arrow right" onclick="nextSlide()">❯</button>
@@ -51,7 +50,7 @@
 <script>
     let current = 0, indexTime = 10000, otherTime = 4200, time = indexTime;
     const slides = document.querySelectorAll('.slide'), dots = document.querySelectorAll('#dots span');
-    const canvas8Event = document.getElementById("canvas8"), slider = document.getElementById('slider');
+    const slider = document.getElementById('slider');
     let TimeOutTimer = null, H5Scal = null, radioY = null, H5PrintFont = null;
     const canvas1 = document.getElementById('canvas1');
 
@@ -62,7 +61,6 @@
         dots[n].classList.add('active');
         current = n;
         if (n === 0) { canvas1._textIndex = 0; canvas1._textTimer = performance.now(); }
-        canvas8Event.style.cursor = current === 5 ? 'pointer' : 'auto';
         resetTimer();
         redrawAllCanvas();
     }
@@ -194,9 +192,29 @@
     }
 
     function animate() { const ac = document.querySelector('.slide.active canvas'); if (!ac) { requestAnimationFrame(animate); return; } switch (ac.id) { case 'canvas1': drawCanvas1(ac); break; case 'canvas2': drawCanvas2(ac); break; case 'canvas3': drawCanvas3(ac); break; case 'canvas4': drawCanvas4(ac); break; case 'canvas5': drawCanvas5(ac); break; case 'canvas6': drawCanvas6(ac); break; case 'canvas7': drawCanvas7(ac); break; case 'canvas8': drawCanvas8(ac); break; case 'canvas9': drawCanvas9(ac); break; } requestAnimationFrame(animate); } animate();
-    function createAlink() { const l = document.createElement('a'); l.href = './nestedInvolutionRingHuge.html'; l.target = '_self'; l.rel = 'noopener noreferrer'; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
-    function canvas8ClickFun() { if (current === 5) createAlink(); }
-    function canvas9ClickFun() { const l = document.createElement('a'); l.href = './heo_cglt.html'; l.target = '_self'; l.rel = 'noopener noreferrer'; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
+
+    function canvas8ClickFun() {
+        if (current === 5) {
+            const l = document.createElement('a');
+            l.href = './nestedInvolutionRingHuge.html';
+            l.target = '_self';
+            l.rel = 'noopener noreferrer';
+            document.body.appendChild(l);
+            l.click();
+            document.body.removeChild(l);
+        }
+    }
+
+    function canvas9ClickFun() {
+        const l = document.createElement('a');
+        l.href = './heo_cglt.html';
+        l.target = '_self';
+        l.rel = 'noopener noreferrer';
+        document.body.appendChild(l);
+        l.click();
+        document.body.removeChild(l);
+    }
+
     function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); else if (ac.id === 'canvas9') drawCanvas9(document.getElementById('canvas9')); } }
     function initCanvas() { drawCanvas2(document.getElementById('canvas2')); drawCanvas3(document.getElementById('canvas3')); drawCanvas4(document.getElementById('canvas4')); drawCanvas5(document.getElementById('canvas5')); drawCanvas6(document.getElementById('canvas6')); drawCanvas7(document.getElementById('canvas7')); drawCanvas8(document.getElementById('canvas8')); drawCanvas9(document.getElementById('canvas9')); } initCanvas();
     function waitForDomStable(el, cb, to = 300) { let t = null; const ob = new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }); ob.observe(el, {childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']}); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }
