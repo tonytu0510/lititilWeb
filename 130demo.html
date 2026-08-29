@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>130号段演示</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            height: calc(100vh - 50px);
+        }
+        .container {
+            background: #181818;
+            border-radius: 16px;
+            padding: 30px 32px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
+            max-width: 600px;
+            min-height: 300px;
+            width: 100%;
+        }
+.display {
+    background: #0a0a0a;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+    border: 1px solid #2a2a2a;
+    margin-bottom: 20px;
+}
+.display .prefix {
+    color: #7cb8b8;
+    font-size: 28px;
+    letter-spacing: 6px;
+}
+.display .suffix {
+    color: #d0d0d0;
+    font-size: 28px;
+    letter-spacing: 6px;
+}
+.display .suffix .highlight {
+    color: #e8a838;
+}
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    min-width: 100%;
+}
+.key {
+    background: #2a2a2a;
+    border: none;
+    border-radius: 10px;
+    padding: 16px 0;
+    color: #d0d0d0;
+    font-size: 22px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: 0.15s;
+    text-align: center;
+}
+.key:active { background: #3d3d3d; transform: scale(0.94); }
+.key.special {
+    background: #1a2a2a;
+    border: 1px solid #7cb8b8;
+    color: #7cb8b8;
+}
+.key.special2 {
+    background: #1a1a2a;
+    border: 1px solid #e8a838;
+    color: #e8a838;
+}
+.key.special3 {
+    background: #2a1a1a;
+    border: 1px solid #c87a7a;
+    color: #c87a7a;
+}
+.clear-btn {
+    background: #2a2a2a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 0;
+    color: #666;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+    transition: 0.15s;
+}
+.clear-btn:active { background: #3d3d3d; }
+</style>
+</head>
+<body>
+<div id="topBarContainer"></div>
+<div class="wrap">
+<div class="container">
+    <div class="display">
+        <div class="prefix" id="numberDisplay">130</div>
+        <div class="suffix" id="suffixDisplay"><span class="highlight">·</span>·<span class="highlight">·</span>·<span class="highlight">·</span>·</div>
+    </div>
+    <div class="keypad">
+        <button class="key" data-value="1">1</button>
+        <button class="key special2" data-value="2">2</button>
+        <button class="key special3" data-value="3">3</button>
+        <button class="key" data-value="4">4</button>
+        <button class="key special2" data-value="5">5</button>
+        <button class="key" data-value="6">6</button>
+        <button class="key special" data-value="7">7</button>
+        <button class="key" data-value="8">8</button>
+        <button class="key" data-value="9">9</button>
+        <button class="key" data-value="*">*</button>
+        <button class="key" data-value="0">0</button>
+        <button class="key" data-value="#">#</button>
+    </div>
+    <button class="clear-btn" id="clearBtn">清除</button>
+</div>
+</div>
+<script src="./common.js"></script>
+<script>
+    const numberDisplay = document.getElementById('numberDisplay');
+    const suffixDisplay = document.getElementById('suffixDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    let suffixCount = 0;
+    const maxSuffix = 8;
+
+    function updateDisplay() {
+        let displayText = '';
+        for (let i = 0; i < suffixCount; i++) {
+            displayText += '·';
+        }
+        const remaining = maxSuffix - suffixCount;
+        for (let i = 0; i < remaining; i++) {
+            displayText += '·';
+        }
+        const chars = displayText.split('');
+        for (let i = 0; i < chars.length; i++) {
+            if (i === 0 || i === 3 || i === 6) {
+                chars[i] = `<span class="highlight">${chars[i]}</span>`;
+            }
+        }
+        suffixDisplay.innerHTML = chars.join('');
+    }
+
+    document.querySelectorAll('.key').forEach(key => {
+        key.addEventListener('click', function() {
+            if (suffixCount < maxSuffix) {
+                suffixCount++;
+                updateDisplay();
+            }
+        });
+    });
+
+    clearBtn.addEventListener('click', function() {
+        suffixCount = 0;
+        updateDisplay();
+    });
+
+    // 键盘数字输入支持
+    document.addEventListener('keydown', function(e) {
+        if (e.key >= '0' && e.key <= '9' || e.key === '*' || e.key === '#') {
+            if (suffixCount < maxSuffix) {
+                suffixCount++;
+                updateDisplay();
+            }
+        }
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            suffixCount = Math.max(0, suffixCount - 1);
+            updateDisplay();
+        }
+    });
+
+    updateDisplay();
+</script>
+</body>
+</html>
