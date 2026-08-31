@@ -64,6 +64,7 @@
                     <a href="namePairing.html">缘分测试</a>
                     <a href="panding.html">判证</a>
                     <a href="130demo.html">130 演示</a>
+                    <a href="notes.html">笔记</a>
                     <a href="aboutMe.html">关于我</a>
                 </nav>
             </div>
