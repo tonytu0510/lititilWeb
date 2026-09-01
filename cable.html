@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>布线笔记 · 2026</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            min-height: 90vh;
+            padding:20px 0
+        }
+        .container {
+            background: #181818;
+            border-radius: 16px;
+            padding: 30px 32px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
+            max-width: 600px;
+            min-height: 300px;
+            width: 100%;
+        }
+        .title {
+            color: #d0d0d0;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        .title span {
+            color: #7cb8b8;
+        }
+        .entry {
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+            padding: 12px 16px;
+            border-left: 3px solid #2a2a2a;
+            background: #0f0f0f;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .entry .date {
+            color: #555;
+            font-size: 11px;
+        }
+        .entry .highlight {
+            color: #7cb8b8;
+        }
+        .entry .dim {
+            color: #555;
+        }
+        .foot {
+            color: #444;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<div id="topBarContainer"></div>
+<div class="wrap">
+<div class="container">
+    <div class="title">⬡ <span>布线笔记</span> · 2026</div>
+
+    <div class="entry">
+        <div class="date"># 2026-09-02</div><br>
+        入射角 + 出射角 → 可判断网线走向是否合理<br>
+        信号强度 + 时间 → 可算出实际长度和直线长度的差值<br>
+        <span class="highlight">差值 = 盘绕程度</span><br>
+        <span class="dim">——不需要拆墙，不需要看图纸，从两端读数即可。</span>
+    </div>
+
+    <div class="entry">
+        <div class="date"># 2026-09-01</div><br>
+        网线盘起时，实际长度 &gt; 直线长度<br>
+        信号强度的衰减会叠加弯曲损耗<br>
+        <span class="highlight">弯曲损耗 = 额外绕路的代价</span>
+    </div>
+
+    <div class="entry">
+        <div class="date"># 2026-08-31</div><br>
+        排线验收的核心是：<br>
+        1. 判断路径是否合理<br>
+        2. 判断是否存在虚报工作量<br>
+        3. 判断故障点是否由弯曲引起<br>
+        <span class="dim">——能用数据说话，就不需要猜。</span>
+    </div>
+
+    <div class="foot">
+        <span>布线笔记</span> · 不定期更新
+    </div>
+</div>
+</div>
+<script src="./common.js"></script>
+</body>
+</html>
