@@ -7,7 +7,7 @@
     <meta name="keywords" content="个人网站,弘扬正能量">
     <meta name="description" content="这是一个个人网站,弘扬正能量">
     <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>规则与边界 · 笔记</title>
+    <title>对称 · 笔记</title>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./common.css">
     <script src="./dino-game.js"></script>
@@ -22,7 +22,7 @@
             justify-content: center;
             align-items: center;
             width:100%;
-            min-height: 100vh;
+            min-height: 90vh;
             padding:20px 0
         }
         .container {
@@ -48,25 +48,27 @@
         .title span {
             color: #7cb8b8;
         }
-        .note {
+        .entry {
             color: #999;
             font-size: 14px;
             line-height: 1.8;
-            margin-bottom: 16px;
             padding: 12px 16px;
             border-left: 3px solid #2a2a2a;
             background: #0f0f0f;
             border-radius: 4px;
+            margin-bottom: 12px;
         }
-        .note .highlight {
+        .entry .highlight {
             color: #7cb8b8;
         }
-        .note .dim {
+        .entry .dim {
             color: #555;
         }
-        .divider {
-            border-top: 1px dashed #2a2a2a;
-            margin: 18px 0;
+        .entry .warning {
+            color: #c87a7a;
+        }
+        .entry .gold {
+            color: #e8a838;
         }
         .foot {
             color: #444;
@@ -94,22 +96,22 @@
             text-align: right;
             letter-spacing: 0.5px;
         }
-        /* 底部链接 - 新添加 */
-        .bottom-link {
-            text-align: center;
-            margin-top: 18px;
-            border-top: 1px solid #1a1a1a;
-            padding-top: 14px;
+        .divider {
+            border-top: 1px dashed #2a2a2a;
+            margin: 18px 0;
         }
-        .bottom-link a {
-            color: #555;
-            text-decoration: none;
-            font-size: 12px;
-            letter-spacing: 2px;
-            transition: color 0.2s;
+        .sym-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 4px 0;
         }
-        .bottom-link a:hover {
+        .sym-row .good {
             color: #7cb8b8;
+        }
+        .sym-row .bad {
+            color: #c87a7a;
         }
     </style>
 </head>
@@ -117,51 +119,52 @@
 <div id="topBarContainer"></div>
 <div class="wrap">
 <div class="container">
-    <div class="title">⬡ <span>规则与边界</span> · 笔记</div>
+    <div class="title">⬡ <span>对称</span> · 笔记</div>
 
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-31</span><br><br>
-        一个系统如果长期运行，必然会在内部形成某种 <span class="highlight">“预设的优势方向”</span>。<br><br>
-        这种优势不依赖外部干预，而是内嵌在规则本身的结构里。<br><br>
-        参与者可以感知到它的存在，但很难准确描述它的位置。<br><br>
-        <span class="dim">——它既不是“作弊”，也不是“公平”，而是“规则设计的一部分”。</span>
+    <div class="entry">
+        <span class="dim"># 笔记 2026-09-03</span><br><br>
+        真 善 美 —— 左右对称，字形规整，中心可寻。<br>
+        假 恶 丑 —— 左右失衡，重心偏移，结构不稳。<br><br>
+        <span class="highlight">对称不是美学的唯一标准，但它是一个可测量的分界线。</span>
     </div>
 
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-29</span><br><br>
-        如果所有人都能看清规则的底层结构，那套系统就不再需要“维护”了。<br><br>
-        它会自然退化，成为一种 <span class="highlight">“参与者之间的娱乐”</span>。<br><br>
-        到那时，规则本身不再重要，重要的是参与者在规则里 <span class="highlight">“如何相处”</span>。
+    <div class="entry">
+        <div class="sym-row">
+            <span class="good">真</span>
+            <span class="good">善</span>
+            <span class="good">美</span>
+            <span style="color:#444;">丨</span>
+            <span class="bad">假</span>
+            <span class="bad">恶</span>
+            <span class="bad">丑</span>
+        </div>
+        <div style="color:#555; font-size:12px; text-align:center; margin-top:4px;">
+            对称 · 不对称
+        </div>
     </div>
 
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-27</span><br><br>
-        规则的有效性，取决于 <span class="highlight">“有多少人相信它是公平的”</span>。<br><br>
-        当相信的人变少，规则就不再需要修改——它自己会失去效力。<br><br>
-        <span class="dim">——规则不是被打破的，是被“看透”的。</span>
+    <div class="entry">
+        <span class="dim"># 扩展</span><br><br>
+        英文大写对称字母：A H I M O T U V W X Y<br>
+        中文对称字：王 中 口 日 田 申 丰 来 木 林<br>
+        <span class="dim">——对称结构本身不带立场，但人习惯把对称与“正”关联。</span>
     </div>
 
     <div class="divider"></div>
 
     <div style="color:#555; font-size:12px; line-height:1.8; padding: 4px 0;">
-        <span class="tag">系统</span>
-        <span class="tag">规则</span>
-        <span class="tag">边界</span>
-        <span class="tag">认知</span>
+        <span class="tag">对称</span>
+        <span class="tag">结构</span>
+        <span class="tag">正</span>
+        <span class="tag">偏</span>
     </div>
 
     <div class="meta">
-        仅作记录 · 不构成任何建议
-    </div>
-
-    <!-- 底部链接：指向红蘑菇笔记 -->
-    <div class="bottom-link">
-        <a href="hongmogu.html">⬡ 红蘑菇 · 笔记</a>
-        <a href="symmetry.html">对称</a>
+        仅作记录 · 不构成任何结论
     </div>
 
     <div class="foot">
-        <span>观察笔记</span> · 不定期更新
+        <span>对称笔记</span> · 不定期更新
     </div>
 </div>
 </div>
