@@ -67,6 +67,7 @@
                     <a href="notes.html">笔记</a>
                     <a href="cable.html">布线笔记</a>
                     <a href="aboutMe.html">关于我</a>
+                    <a href="statement.html">声明</a>
                 </nav>
             </div>
             <canvas id="dinoIcon" width="50" height="50"></canvas>

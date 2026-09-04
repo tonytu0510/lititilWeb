@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>个人声明</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            min-height: 90vh;
+            padding:20px 0
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #181818;
+            border-radius: 24px;
+            padding: 60px 50px;
+            border: 1px solid #2a2a2a;
+            text-align: center;
+        }
+        .title {
+            color: #d0d0d0;
+            font-size: clamp(28px, 5vw, 48px);
+            letter-spacing: 6px;
+            font-weight: 300;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        .title span {
+            color: #7cb8b8;
+        }
+        .statement {
+            color: #d0d0d0;
+            font-size: clamp(24px, 4vw, 40px);
+            line-height: 1.8;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+        .statement .highlight {
+            color: #7cb8b8;
+        }
+        .statement .retired {
+            color: #e8a838;
+        }
+        .statement .warning {
+            color: #999;
+            font-size: clamp(18px, 2.5vw, 28px);
+            margin-top: 30px;
+            display: block;
+            border-top: 1px solid #2a2a2a;
+            padding-top: 30px;
+        }
+        .footer {
+            color: #444;
+            font-size: clamp(14px, 1.2vw, 18px);
+            margin-top: 50px;
+            letter-spacing: 2px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 30px;
+        }
+        .footer span {
+            color: #7cb8b8;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="topBarContainer"></div>
+<div class="wrap">
+<div class="container">
+    <div class="title">⬡ <span>个人声明</span></div>
+
+    <div class="statement">
+        本人是中华人民共和国公民，<br>
+        严格遵守 <span class="highlight">宪法与法律</span>，<br>
+        已 <span class="retired">退休</span>，<br>
+        不参与、不干涉任何活动。<br>
+        <span class="warning">若有违反，愿依法承担相应责任。</span>
+    </div>
+
+    <div class="footer">
+        <span>守法公民</span> · 个人声明
+    </div>
+</div>
+</div>
+<script src="./common.js"></script>
+</body>
+</html>
