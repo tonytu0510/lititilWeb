@@ -135,7 +135,7 @@ body {
 }
 
 #subNav a:hover {
-    background: var(--menuHorver);
+    background: #f9ed69;
     color: #fff;
 }
 
@@ -143,7 +143,9 @@ body {
 #dinoBar {
     width: 100%;
     height: 50px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    /*background: linear-gradient(90deg, var(--primary), var(--secondary));*/
+    background: linear-gradient(40deg, #6a2c70 0%,#b83b5e 40%,#f08a5d 70%,#f9ed69 100%);
+
     position: fixed;
     top: 0;
     left: 0;

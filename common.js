@@ -104,7 +104,7 @@
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, 50, 50);
-        ctx.fillStyle = '#871F78';
+        ctx.fillStyle = '#f9ed69';
         ctx.beginPath();
         ctx.arc(25, 25, 25, 0, Math.PI * 2);
         ctx.fill();
@@ -125,12 +125,12 @@
         ctx.beginPath();
         ctx.arc(25, 25, 25, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#871F78';
+        ctx.fillStyle = '#f9ed69';
         ctx.fillRect(12, 18, 16, 18);
         ctx.fillRect(24, 8, 12, 12);
         ctx.fillStyle = '#fff';
         ctx.fillRect(32, 10, 3, 3);
-        ctx.fillStyle = '#871F78';
+        ctx.fillStyle = '#f9ed69';
         ctx.fillRect(14, 34, 5, 8);
         ctx.fillRect(21, 34, 5, 8);
     }
