@@ -16,7 +16,6 @@
         sessionStorage.setItem(DINO_STATE_KEY, closed ? 'true' : 'false');
     }
 
-    // ==================== 菜单状态保存/读取 ====================
     function saveMenuIndex(index) {
         sessionStorage.setItem(MENU_STATE_KEY, index.toString());
     }
@@ -53,7 +52,6 @@
         }
     }
 
-    // ==================== 圆弧菜单数据 ====================
     const menuData = [
         { name: '首页', href: 'index.html?M=1' },
         { name: '工具箱', href: 'tools.html' },
@@ -71,9 +69,7 @@
         { name: '声明', href: 'statement.html' }
     ];
 
-    // ==================== HTML 模板 ====================
     const html = `
-        <!-- 圆弧菜单 -->
         <style>
             #menuTrigger {
                 position: fixed;
@@ -229,7 +225,6 @@
             <div id="menuBg"></div>
         </div>
 
-        <!-- 小恐龙跑酷组件 -->
         <div id="dinoBar" style="position:relative; display:none;">
             <button class="close-btn" id="topPlaceholder">✕</button>
             <dino-game speed="3" style="position: absolute;left: 50px;top: 0;height: 50px;width: calc(100% - 230px)" id='dinoGameChangeWidth'></dino-game>
@@ -269,7 +264,6 @@
         let rotationOffset = 0;
         let isInitialized = false;
 
-        // 从 sessionStorage 恢复上次选中的索引
         const savedIndex = getSavedMenuIndex();
 
         function buildMenu() {
@@ -304,9 +298,7 @@
                 containerEl.appendChild(el);
             });
 
-            // 先初始化位置，再选中保存的索引
             updatePositions(0);
-            // 如果保存的索引有效，选中它，否则选中0
             const targetIdx = (savedIndex >= 0 && savedIndex < menuData.length) ? savedIndex : 0;
             switchToIndex(targetIdx);
             isInitialized = true;
@@ -377,7 +369,7 @@
             }
         }
 
-        // ========== 事件绑定 ==========
+        // ========== 事件绑定（仅针对 menuContainer 区域） ==========
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
             toggleMenu(!isOpen);
@@ -389,30 +381,26 @@
             }
         });
 
-        // 鼠标滚轮
-        document.addEventListener('wheel', function(e) {
+        // ========== 滚轮事件：只对 menuContainer 生效 ==========
+        containerEl.addEventListener('wheel', function(e) {
             if (!isOpen) return;
             e.preventDefault();
+            e.stopPropagation();
             stepSwitch(e.deltaY);
         }, { passive: false });
 
-        // ========== 禁用鼠标中键 ==========
+        // ========== 禁用鼠标中键（全局） ==========
         document.addEventListener('mousedown', function(e) {
-            // 禁用中键（按钮 1）
             if (e.button === 1) {
                 e.preventDefault();
                 return false;
             }
         });
 
-        // 同时也禁用中键的 wheel 事件（部分浏览器中键会触发滚轮）
-        // 但 wheel 事件本身已经处理了滚轮切换，不需要额外禁用
-
-        // 鼠标拖拽
+        // ========== 鼠标拖拽：只在 menuContainer 上生效 ==========
         let dragStartY = 0;
         containerEl.addEventListener('mousedown', function(e) {
             if (!isOpen) return;
-            // 左键拖动（按钮0）
             if (e.button !== 0) return;
             isDragging = true;
             dragStartY = e.clientY;
@@ -432,7 +420,7 @@
             isDragging = false;
         });
 
-        // 触摸滑动
+        // ========== 触摸滑动：只在 menuContainer 上生效 ==========
         let touchStartY = 0;
         containerEl.addEventListener('touchstart', function(e) {
             if (!isOpen) return;
@@ -453,7 +441,7 @@
             isDragging = false;
         }, { passive: true });
 
-        // 键盘支持
+        // ========== 键盘支持 ==========
         document.addEventListener('keydown', function(e) {
             if (!isOpen) return;
             if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
@@ -558,7 +546,6 @@
         if (dinoGameChangeWidth) dinoGameChangeWidth.style.width = 'calc(100% - 120px)';
     };
 
-    // ==================== 游戏说明弹窗 ====================
     window.showHelp = function() {
         document.getElementById('helpModal').style.display = 'block';
     };
