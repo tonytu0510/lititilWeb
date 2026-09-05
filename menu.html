@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>圆形滚轮 · 连接</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d0d0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+        }
+
+        /* 圆环背景 */
+        .ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid #2a2a2a;
+            background: rgba(24, 24, 24, 0.6);
+            backdrop-filter: blur(2px);
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            transition: border-color 0.3s;
+        }
+        .ring:hover {
+            border-color: #3d3d3d;
+        }
+
+        /* 连接线（可视化的闭合环路） */
+        .connection-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .connection-line svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 菜单项：分布在圆环上 */
+        .item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid #3d3d3d;
+            color: #999;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            margin-left: -25px;
+            margin-top: -25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .item:hover {
+            border-color: #7cb8b8;
+            color: #d0d0d0;
+            transform: scale(1.1);
+        }
+        .item.active {
+            background: #7cb8b8;
+            color: #0d0d0d;
+            border-color: #7cb8b8;
+            transform: scale(1.15);
+        }
+
+        /* 中心指示器 */
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #7cb8b8;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            box-shadow: 0 0 30px rgba(124, 184, 184, 0.3);
+        }
+
+        /* 当前选中标签 */
+        #currentLabel {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #444;
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 1px;
+            background: rgba(24, 24, 24, 0.8);
+            padding: 8px 24px;
+            border-radius: 30px;
+            border: 1px solid #2a2a2a;
+            transition: opacity 0.4s;
+        }
+        #currentLabel .name {
+            color: #7cb8b8;
+            font-size: 18px;
+        }
+        #currentLabel .index {
+            color: #555;
+            font-size: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .wrapper {
+                width: 300px;
+                height: 300px;
+            }
+            .item {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+                margin-left: -20px;
+                margin-top: -20px;
+            }
+            #currentLabel {
+                font-size: 12px;
+                padding: 6px 16px;
+                bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper" id="ringWrapper">
+        <div class="ring"></div>
+
+        <!-- SVG 连接线（闭合环路） -->
+        <div class="connection-line">
+            <svg id="lineSvg" viewBox="0 0 400 400">
+                <path id="linePath" d="" fill="none" stroke="#2a2a2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <div class="center-dot"></div>
+        <!-- 菜单项由 JS 动态生成 -->
+    </div>
+
+    <div id="currentLabel">
+        <div class="index" id="currentIndex">1 / 8</div>
+        <div class="name" id="currentName">首页</div>
+        <div style="color:#555;font-size:11px;">滑动滚轮 · 拖拽旋转</div>
+    </div>
+
+    <script>
+        (function() {
+            const menuData = [
+                { name: '首页', href: '#' },
+                { name: '拆字', href: '#' },
+                { name: '判证', href: '#' },
+                { name: '对合环', href: '#' },
+                { name: '笔记', href: '#' },
+                { name: '布线', href: '#' },
+                { name: '声明', href: '#' },
+                { name: '关于', href: '#' }
+            ];
+
+            const wrapper = document.getElementById('ringWrapper');
+            const linePath = document.getElementById('linePath');
+            const currentName = document.getElementById('currentName');
+            const currentIndex = document.getElementById('currentIndex');
+
+            let selectedIndex = 0;
+            let rotation = 0; // 当前旋转角度（度）
+            let isDragging = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let dragStartRotation = 0;
+
+            const count = menuData.length;
+            const radius = Math.min(wrapper.offsetWidth || 400, wrapper.offsetHeight || 400) * 0.4;
+            const cx = (wrapper.offsetWidth || 400) / 2;
+            const cy = (wrapper.offsetHeight || 400) / 2;
+
+            // ===== 生成菜单项 =====
+            function buildItems() {
+                wrapper.querySelectorAll('.item').forEach(el => el.remove());
+
+                menuData.forEach((item, index) => {
+                    const el = document.createElement('a');
+                    el.className = 'item';
+                    el.textContent = item.name.slice(0, 3);
+                    el.title = item.name;
+                    el.href = item.href;
+                    el.dataset.index = index;
+
+                    const angle = -90 + (360 * index / count);
+                    el.dataset.angle = angle;
+
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const idx = parseInt(this.dataset.index);
+                        selectItem(idx);
+                    });
+
+                    wrapper.appendChild(el);
+                });
+
+                updatePositions(0);
+                selectItem(0);
+            }
+
+            // ===== 更新位置 + 连接线 =====
+            function updatePositions(rotationDeg) {
+                const items = wrapper.querySelectorAll('.item');
+                const points = [];
+
+                items.forEach((el, index) => {
+                    const baseAngle = parseFloat(el.dataset.angle);
+                    const angleDeg = baseAngle + rotationDeg;
+                    const rad = angleDeg * Math.PI / 180;
+                    const x = cx + radius * Math.cos(rad);
+                    const y = cy + radius * Math.sin(rad);
+
+                    el.style.left = x + 'px';
+                    el.style.top = y + 'px';
+
+                    points.push({ x, y });
+                });
+
+                // 更新连接线（闭合环路）
+                if (points.length > 0) {
+                    let d = '';
+                    points.forEach((p, i) => {
+                        d += (i === 0 ? 'M' : 'L') + p.x + ',' + p.y;
+                    });
+                    d += 'Z'; // 闭合回起点
+                    linePath.setAttribute('d', d);
+                }
+            }
+
+            // ===== 选中 =====
+            function selectItem(index) {
+                const items = wrapper.querySelectorAll('.item');
+                items.forEach((el, i) => {
+                    el.classList.toggle('active', i === index);
+                });
+                selectedIndex = index;
+                if (menuData[index]) {
+                    currentName.textContent = menuData[index].name;
+                    currentIndex.textContent = (index + 1) + ' / ' + menuData.length;
+                }
+            }
+
+            // ===== 切换到指定索引（居中） =====
+            function switchToIndex(index) {
+                const targetAngle = -90 + (360 * index / count);
+                // 让选中的项位于正上方（-90°）
+                const offset = -90 - targetAngle;
+                rotation = offset;
+                updatePositions(rotation);
+                selectItem(index);
+            }
+
+            // ===== 步进切换 =====
+            function stepSwitch(delta) {
+                const dir = delta > 0 ? 1 : -1;
+                const next = (selectedIndex + dir + count) % count;
+                switchToIndex(next);
+            }
+
+            // ===== 鼠标/触摸旋转 =====
+            function getAngle(clientX, clientY) {
+                const rect = wrapper.getBoundingClientRect();
+                const cx2 = rect.left + rect.width / 2;
+                const cy2 = rect.top + rect.height / 2;
+                return Math.atan2(clientY - cy2, clientX - cx2) * 180 / Math.PI;
+            }
+
+            function handlePointerMove(clientX, clientY) {
+                if (!isDragging) return;
+                const angle = getAngle(clientX, clientY);
+                const diff = angle - dragStartAngle;
+                rotation = dragStartRotation + diff;
+                // 限制角度范围，避免疯狂旋转
+                updatePositions(rotation);
+                // 根据当前角度高亮最近项
+                const normalized = ((rotation % 360) + 360) % 360;
+                const rawIndex = (normalized / 360) * count;
+                let idx = Math.round(rawIndex) % count;
+                if (idx < 0) idx += count;
+                selectItem(idx);
+            }
+
+            let dragStartAngle = 0;
+
+            // ===== 事件 =====
+            // 鼠标
+            wrapper.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                dragStartAngle = getAngle(e.clientX, e.clientY);
+                dragStartRotation = rotation;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                handlePointerMove(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+
+            // 触摸
+            wrapper.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                if (!touch) return;
+                isDragging = true;
+                dragStartAngle = getAngle(touch.clientX, touch.clientY);
+                dragStartRotation = rotation;
+            }, { passive: true });
+
+            wrapper.addEventListener('touchmove', function(e) {
+                const touch = e.touches[0];
+                if (!touch || !isDragging) return;
+                handlePointerMove(touch.clientX, touch.clientY);
+            }, { passive: true });
+
+            wrapper.addEventListener('touchend', function() {
+                isDragging = false;
+            }, { passive: true });
+
+            // 滚轮
+            wrapper.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                stepSwitch(e.deltaY);
+            }, { passive: false });
+
+            // 键盘
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    stepSwitch(-1);
+                } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    stepSwitch(1);
+                }
+            });
+
+            // ===== 初始化 =====
+            buildItems();
+            switchToIndex(0);
+
+            // 窗口尺寸变化时重新计算
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    updatePositions(rotation);
+                }, 200);
+            });
+        })();
+    </script>
+</body>
+</html>

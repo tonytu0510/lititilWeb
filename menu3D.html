@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>球体菜单 · 贴合球面</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { 
+            background: #0d0d0d; 
+            overflow: hidden; 
+            font-family: 'Courier New', monospace;
+            user-select: none;
+        }
+        canvas { display: block; }
+
+        /* CSS2D 标签样式 */
+        .menu-label {
+            color: #999;
+            font-size: 14px;
+            font-weight: 400;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(60, 60, 80, 0.3);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            white-space: nowrap;
+        }
+        .menu-label:hover {
+            border-color: #7cb8b8;
+            color: #d0d0d0;
+            background: rgba(30, 40, 50, 0.8);
+            transform: scale(1.05);
+        }
+        .menu-label.active {
+            border-color: #7cb8b8;
+            color: #0d0d0d;
+            background: #7cb8b8;
+            box-shadow: 0 0 40px rgba(124, 184, 184, 0.3);
+            transform: scale(1.1);
+        }
+        .menu-label .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        #currentLabel {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #444;
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 1px;
+            background: rgba(24, 24, 24, 0.8);
+            padding: 10px 28px;
+            border-radius: 30px;
+            border: 1px solid #2a2a2a;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            pointer-events: none;
+        }
+        #currentLabel .name { color: #7cb8b8; font-size: 18px; }
+        #currentLabel .index { color: #555; font-size: 12px; }
+
+        @media (max-width: 550px) {
+            #currentLabel { font-size: 12px; padding: 6px 16px; bottom: 20px; }
+            .menu-label { font-size: 11px; padding: 4px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="currentLabel">
+        <div class="index" id="currentIndex">1 / 10</div>
+        <div class="name" id="currentName">首页</div>
+        <div style="color:#555;font-size:11px;">拖拽旋转 · 滚轮缩放 · 点击切换</div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // ===== 数据 =====
+        const menuData = [
+            { name: '首页', color: '#7cb8b8' },
+            { name: '拆字', color: '#e8a838' },
+            { name: '判证', color: '#c87a7a' },
+            { name: '对合环', color: '#88b8d0' },
+            { name: '笔记', color: '#b8a8d0' },
+            { name: '布线', color: '#80c8a0' },
+            { name: '声明', color: '#d0a888' },
+            { name: '关于', color: '#a0b8c8' },
+            { name: '工具箱', color: '#c8a080' },
+            { name: '二维码', color: '#90b8b8' }
+        ];
+
+        const count = menuData.length;
+
+        // ===== 场景 =====
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d0d0d);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1, 6);
+        camera.lookAt(0, 0, 0);
+
+        // ===== WebGL渲染器 =====
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.prepend(renderer.domElement);
+
+        // ===== CSS2D渲染器（文字标签） =====
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.left = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none'; // 让点击穿透到 WebGL
+        document.body.prepend(labelRenderer.domElement);
+
+        // ===== 控制器 =====
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.8;
+        controls.minDistance = 2.5;
+        controls.maxDistance = 12;
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        // ===== 灯光 =====
+        scene.add(new THREE.AmbientLight(0x404060, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffeedd, 2);
+        dirLight.position.set(2, 5, 3);
+        scene.add(dirLight);
+        scene.add(new THREE.DirectionalLight(0x4488ff, 0.5));
+        scene.add(new THREE.DirectionalLight(0x7cb8b8, 0.2));
+
+        // ===== 球体 =====
+        const sphereRadius = 1.8;
+
+        const sphereGeo = new THREE.SphereGeometry(sphereRadius * 0.95, 64, 64);
+        const sphereMat = new THREE.MeshPhysicalMaterial({
+            color: 0x1a2a2a,
+            metalness: 0.1,
+            roughness: 0.3,
+            transparent: true,
+            opacity: 0.4,
+            clearcoat: 0.05,
+            clearcoatRoughness: 0.4,
+        });
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+        scene.add(sphere);
+
+        // 线框
+        const wireframeGeo = new THREE.SphereGeometry(sphereRadius * 0.97, 24, 16);
+        const wireframeMat = new THREE.MeshBasicMaterial({
+            color: 0x2a4a4a,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.1
+        });
+        const wireframe = new THREE.Mesh(wireframeGeo, wireframeMat);
+        scene.add(wireframe);
+
+        // 发光
+        const glowGeo = new THREE.SphereGeometry(sphereRadius * 1.08, 32, 32);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0x7cb8b8,
+            transparent: true,
+            opacity: 0.03
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        scene.add(glow);
+
+        // ===== 球面上的点 =====
+        function fibonacciSphere(samples, radius) {
+            const pts = [];
+            const phi = Math.PI * (3 - Math.sqrt(5));
+            for (let i = 0; i < samples; i++) {
+                const y = 1 - (i / (samples - 1)) * 2;
+                const r = Math.sqrt(1 - y * y);
+                const theta = phi * i;
+                pts.push(new THREE.Vector3(
+                    Math.cos(theta) * r * radius,
+                    y * radius,
+                    Math.sin(theta) * r * radius
+                ));
+            }
+            return pts;
+        }
+
+        const positions = fibonacciSphere(count, sphereRadius * 1.12);
+
+        // ===== 创建 CSS2D 标签 =====
+        const labelGroup = new THREE.Group();
+        scene.add(labelGroup);
+
+        const labels = [];
+        const labelPositions = [];
+
+        menuData.forEach((item, index) => {
+            const pos = positions[index];
+
+            // 创建标签 DOM 元素
+            const div = document.createElement('div');
+            div.className = 'menu-label';
+            div.textContent = item.name;
+            div.style.borderColor = item.color;
+            div.dataset.index = index;
+
+            // 点击事件（因为 CSS2D 默认不捕获点击，我们需要在 div 上直接绑定）
+            div.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(div.dataset.index);
+                updateSelection(idx);
+            });
+
+            const label = new CSS2DObject(div);
+            label.position.copy(pos);
+            label.userData = { index, name: item.name };
+            labelGroup.add(label);
+            labels.push(label);
+            labelPositions.push(pos.clone());
+        });
+
+        // ===== 连接线（环形） =====
+        const sortedIndices = labelPositions.map((p, i) => ({ i, angle: Math.atan2(p.y, p.x) }));
+        sortedIndices.sort((a, b) => a.angle - b.angle);
+        const sortedPos = sortedIndices.map(s => labelPositions[s.i]);
+
+        const curvePoints = [];
+        const segments = 100;
+        for (let i = 0; i <= segments; i++) {
+            const t = i / segments;
+            const idx = t * sortedPos.length;
+            const idx0 = Math.floor(idx) % sortedPos.length;
+            const idx1 = (idx0 + 1) % sortedPos.length;
+            const frac = idx - Math.floor(idx);
+            const p0 = sortedPos[idx0];
+            const p1 = sortedPos[idx1];
+            curvePoints.push(new THREE.Vector3().lerpVectors(p0, p1, frac));
+        }
+
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
+        const lineMat = new THREE.LineBasicMaterial({ 
+            color: 0x3a6a6a, 
+            transparent: true, 
+            opacity: 0.25
+        });
+        const line = new THREE.Line(lineGeo, lineMat);
+        scene.add(line);
+
+        // 第二根细线
+        const lineMat2 = new THREE.LineBasicMaterial({ 
+            color: 0x4a7a7a, 
+            transparent: true, 
+            opacity: 0.08
+        });
+        const line2 = new THREE.Line(lineGeo.clone(), lineMat2);
+        line2.scale.set(1.03, 1.03, 1.03);
+        scene.add(line2);
+
+        // ===== 星空 =====
+        const starsGeo = new THREE.BufferGeometry();
+        const starCount = 600;
+        const starPos = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 150;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.4,
+            sizeAttenuation: true,
+        });
+        const stars = new THREE.Points(starsGeo, starMat);
+        scene.add(stars);
+
+        // ===== 选中高亮 =====
+        let selectedIndex = 0;
+
+        function updateSelection(index) {
+            selectedIndex = index;
+            const item = menuData[index];
+            document.getElementById('currentName').textContent = item.name;
+            document.getElementById('currentIndex').textContent = (index + 1) + ' / ' + count;
+
+            labels.forEach((label, i) => {
+                const div = label.element;
+                div.classList.toggle('active', i === index);
+                if (i === index) {
+                    div.style.borderColor = '#7cb8b8';
+                } else {
+                    div.style.borderColor = menuData[i].color;
+                }
+            });
+        }
+
+        updateSelection(0);
+
+        // ===== 键盘 =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                updateSelection((selectedIndex - 1 + count) % count);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                updateSelection((selectedIndex + 1) % count);
+            }
+        });
+
+        // ===== 自适应 =====
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth, h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            labelRenderer.setSize(w, h);
+        });
+
+        // ===== 让 CSS2D 元素可点击 =====
+        // CSS2DRenderer 默认 pointer-events: none，我们需要在容器上允许点击
+        labelRenderer.domElement.style.pointerEvents = 'auto';
+        // 但要让点击穿透到背景，只让标签本身接收点击
+        labelRenderer.domElement.querySelectorAll('.menu-label').forEach(el => {
+            el.style.pointerEvents = 'auto';
+        });
+
+        // ===== 动画循环 =====
+        function animate() {
+            requestAnimationFrame(animate);
+
+            sphere.rotation.y += 0.0006;
+            wireframe.rotation.y += 0.0006;
+            glow.rotation.y += 0.0003;
+            stars.rotation.y += 0.0002;
+
+            // 标签组跟随球体旋转（保持标签在球面上的位置）
+            labelGroup.rotation.y = sphere.rotation.y;
+
+            controls.update();
+
+            // 先渲染 WebGL，再渲染 CSS2D（覆盖在上面）
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        animate();
+
+        console.log('🌍 球体菜单已加载 — 文字贴合球面，CSS2D 渲染');
+    </script>
+</body>
+</html>
