@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拆字 · 环形多级菜单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== 主容器 ===== */
+        #app {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ===== 环形菜单容器 ===== */
+        #ringContainer {
+            position: relative;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            /* 调试用：可取消注释查看中心参考线 */
+            /* border: 1px solid rgba(255,255,255,0.05); */
+        }
+
+        /* ===== 内环（一级菜单） ===== */
+        .inner-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 220px;
+            height: 220px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(60, 60, 80, 0.2);
+            background: rgba(24, 24, 24, 0.3);
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+        .inner-ring .ring-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #444;
+            font-size: 12px;
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        /* ===== 外环（二级菜单弧段） ===== */
+        .outer-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 380px;
+            height: 380px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            /* 弧段背景由 JS 动态绘制 */
+        }
+
+        /* ===== 菜单项（通用） ===== */
+        .menu-item {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid #3d3d3d;
+            color: #999;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            font-family: 'Courier New', monospace;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            margin-left: -24px;
+            margin-top: -24px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+        .menu-item:hover {
+            border-color: #7cb8b8;
+            color: #d0d0d0;
+            transform: scale(1.08);
+        }
+        .menu-item.active {
+            background: #7cb8b8;
+            color: #0d0d0d;
+            border-color: #7cb8b8;
+            box-shadow: 0 0 40px rgba(124, 184, 184, 0.3);
+        }
+
+        /* ===== 二级菜单项（弧段上的子项） ===== */
+        .sub-item {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid #4a4a5a;
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+            font-family: 'Courier New', monospace;
+            text-decoration: none;
+            font-weight: 300;
+            margin-left: -20px;
+            margin-top: -20px;
+            z-index: 8;
+            pointer-events: auto;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        .sub-item:hover {
+            border-color: #7cb8b8;
+            color: #d0d0d0;
+            transform: scale(1.1);
+            z-index: 12;
+        }
+        .sub-item.active {
+            background: #7cb8b8;
+            color: #0d0d0d;
+            border-color: #7cb8b8;
+        }
+
+        /* ===== 左右滑动箭头 ===== */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(26, 26, 26, 0.7);
+            border: 1px solid #3d3d3d;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            pointer-events: auto;
+        }
+        .slide-arrow:hover {
+            background: rgba(60, 60, 80, 0.8);
+            color: #d0d0d0;
+            border-color: #7cb8b8;
+        }
+        .slide-arrow.left {
+            left: -10px;
+        }
+        .slide-arrow.right {
+            right: -10px;
+        }
+
+        /* ===== 当前选中显示 ===== */
+        #currentLabel {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #444;
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 1px;
+            background: rgba(24, 24, 24, 0.8);
+            padding: 8px 24px;
+            border-radius: 30px;
+            border: 1px solid #2a2a2a;
+            backdrop-filter: blur(10px);
+            transition: opacity 0.4s;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #currentLabel .name {
+            color: #7cb8b8;
+            font-size: 18px;
+        }
+        #currentLabel .index {
+            color: #555;
+            font-size: 12px;
+        }
+
+        /* ===== 标题 ===== */
+        #pageTitle {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 16px;
+            letter-spacing: 4px;
+            z-index: 50;
+            pointer-events: none;
+            background: rgba(13, 13, 13, 0.6);
+            padding: 6px 20px;
+            border-radius: 30px;
+            border: 1px solid #1a1a1a;
+            backdrop-filter: blur(4px);
+        }
+        #pageTitle span {
+            color: #7cb8b8;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 550px) {
+            #ringContainer {
+                width: 340px;
+                height: 340px;
+            }
+            .inner-ring {
+                width: 160px;
+                height: 160px;
+            }
+            .outer-ring {
+                width: 270px;
+                height: 270px;
+            }
+            .menu-item {
+                width: 38px;
+                height: 38px;
+                font-size: 11px;
+                margin-left: -19px;
+                margin-top: -19px;
+            }
+            .sub-item {
+                width: 32px;
+                height: 32px;
+                font-size: 10px;
+                margin-left: -16px;
+                margin-top: -16px;
+            }
+            .slide-arrow {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+            #currentLabel {
+                font-size: 12px;
+                padding: 6px 16px;
+                bottom: 20px;
+            }
+            #pageTitle {
+                font-size: 13px;
+                padding: 4px 14px;
+                top: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pageTitle">⬡ <span>拆字</span> · 环形多级</div>
+
+    <div id="currentLabel">
+        <div class="index" id="currentIndex">1 / 4</div>
+        <div class="name" id="currentName">独体字</div>
+        <div style="color:#555;font-size:11px;">点击一级 · 二级弧段滑动</div>
+    </div>
+
+    <div id="app">
+        <div id="ringContainer">
+            <!-- 内环（一级菜单容器） -->
+            <div class="inner-ring" id="innerRing">
+                <div class="ring-label">一级</div>
+            </div>
+            <!-- 外环（二级菜单弧段容器） -->
+            <div class="outer-ring" id="outerRing">
+                <!-- 滑动箭头 -->
+                <div class="slide-arrow left" id="arrowLeft">‹</div>
+                <div class="slide-arrow right" id="arrowRight">›</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // =============================================
+            //  1. 数据：拆字分类 + 子项
+            // =============================================
+            const menuData = [{
+                id: '独体字',
+                name: '独体字',
+                href: '#',
+                children: [
+                    { name: '人', href: 'char.html?char=人' },
+                    { name: '口', href: 'char.html?char=口' },
+                    { name: '日', href: 'char.html?char=日' },
+                    { name: '月', href: 'char.html?char=月' },
+                    { name: '山', href: 'char.html?char=山' },
+                    { name: '水', href: 'char.html?char=水' }
+                ]
+            }, {
+                id: '合体字',
+                name: '合体字',
+                href: '#',
+                children: [
+                    { name: '明', href: 'char.html?char=明' },
+                    { name: '林', href: 'char.html?char=林' },
+                    { name: '休', href: 'char.html?char=休' },
+                    { name: '相', href: 'char.html?char=相' },
+                    { name: '品', href: 'char.html?char=品' }
+                ]
+            }, {
+                id: '会意字',
+                name: '会意字',
+                href: '#',
+                children: [
+                    { name: '武', href: 'char.html?char=武' },
+                    { name: '信', href: 'char.html?char=信' },
+                    { name: '仁', href: 'char.html?char=仁' },
+                    { name: '智', href: 'char.html?char=智' },
+                    { name: '勇', href: 'char.html?char=勇' }
+                ]
+            }, {
+                id: '形声字',
+                name: '形声字',
+                href: '#',
+                children: [
+                    { name: '江', href: 'char.html?char=江' },
+                    { name: '河', href: 'char.html?char=河' },
+                    { name: '湖', href: 'char.html?char=湖' },
+                    { name: '海', href: 'char.html?char=海' },
+                    { name: '洋', href: 'char.html?char=洋' }
+                ]
+            }];
+
+            const ringContainer = document.getElementById('ringContainer');
+            const innerRing = document.getElementById('innerRing');
+            const outerRing = document.getElementById('outerRing');
+            const currentName = document.getElementById('currentName');
+            const currentIndex = document.getElementById('currentIndex');
+            const arrowLeft = document.getElementById('arrowLeft');
+            const arrowRight = document.getElementById('arrowRight');
+
+            // =============================================
+            //  2. 状态
+            // =============================================
+            let selectedIndex = 0; // 当前选中一级菜单索引
+            let subOffset = 0; // 二级菜单滑动偏移（子项数量）
+            let isDragging = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let isOpen = false;
+            let rotationOffset = 0;
+
+            const total = menuData.length;
+
+            // =============================================
+            //  3. 工具：计算圆上点的位置
+            // =============================================
+            function getPointOnCircle(cx, cy, radius, angleDeg) {
+                const rad = angleDeg * Math.PI / 180;
+                return {
+                    x: cx + radius * Math.cos(rad),
+                    y: cy + radius * Math.sin(rad)
+                };
+            }
+
+            // =============================================
+            //  4. 构建一级菜单（内环）
+            // =============================================
+            function buildInnerRing() {
+                innerRing.querySelectorAll('.menu-item').forEach(el => el.remove());
+
+                const cx = innerRing.offsetWidth / 2;
+                const cy = innerRing.offsetHeight / 2;
+                const radius = Math.min(innerRing.offsetWidth, innerRing.offsetHeight) * 0.38;
+
+                menuData.forEach((item, index) => {
+                    const angle = -90 + (360 * index / total);
+                    const pos = getPointOnCircle(cx, cy, radius, angle);
+
+                    const el = document.createElement('a');
+                    el.className = 'menu-item';
+                    el.textContent = item.name.length > 3 ? item.name.slice(0, 3) : item.name;
+                    el.title = item.name;
+                    el.href = item.href || '#';
+                    el.dataset.index = index;
+
+                    el.style.left = pos.x + 'px';
+                    el.style.top = pos.y + 'px';
+
+                    // 点击一级菜单 → 切换选中，更新二级
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const idx = parseInt(this.dataset.index);
+                        selectPrimary(idx);
+                        // 如果是可跳转的，可以跳转
+                        if (menuData[idx].href && menuData[idx].href !== '#') {
+                            window.location.href = menuData[idx].href;
+                        }
+                    });
+
+                    // 鼠标悬停 → 自动切换二级
+                    el.addEventListener('mouseenter', function() {
+                        const idx = parseInt(this.dataset.index);
+                        selectPrimary(idx);
+                    });
+
+                    innerRing.appendChild(el);
+                });
+            }
+
+            // =============================================
+            //  5. 构建二级菜单（外环弧段）
+            // =============================================
+            function buildOuterRing(primaryIndex, offset) {
+                outerRing.querySelectorAll('.sub-item').forEach(el => el.remove());
+
+                const children = menuData[primaryIndex].children || [];
+                if (children.length === 0) return;
+
+                const cx = outerRing.offsetWidth / 2;
+                const cy = outerRing.offsetHeight / 2;
+                const radius = Math.min(outerRing.offsetWidth, outerRing.offsetHeight) * 0.38;
+
+                // 限制可见数量：最多同时显示 6 个，但保留所有子项在滑动范围内
+                const visibleCount = Math.min(children.length, 6);
+                const totalItems = children.length;
+                const startAngle = -120;
+                const endAngle = -60;
+                const angleRange = endAngle - startAngle;
+                const step = angleRange / (visibleCount - 1 || 1);
+
+                // 计算偏移后的显示范围
+                const maxOffset = Math.max(0, totalItems - visibleCount);
+                const clampedOffset = Math.max(0, Math.min(offset, maxOffset));
+
+                // 显示从 clampedOffset 开始的 visibleCount 个子项
+                for (let i = 0; i < visibleCount; i++) {
+                    const idx = clampedOffset + i;
+                    if (idx >= totalItems) break;
+
+                    const item = children[idx];
+                    const angle = startAngle + i * step;
+                    const pos = getPointOnCircle(cx, cy, radius, angle);
+
+                    const el = document.createElement('a');
+                    el.className = 'sub-item';
+                    el.textContent = item.name.length > 2 ? item.name.slice(0, 2) : item.name;
+                    el.title = item.name;
+                    el.href = item.href || '#';
+                    el.dataset.subIndex = idx;
+
+                    el.style.left = pos.x + 'px';
+                    el.style.top = pos.y + 'px';
+
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        if (href && href !== '#') {
+                            window.location.href = href;
+                        }
+                    });
+
+                    outerRing.appendChild(el);
+                }
+
+                // 更新箭头状态
+                const canPrev = clampedOffset > 0;
+                const canNext = clampedOffset < totalItems - visibleCount;
+                arrowLeft.style.opacity = canPrev ? '1' : '0.2';
+                arrowLeft.style.pointerEvents = canPrev ? 'auto' : 'none';
+                arrowRight.style.opacity = canNext ? '1' : '0.2';
+                arrowRight.style.pointerEvents = canNext ? 'auto' : 'none';
+
+                // 保存当前偏移量
+                outerRing.dataset.offset = clampedOffset;
+                outerRing.dataset.total = totalItems;
+                outerRing.dataset.visible = visibleCount;
+            }
+
+            // =============================================
+            //  6. 选中一级菜单
+            // =============================================
+            function selectPrimary(index) {
+                if (selectedIndex === index && outerRing.dataset.offset !== undefined) {
+                    // 如果已经选中，只刷新高亮
+                    updatePrimaryHighlight(index);
+                    return;
+                }
+                selectedIndex = index;
+                subOffset = 0; // 切换一级时重置二级滑动
+                updatePrimaryHighlight(index);
+                buildOuterRing(index, subOffset);
+                updateLabel(index);
+            }
+
+            function updatePrimaryHighlight(index) {
+                innerRing.querySelectorAll('.menu-item').forEach((el, i) => {
+                    el.classList.toggle('active', i === index);
+                });
+            }
+
+            function updateLabel(index) {
+                const item = menuData[index];
+                if (item) {
+                    currentName.textContent = item.name;
+                    currentIndex.textContent = (index + 1) + ' / ' + total;
+                }
+            }
+
+            // =============================================
+            //  7. 二级滑动
+            // =============================================
+            function slideSub(direction) {
+                const totalItems = parseInt(outerRing.dataset.total) || 0;
+                const visibleCount = parseInt(outerRing.dataset.visible) || 4;
+                const maxOffset = Math.max(0, totalItems - visibleCount);
+                let currentOffset = parseInt(outerRing.dataset.offset) || 0;
+                const newOffset = Math.max(0, Math.min(currentOffset + direction, maxOffset));
+                if (newOffset !== currentOffset) {
+                    subOffset = newOffset;
+                    buildOuterRing(selectedIndex, subOffset);
+                }
+            }
+
+            // =============================================
+            //  8. 事件绑定
+            // =============================================
+            // 箭头点击
+            arrowLeft.addEventListener('click', function(e) {
+                e.stopPropagation();
+                slideSub(-1);
+            });
+            arrowRight.addEventListener('click', function(e) {
+                e.stopPropagation();
+                slideSub(1);
+            });
+
+            // 鼠标在二级区域滑动切换
+            let subDragStartX = 0;
+            outerRing.addEventListener('mousedown', function(e) {
+                if (e.target.closest('.sub-item') || e.target.closest('.slide-arrow')) return;
+                isDragging = true;
+                subDragStartX = e.clientX;
+                outerRing.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                const delta = e.clientX - subDragStartX;
+                if (Math.abs(delta) > 30) {
+                    const dir = delta > 0 ? -1 : 1;
+                    slideSub(dir);
+                    subDragStartX = e.clientX;
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    outerRing.style.cursor = 'default';
+                }
+            });
+
+            // 触摸滑动
+            let touchStartX = 0;
+            outerRing.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                if (!touch) return;
+                if (e.target.closest('.sub-item') || e.target.closest('.slide-arrow')) return;
+                isDragging = true;
+                touchStartX = touch.clientX;
+            }, { passive: true });
+
+            outerRing.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                if (!touch) return;
+                const delta = touch.clientX - touchStartX;
+                if (Math.abs(delta) > 30) {
+                    const dir = delta > 0 ? -1 : 1;
+                    slideSub(dir);
+                    touchStartX = touch.clientX;
+                }
+            }, { passive: true });
+
+            outerRing.addEventListener('touchend', function() {
+                isDragging = false;
+            }, { passive: true });
+
+            // 键盘
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    slideSub(-1);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    slideSub(1);
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const dir = e.key === 'ArrowUp' ? -1 : 1;
+                    const next = (selectedIndex + dir + total) % total;
+                    selectPrimary(next);
+                }
+            });
+
+            // =============================================
+            //  9. 窗口自适应
+            // =============================================
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    // 重建所有
+                    buildInnerRing();
+                    buildOuterRing(selectedIndex, subOffset);
+                    updatePrimaryHighlight(selectedIndex);
+                    updateLabel(selectedIndex);
+                }, 300);
+            });
+
+            // =============================================
+            //  10. 启动
+            // =============================================
+            function init() {
+                buildInnerRing();
+                // 默认选中第一个
+                selectPrimary(0);
+                // 确保二级菜单初始可见
+                setTimeout(() => {
+                    buildOuterRing(0, 0);
+                }, 100);
+            }
+
+            // 等待 DOM 完全渲染
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            console.log('🔄 环形多级菜单已加载');
+            console.log('📂 一级菜单: ' + menuData.map(d => d.name).join(', '));
+            console.log('🖱 悬停一级切换 · 点击二级跳转 · 左右滑动翻页');
+
+        })();
+    </script>
+
+</body>
+</html>

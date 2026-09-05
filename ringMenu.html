@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>环形多级 · 独立版</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #menuTrigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            border: 1px solid #3d3d3d;
+            color: #d0d0d0;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            user-select: none;
+        }
+        #menuTrigger:hover { background: #3d3d3d; }
+        #menuTrigger.active { background: #7cb8b8; color: #0d0d0d; }
+
+        #menuContainer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 480px;
+            height: 480px;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+            display: none;
+        }
+        #menuContainer.active {
+            pointer-events: auto;
+            display: block;
+        }
+
+        #menuBg {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(24,24,24,0.92);
+            backdrop-filter: blur(6px);
+            border-left: 1px solid #2a2a2a;
+            border-top: 1px solid #2a2a2a;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            border-radius: 480px 0 0 0;
+        }
+        #menuContainer.active #menuBg { opacity: 1; }
+
+        .layer-wrapper {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .menu-item {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid #3d3d3d;
+            color: #999;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            font-family: 'Courier New', monospace;
+            text-decoration: none;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            margin-left: -22px;
+            margin-top: -22px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+        .menu-item:hover {
+            border-color: #7cb8b8;
+            color: #d0d0d0;
+            transform: scale(1.08);
+        }
+        .menu-item.active {
+            background: #7cb8b8;
+            color: #0d0d0d;
+            border-color: #7cb8b8;
+            box-shadow: 0 0 40px rgba(124,184,184,0.3);
+        }
+        .menu-item.sub {
+            width: 36px; height: 36px; font-size: 10px;
+            margin-left: -18px; margin-top: -18px;
+            z-index: 5;
+        }
+        .menu-item.sub2 {
+            width: 32px; height: 32px; font-size: 9px;
+            margin-left: -16px; margin-top: -16px;
+            z-index: 4;
+        }
+        .menu-item.sub3 {
+            width: 28px; height: 28px; font-size: 8px;
+            margin-left: -14px; margin-top: -14px;
+            z-index: 3;
+        }
+
+        .slide-arrow {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(26,26,26,0.8);
+            border: 1px solid #3d3d3d;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            pointer-events: auto;
+        }
+        .slide-arrow:hover {
+            background: rgba(60,60,80,0.8);
+            color: #d0d0d0;
+            border-color: #7cb8b8;
+        }
+
+        #currentLabel {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            color: #444;
+            font-size: 13px;
+            letter-spacing: 1px;
+            z-index: 1001;
+            pointer-events: none;
+            text-align: right;
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        #currentLabel.show { opacity: 1; }
+        #currentLabel .name { color: #7cb8b8; font-size: 16px; }
+        #currentLabel .index { color: #555; font-size: 11px; }
+
+        #pageContent {
+            color: #444;
+            font-size: 14px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20vh;
+            letter-spacing: 1px;
+            line-height: 2;
+        }
+        #pageContent span { color: #7cb8b8; }
+
+        @media (max-width: 500px) {
+            #menuContainer { width: 340px; height: 340px; }
+            .menu-item { width: 36px; height: 36px; font-size: 10px; margin-left: -18px; margin-top: -18px; }
+            .menu-item.sub { width: 30px; height: 30px; font-size: 9px; margin-left: -15px; margin-top: -15px; }
+            .menu-item.sub2 { width: 26px; height: 26px; font-size: 8px; margin-left: -13px; margin-top: -13px; }
+            .menu-item.sub3 { width: 22px; height: 22px; font-size: 7px; margin-left: -11px; margin-top: -11px; }
+            .slide-arrow { width: 22px; height: 22px; font-size: 11px; }
+            #menuTrigger { width: 50px; height: 50px; font-size: 22px; bottom: 20px; right: 20px; }
+            #currentLabel { bottom: 80px; right: 20px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pageContent"><span>⬡ 环形多级</span><br>悬停展开 · 点击跳转</div>
+
+    <div id="currentLabel">
+        <div class="index" id="currentIndex">1 / 14</div>
+        <div class="name" id="currentName">首页</div>
+        <div style="color:#555;font-size:11px;">悬停展开 · 点击跳转</div>
+    </div>
+
+    <button id="menuTrigger">☰</button>
+
+    <div id="menuContainer">
+        <div id="menuBg"></div>
+        <div class="layer-wrapper" id="layerWrapper"></div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // =============================================
+            //  一级菜单数据（common.js 原有的链接）
+            // =============================================
+            var menuData = [{
+                name: '首页',
+                color: '#7cb8b8',
+                href: 'index.html?M=1',
+                children: [
+                    { name: '子页1', href: '#' },
+                    { name: '子页2', href: '#' }
+                ]
+            }, {
+                name: '工具箱',
+                color: '#e8a838',
+                href: 'tools.html',
+                children: [
+                    { name: '工具1', href: '#' },
+                    { name: '工具2', href: '#' }
+                ]
+            }, {
+                name: '二维码',
+                color: '#c87a7a',
+                href: 'qrCode.html',
+                children: [
+                    { name: '扫码', href: '#' },
+                    { name: '生成', href: '#' }
+                ]
+            }, {
+                name: '对合环',
+                color: '#88b8d0',
+                href: 'nestedInvolutionRingHuge.html',
+                children: [
+                    { name: '环1', href: '#' },
+                    { name: '环2', href: '#' }
+                ]
+            }, {
+                name: 'RSTUV',
+                color: '#b8a8d0',
+                href: 'chinaClock.html',
+                children: [
+                    { name: 'R', href: '#' },
+                    { name: 'S', href: '#' }
+                ]
+            }, {
+                name: '太阳系',
+                color: '#80c8a0',
+                href: 'cosmos.html',
+                children: [
+                    { name: '行星', href: '#' },
+                    { name: '恒星', href: '#' }
+                ]
+            }, {
+                name: '拆字',
+                color: '#d0a888',
+                href: 'fontAll.html',
+                children: [
+                    { name: '独体', href: '#' },
+                    { name: '合体', href: '#' }
+                ]
+            }, {
+                name: '缘分测试',
+                color: '#a0b8c8',
+                href: 'namePairing.html',
+                children: [
+                    { name: '测1', href: '#' },
+                    { name: '测2', href: '#' }
+                ]
+            }, {
+                name: '判证',
+                color: '#c8a080',
+                href: 'panding.html',
+                children: [
+                    { name: '判1', href: '#' },
+                    { name: '判2', href: '#' }
+                ]
+            }, {
+                name: '130演示',
+                color: '#90b8b8',
+                href: '130demo.html',
+                children: [
+                    { name: '演示1', href: '#' },
+                    { name: '演示2', href: '#' }
+                ]
+            }, {
+                name: '笔记',
+                color: '#7cb8b8',
+                href: 'notes.html',
+                children: [
+                    { name: '笔记1', href: '#' },
+                    { name: '笔记2', href: '#' }
+                ]
+            }, {
+                name: '布线笔记',
+                color: '#e8a838',
+                href: 'cable.html',
+                children: [
+                    { name: '布线1', href: '#' },
+                    { name: '布线2', href: '#' }
+                ]
+            }, {
+                name: '关于我',
+                color: '#c87a7a',
+                href: 'aboutMe.html',
+                children: [
+                    { name: '关于1', href: '#' },
+                    { name: '关于2', href: '#' }
+                ]
+            }, {
+                name: '声明',
+                color: '#88b8d0',
+                href: 'statement.html',
+                children: [
+                    { name: '声明1', href: '#' },
+                    { name: '声明2', href: '#' }
+                ]
+            }, {
+                name: '导航',
+                color: '#88b8d0',
+                href: 'ringMenu.html',
+                children: [
+                    { name: '导航1', href: '#' },
+                    { name: '导航2', href: '#' }
+                ]
+            }];
+
+            var container = document.getElementById('menuContainer');
+            var trigger = document.getElementById('menuTrigger');
+            var layerWrapper = document.getElementById('layerWrapper');
+            var currentName = document.getElementById('currentName');
+            var currentIndex = document.getElementById('currentIndex');
+            var label = document.getElementById('currentLabel');
+
+            var isOpen = false;
+            var layerOffsets = {};
+            var rotationOffset = 0;
+
+            function RingMenu(data, options) {
+                this.data = data || [];
+                this.options = Object.assign({
+                    baseRadius: 0.28,
+                    radiusStep: 0.12,
+                    maxVisible: 6
+                }, options || {});
+                this.selectedPath = [0];
+                this.offsets = {};
+                this._lastHoverPrimary = -1;
+            }
+
+            RingMenu.prototype.getLayerData = function(level) {
+                if (!this.data || !Array.isArray(this.data)) return [];
+                var data = this.data;
+                for (var i = 0; i < level; i++) {
+                    var idx = (this.selectedPath && this.selectedPath[i]) || 0;
+                    if (data && data[idx] && data[idx].children && Array.isArray(data[idx].children)) {
+                        data = data[idx].children;
+                    } else {
+                        return [];
+                    }
+                }
+                return data || [];
+            };
+
+            RingMenu.prototype.getLayerColor = function(level) {
+                if (!this.data || !Array.isArray(this.data)) return '#7cb8b8';
+                var data = this.data;
+                var color = '#7cb8b8';
+                for (var i = 0; i <= level; i++) {
+                    var idx = (this.selectedPath && this.selectedPath[i]) || 0;
+                    if (data && data[idx] && data[idx].color) {
+                        color = data[idx].color;
+                    }
+                    if (i < level && data && data[idx] && data[idx].children && Array.isArray(data[idx].children)) {
+                        data = data[idx].children;
+                    }
+                }
+                return color;
+            };
+
+            RingMenu.prototype.getPathNames = function() {
+                if (!this.data || !Array.isArray(this.data)) return [];
+                var names = [];
+                var data = this.data;
+                for (var i = 0; i < this.selectedPath.length; i++) {
+                    var idx = this.selectedPath[i] || 0;
+                    if (data && data[idx]) {
+                        names.push(data[idx].name || '?');
+                        if (data[idx].children && Array.isArray(data[idx].children)) {
+                            data = data[idx].children;
+                        } else break;
+                    } else break;
+                }
+                return names;
+            };
+
+            RingMenu.prototype.selectItem = function(level, index, callback) {
+                if (!this.selectedPath) this.selectedPath = [0];
+                this.selectedPath[level] = index;
+                while (this.selectedPath.length > level + 1) {
+                    this.selectedPath.pop();
+                }
+                var nextData = this.getLayerData(level + 1);
+                if (nextData && nextData.length > 0) {
+                    this.selectedPath.push(0);
+                }
+                this.offsets = this.offsets || {};
+                if (callback) callback();
+            };
+
+            RingMenu.prototype.slideLayer = function(level, dir, callback) {
+                var data = this.getLayerData(level);
+                if (!data || data.length === 0) return;
+                var total = data.length;
+                var maxVis = Math.min(total, this.options.maxVisible || 6);
+                var maxOff = Math.max(0, total - maxVis);
+                if (!this.offsets) this.offsets = {};
+                var cur = this.offsets[level] || 0;
+                var nxt = Math.max(0, Math.min(cur + dir, maxOff));
+                if (nxt !== cur) {
+                    this.offsets[level] = nxt;
+                    if (callback) callback();
+                }
+            };
+
+            RingMenu.prototype.getPrimaryIndex = function() {
+                return (this.selectedPath && this.selectedPath[0]) || 0;
+            };
+
+            RingMenu.prototype.setPrimaryIndex = function(idx) {
+                if (!this.selectedPath) this.selectedPath = [0];
+                if (this.selectedPath[0] === idx && this.selectedPath.length > 1) {
+                    return false;
+                }
+                this.selectedPath[0] = idx;
+                while (this.selectedPath.length > 1) {
+                    this.selectedPath.pop();
+                }
+                var data = this.getLayerData(1);
+                if (data && data.length > 0) {
+                    this.selectedPath.push(0);
+                }
+                return true;
+            };
+
+            RingMenu.prototype.resetToPrimary = function() {
+                if (!this.selectedPath) this.selectedPath = [0];
+                while (this.selectedPath.length > 1) {
+                    this.selectedPath.pop();
+                }
+                this.offsets = {};
+                this._lastHoverPrimary = -1;
+            };
+
+            var ringMenu = new RingMenu(menuData);
+
+            function getPoint(cx, cy, r, deg) {
+                var rad = deg * Math.PI / 180;
+                return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+            }
+
+            function getTriggerCenter() {
+                var containerRect = container.getBoundingClientRect();
+                var triggerRect = trigger.getBoundingClientRect();
+                var cx = triggerRect.left + triggerRect.width / 2 - containerRect.left;
+                var cy = triggerRect.top + triggerRect.height / 2 - containerRect.top;
+                return { cx: cx, cy: cy };
+            }
+
+            function getSubClass(level) {
+                if (level === 1) return 'sub';
+                if (level === 2) return 'sub2';
+                if (level >= 3) return 'sub3';
+                return '';
+            }
+
+            function handleItemClick(e) {
+                var el = e.currentTarget;
+                var href = el.getAttribute('href');
+                if (href && href !== '#') {
+                    toggleMenu(false);
+                    setTimeout(function() {
+                        window.location.href = href;
+                    }, 200);
+                }
+                e.preventDefault();
+            }
+
+            function renderMenu() {
+                layerWrapper.innerHTML = '';
+                var W = container.offsetWidth || 480;
+                var H = container.offsetHeight || 480;
+                var center = getTriggerCenter();
+                var cx = center.cx;
+                var cy = center.cy;
+                var count0 = menuData.length;
+
+                var radius0 = Math.min(W, H) * ringMenu.options.baseRadius;
+                var startAngle0 = -180;
+                var angleStep0 = 360 / count0;
+
+                var selectedPath = ringMenu.selectedPath || [0];
+
+                menuData.forEach(function(item, idx) {
+                    if (!item) return;
+                    var angle = startAngle0 + (angleStep0 * idx) + rotationOffset;
+                    var pos = getPoint(cx, cy, radius0, angle);
+                    var el = document.createElement('a');
+                    el.className = 'menu-item';
+                    el.textContent = item.name ? item.name.slice(0, 3) : '?';
+                    el.title = item.name || '';
+                    el.href = item.href || '#';
+                    el.dataset.level = 0;
+                    el.dataset.index = idx;
+                    el.style.left = pos.x + 'px';
+                    el.style.top = pos.y + 'px';
+                    if (selectedPath[0] === idx) el.classList.add('active');
+
+                    el.addEventListener('mouseenter', function(e) {
+                        var el2 = e.currentTarget;
+                        var idx2 = parseInt(el2.dataset.index);
+                        if (ringMenu._lastHoverPrimary === idx2) return;
+                        ringMenu._lastHoverPrimary = idx2;
+                        var changed = ringMenu.setPrimaryIndex(idx2);
+                        if (changed) {
+                            renderMenu();
+                            updateLabel();
+                        }
+                    });
+
+                    el.addEventListener('click', handleItemClick);
+                    layerWrapper.appendChild(el);
+                });
+
+                for (var level = 1; level < selectedPath.length; level++) {
+                    var data = ringMenu.getLayerData(level);
+                    if (!data || data.length === 0) break;
+
+                    var color = ringMenu.getLayerColor(level);
+                    var total = data.length;
+                    var maxVis = Math.min(total, ringMenu.options.maxVisible || 6);
+                    var offset = ringMenu.offsets[level] || 0;
+                    var maxOff = Math.max(0, total - maxVis);
+                    var clo = Math.max(0, Math.min(offset, maxOff));
+                    var visible = data.slice(clo, clo + maxVis);
+                    var cnt = visible.length;
+
+                    var radius = Math.min(W, H) * (ringMenu.options.baseRadius + level * ringMenu.options.radiusStep);
+                    var innerR = radius - 16;
+                    var outerR = radius + 16;
+
+                    var arcRange = angleStep0 * 0.85;
+                    var selectedAngle = startAngle0 + (angleStep0 * selectedPath[0]) + rotationOffset;
+                    var arcStart = selectedAngle - arcRange / 2;
+                    var step = arcRange / Math.max(cnt, 1);
+
+                    var canvas = document.createElement('canvas');
+                    canvas.width = W * 2;
+                    canvas.height = H * 2;
+                    canvas.style.cssText =
+                        'position:absolute;bottom:0;right:0;width:100%;height:100%;pointer-events:none;z-index:1;';
+                    var ctx = canvas.getContext('2d');
+                    ctx.scale(2, 2);
+
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, outerR, arcStart * Math.PI / 180, (arcStart + arcRange) * Math.PI / 180);
+                    ctx.arc(cx, cy, innerR, (arcStart + arcRange) * Math.PI / 180, arcStart * Math.PI / 180, true);
+                    ctx.closePath();
+                    ctx.fillStyle = color + '1e';
+                    ctx.fill();
+                    ctx.strokeStyle = color + '33';
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+
+                    visible.forEach(function(item, vi) {
+                        if (!item) return;
+                        var realIdx = clo + vi;
+                        var centerA = arcStart + (vi + 0.5) * step;
+                        var halfA = step * 0.4;
+                        var a1 = centerA - halfA;
+                        var a2 = centerA + halfA;
+                        var isActive = (selectedPath[level] === realIdx);
+
+                        if (isActive) {
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, outerR, a1 * Math.PI / 180, a2 * Math.PI / 180);
+                            ctx.arc(cx, cy, innerR, a2 * Math.PI / 180, a1 * Math.PI / 180, true);
+                            ctx.closePath();
+                            ctx.fillStyle = color + '55';
+                            ctx.fill();
+                            ctx.strokeStyle = color + '88';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+
+                        var midR = (innerR + outerR) / 2;
+                        var midA = (a1 + a2) / 2;
+                        var p = getPoint(cx, cy, midR, midA);
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(midA * Math.PI / 180 + Math.PI / 2);
+                        ctx.fillStyle = isActive ? '#fff' : '#888';
+                        ctx.font = '10px "Courier New", monospace';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(item.name ? item.name.slice(0, 4) : '?', 0, 0);
+                        ctx.restore();
+                    });
+
+                    layerWrapper.appendChild(canvas);
+
+                    visible.forEach(function(item, vi) {
+                        if (!item) return;
+                        var realIdx = clo + vi;
+                        var centerA = arcStart + (vi + 0.5) * step;
+                        var p = getPoint(cx, cy, radius, centerA);
+                        var el = document.createElement('a');
+                        var cls = getSubClass(level);
+                        el.className = 'menu-item ' + cls;
+                        el.textContent = item.name ? item.name.slice(0, 3) : '?';
+                        el.title = item.name || '';
+                        el.href = item.href || '#';
+                        el.dataset.level = level;
+                        el.dataset.index = realIdx;
+                        el.style.left = p.x + 'px';
+                        el.style.top = p.y + 'px';
+                        if (selectedPath[level] === realIdx) el.classList.add('active');
+
+                        el.addEventListener('mouseenter', function(e) {
+                            var el2 = e.currentTarget;
+                            var lvl = parseInt(el2.dataset.level);
+                            var i = parseInt(el2.dataset.index);
+                            if (ringMenu.selectedPath[lvl] === i) {
+                                if (ringMenu.selectedPath.length <= lvl + 1) {
+                                    var nextData2 = ringMenu.getLayerData(lvl + 1);
+                                    if (nextData2 && nextData2.length > 0) {
+                                        ringMenu.selectedPath.push(0);
+                                        renderMenu();
+                                        updateLabel();
+                                    }
+                                }
+                                return;
+                            }
+                            ringMenu.selectItem(lvl, i, renderMenu);
+                            updateLabel();
+                        });
+
+                        el.addEventListener('click', handleItemClick);
+                        layerWrapper.appendChild(el);
+                    });
+
+                    if (total > maxVis) {
+                        var arrowY = H - radius - 24;
+                        var makeArrow = function(dir) {
+                            var el = document.createElement('div');
+                            el.className = 'slide-arrow';
+                            el.textContent = dir === -1 ? '‹' : '›';
+                            el.style.top = arrowY + 'px';
+                            if (dir === -1) {
+                                el.style.left = (W - radius - 44) + 'px';
+                                el.style.opacity = clo > 0 ? '1' : '0.2';
+                                el.style.pointerEvents = clo > 0 ? 'auto' : 'none';
+                            } else {
+                                el.style.right = (W - radius - 44) + 'px';
+                                el.style.opacity = clo < maxOff ? '1' : '0.2';
+                                el.style.pointerEvents = clo < maxOff ? 'auto' : 'none';
+                            }
+                            el.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                ringMenu.slideLayer(level, dir, renderMenu);
+                            });
+                            layerWrapper.appendChild(el);
+                        };
+                        makeArrow(-1);
+                        makeArrow(1);
+                    }
+                }
+
+                updateLabel();
+            }
+
+            function updateLabel() {
+                var names = ringMenu.getPathNames();
+                currentName.textContent = names.join(' › ') || '根';
+                currentIndex.textContent = (ringMenu.selectedPath[0] || 0) + 1 + ' / ' + menuData.length;
+                label.classList.add('show');
+            }
+
+            function toggleMenu(open) {
+                isOpen = open;
+                if (open) {
+                    container.style.display = 'block';
+                    container.classList.add('active');
+                    trigger.classList.add('active');
+                    label.classList.add('show');
+                    ringMenu.selectedPath = [0];
+                    ringMenu.offsets = {};
+                    rotationOffset = 0;
+                    ringMenu._lastHoverPrimary = -1;
+                    setTimeout(renderMenu, 50);
+                } else {
+                    container.style.display = 'none';
+                    container.classList.remove('active');
+                    trigger.classList.remove('active');
+                    setTimeout(function() {
+                        if (!isOpen) label.classList.remove('show');
+                    }, 300);
+                }
+            }
+
+            function rotateMenu(delta) {
+                rotationOffset += delta;
+                renderMenu();
+            }
+
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu(!isOpen);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (isOpen && !container.contains(e.target) && e.target !== trigger) {
+                    toggleMenu(false);
+                }
+            });
+
+            document.addEventListener('wheel', function(e) {
+                if (!isOpen) return;
+                var isInMenu = container.contains(e.target) || e.target === trigger;
+                if (!isInMenu) return;
+                e.preventDefault();
+                var delta = e.deltaY > 0 ? 10 : -10;
+                rotateMenu(delta);
+            }, { passive: false });
+
+            container.addEventListener('mousedown', function(e) {
+                if (!isOpen) return;
+                if (e.target.closest('.menu-item') || e.target === trigger) return;
+                var isDragging = true;
+                var dragStartX = e.clientX;
+                var dragStartRot = rotationOffset;
+                e.preventDefault();
+
+                function onMove(ev) {
+                    if (!isDragging) return;
+                    var dx = ev.clientX - dragStartX;
+                    rotationOffset = dragStartRot + dx * 0.5;
+                    renderMenu();
+                }
+
+                function onUp() {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                }
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+
+            container.addEventListener('touchstart', function(e) {
+                if (!isOpen) return;
+                if (e.target.closest('.menu-item') || e.target === trigger) return;
+                var touch = e.touches[0];
+                if (!touch) return;
+                var isDragging = true;
+                var touchStartX = touch.clientX;
+                var touchStartRot = rotationOffset;
+
+                function onMove(ev) {
+                    if (!isDragging) return;
+                    var touch2 = ev.touches[0];
+                    if (!touch2) return;
+                    var dx = touch2.clientX - touchStartX;
+                    rotationOffset = touchStartRot + dx * 0.5;
+                    renderMenu();
+                }
+
+                function onUp() {
+                    isDragging = false;
+                    document.removeEventListener('touchmove', onMove);
+                    document.removeEventListener('touchend', onUp);
+                }
+
+                document.addEventListener('touchmove', onMove, { passive: true });
+                document.addEventListener('touchend', onUp, { passive: true });
+            }, { passive: true });
+
+            document.addEventListener('keydown', function(e) {
+                if (!isOpen) return;
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    rotateMenu(-10);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    rotateMenu(10);
+                } else if (e.key === 'Escape') {
+                    toggleMenu(false);
+                }
+            });
+
+            container.addEventListener('mouseleave', function() {
+                if (isOpen) {
+                    ringMenu.resetToPrimary();
+                    renderMenu();
+                    updateLabel();
+                }
+            });
+
+            var resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    if (isOpen) renderMenu();
+                }, 300);
+            });
+
+            function init() {
+                ringMenu.selectedPath = [0];
+                ringMenu.offsets = {};
+                rotationOffset = 0;
+                ringMenu._lastHoverPrimary = -1;
+                renderMenu();
+                toggleMenu(false);
+                console.log('🔄 环形多级 · 独立版');
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -66,7 +66,8 @@
         { name: '笔记', href: 'notes.html' },
         { name: '布线笔记', href: 'cable.html' },
         { name: '关于我', href: 'aboutMe.html' },
-        { name: '声明', href: 'statement.html' }
+        { name: '声明', href: 'statement.html' },
+        { name: '导航', href: 'ringMenu.html' }
     ];
 
     const html = `
