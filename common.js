@@ -67,7 +67,8 @@
         { name: '布线笔记', href: 'cable.html' },
         { name: '关于我', href: 'aboutMe.html' },
         { name: '声明', href: 'statement.html' },
-        { name: '导航', href: 'ringMenu.html' }
+        { name: '导航', href: 'ringMenu.html' },
+        { name: '读呼吸', href: 'BreathBetweenWords.html' }
     ];
 
     const html = `

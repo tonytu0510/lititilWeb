@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>读呼吸 · 标点与停顿</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f7f4ef;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e4ddd2;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            padding: 2rem 1rem;
+            flex-direction: column;
+            align-items: center;
+            margin:0 auto
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            width:100%
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #fdfcfa;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .wrap button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.8rem;
+        }
+
+        button:hover {
+            background: #9e342c;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .result {
+            margin-top: 1.2rem;
+            padding: 1rem 1.2rem;
+            background: var(--accent-soft);
+            border-radius: 0.9rem;
+            font-size: 1rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            background: #faf7f2;
+            padding: 0.7rem 0.9rem;
+            border-radius: 0.7rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--line);
+        }
+
+        .legend-item strong {
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .example-box {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .example-line {
+            margin-bottom: 0.6rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--muted);
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>读呼吸</h1>
+            <p>标点不是符号，是呼吸。停顿不同，意思就不同。</p>
+        </header>
+
+        <div class="section">
+            <h2>输入一段话</h2>
+            <textarea id="inputText" placeholder="比如：我知道了 / 你来了 / 行 / 下雨天留客天留我不留">我知道了</textarea>
+            <button id="analyzeBtn">读一下</button>
+            <div class="result" id="result">结果会显示在这里。</div>
+        </div>
+
+        <div class="section">
+            <h2>常用标点与呼吸</h2>
+            <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="section">
+            <h2>一个经典例子</h2>
+            <div class="example-box">
+                <div class="example-line"><strong>下雨天，留客天，留我不留？</strong></div>
+                <div class="example-line"><strong>下雨，天留客；天留，我不留。</strong></div>
+                <div class="example-line"><strong>下雨天，留客天，留我不？留。</strong></div>
+                <div class="example-line"><strong>下雨天留客，天留我不留。</strong></div>
+                <p style="margin-top:0.8rem; color:var(--muted);">同样十个字，标点一换，意思全变。</p>
+            </div>
+        </div>
+
+        <div class="quote">
+            “一个人怎么停，就怎么想。”
+        </div>
+
+        <footer>
+            看标点、空格和停顿，读懂一句话背后的意思 · 可直接部署到网站
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+    <script>
+        const legendData = [
+            { symbol: '逗号 ，', meaning: '换气、犹豫、话没说完' },
+            { symbol: '句号 。', meaning: '收住、冷静、完整结束' },
+            { symbol: '问号 ？', meaning: '试探、不安、想知道更多' },
+            { symbol: '叹号 ！', meaning: '情绪上头、激动或愤怒' },
+            { symbol: '空格', meaning: '停顿、空、克制或强调' },
+            { symbol: '省略号 ……', meaning: '尾音、欲言又止、没说完' },
+            { symbol: '顿号 、', meaning: '短暂并列、轻微停顿' },
+            { symbol: '分号 ；', meaning: '分开但还有联系' },
+        ];
+
+        function renderLegend() {
+            const el = document.getElementById('legend');
+            el.innerHTML = '';
+            legendData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'legend-item';
+                div.innerHTML = `<strong>${item.symbol}</strong>${item.meaning}`;
+                el.appendChild(div);
+            });
+        }
+
+        function analyzeText(text) {
+            if (!text.trim()) {
+                return '你什么都没打。这本身也是一种态度：空着，不说。';
+            }
+
+            const hasComma = /，|,/.test(text);
+            const hasPeriod = /。|\./.test(text);
+            const hasQuestion = /？|\?/.test(text);
+            const hasExclaim = /！|!/.test(text);
+            const hasSpace = /\s+/.test(text.trim());
+            const hasEllipsis = /……|\.\.\./.test(text);
+            const hasDun = /、/.test(text);
+            const hasSemicolon = /；|;/.test(text);
+
+            let reading = '';
+
+            if (hasQuestion) {
+                reading += '这句话在问，语气里带着不确定，或者想听你回答。\n';
+            }
+            if (hasExclaim) {
+                reading += '情绪比较重，可能是激动、生气，也可能是真的在意。\n';
+            }
+            if (hasEllipsis) {
+                reading += '话没说完，或者故意留着余地，心里还有后半句。\n';
+            }
+            if (hasComma) {
+                reading += '有停顿，说明他边想边说，或者在强调前半句。\n';
+            }
+            if (hasDun) {
+                reading += '有顿号，像是在列举，也像是在克制地停顿。\n';
+            }
+            if (hasSemicolon) {
+                reading += '用分号，说明前后有关系，但又不是完全连在一起。\n';
+            }
+            if (hasSpace) {
+                reading += '文字里有空格，可能是故意停顿，也可能是在克制情绪。\n';
+            }
+            if (hasPeriod && !hasQuestion && !hasExclaim) {
+                reading += '句子收得比较完整，语气偏冷静，甚至有点结束对话的意思。\n';
+            }
+
+            if (!hasComma && !hasPeriod && !hasQuestion && !hasExclaim && !hasSpace && !hasEllipsis && !hasDun && !hasSemicolon) {
+                reading = '没有明显标点和空格，要么很平静，要么懒得修饰，直直地把字丢出来。';
+            }
+
+            reading += '\n—— 他真正的意思，不一定在字面上，而在这些停顿里。';
+
+            return reading;
+        }
+
+        document.getElementById('analyzeBtn').addEventListener('click', () => {
+            const text = document.getElementById('inputText').value;
+            document.getElementById('result').textContent = analyzeText(text);
+        });
+
+        document.getElementById('inputText').addEventListener('input', () => {
+            const text = document.getElementById('inputText').value;
+            document.getElementById('result').textContent = analyzeText(text);
+        });
+
+        renderLegend();
+        document.getElementById('result').textContent = analyzeText('我知道了');
+    </script>
+</body>
+</html>
