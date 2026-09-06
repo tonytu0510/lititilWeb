@@ -2,14 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>环形多级 · 独立版</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>环形多级 · 移动端适配</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -207,7 +201,7 @@
     <div id="pageContent"><span>⬡ 环形多级</span><br>悬停展开 · 点击跳转</div>
 
     <div id="currentLabel">
-        <div class="index" id="currentIndex">1 / 14</div>
+        <div class="index" id="currentIndex">1 / 15</div>
         <div class="name" id="currentName">首页</div>
         <div style="color:#555;font-size:11px;">悬停展开 · 点击跳转</div>
     </div>
@@ -224,12 +218,12 @@
             'use strict';
 
             // =============================================
-            //  一级菜单数据（common.js 原有的链接）
+            //  数据（有子菜单的项，点击展开/收拢，不跳转）
             // =============================================
             var menuData = [{
                 name: '首页',
                 color: '#7cb8b8',
-                href: 'index.html?M=1',
+                href: '#',
                 children: [
                     { name: '子页1', href: '#' },
                     { name: '子页2', href: '#' }
@@ -237,7 +231,7 @@
             }, {
                 name: '工具箱',
                 color: '#e8a838',
-                href: 'tools.html',
+                href: '#',
                 children: [
                     { name: '工具1', href: '#' },
                     { name: '工具2', href: '#' }
@@ -245,7 +239,7 @@
             }, {
                 name: '二维码',
                 color: '#c87a7a',
-                href: 'qrCode.html',
+                href: '#',
                 children: [
                     { name: '扫码', href: '#' },
                     { name: '生成', href: '#' }
@@ -253,7 +247,7 @@
             }, {
                 name: '对合环',
                 color: '#88b8d0',
-                href: 'nestedInvolutionRingHuge.html',
+                href: '#',
                 children: [
                     { name: '环1', href: '#' },
                     { name: '环2', href: '#' }
@@ -261,7 +255,7 @@
             }, {
                 name: 'RSTUV',
                 color: '#b8a8d0',
-                href: 'chinaClock.html',
+                href: '#',
                 children: [
                     { name: 'R', href: '#' },
                     { name: 'S', href: '#' }
@@ -269,7 +263,7 @@
             }, {
                 name: '太阳系',
                 color: '#80c8a0',
-                href: 'cosmos.html',
+                href: '#',
                 children: [
                     { name: '行星', href: '#' },
                     { name: '恒星', href: '#' }
@@ -277,7 +271,7 @@
             }, {
                 name: '拆字',
                 color: '#d0a888',
-                href: 'fontAll.html',
+                href: '#',
                 children: [
                     { name: '独体', href: '#' },
                     { name: '合体', href: '#' }
@@ -285,7 +279,7 @@
             }, {
                 name: '缘分测试',
                 color: '#a0b8c8',
-                href: 'namePairing.html',
+                href: '#',
                 children: [
                     { name: '测1', href: '#' },
                     { name: '测2', href: '#' }
@@ -293,7 +287,7 @@
             }, {
                 name: '判证',
                 color: '#c8a080',
-                href: 'panding.html',
+                href: '#',
                 children: [
                     { name: '判1', href: '#' },
                     { name: '判2', href: '#' }
@@ -301,7 +295,7 @@
             }, {
                 name: '130演示',
                 color: '#90b8b8',
-                href: '130demo.html',
+                href: '#',
                 children: [
                     { name: '演示1', href: '#' },
                     { name: '演示2', href: '#' }
@@ -309,7 +303,7 @@
             }, {
                 name: '笔记',
                 color: '#7cb8b8',
-                href: 'notes.html',
+                href: '#',
                 children: [
                     { name: '笔记1', href: '#' },
                     { name: '笔记2', href: '#' }
@@ -317,7 +311,7 @@
             }, {
                 name: '布线笔记',
                 color: '#e8a838',
-                href: 'cable.html',
+                href: '#',
                 children: [
                     { name: '布线1', href: '#' },
                     { name: '布线2', href: '#' }
@@ -325,7 +319,7 @@
             }, {
                 name: '关于我',
                 color: '#c87a7a',
-                href: 'aboutMe.html',
+                href: '#',
                 children: [
                     { name: '关于1', href: '#' },
                     { name: '关于2', href: '#' }
@@ -333,18 +327,10 @@
             }, {
                 name: '声明',
                 color: '#88b8d0',
-                href: 'statement.html',
+                href: '#',
                 children: [
                     { name: '声明1', href: '#' },
                     { name: '声明2', href: '#' }
-                ]
-            }, {
-                name: '导航',
-                color: '#88b8d0',
-                href: 'ringMenu.html',
-                children: [
-                    { name: '导航1', href: '#' },
-                    { name: '导航2', href: '#' }
                 ]
             }];
 
@@ -497,7 +483,48 @@
                 return '';
             }
 
-            function handleItemClick(e) {
+            // =============================================
+            //  一级菜单点击：有子菜单则切换展开/收拢
+            // =============================================
+            function handlePrimaryClick(e) {
+                e.preventDefault();
+                var el = e.currentTarget;
+                var idx2 = parseInt(el.dataset.index);
+                var item = menuData[idx2];
+                var href = el.getAttribute('href');
+
+                // 如果有子菜单，切换展开/收拢（不跳转）
+                if (item.children && item.children.length > 0) {
+                    // 如果当前已经展开且点击的是同一个，收拢
+                    if (ringMenu.selectedPath[0] === idx2 && ringMenu.selectedPath.length > 1) {
+                        ringMenu.selectedPath = [idx2];
+                        ringMenu._lastHoverPrimary = -1;
+                        renderMenu();
+                        updateLabel();
+                        return;
+                    }
+                    // 否则展开
+                    ringMenu._lastHoverPrimary = idx2;
+                    var changed = ringMenu.setPrimaryIndex(idx2);
+                    if (changed) {
+                        renderMenu();
+                        updateLabel();
+                    }
+                    return;
+                }
+
+                // 没有子菜单，跳转
+                if (href && href !== '#') {
+                    toggleMenu(false);
+                    setTimeout(function() {
+                        window.location.href = href;
+                    }, 200);
+                }
+            }
+
+            // 二级及更深层点击：直接跳转
+            function handleSubClick(e) {
+                e.preventDefault();
                 var el = e.currentTarget;
                 var href = el.getAttribute('href');
                 if (href && href !== '#') {
@@ -506,7 +533,6 @@
                         window.location.href = href;
                     }, 200);
                 }
-                e.preventDefault();
             }
 
             function renderMenu() {
@@ -524,6 +550,7 @@
 
                 var selectedPath = ringMenu.selectedPath || [0];
 
+                // ===== 一级菜单 =====
                 menuData.forEach(function(item, idx) {
                     if (!item) return;
                     var angle = startAngle0 + (angleStep0 * idx) + rotationOffset;
@@ -539,6 +566,7 @@
                     el.style.top = pos.y + 'px';
                     if (selectedPath[0] === idx) el.classList.add('active');
 
+                    // 桌面端悬停展开
                     el.addEventListener('mouseenter', function(e) {
                         var el2 = e.currentTarget;
                         var idx2 = parseInt(el2.dataset.index);
@@ -551,10 +579,13 @@
                         }
                     });
 
-                    el.addEventListener('click', handleItemClick);
+                    // 移动端点击切换
+                    el.addEventListener('click', handlePrimaryClick);
+
                     layerWrapper.appendChild(el);
                 });
 
+                // ===== 递归渲染更深层级 =====
                 for (var level = 1; level < selectedPath.length; level++) {
                     var data = ringMenu.getLayerData(level);
                     if (!data || data.length === 0) break;
@@ -668,7 +699,9 @@
                             updateLabel();
                         });
 
-                        el.addEventListener('click', handleItemClick);
+                        // 二级及更深点击跳转
+                        el.addEventListener('click', handleSubClick);
+
                         layerWrapper.appendChild(el);
                     });
 
@@ -736,6 +769,9 @@
                 renderMenu();
             }
 
+            // =============================================
+            //  事件绑定
+            // =============================================
             trigger.addEventListener('click', function(e) {
                 e.stopPropagation();
                 toggleMenu(!isOpen);
@@ -845,7 +881,7 @@
                 ringMenu._lastHoverPrimary = -1;
                 renderMenu();
                 toggleMenu(false);
-                console.log('🔄 环形多级 · 独立版');
+                console.log('🔄 环形多级 · 移动端适配');
             }
 
             if (document.readyState === 'loading') {
