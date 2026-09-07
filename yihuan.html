@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>一丨环 · 半与伴</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .big-char {
+            font-size: 4rem;
+            text-align: center;
+            line-height: 1.3;
+            margin: 0.8rem 0;
+            color: var(--ink);
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ring {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+        }
+
+        .ring-item {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .ring-item.arrow {
+            border: none;
+            background: transparent;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 480px;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: center;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        td:first-child {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .group-box {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .group-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .group-chars {
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>一丨环</h1>
+            <p>从“一半丨”和“一伴丨”推出来的字环</p>
+        </header>
+
+        <div class="section">
+            <h2>从一到十：一半丨，一伴丨</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>数字</th>
+                            <th>一半丨</th>
+                            <th>一伴丨</th>
+                        </tr>
+                    </thead>
+                    <tbody id="numTable"></tbody>
+                </table>
+            </div>
+            <p class="note">左边是拆，右边是合。一拆一合，字就出来了。</p>
+        </div>
+
+        <div class="section">
+            <h2>根本</h2>
+            <div class="big-char">一 · 丨</div>
+            <div class="explain">
+                <p><span class="highlight">一</span> 是横，平着，表示展开、地面、时间。</p>
+                <p><span class="highlight">丨</span> 是竖，直着，表示贯通、立起、上下。</p>
+                <p>一和丨相交，就成了 <span class="highlight">十</span>。</p>
+                <p>十不是十全十美，是横竖相遇的那一个点。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>一半丨，一伴丨</h2>
+            <div class="explain">
+                <p><span class="highlight">一半丨</span>：把“丨”分成两半，是拆。</p>
+                <p><span class="highlight">一伴丨</span>：让“一”和“丨”作伴，是合。</p>
+                <p>一拆一合，就是字的生死。</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">卜</span>：十少一横，旁边一点。</p>
+                <p><span class="highlight">不</span>：卜上加一横，右边多一点。</p>
+                <p><span class="highlight">个</span>：人下一竖。</p>
+                <p><span class="highlight">人</span>：八分开，站成两个人。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>推导环</h2>
+            <div class="ring" id="ringContainer"></div>
+            <p class="note">从“一”出发，经过天地人日，最后又回到“一”。</p>
+        </div>
+
+        <div class="section">
+            <h2>环里怎么走</h2>
+            <div class="explain">
+                <p>一 伴丨 → <span class="highlight">十</span></p>
+                <p>十 变一点 → <span class="highlight">卜</span></p>
+                <p>卜 加一横两点 → <span class="highlight">不</span></p>
+                <p>不 变一变 → <span class="highlight">个</span></p>
+                <p>个 去竖变撇捺 → <span class="highlight">人</span></p>
+                <p>人 上加一横 → <span class="highlight">大</span></p>
+                <p>大 上再加一横 → <span class="highlight">天</span></p>
+                <p>天 收成框 → <span class="highlight">日</span></p>
+                <p>日 中间竖下来 → <span class="highlight">田</span></p>
+                <p>田 下面一横拉长 → <span class="highlight">土</span></p>
+                <p>土 加个也字 → <span class="highlight">地</span></p>
+                <p>地 拆开，土里有十，十里有丨，丨里有一。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>主要偏旁咬合</h2>
+            <div class="group-box">
+                <div class="group-title">亻（人字旁）</div>
+                <div class="group-chars">人 → 个 → 大 → 天 → 化 → 什 → 仁 → 仙 → 休 → 体</div>
+                <p class="note">人旁的字，都是“人”在左边站着，和右边作伴。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">氵（三点水）</div>
+                <div class="group-chars">一 → 十 → 土 → 地 → 池 → 河 → 海 → 洋 → 江 → 湖</div>
+                <p class="note">水旁的字，是从“地”生出来的水，再流成江河湖海。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">木（木字旁）</div>
+                <div class="group-chars">十 → 木 → 林 → 森 → 树 → 根 → 枝 → 叶 → 花 → 草</div>
+                <p class="note">木从“十”长出来，木多成林，林多成森，再开花长草。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">艹（草字头）</div>
+                <div class="group-chars">十 → 艹 → 花 → 茶 → 药 → 草 → 苗 → 芽 → 英 → 莲</div>
+                <p class="note">草字头就是两个“十”并排，草木都从土里长出来。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">口（口字旁）</div>
+                <div class="group-chars">一 → 丨 → 口 → 日 → 田 → 由 → 甲 → 申 → 电 → 申</div>
+                <p class="note">口是横竖围成框，里面加横就成日、田、由、甲。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">忄（心字旁）</div>
+                <div class="group-chars">心 → 忄 → 想 → 思 → 念 → 情 → 恨 → 怕 → 慌 → 忙</div>
+                <p class="note">心旁的字，都是心里在动，不是拆字，是心动。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">讠（言字旁）</div>
+                <div class="group-chars">言 → 讠 → 说 → 话 → 记 → 让 → 讲 → 课 → 读 → 诗</div>
+                <p class="note">言旁的字，都和说话、文字有关，口里出来的东西。</p>
+            </div>
+            <div class="group-box">
+                <div class="group-title">扌（手字旁）</div>
+                <div class="group-chars">手 → 扌 → 打 → 找 → 把 → 拉 → 推 → 接 → 提 → 握</div>
+                <p class="note">手旁的字，都是手在做动作，一提一放，都是手。</p>
+            </div>
+        </div>
+
+        <footer>
+            一横一竖，半半伴伴，全在里面转。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+    <script>
+        const numTableData = [
+            { num: '一', half: '一 + 一', companion: '十' },
+            { num: '二', half: '一 + 一', companion: '干' },
+            { num: '三', half: '一 + 一 + 一', companion: '王' },
+            { num: '四', half: '一 + 一 + 一 + 一', companion: '田' },
+            { num: '五', half: '一 + 一 + 一 + 一 + 一', companion: '午' },
+            { num: '六', half: '亠 + 八', companion: '文' },
+            { num: '七', half: '七 + 丨', companion: '化' },
+            { num: '八', half: '八 + 丨', companion: '个' },
+            { num: '九', half: '九 + 一', companion: '无' },
+            { num: '十', half: '十 + 丨', companion: '卜' }
+        ];
+
+        function renderNumTable() {
+            const tbody = document.getElementById('numTable');
+            tbody.innerHTML = '';
+            numTableData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.num}</td><td>${item.half}</td><td>${item.companion}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const ringData = [
+            '一', '十', '卜', '不', '个', '人',
+            '大', '天', '日', '田', '土', '地', '一'
+        ];
+
+        function renderRing() {
+            const container = document.getElementById('ringContainer');
+            container.innerHTML = '';
+            ringData.forEach((char, index) => {
+                const item = document.createElement('span');
+                item.className = 'ring-item';
+                item.textContent = char;
+                container.appendChild(item);
+
+                if (index < ringData.length - 1) {
+                    const arrow = document.createElement('span');
+                    arrow.className = 'ring-item arrow';
+                    arrow.textContent = '→';
+                    container.appendChild(arrow);
+                }
+            });
+        }
+
+        renderNumTable();
+        renderRing();
+    </script>
+</body>
+</html>
