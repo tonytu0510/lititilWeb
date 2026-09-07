@@ -64,7 +64,4 @@ if %errorlevel% neq 0 (
 )
 
 :end
-echo.
-echo [结束] 脚本执行完毕。
-pause
 echo [结束] 脚本执行完毕。
