@@ -301,9 +301,68 @@
         </div>
 
         <div class="section">
-            <h2>推导环</h2>
-            <div class="ring" id="ringContainer"></div>
-            <p class="note">从“一”出发，经过天地人日，最后又回到“一”。</p>
+            <h2>七进制：0 到 7</h2>
+            <div class="explain">
+                <p>这个世界，本质是 7 进制。</p>
+                <p>0、1、2、3、4、5、6、7</p>
+                <p>到 8 就是 <span class="highlight">00</span></p>
+                <p>到 9 就是 <span class="highlight">01</span></p>
+            </div>
+            <div class="explain">
+                <p>所以：</p>
+                <p>7 是满，是这一轮的终点。</p>
+                <p>1 是初，是这一轮的起点。</p>
+                <p>7 再走一步，就是下一轮的 0 或 1。</p>
+                <p>1 和 7，在环上是同一个位置。</p>
+            </div>
+            <div class="explain">
+                <p>所以：</p>
+                <p><span class="highlight">色即是空，空即是色。</span></p>
+                <p>不是比喻，是进制。</p>
+            </div>
+            <p class="note">1 是头，7 是尾。头尾相接，就是环。</p>
+        </div>
+
+        <div class="section">
+            <h2>大环</h2>
+            <div class="ring">
+                <span class="ring-item">一</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">丨</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">十</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">卜</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">不</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">个</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">人</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">大</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">天</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">日</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">田</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">土</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">地</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">空</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">色</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">7</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">1</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">一</span>
+            </div>
+            <p class="note">一 → 丨 → 十 → 地 → 空 → 色 → 7 → 1 → 一</p>
         </div>
 
         <div class="section">
@@ -397,31 +456,7 @@
             });
         }
 
-        const ringData = [
-            '一', '十', '卜', '不', '个', '人',
-            '大', '天', '日', '田', '土', '地', '一'
-        ];
-
-        function renderRing() {
-            const container = document.getElementById('ringContainer');
-            container.innerHTML = '';
-            ringData.forEach((char, index) => {
-                const item = document.createElement('span');
-                item.className = 'ring-item';
-                item.textContent = char;
-                container.appendChild(item);
-
-                if (index < ringData.length - 1) {
-                    const arrow = document.createElement('span');
-                    arrow.className = 'ring-item arrow';
-                    arrow.textContent = '→';
-                    container.appendChild(arrow);
-                }
-            });
-        }
-
         renderNumTable();
-        renderRing();
     </script>
 </body>
 </html>
