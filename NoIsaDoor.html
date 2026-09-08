@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>No · 英文拆字</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>No · 英文拆字</h1>
+            <p>No 不只是否定，它里面藏着一个 and。</p>
+        </header>
+
+        <div class="section">
+            <h2>规则</h2>
+            <div class="explain">
+                <p>No → N + O</p>
+                <p>N = and</p>
+                <p>O = 0 / 空</p>
+                <p>所以 No 后面，常常能拆成：</p>
+                <p><span class="highlight">and + 俚语 / and + 反转动作</span></p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>警示语拆解</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>原句</th>
+                        <th>拆后</th>
+                        <th>意思</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>No Smoking</td>
+                        <td>N sok</td>
+                        <td>and sucker</td>
+                    </tr>
+                    <tr>
+                        <td>No U-turn</td>
+                        <td>N U-turn</td>
+                        <td>and U-turn</td>
+                    </tr>
+                    <tr>
+                        <td>No Entry</td>
+                        <td>N entry</td>
+                        <td>and try</td>
+                    </tr>
+                    <tr>
+                        <td>No Overtaking</td>
+                        <td>N over taking</td>
+                        <td>and over taking</td>
+                    </tr>
+                    <tr>
+                        <td>No Trespassing</td>
+                        <td>N tres passing</td>
+                        <td>and trace passing</td>
+                    </tr>
+                    <tr>
+                        <td>No Fly Zone</td>
+                        <td>N fly zone</td>
+                        <td>and fly zone</td>
+                    </tr>
+                    <tr>
+                        <td>No Fireworks</td>
+                        <td>N fire works</td>
+                        <td>and fire works</td>
+                    </tr>
+                    <tr>
+                        <td>No Sharp Objects</td>
+                        <td>N sharp objects</td>
+                        <td>and sharp objects</td>
+                    </tr>
+                    <tr>
+                        <td>No Soliciting</td>
+                        <td>N so licit ing</td>
+                        <td>and so licit ing</td>
+                    </tr>
+                    <tr>
+                        <td>No Refunds</td>
+                        <td>N re funds</td>
+                        <td>and re funds</td>
+                    </tr>
+                    <tr>
+                        <td>No Smoking In Bed</td>
+                        <td>N smoking in bed</td>
+                        <td>and sucker in bed</td>
+                    </tr>
+                    <tr>
+                        <td>No Shoes, No Shirt, No Service</td>
+                        <td>N shoes, N shirt, N service</td>
+                        <td>and shoes, and shirt, and service</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="note">大部分符合，不是全部。语言不是数学，能有大半命中，就不是巧合。</p>
+        </div>
+
+        <div class="section">
+            <h2>为什么用 No，不用 Not</h2>
+            <div class="explain">
+                <p>Not = N + O + T</p>
+                <p>T = 一丨 = 十，太完整，太正式，不容易滑动。</p>
+                <p>No = N + O，是开着的口子。</p>
+                <p>所以警示牌偏爱 No，不是偶然。</p>
+            </div>
+        </div>
+
+        <footer>
+            No 不是墙，是门。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
