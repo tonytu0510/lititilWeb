@@ -641,10 +641,10 @@
         <style>
             .back-to-top-btn {
                 position: fixed;
-                right: 45px;
+                right: 30px;
                 top: 30px;
-                width: 44px;
-                height: 44px;
+                width: 60px;
+                height: 60px;
                 border-radius: 50%;
                 background: rgba(43, 43, 43, 0.75);
                 color: #f5efe8;
