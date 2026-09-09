@@ -652,7 +652,7 @@
                 cursor: pointer;
                 display: none;
                 text-align: center;
-                line-height:60px;
+                line-height:50px;
                 font-size: 36px;
                 z-index: 998;
                 backdrop-filter: blur(4px);
