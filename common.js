@@ -653,7 +653,7 @@
                 display: none;
                 align-items: center;
                 justify-content: center;
-                font-size: 20px;
+                font-size: 36px;
                 z-index: 998;
                 backdrop-filter: blur(4px);
                 transition: background 0.2s, opacity 0.2s;
