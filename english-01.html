@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>英文拆解 · 0与1</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>英文拆解</h1>
+            <p>英文字母不是字母，是 0 和 1 的加减法。</p>
+        </header>
+
+        <div class="section">
+            <h2>基础规则</h2>
+            <div class="explain">
+                <p><span class="highlight">o = 0</span></p>
+                <p><span class="highlight">丨 = 1</span></p>
+                <p><span class="highlight">半0 = 0的一半</span></p>
+                <p>两个半0，可以合成一个0，也可以约掉。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>字母拆法</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>字母</th>
+                        <th>拆法</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>d</td><td>半0 + 1</td></tr>
+                    <tr><td>b</td><td>1 + 半0</td></tr>
+                    <tr><td>p</td><td>半0 + 1</td></tr>
+                    <tr><td>q</td><td>半0 + 1</td></tr>
+                    <tr><td>n</td><td>半0</td></tr>
+                    <tr><td>u</td><td>半0</td></tr>
+                    <tr><td>c</td><td>半0</td></tr>
+                    <tr><td>o</td><td>0</td></tr>
+                    <tr><td>l</td><td>1</td></tr>
+                    <tr><td>i</td><td>1</td></tr>
+                    <tr><td>t</td><td>1 + 0</td></tr>
+                    <tr><td>f</td><td>1 + 0</td></tr>
+                    <tr><td>e</td><td>1 + 0</td></tr>
+                    <tr><td>a</td><td>1 + 半0</td></tr>
+                    <tr><td>g</td><td>0 + 1</td></tr>
+                    <tr><td>y</td><td>1 + 1</td></tr>
+                    <tr><td>v</td><td>1 + 1</td></tr>
+                    <tr><td>w</td><td>1 + 1 + 1</td></tr>
+                    <tr><td>m</td><td>半0 + 半0 + 半0</td></tr>
+                    <tr><td>h</td><td>1 + 半0 + 1</td></tr>
+                    <tr><td>k</td><td>1 + 1</td></tr>
+                    <tr><td>x</td><td>1 + 1</td></tr>
+                    <tr><td>r</td><td>1 + 半0</td></tr>
+                    <tr><td>s</td><td>0弯一下</td></tr>
+                    <tr><td>z</td><td>1 + 0 + 1</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>单词试算</h2>
+            <div class="explain">
+                <p><span class="highlight">no</span></p>
+                <p>n + o = 半0 + 0 = 0 + 0 = 0</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">on</span></p>
+                <p>o + n = 0 + 半0 = 0</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">do</span></p>
+                <p>d + o = 半0 + 1 + 0 = 1 + 0 + 0 = 1</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">be</span></p>
+                <p>b + e = 1 + 半0 + 1 + 0 = 1 + 1 + 0 + 0 = 2</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">love</span></p>
+                <p>l + o + v + e = 1 + 0 + (1+1) + (1+0)</p>
+                <p>= 1 + 0 + 1 + 1 + 1 + 0 = 4</p>
+            </div>
+            <p class="note">每个词，都能用 0 和 1 算出一个值。</p>
+        </div>
+
+        <div class="section">
+            <h2>一句话总结</h2>
+            <div class="explain">
+                <p>英文字母不是拼音，是结构。</p>
+                <p>d、b、p、q 是半0加1，n、u、c是半0，o是0，l是1。</p>
+                <p>它们可以加，可以约，可以变成数字。</p>
+                <p>英文和中文一样，都在 0 和 1 之间。</p>
+            </div>
+        </div>
+
+        <footer>
+            字母不是字母，是 0 和 1 在排队。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
