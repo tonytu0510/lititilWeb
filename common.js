@@ -669,7 +669,7 @@
                 text-align: center;
                 line-height:50px;
                 font-size: 36px;
-                z-index: 998;
+                z-index: 1000;
                 font-family: 'Courier New', monospace;
             }
             .back-to-top-btn:hover {
