@@ -184,6 +184,10 @@
                 color: #555;
                 font-size: 11px;
             }
+            .currentLabelScoll{
+                color:#555;
+                font-size:11px;
+            }
             @media (max-width: 500px) {
                 #menuContainer {
                     width: 180px;
@@ -208,13 +212,22 @@
                     right: 20px;
                     font-size: 11px;
                 }
+                .currentLabelScoll{
+                    display:none
+                }
+                #currentLabel .index {
+                    margin-bottom: -2px;
+                }
+                #currentLabel .name {
+                    margin-bottom: -10px;
+                }
             }
         </style>
 
         <div id="currentLabel">
             <div class="index" id="currentIndex">1 / 14</div>
             <div class="name" id="currentName">首页</div>
-            <div style="color:#555;font-size:11px;">滚轮/滑动切换</div>
+            <div class="currentLabelScoll">滚轮/滑动切换</div>
         </div>
 
         <button id="menuTrigger">☰</button>
@@ -309,7 +322,9 @@
         function updatePositions(offsetDeg) {
             const count = menuData.length;
             const size = containerEl.offsetWidth || 400;
-            const radius = size * 0.55;
+            const clientWidth = document.documentElement.clientWidth;
+            console.log('windowsWidth=>',clientWidth)
+            const radius = (clientWidth > 500) ? (size * 0.55) : (size * 0.8);
             const items = containerEl.querySelectorAll('.menu-item');
 
             items.forEach((el, index) => {
