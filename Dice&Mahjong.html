@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>骰子麻将 · 数时空间</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ring {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+        }
+
+        .ring-item {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .ring-item.arrow {
+            border: none;
+            background: transparent;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>骰子麻将</h1>
+            <p>6面、4人、9数，最后都回到7。</p>
+        </header>
+
+        <div class="section">
+            <h2>核心关系</h2>
+            <div class="explain">
+                <p><span class="highlight">144 = 4 × 4 × (6 + 3)</span></p>
+                <p><span class="highlight">136 = 4 × 4 × (6 + 3) − 8</span></p>
+            </div>
+            <div class="explain">
+                <p>第一个 4：固定 4 个人</p>
+                <p>第二个 4：4 种花色</p>
+                <p>6：骰子 6 面</p>
+                <p>3：骰子 3 组对面</p>
+                <p>8：花牌数量</p>
+            </div>
+            <p class="note">骰子的六面 + 三组对面，正好是麻将的最大数字 9。</p>
+        </div>
+
+        <div class="section">
+            <h2>从骰子到麻将</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>结构</th>
+                        <th>数字</th>
+                        <th>含义</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>骰子面数</td>
+                        <td>6</td>
+                        <td>空间六合</td>
+                    </tr>
+                    <tr>
+                        <td>骰子对面组数</td>
+                        <td>3</td>
+                        <td>三才 / 三组对面</td>
+                    </tr>
+                    <tr>
+                        <td>骰子对面和</td>
+                        <td>7</td>
+                        <td>核心循环数</td>
+                    </tr>
+                    <tr>
+                        <td>麻将人数</td>
+                        <td>4</td>
+                        <td>四方 / 四手</td>
+                    </tr>
+                    <tr>
+                        <td>麻将花色</td>
+                        <td>4</td>
+                        <td>万条筒 + 风</td>
+                    </tr>
+                    <tr>
+                        <td>麻将数字</td>
+                        <td>1–9</td>
+                        <td>6 + 3 = 9</td>
+                    </tr>
+                    <tr>
+                        <td>花牌</td>
+                        <td>8</td>
+                        <td>四季 + 四君子</td>
+                    </tr>
+                    <tr>
+                        <td>带花麻将</td>
+                        <td>144</td>
+                        <td>4 × 4 × 9</td>
+                    </tr>
+                    <tr>
+                        <td>标准麻将</td>
+                        <td>136</td>
+                        <td>144 − 8</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>万条筒</h2>
+            <div class="explain">
+                <p><span class="highlight">万 = 数</span></p>
+                <p><span class="highlight">条 = 时</span></p>
+                <p><span class="highlight">筒 = 空</span></p>
+            </div>
+            <div class="explain">
+                <p>万：数字、财富、极限</p>
+                <p>条：长线、时间、生长</p>
+                <p>筒：圆形、空间、容纳</p>
+            </div>
+            <p class="note">三种花色，就是数、时、空三种状态。</p>
+        </div>
+
+        <div class="section">
+            <h2>四人为什么是四人</h2>
+            <div class="explain">
+                <p>4 = 四方 = 四手 = 四风</p>
+                <p>4 × 6 = 24 = 一天二十四小时</p>
+                <p>4 × 9 × 3 = 108 = 数字牌总数</p>
+                <p>4 × 4 = 16 = 风牌数量</p>
+            </div>
+            <p class="note">四个人，就是四个方向，四个时间点，四种命运。</p>
+        </div>
+
+        <div class="section">
+            <h2>为什么数字是 1 到 9</h2>
+            <div class="explain">
+                <p>9 = 6 + 3</p>
+                <p>6 是骰子面数，3 是对面组数。</p>
+                <p>所以麻将最大数字 9，是骰子结构长出来的。</p>
+                <p>9 是阳数之极，再往上就是新循环。</p>
+            </div>
+            <p class="note">1 到 9，不是随意定的，是骰子的 6 和 3 加出来的。</p>
+        </div>
+
+        <div class="section">
+            <h2>最后一环</h2>
+            <div class="ring">
+                <span class="ring-item">6</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">+3</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">9</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">×4</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">144</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">−8</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">136</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">7</span>
+            </div>
+            <p class="note">6 → 9 → 144 → 136 → 7</p>
+        </div>
+
+        <footer>
+            骰子不是赌具，麻将不是游戏。它们是一套数、时、空的结构。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
