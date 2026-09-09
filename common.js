@@ -634,7 +634,63 @@
     }
 
 })();
+// ==================== 回到顶部按钮 ====================
+(function() {
+    const backToTopHtml = `
+        <style>
+            .back-to-top-btn {
+                position: fixed;
+                right: 20px;
+                bottom: 30px;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: rgba(43, 43, 43, 0.75);
+                color: #f5efe8;
+                border: 1px solid #555;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                z-index: 998;
+                backdrop-filter: blur(4px);
+                transition: background 0.2s, opacity 0.2s;
+                font-family: 'Courier New', monospace;
+            }
+            .back-to-top-btn:hover {
+                background: rgba(43, 43, 43, 0.9);
+            }
+        </style>
+        <button class="back-to-top-btn" id="backToTopBtn" title="回到顶部">↑</button>
+    `;
 
+    document.body.insertAdjacentHTML('beforeend', backToTopHtml);
+
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (!backToTopBtn) return;
+
+    function checkBackToTop() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        const windowHeight = window.innerHeight;
+        const fullHeight = document.documentElement.scrollHeight;
+
+        if (fullHeight > windowHeight && scrollTop > 0) {
+            backToTopBtn.style.display = 'flex';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    }
+
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', checkBackToTop);
+    window.addEventListener('resize', checkBackToTop);
+
+    checkBackToTop();
+})();
 // ==================== 百度统计 ====================
 var _hmt = _hmt || [];
 (function() {
