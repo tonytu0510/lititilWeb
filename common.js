@@ -677,7 +677,7 @@
         const fullHeight = document.documentElement.scrollHeight;
 
         if (fullHeight > windowHeight && scrollTop > 0) {
-            backToTopBtn.style.display = 'fixed';
+            backToTopBtn.style.display = 'block';
         } else {
             backToTopBtn.style.display = 'none';
         }
