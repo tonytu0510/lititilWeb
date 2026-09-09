@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>斗地主 · 纸牌结构</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ring {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+        }
+
+        .ring-item {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .ring-item.arrow {
+            border: none;
+            background: transparent;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>斗地主</h1>
+            <p>4种花色，13个点数，3个人，一副牌。</p>
+        </header>
+
+        <div class="section">
+            <h2>核心关系</h2>
+            <div class="explain">
+                <p><span class="highlight">54 = 4 × 13 + 2</span></p>
+                <p><span class="highlight">52 = 4 × 13</span></p>
+                <p><span class="highlight">54 = 6 × 9</span></p>
+            </div>
+            <div class="explain">
+                <p>4 种花色：黑桃、红心、梅花、方块</p>
+                <p>13 个点数：A 到 K</p>
+                <p>2 张王：大王、小王</p>
+                <p>3 个人：1 地主 + 2 农民</p>
+            </div>
+            <p class="note">54 张牌，是 4 种花色乘 13 个点数，再加大小王。</p>
+        </div>
+
+        <div class="section">
+            <h2>斗地主结构</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>数字</th>
+                        <th>含义</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>花色</td>
+                        <td>4</td>
+                        <td>四季</td>
+                    </tr>
+                    <tr>
+                        <td>点数</td>
+                        <td>13</td>
+                        <td>一年 12 月 + 1</td>
+                    </tr>
+                    <tr>
+                        <td>标准牌</td>
+                        <td>52</td>
+                        <td>4 × 13</td>
+                    </tr>
+                    <tr>
+                        <td>王</td>
+                        <td>2</td>
+                        <td>阴阳 / 大小</td>
+                    </tr>
+                    <tr>
+                        <td>总牌数</td>
+                        <td>54</td>
+                        <td>52 + 2</td>
+                    </tr>
+                    <tr>
+                        <td>人数</td>
+                        <td>3</td>
+                        <td>1 地主 + 2 农民</td>
+                    </tr>
+                    <tr>
+                        <td>每人牌数</td>
+                        <td>17</td>
+                        <td>51 ÷ 3</td>
+                    </tr>
+                    <tr>
+                        <td>底牌</td>
+                        <td>3</td>
+                        <td>地主多拿</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>花色与季节</h2>
+            <div class="explain">
+                <p><span class="highlight">黑桃 ♠ = 冬</span></p>
+                <p><span class="highlight">红心 ♥ = 春</span></p>
+                <p><span class="highlight">梅花 ♣ = 秋</span></p>
+                <p><span class="highlight">方块 ♦ = 夏</span></p>
+            </div>
+            <p class="note">四种花色，对应一年四季。</p>
+        </div>
+
+        <div class="section">
+            <h2>斗地主和麻将、骰子</h2>
+            <div class="explain">
+                <p>骰子：6 面，对面和 7，3 组对面</p>
+                <p>麻将：4 人，4 花色，9 数字，144 张</p>
+                <p>斗地主：3 人，4 花色，13 点数，54 张</p>
+            </div>
+            <div class="explain">
+                <p>54 = 6 × 9</p>
+                <p>3 是骰子对面组数，也是斗地主人数</p>
+                <p>4 是花色，也是麻将人数</p>
+                <p>13 是月循环，9 是数之极</p>
+            </div>
+            <p class="note">斗地主比麻将简单，但底层还是数字、人数、概率。</p>
+        </div>
+
+        <div class="section">
+            <h2>最后一环</h2>
+            <div class="ring">
+                <span class="ring-item">4</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">13</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">52</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">+2王</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">54</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">÷3人</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">17张+3底牌</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">1地主 vs 2农民</span>
+            </div>
+            <p class="note">4 → 13 → 52 → 54 → 3 → 17 → 3 → 1</p>
+        </div>
+
+        <footer>
+            纸牌比麻将简单，但牌型、人数、概率，一样都不少。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
