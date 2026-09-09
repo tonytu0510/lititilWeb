@@ -230,7 +230,7 @@
             <div class="currentLabelScoll">滚轮/滑动切换</div>
         </div>
 
-        <button id="menuTrigger">☰</button>
+        <div id="menuTrigger">☰</div>
 
         <div id="iconGroup">
             <canvas id="dinoIcon" width="50" height="50"></canvas>
