@@ -660,6 +660,15 @@
             .back-to-top-btn:hover {
                 background: rgba(43, 43, 43, 0.9);
             }
+            @media (max-width: 500px) {
+                .back-to-top-btn {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 22px;
+                    right: 20px;
+                    line-height:46px
+                }
+            }
         </style>
         <div class="back-to-top-btn" id="backToTopBtn" title="回到顶部">↑</div>
     `;
