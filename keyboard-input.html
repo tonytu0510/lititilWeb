@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>键盘输入法 · 拆字对和语音</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .keyboard-bg {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 520px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .kb-bg-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .kb-bg-key {
+            width: 30px;
+            height: 36px;
+            border-radius: 6px;
+            background: #2b2b2b;
+            color: #f5efe8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        header, .section, footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            backdrop-filter: blur(4px);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: rgba(250, 247, 242, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <div class="keyboard-bg" id="keyboardBg"></div>
+
+        <header>
+            <h1>键盘输入法</h1>
+            <p>拆字、对和、语音，底层早就对好了。</p>
+        </header>
+
+        <div class="section">
+            <h2>键盘与拆字</h2>
+            <div class="explain">
+                <p>键盘上的字母，不是随便放的。</p>
+                <p>Q 是 0 中间有一点，只是把里面的一点拿到右下角来了。</p>
+                <p>W 是山。</p>
+                <p>E 是山向右倒。</p>
+                <p>N 是旋转的 Z。</p>
+                <p>X 是两个 V，说到底也是山。</p>
+                <p>J 就是把 P 第二条线擦掉了。</p>
+                <p>S 就是丨或者 1 弄弯曲了。</p>
+            </div>
+            <div class="explain">
+                <p>按照“一=1，丨=0，十=10”的规则：</p>
+                <p>A = 一 = 1</p>
+                <p>E = 丨一 = 01 = 1</p>
+                <p>L = 丨一 = 01 = 1</p>
+                <p>T = 一丨 = 10</p>
+                <p>Q = 0</p>
+            </div>
+            <p class="note">字母不是字母，是笔画在键盘上的位置。</p>
+        </div>
+
+        <div class="section">
+            <h2>对和</h2>
+            <div class="explain">
+                <p>“对和”不是单纯唱歌，是声音和文字的互相呼应。</p>
+                <p>输入法打拼音，显示汉字，是“音对字”。</p>
+                <p>打汉字，反查拼音，是“字对音”。</p>
+                <p>古人说“音义合一”，现在输入法每天都在做这件事。</p>
+            </div>
+            <div class="explain">
+                <p>比如：</p>
+                <p>打 “zhong” → 中、钟、终、忠</p>
+                <p>打 “中” → zhong</p>
+                <p>这就是一套已经对好的关系。</p>
+            </div>
+            <p class="note">输入法就是现代版的“对和”。</p>
+        </div>
+
+        <div class="section">
+            <h2>语音</h2>
+            <div class="explain">
+                <p>语音输入也是同一套东西。</p>
+                <p>你说一句话，设备先听音，再把音转成字。</p>
+                <p>标点、停顿、声调，都是语音的一部分。</p>
+                <p>所以语音不只是一个字一个字地认，是认一整句的呼吸。</p>
+            </div>
+            <div class="explain">
+                <p>比如你说：</p>
+                <p>“我知道了。” 和 “我知道了……” 和 “我知道了！”</p>
+                <p>语音里是不一样的。</p>
+                <p>输入法如果不懂停顿，就听不懂真实意思。</p>
+            </div>
+            <p class="note">语音是呼吸，标点是停顿，键盘是笔画。</p>
+        </div>
+
+        <div class="section">
+            <h2>它们之间的关系</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>层</th>
+                        <th>内容</th>
+                        <th>底层</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>键盘</td>
+                        <td>字母、数字、符号</td>
+                        <td>一、丨、十、0、1</td>
+                    </tr>
+                    <tr>
+                        <td>输入法</td>
+                        <td>拼音、汉字</td>
+                        <td>音义合一</td>
+                    </tr>
+                    <tr>
+                        <td>语音</td>
+                        <td>声调、停顿、语气</td>
+                        <td>呼吸</td>
+                    </tr>
+                    <tr>
+                        <td>拆字</td>
+                        <td>笔画、偏旁、结构</td>
+                        <td>半与伴</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>一句话总结</h2>
+            <div class="explain">
+                <p>键盘是笔画，输入法是音义，语音是呼吸。</p>
+                <p>它们早就被同一套东西对好了。</p>
+                <p>不是科技太复杂，是我们一直没往底下看。</p>
+            </div>
+        </div>
+
+        <footer>
+            拆字、对和、语音，都是同一个环。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+    <script>
+        const rows = [
+            ['Q','W','E','R','T','Y','U','I','O','P'],
+            ['A','S','D','F','G','H','J','K','L'],
+            ['Z','X','C','V','B','N','M']
+        ];
+
+        function renderKeyboardBg() {
+            const container = document.getElementById('keyboardBg');
+            rows.forEach(row => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'kb-bg-row';
+                row.forEach(key => {
+                    const keyEl = document.createElement('span');
+                    keyEl.className = 'kb-bg-key';
+                    keyEl.textContent = key;
+                    rowEl.appendChild(keyEl);
+                });
+                container.appendChild(rowEl);
+            });
+        }
+
+        renderKeyboardBg();
+    </script>
+</body>
+</html>
