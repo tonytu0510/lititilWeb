@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>均富 · 概率与平衡</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ring {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin: 1.2rem 0;
+        }
+
+        .ring-item {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .ring-item.arrow {
+            border: none;
+            background: transparent;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>均富</h1>
+            <p>从麻将、概率到社会平衡。</p>
+        </header>
+
+        <div class="section">
+            <h2>核心推演</h2>
+            <div class="explain">
+                <p>短期看，人可以靠换位、换手、选择序列，提高胜率。</p>
+                <p>长期看，概率会趋于平均，任何人都会被拉回大数。</p>
+                <p>所以市场里永远有人破产，也有人发财。</p>
+                <p>但如果贫富一直极端分化，系统就会崩掉。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>为什么最后会走向均富</h2>
+            <div class="explain">
+                <p>如果底层人太多、太穷，消费、教育、稳定都会垮掉。</p>
+                <p>中产塌了，社会就没了缓冲。</p>
+                <p>富人再有钱，也需要市场、雇人、依赖社会运转。</p>
+                <p>所以为了自保，有钱人也会推动底线上升。</p>
+                <p>均富不是道德喊出来的，是结构逼出来的。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>国家为什么扶贫</h2>
+            <div class="explain">
+                <p>扶贫不是只发钱，是拉高平均线。</p>
+                <p>底线抬高，整体消费、健康、生产力才会上来。</p>
+                <p>平均线越高，社会越稳，富人也越安全。</p>
+                <p>所以消除贫困，本质是让系统长期活下去。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>有钱人真的不怕搞吗</h2>
+            <div class="explain">
+                <p>有钱人是从竞争中活下来的，不是凭空有钱。</p>
+                <p>他可能没权力，但有钱能变成律师、关系、信息。</p>
+                <p>真要动他，代价往往比想象中大得多。</p>
+                <p>所以聪明人不是仇富，是看懂财富背后的结构和反噬。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>共产主义能实现吗</h2>
+            <div class="explain">
+                <p>按这套逻辑，共产主义不是“能不能实现”，而是迟早会往那个方向走。</p>
+                <p>不是突然平均，而是不断拉高底线、缩小极端差距。</p>
+                <p>先解决温饱，再解决教育、医疗、养老。</p>
+                <p>最后让钱不再是衡量一切的唯一标准。</p>
+                <p>它是系统为了活下去，必须走的方向。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>最后一环</h2>
+            <div class="ring">
+                <span class="ring-item">概率</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">平均</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">分化</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">系统不稳</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">均富</span>
+                <span class="ring-item arrow">→</span>
+                <span class="ring-item">系统活下去</span>
+            </div>
+            <p class="note">概率 → 平均 → 分化 → 不稳定 → 均富 → 再平衡</p>
+        </div>
+
+        <footer>
+            不是富人仁慈，是均富才是所有人的活路。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
