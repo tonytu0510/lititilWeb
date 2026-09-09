@@ -641,7 +641,7 @@
         <style>
             .back-to-top-btn {
                 position: fixed;
-                right: 30px;
+                right: 26px;
                 top: 30px;
                 width: 60px;
                 height: 60px;
