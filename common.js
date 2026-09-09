@@ -651,7 +651,7 @@
                 border: 1px solid #555;
                 cursor: pointer;
                 display: none;
-                padding-top:8px;
+                padding-top:5px;
                 justify-content: center;
                 font-size: 36px;
                 z-index: 998;
