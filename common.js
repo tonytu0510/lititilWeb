@@ -640,8 +640,8 @@
         <style>
             .back-to-top-btn {
                 position: fixed;
-                right: 40px;
-                top: 40px;
+                right: 50px;
+                top: 30px;
                 width: 44px;
                 height: 44px;
                 border-radius: 50%;
