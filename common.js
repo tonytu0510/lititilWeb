@@ -655,8 +655,6 @@
                 line-height:50px;
                 font-size: 36px;
                 z-index: 998;
-                backdrop-filter: blur(4px);
-                transition: background 0.2s, opacity 0.2s;
                 font-family: 'Courier New', monospace;
             }
             .back-to-top-btn:hover {
