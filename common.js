@@ -651,8 +651,8 @@
                 border: 1px solid #555;
                 cursor: pointer;
                 display: none;
-                padding-top:5px;
-                justify-content: center;
+                text-align: center;
+                line-height:60px;
                 font-size: 36px;
                 z-index: 998;
                 backdrop-filter: blur(4px);
