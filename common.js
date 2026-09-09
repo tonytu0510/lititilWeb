@@ -666,7 +666,7 @@
                     height: 50px;
                     font-size: 22px;
                     right: 20px;
-                    line-height:46px
+                    line-height:48px
                 }
             }
         </style>
