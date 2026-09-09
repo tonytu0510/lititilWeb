@@ -677,7 +677,7 @@
         const fullHeight = document.documentElement.scrollHeight;
 
         if (fullHeight > windowHeight && scrollTop > 0) {
-            backToTopBtn.style.display = 'flex';
+            backToTopBtn.style.display = 'fixed';
         } else {
             backToTopBtn.style.display = 'none';
         }
