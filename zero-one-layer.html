@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>0/1 通用层 · 多语言标记</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e2dbd0;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+            --gold: #a9823a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5efe8;
+            font-family: 'Courier New', monospace;
+        }
+
+        .wrap {
+            max-width: 880px;
+            width: 100%;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        .explain {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin: 0.8rem 0;
+        }
+
+        .explain p {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.7rem 0.6rem;
+            border: 1px solid var(--line);
+            text-align: left;
+        }
+
+        th {
+            background: #f4ede5;
+            font-weight: 600;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+    <div class="wrap">
+        <header>
+            <h1>0/1 通用层</h1>
+            <p>先写语言，后面正常书写。</p>
+        </header>
+
+        <div class="section">
+            <h2>规则</h2>
+            <div class="explain">
+                <p>在文章最前面，标明是哪一种语言。</p>
+                <p>后面直接用正常文字书写。</p>
+                <p>需要跨语言转换时，再进入 0/1 编码。</p>
+                <p>这样人能看，机器也能转。</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>示例</h2>
+            <div class="explain">
+                <p><span class="highlight">中文：</span>一丨十，天地人。</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">英文：</span>A B C D E F G</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">盲文：</span>⠁ ⠃ ⠉</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">摩斯：</span>. - . - . - . - . - . -</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">日文：</span>あ か さ た</p>
+            </div>
+            <div class="explain">
+                <p><span class="highlight">韩文：</span>한 글</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>代表性编码</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>语言</th>
+                        <th>示例字符</th>
+                        <th>0/1 编码</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>中文</td>
+                        <td>一</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>中文</td>
+                        <td>丨</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>中文</td>
+                        <td>十</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>英文</td>
+                        <td>A</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>英文</td>
+                        <td>O</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>英文</td>
+                        <td>T</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>盲文</td>
+                        <td>数字1</td>
+                        <td>100000</td>
+                    </tr>
+                    <tr>
+                        <td>盲文</td>
+                        <td>数字2</td>
+                        <td>110000</td>
+                    </tr>
+                    <tr>
+                        <td>摩斯</td>
+                        <td>E</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>摩斯</td>
+                        <td>T</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>摩斯</td>
+                        <td>A</td>
+                        <td>01</td>
+                    </tr>
+                    <tr>
+                        <td>日文</td>
+                        <td>あ</td>
+                        <td>001</td>
+                    </tr>
+                    <tr>
+                        <td>韩文</td>
+                        <td>한</td>
+                        <td>011</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>一句话总结</h2>
+            <div class="explain">
+                <p>先写语言，后面正常书写。</p>
+                <p>人看方便，机器转换方便。</p>
+                <p>所有文字，最后都能落到 0/1。</p>
+            </div>
+        </div>
+
+        <footer>
+            语言是入口，0/1 是底层。
+        </footer>
+    </div>
+    <script src="./common.js"></script>
+</body>
+</html>
