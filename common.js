@@ -186,8 +186,8 @@
             }
             @media (max-width: 500px) {
                 #menuContainer {
-                    width: 300px;
-                    height: 300px;
+                    width: 180px;
+                    height: 180px;
                 }
                 .menu-item {
                     width: 36px;
