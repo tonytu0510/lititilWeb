@@ -663,7 +663,7 @@
                 background: rgba(43, 43, 43, 0.9);
             }
         </style>
-        <button class="back-to-top-btn" id="backToTopBtn" title="回到顶部">↑</button>
+        <div class="back-to-top-btn" id="backToTopBtn" title="回到顶部">↑</div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', backToTopHtml);
