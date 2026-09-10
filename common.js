@@ -68,7 +68,8 @@
         { name: '关于我', href: 'aboutMe.html' },
         { name: '声明', href: 'statement.html' },
         { name: '导航', href: 'ringMenu.html' },
-        { name: '读呼吸', href: 'BreathBetweenWords.html' }
+        { name: '读呼吸', href: 'BreathBetweenWords.html' },
+        { name: '想法', href: 'idea.html' }
     ];
 
     const html = `
