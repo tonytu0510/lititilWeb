@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>反着来 · 百年公司</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+<style>
+  :root{
+    --bg:#0b0f14;
+    --card:#121922;
+    --card2:#0f1620;
+    --line:#223041;
+    --text:#e8eef6;
+    --muted:#8fa3b8;
+    --gold:#f0b429;
+    --green:#3ddc97;
+    --blue:#4da3ff;
+    --red:#ff7b7b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(77,163,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(240,180,41,.12), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 14px}
+
+  .tag{
+    display:inline-block;
+    font-size:13px;
+    letter-spacing:2px;
+    color:var(--gold);
+    border:1px solid rgba(240,180,41,.35);
+    border-radius:999px;
+    padding:5px 14px;
+    margin-bottom:22px;
+  }
+
+  h1{
+    font-size:clamp(28px,5vw,46px);
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-.5px;
+    margin-bottom:18px;
+  }
+  h1 .hl{
+    background:linear-gradient(90deg,var(--gold),#ffd76a);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:clamp(15px,2vw,17px);
+    max-width:720px;
+    margin-bottom:42px;
+  }
+
+  .section-title{
+    font-size:14px;
+    letter-spacing:3px;
+    color:var(--muted);
+    margin:52px 0 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,var(--line),transparent);
+  }
+
+  .chain{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+  }
+  .step{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 16px;
+    font-size:15px;
+    color:#d7e3f0;
+    transition:.25s;
+  }
+  .step:hover{
+    border-color:var(--gold);
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  .step.bad{
+    border-color:rgba(255,123,123,.4);
+    color:#ffb4b4;
+  }
+  .step.good{
+    border-color:rgba(61,220,151,.4);
+    color:#bff5dd;
+  }
+  .arrow{
+    color:var(--gold);
+    font-size:16px;
+    opacity:.8;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    transition:.25s;
+  }
+  .card:hover{
+    border-color:rgba(240,180,41,.5);
+    transform:translateY(-3px);
+  }
+  .card h3{
+    font-size:17px;
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    display:inline-block;
+  }
+  .dot.gold{background:var(--gold)}
+  .dot.green{background:var(--green)}
+  .dot.blue{background:var(--blue)}
+  .dot.red{background:var(--red)}
+  .card ul{list-style:none}
+  .card li{
+    color:#c6d4e3;
+    font-size:15px;
+    padding:7px 0 7px 18px;
+    position:relative;
+  }
+  .card li::before{
+    content:"→";
+    position:absolute;
+    left:0;
+    color:var(--muted);
+  }
+
+  .quote{
+    margin-top:16px;
+    background:linear-gradient(135deg,rgba(240,180,41,.12),rgba(77,163,255,.08));
+    border:1px solid rgba(240,180,41,.3);
+    border-radius:18px;
+    padding:28px 26px;
+    font-size:clamp(17px,2.4vw,21px);
+    font-weight:700;
+    line-height:1.7;
+    text-align:center;
+  }
+  .quote span{color:var(--gold)}
+
+  .end{
+    margin-top:60px;
+    text-align:center;
+    padding:40px 20px;
+    border-top:1px solid var(--line);
+  }
+  .end p{
+    font-size:clamp(18px,2.6vw,23px);
+    font-weight:800;
+    line-height:1.9;
+  }
+  .end .gold{color:var(--gold)}
+  .end .green{color:var(--green)}
+  .end .blue{color:var(--blue)}
+  .foot{
+    margin-top:26px;
+    color:#5f7288;
+    font-size:13px;
+  }
+
+  @media (max-width:520px){
+    .step{font-size:14px;padding:8px 12px}
+    .arrow{font-size:13px}
+  }
+</style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+<div class="wrap">
+
+  <div class="tag">我的想法</div>
+
+  <h1>
+    想搞成百年公司，<br>
+    <span class="hl">反着来就行</span>
+  </h1>
+
+  <p class="sub">
+    有野心，搞政治，攀关系，搞裙带，开公司，拉高管亲属进公司，公司倒闭，再开公司，再倒闭，循环往复。<br>
+    这条路，走不通。<br>
+    想走通，反着来。
+  </p>
+
+  <div class="section-title">那条走不通的路</div>
+  <div class="chain">
+    <div class="step bad">有野心</div><span class="arrow">→</span>
+    <div class="step bad">搞政治</div><span class="arrow">→</span>
+    <div class="step bad">攀关系</div><span class="arrow">→</span>
+    <div class="step bad">搞裙带</div><span class="arrow">→</span>
+    <div class="step bad">开公司</div><span class="arrow">→</span>
+    <div class="step bad">拉高管亲属进公司</div><span class="arrow">→</span>
+    <div class="step bad">公司倒闭</div><span class="arrow">→</span>
+    <div class="step bad">再开公司</div><span class="arrow">→</span>
+    <div class="step bad">再倒闭</div><span class="arrow">→</span>
+    <div class="step bad">循环往复</div>
+  </div>
+
+  <div class="section-title">反着来的路</div>
+  <div class="chain">
+    <div class="step good">有野心</div><span class="arrow">→</span>
+    <div class="step good">搞产品</div><span class="arrow">→</span>
+    <div class="step good">攀技术</div><span class="arrow">→</span>
+    <div class="step good">搞制度</div><span class="arrow">→</span>
+    <div class="step good">开公司</div><span class="arrow">→</span>
+    <div class="step good">拉人才进公司</div><span class="arrow">→</span>
+    <div class="step good">公司迭代</div><span class="arrow">→</span>
+    <div class="step good">再迭代</div><span class="arrow">→</span>
+    <div class="step good">再迭代</div><span class="arrow">→</span>
+    <div class="step good">百年公司</div>
+  </div>
+
+  <div class="section-title">对照表</div>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="dot red"></span>走不通的</h3>
+      <ul>
+        <li>搞政治</li>
+        <li>攀关系</li>
+        <li>搞裙带</li>
+        <li>拉高管亲属</li>
+        <li>公司倒闭</li>
+        <li>再开再倒</li>
+        <li>循环往复</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>走得通的</h3>
+      <ul>
+        <li>搞产品</li>
+        <li>攀技术</li>
+        <li>搞制度</li>
+        <li>拉人才</li>
+        <li>公司迭代</li>
+        <li>再迭代</li>
+        <li>百年公司</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">核心</div>
+  <div class="quote">
+    想搞成百年公司，<br>
+    <span>反着来就行</span>。
+  </div>
+
+  <div class="end">
+    <p>
+      <span class="gold">不搞政治，搞产品</span><br>
+      <span class="green">不攀关系，攀技术</span><br>
+      <span class="blue">不搞裙带，搞制度</span><br>
+      <span class="gold">不拉亲属，拉人才</span>
+    </p>
+    <div class="foot">个人观点 · 欢迎讨论</div>
+  </div>
+
+</div>
+<script src="./common.js"></script>
+</body>
+</html>
