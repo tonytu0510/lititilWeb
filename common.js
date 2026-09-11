@@ -69,7 +69,8 @@
         { name: '声明', href: 'statement.html' },
         { name: '导航', href: 'ringMenu.html' },
         { name: '读呼吸', href: 'BreathBetweenWords.html' },
-        { name: '想法', href: 'idea.html' }
+        { name: '想法', href: 'idea.html' },
+        { name: '压缩方案', href: 'compress.html' }
     ];
 
     const html = `
