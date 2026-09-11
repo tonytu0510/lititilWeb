@@ -22,6 +22,7 @@
     --gold:#f0b429;
     --green:#3ddc97;
     --blue:#4da3ff;
+    --red:#ff7b7b;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
@@ -102,6 +103,14 @@
     color:#fff;
     transform:translateY(-2px);
   }
+  .step.medical{
+    border-color:rgba(61,220,151,.45);
+    color:#bff5dd;
+  }
+  .step.medical:hover{
+    border-color:var(--green);
+    color:#fff;
+  }
   .arrow{
     color:var(--gold);
     font-size:16px;
@@ -138,6 +147,7 @@
   .dot.gold{background:var(--gold)}
   .dot.green{background:var(--green)}
   .dot.blue{background:var(--blue)}
+  .dot.red{background:var(--red)}
   .card ul{list-style:none}
   .card li{
     color:#c6d4e3;
@@ -220,7 +230,7 @@
 
   <p class="sub">
     我一直觉得，很多事没那么复杂。
-    准入放开，竞争上岗，优胜劣汰，培训换道，底线兜住。
+    准入放开，竞争上岗，优胜劣汰，培训换道，医疗兜住，底线兜住。
     循环不断链，就是良性循环。
   </p>
 
@@ -232,6 +242,7 @@
     <div class="step">优胜劣汰</div><span class="arrow">→</span>
     <div class="step">培训跟上</div><span class="arrow">→</span>
     <div class="step">换赛道再战</div><span class="arrow">→</span>
+    <div class="step medical">医疗兜住</div><span class="arrow">→</span>
     <div class="step">底线兜住</div><span class="arrow">→</span>
     <div class="step">敢干的人多</div><span class="arrow">→</span>
     <div class="step">市场更活</div><span class="arrow">→</span>
@@ -248,6 +259,7 @@
         <li>少审批</li>
         <li>多服务</li>
         <li>兜底线</li>
+        <li>医疗兜住命</li>
         <li>当裁判，不当守门员</li>
       </ul>
     </div>
@@ -267,13 +279,36 @@
         <li>敢试</li>
         <li>不行就换</li>
         <li>有底可兜，有路可退</li>
+        <li>病有所医，才敢再战</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">为什么医疗要单独拎出来</div>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="dot red"></span>医疗不是普通消费</h3>
+      <ul>
+        <li>是刚需，不是可选</li>
+        <li>没钱也得看，不然就是等死</li>
+        <li>完全市场化，穷人看不起病</li>
+        <li>完全免费，又容易浪费、排队、效率低</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>医疗兜不住，循环就断</h3>
+      <ul>
+        <li>敢干的人，一场大病回到解放前</li>
+        <li>想换赛道的人，医保断了不敢动</li>
+        <li>市场再活，钱最后都流进医院</li>
+        <li>兜底兜不住命，别的兜底都是空的</li>
       </ul>
     </div>
   </div>
 
   <div class="section-title">结果</div>
   <div class="quote">
-    钱转起来 · GDP上去 · 机会变多 · <span>贫困减少</span>
+    钱转起来 · GDP上去 · 机会变多 · <span>贫困减少</span> · 病有所医
   </div>
 
   <div class="section-title">关键：别断链</div>
@@ -281,6 +316,7 @@
     <div class="break-item"><b>放开了不兜底</b> → 断</div>
     <div class="break-item"><b>兜底了不培训</b> → 断</div>
     <div class="break-item"><b>培训了不对接市场</b> → 断</div>
+    <div class="break-item"><b>医疗没兜住</b> → 断</div>
     <div class="break-item"><b>政府又回去卡审批</b> → 又断</div>
   </div>
 
@@ -310,7 +346,8 @@
     <p>
       <span class="gold">准入让市场说了算</span><br>
       <span class="green">运行让规则说了算</span><br>
-      <span class="blue">出事让法律说了算</span>
+      <span class="blue">出事让法律说了算</span><br>
+      <span class="gold">医疗让兜底说了算</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
