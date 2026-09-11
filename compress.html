@@ -7,7 +7,7 @@
     <meta name="keywords" content="个人网站,弘扬正能量">
     <meta name="description" content="这是一个个人网站,弘扬正能量">
     <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>规则压缩与还原 · 框架版</title>
+    <title>规则压缩与还原 · 示例版</title>
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./common.css">
     <script src="./dino-game.js"></script>
@@ -153,6 +153,17 @@
   }
   .hint b{color:var(--gold)}
 
+  .rule-box{
+    background:#0a0e13;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+    font-size:15px;
+    color:#c6d4e3;
+    line-height:2;
+  }
+  .rule-box .hl{color:var(--gold);font-weight:700}
+
   .end{
     margin-top:60px;
     text-align:center;
@@ -178,16 +189,16 @@
     <div id="topBarContainer"></div>
 <div class="wrap">
 
-  <div class="tag">技术设想 · 框架版</div>
+  <div class="tag">技术设想 · 示例版</div>
 
   <h1>
     规则压缩与还原<br>
-    <span class="hl">最小可跑框架</span>
+    <span class="hl">示例版</span>
   </h1>
 
   <p class="sub">
-    先跑通一轮，再换规则。<br>
-    压缩：原文 → 短码；还原：短码 → 原文。
+    压缩逻辑做成一个 JS 方法，命名 compressMethod。<br>
+    前端只调它，规则写在页面上，不碰服务端。
   </p>
 
   <div class="section-title">一、输入原文</div>
@@ -198,8 +209,8 @@
   </div>
 
   <div class="btns">
-    <button class="gold" onclick="compressText()">压缩</button>
-    <button class="green" onclick="restoreText()">还原</button>
+    <button class="gold" onclick="runCompress()">压缩</button>
+    <button class="green" onclick="runRestore()">还原</button>
     <button onclick="clearAll()">清空</button>
   </div>
 
@@ -214,33 +225,20 @@
   <div class="panel">
     <label>还原原文</label>
     <textarea id="outputText" placeholder="还原后，原文会出现在这里"></textarea>
-    <div class="hint">没规则，还原不出来。</div>
+    <div class="hint">当前为示例版，还原逻辑可替换。</div>
   </div>
 
-  <div class="section-title">四、当前规则（框架版）</div>
+  <div class="section-title">四、规则说明（示例）</div>
   <div class="panel">
-    <ul style="list-style:none">
-      <li style="color:#c6d4e3;padding:7px 0 7px 18px;position:relative">
-        <span style="position:absolute;left:0;color:var(--muted)">→</span>
-        规则：一 = 丨 = 空 = 0
-      </li>
-      <li style="color:#c6d4e3;padding:7px 0 7px 18px;position:relative">
-        <span style="position:absolute;left:0;color:var(--muted)">→</span>
-        压缩：取原文每个字的第一个笔画，横归 一，竖归 丨，其余归 0
-      </li>
-      <li style="color:#c6d4e3;padding:7px 0 7px 18px;position:relative">
-        <span style="position:absolute;left:0;color:var(--muted)">→</span>
-        再归约：一、丨、0 统一转成 空
-      </li>
-      <li style="color:#c6d4e3;padding:7px 0 7px 18px;position:relative">
-        <span style="position:absolute;left:0;color:var(--muted)">→</span>
-        还原：按规则反向展开
-      </li>
-      <li style="color:#c6d4e3;padding:7px 0 7px 18px;position:relative">
-        <span style="position:absolute;left:0;color:var(--muted)">→</span>
-        这是框架版，规则可以随时换
-      </li>
-    </ul>
+    <div class="rule-box">
+      <div><span class="hl">核心等式：</span>一 = 丨 = 空 = 0</div>
+      <div><span class="hl">压缩：</span>取原文每个字，按偏旁部首拆</div>
+      <div><span class="hl">归约：</span>横归一，竖归丨，弯/圈/点归0</div>
+      <div><span class="hl">再归约：</span>一、丨、0 统一转成空</div>
+      <div><span class="hl">短码：</span>空的数量 + 位置，组成索引</div>
+      <div><span class="hl">还原：</span>短码 + 规则 → 反向展开 → 原文</div>
+      <div><span class="hl">示例版：</span>压缩方法是占位，规则可替换</div>
+    </div>
   </div>
 
   <div class="end">
@@ -249,52 +247,54 @@
       <span class="green">内容公开</span><br>
       <span class="blue">还原在服务器端</span>
     </p>
-    <div class="foot">技术设想 · 框架版 · 先跑通再调规则</div>
+    <div class="foot">技术设想 · 示例版 · 先跑通再调规则</div>
   </div>
 
 </div>
 
 <script>
-  // 框架版规则：一 = 丨 = 空 = 0
-  // 压缩：取每个字的第一个笔画，横归一，竖归丨，其余归0
-  // 再归约：一、丨、0 统一转成 空
+  // ===== compressMethod（服务端逻辑示例，放在这里当前端用）=====
+  // 入参：text 原文
+  // 出参：code 短码
+  function compressMethod(text){
+    if(!text) return '';
 
-  function getFirstStroke(ch){
-    // 极简判断：只做框架演示
-    if(!ch) return '0';
-    // 常见横起笔
-    if('一二三王十丁厂七'.includes(ch)) return '一';
-    // 常见竖起笔
-    if('丨川山中申甲由田'.includes(ch)) return '丨';
-    // 其余归 0
-    return '0';
+    // 规则：一 = 丨 = 空 = 0
+    // 示例：取每个字的第一个笔画，横归一，竖归丨，其余归0
+    // 再归约：一、丨、0 统一转成空
+    let code = '';
+    for(let i=0;i<text.length;i++){
+      const ch = text[i];
+      let stroke = '0';
+      if('一二三王十丁厂七'.includes(ch)) stroke = '一';
+      else if('丨川山中申甲由田'.includes(ch)) stroke = '丨';
+      else stroke = '0';
+
+      // 再归约：一、丨、0 统一转成空
+      // 示例版：用 · 表示空
+      code += '·';
+    }
+
+    // 示例版：短码 = 空的数量 + 原文长度
+    return '[' + code.length + '·]' + text.length;
   }
 
-  function compressText(){
+  // ===== restoreMethod（服务端逻辑示例）=====
+  // 入参：code 短码
+  // 出参：原文（示例版只做提示）
+  function restoreMethod(code){
+    if(!code) return '';
+    return '【示例版还原】\n短码：' + code + '\n\n规则：一 = 丨 = 空 = 0\n按规则反向展开后，可还原原文。\n（当前为示例版，未接真实还原算法。）';
+  }
+
+  function runCompress(){
     const input = document.getElementById('inputText').value;
-    const code = document.getElementById('codeText');
-    if(!input){
-      code.value = '';
-      return;
-    }
-    let arr = [];
-    for(let i=0;i<input.length;i++){
-      arr.push(getFirstStroke(input[i]));
-    }
-    // 再归约：一、丨、0 统一转成 空
-    // 框架版：直接拼接，保留可读性
-    code.value = arr.join('');
+    document.getElementById('codeText').value = compressMethod(input);
   }
 
-  function restoreText(){
+  function runRestore(){
     const code = document.getElementById('codeText').value;
-    const out = document.getElementById('outputText');
-    if(!code){
-      out.value = '';
-      return;
-    }
-    // 框架版还原：把短码原样展开，提示规则
-    out.value = '【框架版还原】\n短码：' + code + '\n\n规则：一 = 丨 = 空 = 0\n按规则反向展开后，可还原原文。\n（当前为框架版，未接真实还原算法。）';
+    document.getElementById('outputText').value = restoreMethod(code);
   }
 
   function clearAll(){
