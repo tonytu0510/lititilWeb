@@ -190,7 +190,7 @@
     B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
     A：B 的结果大于 1 的数，奇偶转 0/1。<br>
     修正：相邻最多一个 1。<br>
-    差值：按十进制算。
+    差值：按二进制算。
   </p>
 
   <div class="section-title">一、输入</div>
@@ -199,7 +199,7 @@
     <input type="number" id="currentYear" value="2026" placeholder="如 2026">
 
     <label>客户生日年份</label>
-    <input type="number" id="birthYear" value="1996" placeholder="如 1996">
+    <input type="number" id="birthYear" value="2000" placeholder="如 2000">
   </div>
 
   <div class="btns">
@@ -219,14 +219,14 @@
       <div><span style="color:var(--gold)">A：</span>B 的结果大于 1 的数，奇偶转 0/1</div>
       <div><span style="color:var(--gold)">修正：</span>相邻最多一个 1</div>
       <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
-      <div><span style="color:var(--gold)">差值：</span>按十进制算差值，不按二进制、不按位</div>
+      <div><span style="color:var(--gold)">差值：</span>按二进制算差值</div>
     </div>
   </div>
 
   <div class="end">
     <p>
       <span class="gold">按规则算</span><br>
-      <span class="green">按十进制算差值</span><br>
+      <span class="green">按二进制算差值</span><br>
       <span class="blue">按结果得</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
@@ -235,12 +235,10 @@
 </div>
 
 <script>
-  // ===== B：隔位约分 =====
   function ruleB(numStr){
     const arr = numStr.split('');
     let out = arr.slice();
 
-    // 相邻相同 → 约掉（置 0）
     for(let i=0;i<arr.length-1;i++){
       if(arr[i] === arr[i+1]){
         out[i] = '0';
@@ -248,7 +246,6 @@
       }
     }
 
-    // 隔 1 位相同 → 替换成 1
     for(let i=0;i<arr.length-2;i++){
       if(arr[i] === arr[i+2]){
         out[i] = '1';
@@ -256,7 +253,6 @@
       }
     }
 
-    // 隔 2 位相同 → 替换成 1
     for(let i=0;i<arr.length-3;i++){
       if(arr[i] === arr[i+3]){
         out[i] = '1';
@@ -267,7 +263,6 @@
     return out.join('');
   }
 
-  // ===== A：奇偶转 0/1 =====
   function ruleA(numStr){
     let out = '';
     for(let i=0;i<numStr.length;i++){
@@ -281,7 +276,6 @@
     return out;
   }
 
-  // ===== 修正：相邻最多一个 1 =====
   function fixOnes(numStr){
     let arr = numStr.split('');
     for(let i=0;i<arr.length-1;i++){
@@ -292,7 +286,6 @@
     return arr.join('');
   }
 
-  // ===== 最终规则 =====
   function finalRule(numStr){
     let b = ruleB(numStr);
     let a = ruleA(b);
@@ -315,9 +308,9 @@
     const curRes = finalRule(curStr);
     const birthRes = finalRule(birthStr);
 
-    // 按十进制算差值
-    const curNum = parseInt(curRes.fixed, 10);
-    const birthNum = parseInt(birthRes.fixed, 10);
+    // 按二进制算差值
+    const curNum = parseInt(curRes.fixed, 2);
+    const birthNum = parseInt(birthRes.fixed, 2);
     const diff = curNum - birthNum;
 
     const finalNum = birth + diff;
@@ -327,15 +320,15 @@
     out += '  B：' + curRes.b + '\n';
     out += '  A：' + curRes.a + '\n';
     out += '  修正后：' + curRes.fixed + '\n';
-    out += '  结果值：' + curNum + '（按十进制）\n\n';
+    out += '  结果值：' + curNum + '（按二进制）\n\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
     out += '  B：' + birthRes.b + '\n';
     out += '  A：' + birthRes.a + '\n';
     out += '  修正后：' + birthRes.fixed + '\n';
-    out += '  结果值：' + birthNum + '（按十进制）\n\n';
+    out += '  结果值：' + birthNum + '（按二进制）\n\n';
 
-    out += '【差值】' + curRes.fixed + ' - ' + birthRes.fixed + ' = ' + diff + '（按十进制算）\n\n';
+    out += '【差值】' + curRes.fixed + ' - ' + birthRes.fixed + ' = ' + diff + '（按二进制算）\n\n';
     out += '【最终结果】' + birth + ' + ' + diff + ' = ' + finalNum + '\n';
 
     document.getElementById('resultBox').textContent = out;
