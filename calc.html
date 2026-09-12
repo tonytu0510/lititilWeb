@@ -187,8 +187,8 @@
   </h1>
 
   <p class="sub">
-    规则：先走 B，B 走不了走 A。<br>
-    B 的结果含非 0/1，再走 A。<br>
+    B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
+    A：B 的结果大于 1 的数，奇偶转 0/1。<br>
     修正：相邻最多一个 1。
   </p>
 
@@ -214,10 +214,9 @@
   <div class="section-title">三、规则说明</div>
   <div class="panel">
     <div style="color:#c6d4e3;font-size:15px;line-height:2">
-      <div><span style="color:var(--gold)">B：</span>不管隔几位，相同就保留一个，其余归 0，能约的约</div>
-      <div><span style="color:var(--gold)">相邻相同：</span>全部约掉</div>
-      <div><span style="color:var(--gold)">A：</span>B 走不了，或 B 的结果含非 0/1，走 A，奇偶转 0/1</div>
-      <div><span style="color:var(--gold)">修正：</span>结果里相邻最多一个 1</div>
+      <div><span style="color:var(--gold)">B：</span>隔位相同 → 相同位替换成 1，其余位不变；相邻相同 → 约掉</div>
+      <div><span style="color:var(--gold)">A：</span>B 的结果大于 1 的数，奇偶转 0/1</div>
+      <div><span style="color:var(--gold)">修正：</span>相邻最多一个 1</div>
       <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
     </div>
   </div>
@@ -237,46 +236,33 @@
   // ===== B：隔位约分 =====
   function ruleB(numStr){
     const arr = numStr.split('');
-    let used = new Array(arr.length).fill(false);
     let out = arr.slice();
 
-    // 相邻相同 → 全部约掉
+    // 相邻相同 → 约掉（置 0）
     for(let i=0;i<arr.length-1;i++){
       if(arr[i] === arr[i+1]){
-        used[i] = true;
-        used[i+1] = true;
+        out[i] = '0';
+        out[i+1] = '0';
       }
     }
 
-    // 隔 1 位相同
+    // 隔 1 位相同 → 替换成 1
     for(let i=0;i<arr.length-2;i++){
       if(arr[i] === arr[i+2]){
-        used[i] = true;
+        out[i] = '1';
+        out[i+2] = '1';
       }
     }
 
-    // 隔 2 位相同
+    // 隔 2 位相同 → 替换成 1
     for(let i=0;i<arr.length-3;i++){
       if(arr[i] === arr[i+3]){
-        used[i] = true;
+        out[i] = '1';
+        out[i+3] = '1';
       }
     }
 
-    // 没被用的位归 0，被用的保留一个
-    let result = '';
-    for(let i=0;i<arr.length;i++){
-      if(used[i]){
-        result += arr[i];
-      }else{
-        result += '0';
-      }
-    }
-
-    // 如果结果里全是 0，说明没有相同项
-    if(result === '0000' || result === '000'){
-      return null; // B 走不了
-    }
-    return result;
+    return out.join('');
   }
 
   // ===== A：奇偶转 0/1 =====
@@ -284,7 +270,11 @@
     let out = '';
     for(let i=0;i<numStr.length;i++){
       const n = parseInt(numStr[i]);
-      out += (n % 2 === 1) ? '1' : '0';
+      if(n > 1){
+        out += (n % 2 === 1) ? '1' : '0';
+      }else{
+        out += numStr[i];
+      }
     }
     return out;
   }
@@ -302,18 +292,10 @@
 
   // ===== 最终规则 =====
   function finalRule(numStr){
-    // 先走 B
     let b = ruleB(numStr);
-    let mid = b;
-    let base = b ? b : numStr;
-
-    // 走 A
-    let a = ruleA(base);
-
-    // 修正
+    let a = ruleA(b);
     let fixed = fixOnes(a);
-
-    return { mid: mid, base: base, a: a, fixed: fixed };
+    return { b: b, a: a, fixed: fixed };
   }
 
   function runCalc(){
@@ -328,29 +310,25 @@
     const cur = parseInt(curStr);
     const birth = parseInt(birthStr);
 
-    // 当前年份规则结果
     const curRes = finalRule(curStr);
-    // 生日年份规则结果
     const birthRes = finalRule(birthStr);
 
-    // 差值 = 当前年份结果 - 生日年份结果（按最终 0/1 结果转成数值）
     const curNum = parseInt(curRes.fixed, 2);
     const birthNum = parseInt(birthRes.fixed, 2);
     const diff = curNum - birthNum;
 
-    // 最终结果 = 生日年份 + 差值
     const finalNum = birth + diff;
 
     let out = '';
     out += '【当前年份】' + curStr + '\n';
-    out += '  B 中间态：' + (curRes.mid || '无') + '\n';
-    out += '  走 A：' + curRes.a + '\n';
+    out += '  B：' + curRes.b + '\n';
+    out += '  A：' + curRes.a + '\n';
     out += '  修正后：' + curRes.fixed + '\n';
     out += '  结果值：' + curNum + '\n\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
-    out += '  B 中间态：' + (birthRes.mid || '无') + '\n';
-    out += '  走 A：' + birthRes.a + '\n';
+    out += '  B：' + birthRes.b + '\n';
+    out += '  A：' + birthRes.a + '\n';
     out += '  修正后：' + birthRes.fixed + '\n';
     out += '  结果值：' + birthNum + '\n\n';
 
