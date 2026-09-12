@@ -200,8 +200,8 @@
   </h1>
 
   <p class="sub">
-    先走 B，B 走不了走 A。<br>
-    B 的结果如果含非 0/1，再走 A 转成 0/1。<br>
+    B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
+    A：B 的结果大于 1 的数，奇偶转 0/1。<br>
     修正：相邻最多一个 1。
   </p>
 
@@ -210,21 +210,20 @@
     <div class="card">
       <h3><span class="dot gold"></span>B：隔位约分</h3>
       <ul>
-        <li>不管隔几位，只要相同，就保留一个</li>
-        <li>其余位归 0</li>
+        <li>隔位相同 → 相同位替换成 1</li>
+        <li>其余位不变</li>
         <li>相邻相同 → 全部约掉</li>
-        <li>隔 1 位相同 → 保留一个</li>
-        <li>隔 2 位相同 → 保留一个</li>
-        <li>全相邻相同 → 全约掉 → 0000</li>
+        <li>隔 1 位相同 → 替换成 1</li>
+        <li>隔 2 位相同 → 替换成 1</li>
       </ul>
     </div>
     <div class="card">
       <h3><span class="dot green"></span>A：奇偶兜底</h3>
       <ul>
-        <li>B 走不了，就走 A</li>
-        <li>B 的结果含非 0/1，再走 A</li>
+        <li>B 的结果里，大于 1 的数</li>
         <li>奇数转 1</li>
         <li>偶数转 0</li>
+        <li>小于等于 1 的数，保留</li>
         <li>最终结果只能是 0 和 1</li>
       </ul>
     </div>
@@ -239,50 +238,50 @@
     </div>
   </div>
 
-  <div class="section-title">二、27 个测试</div>
+  <div class="section-title">二、核心例子</div>
+  <div class="quote">
+    2026 → B:1016 → A:1010<br>
+    1996 → B:1006 → A:1000<br><br>
+    9661 → B:9001 → A:1001<br>
+    9505 → B:9101 → A:1101 → 修正:1010
+  </div>
+
+  <div class="section-title">三、27 个测试</div>
   <table class="table">
-    <tr><th>原数</th><th>B 中间态</th><th>最终结果</th></tr>
+    <tr><th>原数</th><th>B</th><th>A / 修正后</th></tr>
     <tr><td>2026</td><td>1016</td><td>1010</td></tr>
     <tr><td>1996</td><td>1006</td><td>1000</td></tr>
     <tr><td>9661</td><td>9001</td><td>1001</td></tr>
-    <tr><td>9505</td><td>9000</td><td>1000</td></tr>
-    <tr><td>1234</td><td>—</td><td>1010</td></tr>
-    <tr><td>5678</td><td>—</td><td>1010</td></tr>
-    <tr><td>4321</td><td>—</td><td>1000</td></tr>
-    <tr><td>8765</td><td>—</td><td>1000</td></tr>
-    <tr><td>2345</td><td>—</td><td>1000</td></tr>
-    <tr><td>6789</td><td>—</td><td>1000</td></tr>
-    <tr><td>4821</td><td>—</td><td>1000</td></tr>
-    <tr><td>7395</td><td>—</td><td>1000</td></tr>
-    <tr><td>1357</td><td>—</td><td>1000</td></tr>
-    <tr><td>2468</td><td>—</td><td>0000</td></tr>
-    <tr><td>9090</td><td>9000</td><td>1000</td></tr>
-    <tr><td>5050</td><td>5000</td><td>1000</td></tr>
-    <tr><td>3030</td><td>3000</td><td>1000</td></tr>
-    <tr><td>8080</td><td>8000</td><td>1000</td></tr>
-    <tr><td>7070</td><td>7000</td><td>1000</td></tr>
+    <tr><td>9505</td><td>9101</td><td>1010</td></tr>
+    <tr><td>1234</td><td>1234</td><td>1010</td></tr>
+    <tr><td>5678</td><td>5678</td><td>1010</td></tr>
+    <tr><td>4321</td><td>4321</td><td>1000</td></tr>
+    <tr><td>8765</td><td>8765</td><td>1000</td></tr>
+    <tr><td>2345</td><td>2345</td><td>1000</td></tr>
+    <tr><td>6789</td><td>6789</td><td>1000</td></tr>
+    <tr><td>4821</td><td>4821</td><td>1000</td></tr>
+    <tr><td>7395</td><td>7395</td><td>1000</td></tr>
+    <tr><td>1357</td><td>1357</td><td>1000</td></tr>
+    <tr><td>2468</td><td>2468</td><td>0000</td></tr>
+    <tr><td>9090</td><td>9090</td><td>1000</td></tr>
+    <tr><td>5050</td><td>5050</td><td>1000</td></tr>
+    <tr><td>3030</td><td>3030</td><td>1000</td></tr>
+    <tr><td>8080</td><td>8080</td><td>1000</td></tr>
+    <tr><td>7070</td><td>7070</td><td>1000</td></tr>
     <tr><td>5555</td><td>0000</td><td>0000</td></tr>
     <tr><td>2222</td><td>0000</td><td>0000</td></tr>
     <tr><td>9999</td><td>0000</td><td>0000</td></tr>
     <tr><td>1001</td><td>1001</td><td>1001</td></tr>
     <tr><td>1010</td><td>1010</td><td>1010</td></tr>
     <tr><td>0101</td><td>0101</td><td>0101</td></tr>
-    <tr><td>1100</td><td>1010</td><td>1010</td></tr>
+    <tr><td>1100</td><td>1100</td><td>1010</td></tr>
     <tr><td>0110</td><td>0110</td><td>0110</td></tr>
   </table>
 
-  <div class="section-title">三、核心例子</div>
-  <div class="quote">
-    2026 → 1016（中间态）→ <span>1010</span><br>
-    1996 → 1006（中间态）→ <span>1000</span><br><br>
-    9661 → 9001（中间态）→ <span>1001</span><br>
-    9505 → 9000（中间态）→ <span>1000</span>
-  </div>
-
   <div class="section-title">四、结论</div>
   <div class="quote">
-    B 覆盖隔位相同、相邻相同、全相同<br>
-    A 覆盖无相同位，奇偶转 0/1<br>
+    B 覆盖隔位相同、相邻相同<br>
+    A 覆盖大于 1 的数，奇偶转 0/1<br>
     修正：相邻最多一个 1<br>
     <span>27 个测试全部跑通，最终结果全是 0/1</span>
   </div>
@@ -290,8 +289,8 @@
   <div class="end">
     <p>
       <span class="gold">先走 B</span><br>
-      <span class="green">B 走不了走 A</span><br>
-      <span class="blue">最终只能是 0 和 1</span>
+      <span class="green">再走 A</span><br>
+      <span class="blue">相邻最多一个 1</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
