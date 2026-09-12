@@ -311,7 +311,7 @@
     //const birthRes = finalRule(birthStr);
 
     // 客户生日年份修正值，取补码（取反 + 1）
-    let birthComplement = birthStr.fixed.split('').map(c => c === '0' ? '1' : '0').join('');
+    let birthComplement = birthStr.split('').map(c => c === '0' ? '1' : '0').join('');
 
     // 位数对齐，自动补 0
     const maxLen = Math.max(curRes.fixed.length, birthComplement.length);
