@@ -190,7 +190,7 @@
     B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
     A：B 的结果大于 1 的数，奇偶转 0/1。<br>
     修正：相邻最多一个 1。<br>
-    客户生日年份的修正值倒过来。<br>
+    客户生日年份取补码（取反 + 1），位数不同自动补 0。<br>
     差值：按二进制算。
   </p>
 
@@ -220,7 +220,7 @@
       <div><span style="color:var(--gold)">A：</span>B 的结果大于 1 的数，奇偶转 0/1</div>
       <div><span style="color:var(--gold)">修正：</span>相邻最多一个 1</div>
       <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
-      <div><span style="color:var(--gold)">倒置：</span>客户生日年份的修正值倒过来</div>
+      <div><span style="color:var(--gold)">补码：</span>客户生日年份修正值取反 + 1，位数不同自动补 0</div>
       <div><span style="color:var(--gold)">差值：</span>按二进制算差值</div>
     </div>
   </div>
@@ -228,7 +228,7 @@
   <div class="end">
     <p>
       <span class="gold">按规则算</span><br>
-      <span class="green">客户生日倒过来</span><br>
+      <span class="green">客户生日取补码</span><br>
       <span class="blue">按二进制算差值</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
@@ -310,13 +310,26 @@
     const curRes = finalRule(curStr);
     const birthRes = finalRule(birthStr);
 
-    // 客户生日年份的修正值倒过来
-    const birthFixedReversed = birthRes.fixed.split('').reverse().join('');
+    // 客户生日年份修正值，取补码（取反 + 1）
+    let birthComplement = birthRes.fixed.split('').map(c => c === '0' ? '1' : '0').join('');
 
-    // 当前年份修正值，按二进制
-    const curNum = parseInt(curRes.fixed, 2);
-    // 客户生日倒过来的值，按二进制
-    const birthNum = parseInt(birthFixedReversed, 2);
+    // 位数对齐，自动补 0
+    const maxLen = Math.max(curRes.fixed.length, birthComplement.length);
+    const curFixedPadded = curRes.fixed.padStart(maxLen, '0');
+    const birthComplementPadded = birthComplement.padStart(maxLen, '0');
+
+    // 补码 = 取反 + 1
+    let carry = 1;
+    let birthComplementFinal = '';
+    for(let i = birthComplementPadded.length - 1; i >= 0; i--){
+      const sum = parseInt(birthComplementPadded[i]) + carry;
+      birthComplementFinal = (sum % 2) + birthComplementFinal;
+      carry = Math.floor(sum / 2);
+    }
+
+    // 按二进制算差值
+    const curNum = parseInt(curFixedPadded, 2);
+    const birthNum = parseInt(birthComplementFinal, 2);
     const diff = curNum - birthNum;
 
     const finalNum = birth + diff;
@@ -332,10 +345,10 @@
     out += '  B：' + birthRes.b + '\n';
     out += '  A：' + birthRes.a + '\n';
     out += '  修正后：' + birthRes.fixed + '\n';
-    out += '  倒过来：' + birthFixedReversed + '\n';
+    out += '  补码：' + birthComplementFinal + '\n';
     out += '  结果值：' + birthNum + '（按二进制）\n\n';
 
-    out += '【差值】' + curRes.fixed + ' - ' + birthFixedReversed + ' = ' + diff + '（按二进制算）\n\n';
+    out += '【差值】' + curFixedPadded + ' - ' + birthComplementFinal + ' = ' + diff + '（按二进制算）\n\n';
     out += '【最终结果】' + birth + ' + ' + diff + ' = ' + finalNum + '\n';
 
     document.getElementById('resultBox').textContent = out;
