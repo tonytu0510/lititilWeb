@@ -72,7 +72,8 @@
         { name: '想法', href: 'idea.html' },
         { name: '压缩方案', href: 'compress.html' },
         { name: '百年公司', href: 'company.html' },
-        { name: '规则', href: 'rule.html' }
+        { name: '规则', href: 'rule.html' },
+        { name: '计算器', href: 'calc.html' }
     ];
 
     const html = `

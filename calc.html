@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>年份规则计算器</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+<style>
+  :root{
+    --bg:#0b0f14;
+    --card:#121922;
+    --card2:#0f1620;
+    --line:#223041;
+    --text:#e8eef6;
+    --muted:#8fa3b8;
+    --gold:#f0b429;
+    --green:#3ddc97;
+    --blue:#4da3ff;
+    --red:#ff7b7b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(77,163,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(240,180,41,.12), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 14px}
+
+  .tag{
+    display:inline-block;
+    font-size:13px;
+    letter-spacing:2px;
+    color:var(--gold);
+    border:1px solid rgba(240,180,41,.35);
+    border-radius:999px;
+    padding:5px 14px;
+    margin-bottom:22px;
+  }
+
+  h1{
+    font-size:clamp(26px,4.5vw,42px);
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-.5px;
+    margin-bottom:18px;
+  }
+  h1 .hl{
+    background:linear-gradient(90deg,var(--gold),#ffd76a);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:clamp(15px,2vw,17px);
+    max-width:720px;
+    margin-bottom:42px;
+  }
+
+  .section-title{
+    font-size:14px;
+    letter-spacing:3px;
+    color:var(--muted);
+    margin:52px 0 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,var(--line),transparent);
+  }
+
+  .panel{
+    background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .panel label{
+    display:block;
+    font-size:14px;
+    color:var(--gold);
+    letter-spacing:1px;
+    margin-bottom:10px;
+  }
+  input{
+    width:100%;
+    background:#0a0e13;
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    font-size:16px;
+    font-family:inherit;
+    outline:none;
+    margin-bottom:14px;
+  }
+  input:focus{
+    border-color:var(--gold);
+  }
+
+  .btns{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:18px 0;
+  }
+  button{
+    background:linear-gradient(180deg,#1a2330,#121922);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 22px;
+    font-size:15px;
+    cursor:pointer;
+    transition:.25s;
+    font-family:inherit;
+  }
+  button:hover{
+    border-color:var(--gold);
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  button.gold{
+    border-color:rgba(240,180,41,.5);
+    color:var(--gold);
+  }
+
+  .result{
+    background:#0a0e13;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+    font-size:15px;
+    color:#c6d4e3;
+    line-height:2.2;
+    white-space:pre-wrap;
+  }
+  .result .hl{color:var(--gold);font-weight:700}
+  .result .green{color:var(--green)}
+  .result .blue{color:var(--blue)}
+
+  .end{
+    margin-top:60px;
+    text-align:center;
+    padding:40px 20px;
+    border-top:1px solid var(--line);
+  }
+  .end p{
+    font-size:clamp(16px,2.4vw,20px);
+    font-weight:800;
+    line-height:1.9;
+  }
+  .end .gold{color:var(--gold)}
+  .end .green{color:var(--green)}
+  .end .blue{color:var(--blue)}
+  .foot{
+    margin-top:26px;
+    color:#5f7288;
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+<div class="wrap">
+
+  <div class="tag">我的想法 · 工具</div>
+
+  <h1>
+    年份规则计算器<br>
+    <span class="hl">按规则算差值，再算结果</span>
+  </h1>
+
+  <p class="sub">
+    规则：先走 B，B 走不了走 A。<br>
+    B 的结果含非 0/1，再走 A。<br>
+    修正：相邻最多一个 1。
+  </p>
+
+  <div class="section-title">一、输入</div>
+  <div class="panel">
+    <label>当前年份</label>
+    <input type="number" id="currentYear" value="2026" placeholder="如 2026">
+
+    <label>客户生日年份</label>
+    <input type="number" id="birthYear" value="1996" placeholder="如 1996">
+  </div>
+
+  <div class="btns">
+    <button class="gold" onclick="runCalc()">计算</button>
+    <button onclick="clearAll()">清空</button>
+  </div>
+
+  <div class="section-title">二、结果</div>
+  <div class="panel">
+    <div class="result" id="resultBox">点“计算”后，结果显示在这里。</div>
+  </div>
+
+  <div class="section-title">三、规则说明</div>
+  <div class="panel">
+    <div style="color:#c6d4e3;font-size:15px;line-height:2">
+      <div><span style="color:var(--gold)">B：</span>不管隔几位，相同就保留一个，其余归 0，能约的约</div>
+      <div><span style="color:var(--gold)">相邻相同：</span>全部约掉</div>
+      <div><span style="color:var(--gold)">A：</span>B 走不了，或 B 的结果含非 0/1，走 A，奇偶转 0/1</div>
+      <div><span style="color:var(--gold)">修正：</span>结果里相邻最多一个 1</div>
+      <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
+    </div>
+  </div>
+
+  <div class="end">
+    <p>
+      <span class="gold">按规则算</span><br>
+      <span class="green">按差值推</span><br>
+      <span class="blue">按结果得</span>
+    </p>
+    <div class="foot">个人观点 · 欢迎讨论</div>
+  </div>
+
+</div>
+
+<script>
+  // ===== B：隔位约分 =====
+  function ruleB(numStr){
+    const arr = numStr.split('');
+    let used = new Array(arr.length).fill(false);
+    let out = arr.slice();
+
+    // 相邻相同 → 全部约掉
+    for(let i=0;i<arr.length-1;i++){
+      if(arr[i] === arr[i+1]){
+        used[i] = true;
+        used[i+1] = true;
+      }
+    }
+
+    // 隔 1 位相同
+    for(let i=0;i<arr.length-2;i++){
+      if(arr[i] === arr[i+2]){
+        used[i] = true;
+      }
+    }
+
+    // 隔 2 位相同
+    for(let i=0;i<arr.length-3;i++){
+      if(arr[i] === arr[i+3]){
+        used[i] = true;
+      }
+    }
+
+    // 没被用的位归 0，被用的保留一个
+    let result = '';
+    for(let i=0;i<arr.length;i++){
+      if(used[i]){
+        result += arr[i];
+      }else{
+        result += '0';
+      }
+    }
+
+    // 如果结果里全是 0，说明没有相同项
+    if(result === '0000' || result === '000'){
+      return null; // B 走不了
+    }
+    return result;
+  }
+
+  // ===== A：奇偶转 0/1 =====
+  function ruleA(numStr){
+    let out = '';
+    for(let i=0;i<numStr.length;i++){
+      const n = parseInt(numStr[i]);
+      out += (n % 2 === 1) ? '1' : '0';
+    }
+    return out;
+  }
+
+  // ===== 修正：相邻最多一个 1 =====
+  function fixOnes(numStr){
+    let arr = numStr.split('');
+    for(let i=0;i<arr.length-1;i++){
+      if(arr[i] === '1' && arr[i+1] === '1'){
+        arr[i+1] = '0';
+      }
+    }
+    return arr.join('');
+  }
+
+  // ===== 最终规则 =====
+  function finalRule(numStr){
+    // 先走 B
+    let b = ruleB(numStr);
+    let mid = b;
+    let base = b ? b : numStr;
+
+    // 走 A
+    let a = ruleA(base);
+
+    // 修正
+    let fixed = fixOnes(a);
+
+    return { mid: mid, base: base, a: a, fixed: fixed };
+  }
+
+  function runCalc(){
+    const curStr = document.getElementById('currentYear').value.trim();
+    const birthStr = document.getElementById('birthYear').value.trim();
+
+    if(!curStr || !birthStr){
+      document.getElementById('resultBox').textContent = '请输入两个年份。';
+      return;
+    }
+
+    const cur = parseInt(curStr);
+    const birth = parseInt(birthStr);
+
+    // 当前年份规则结果
+    const curRes = finalRule(curStr);
+    // 生日年份规则结果
+    const birthRes = finalRule(birthStr);
+
+    // 差值 = 当前年份结果 - 生日年份结果（按最终 0/1 结果转成数值）
+    const curNum = parseInt(curRes.fixed, 2);
+    const birthNum = parseInt(birthRes.fixed, 2);
+    const diff = curNum - birthNum;
+
+    // 最终结果 = 生日年份 + 差值
+    const finalNum = birth + diff;
+
+    let out = '';
+    out += '【当前年份】' + curStr + '\n';
+    out += '  B 中间态：' + (curRes.mid || '无') + '\n';
+    out += '  走 A：' + curRes.a + '\n';
+    out += '  修正后：' + curRes.fixed + '\n';
+    out += '  结果值：' + curNum + '\n\n';
+
+    out += '【客户生日年份】' + birthStr + '\n';
+    out += '  B 中间态：' + (birthRes.mid || '无') + '\n';
+    out += '  走 A：' + birthRes.a + '\n';
+    out += '  修正后：' + birthRes.fixed + '\n';
+    out += '  结果值：' + birthNum + '\n\n';
+
+    out += '【差值】' + curNum + ' - ' + birthNum + ' = ' + diff + '\n\n';
+    out += '【最终结果】' + birth + ' + ' + diff + ' = ' + finalNum + '\n';
+
+    document.getElementById('resultBox').textContent = out;
+  }
+
+  function clearAll(){
+    document.getElementById('currentYear').value = '';
+    document.getElementById('birthYear').value = '';
+    document.getElementById('resultBox').textContent = '点“计算”后，结果显示在这里。';
+  }
+</script>
+
+<script src="./common.js"></script>
+</body>
+</html>
