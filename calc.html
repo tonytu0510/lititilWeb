@@ -190,6 +190,7 @@
     B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
     A：B 的结果大于 1 的数，奇偶转 0/1。<br>
     修正：相邻最多一个 1。<br>
+    客户生日年份的修正值倒过来。<br>
     差值：按二进制算。
   </p>
 
@@ -219,6 +220,7 @@
       <div><span style="color:var(--gold)">A：</span>B 的结果大于 1 的数，奇偶转 0/1</div>
       <div><span style="color:var(--gold)">修正：</span>相邻最多一个 1</div>
       <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
+      <div><span style="color:var(--gold)">倒置：</span>客户生日年份的修正值倒过来</div>
       <div><span style="color:var(--gold)">差值：</span>按二进制算差值</div>
     </div>
   </div>
@@ -226,8 +228,8 @@
   <div class="end">
     <p>
       <span class="gold">按规则算</span><br>
-      <span class="green">按二进制算差值</span><br>
-      <span class="blue">按结果得</span>
+      <span class="green">客户生日倒过来</span><br>
+      <span class="blue">按二进制算差值</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
@@ -308,9 +310,12 @@
     const curRes = finalRule(curStr);
     const birthRes = finalRule(birthStr);
 
+    // 客户生日年份的修正值倒过来
+    const birthFixedReversed = birthRes.fixed.split('').reverse().join('');
+
     // 按二进制算差值
     const curNum = parseInt(curRes.fixed, 2);
-    const birthNum = parseInt(birthRes.fixed, 2);
+    const birthNum = parseInt(birthFixedReversed, 2);
     const diff = curNum - birthNum;
 
     const finalNum = birth + diff;
@@ -326,9 +331,10 @@
     out += '  B：' + birthRes.b + '\n';
     out += '  A：' + birthRes.a + '\n';
     out += '  修正后：' + birthRes.fixed + '\n';
+    out += '  倒过来：' + birthFixedReversed + '\n';
     out += '  结果值：' + birthNum + '（按二进制）\n\n';
 
-    out += '【差值】' + curRes.fixed + ' - ' + birthRes.fixed + ' = ' + diff + '（按二进制算）\n\n';
+    out += '【差值】' + curRes.fixed + ' - ' + birthFixedReversed + ' = ' + diff + '（按二进制算）\n\n';
     out += '【最终结果】' + birth + ' + ' + diff + ' = ' + finalNum + '\n';
 
     document.getElementById('resultBox').textContent = out;
