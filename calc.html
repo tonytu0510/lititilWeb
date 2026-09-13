@@ -273,22 +273,26 @@
     }
 
     const curB = ruleB(curStr);
-    const curA = ruleB(ruleA(curB));
+    const curA = ruleA(curB);
+    const curEnd = ruleB(curA)
 
     const birthB = ruleB(birthStr);
-    const birthA = ruleB(ruleA(birthB));
+    const birthA = ruleA(birthB);
+    const birthEnd = ruleB(birthA)
 
     let out = '';
     out += '【当前年份】' + curStr + '\n';
     out += '  B：' + (curB || '（空）') + '\n';
     out += '  A：' + (curA || '（空）') + '\n\n';
+    out += '  修正之后结果：' + (curEnd || '（空）') + '\n\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
     out += '  B：' + (birthB || '（空）') + '\n';
     out += '  A：' + (birthA || '（空）') + '\n\n';
+    out += '  修正之后结果：' + (birthEnd || '（空）') + '\n\n';
 
     out += '【对比】' + curA + ' == ' + birthA + '\n';
-    out += '【是否相等】' + (curA === birthA ? '是' : '否') + '\n';
+    out += '【是否相等】' + (curEnd === birthEnd ? '是' : '否') + '\n';
 
     document.getElementById('resultBox').textContent = out;
   }
