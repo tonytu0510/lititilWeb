@@ -183,15 +183,12 @@
 
   <h1>
     年份规则计算器<br>
-    <span class="hl">按规则算差值，再算结果</span>
+    <span class="hl">相同约分 + 奇偶转 0/1</span>
   </h1>
 
   <p class="sub">
-    B：隔位相同 → 替换成 1；相邻相同 → 约掉。<br>
-    A：B 的结果大于 1 的数，奇偶转 0/1。<br>
-    修正：相邻最多一个 1。<br>
-    客户生日年份取补码（取反 + 1），位数不同自动补 0。<br>
-    差值：按二进制算。
+    B：数字相同的全部约分，只保留出现 1 次的数字，0 也丢掉。<br>
+    A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留。
   </p>
 
   <div class="section-title">一、输入</div>
@@ -216,20 +213,17 @@
   <div class="section-title">三、规则说明</div>
   <div class="panel">
     <div style="color:#c6d4e3;font-size:15px;line-height:2">
-      <div><span style="color:var(--gold)">B：</span>隔位相同 → 相同位替换成 1，其余位不变；相邻相同 → 约掉</div>
-      <div><span style="color:var(--gold)">A：</span>B 的结果大于 1 的数，奇偶转 0/1</div>
-      <div><span style="color:var(--gold)">修正：</span>相邻最多一个 1</div>
-      <div><span style="color:var(--gold)">最终：</span>结果只能是 0 和 1</div>
-      <div><span style="color:var(--gold)">补码：</span>客户生日年份修正值取反 + 1，位数不同自动补 0</div>
-      <div><span style="color:var(--gold)">差值：</span>按二进制算差值</div>
+      <div><span style="color:var(--gold)">B：</span>数字相同的全部约分，只保留出现 1 次的数字，0 也丢掉</div>
+      <div><span style="color:var(--gold)">A：</span>大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留</div>
+      <div><span style="color:var(--gold)">最终：</span>两边各出一串结果，对比是否相等</div>
     </div>
   </div>
 
   <div class="end">
     <p>
-      <span class="gold">按规则算</span><br>
-      <span class="green">客户生日取补码</span><br>
-      <span class="blue">按二进制算差值</span>
+      <span class="gold">相同约分</span><br>
+      <span class="green">奇偶转 0/1</span><br>
+      <span class="blue">对比结果</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
@@ -237,75 +231,25 @@
 </div>
 
 <script>
+  // ===== B：数字相同的全部约分 =====
   function ruleB(numStr){
     const arr = numStr.split('');
-    let rArr = []
-    let start = 0
-    let end = 0
-    console.log('ppppppp')
-    //里面有任何相同的都约分-挨着的
-    /*
-    for(let i=0;i < arr.length;i++){
-        if(arr[i] == arr[i+1]){
-            start = arr[i]
-            end = arr[i + 1]
-            let a = {
-                's':{
-                    index:i,
-                    value:start
-                },
-                'e':{
-                    index:i+1,
-                    value:end
-                }
-            }
-            rArr.push(a)
-        }
-        if((arr[i] == arr[i+1]) && (arr[i] == arr[i-1])){
-            start = arr[i - 1]
-            end = arr[i + 1]
-            let a = {
-                's':{
-                    index:i-1,
-                    value:start
-                },
-                'e':{
-                    index:i+1,
-                    value:end
-                }
-            }
-            rArr.push(a)
-        }
+    const count = new Map();
+    for (const item of arr) {
+      count.set(item, (count.get(item) || 0) + 1);
     }
-    for(let k=0;k<rArr.length;k++){
-        if(rArr[k].s.value == rArr[k].e.value){
-            for(let y=rArr[k].s.index;y<=rArr[k].e.index;y++){
-                arr.splice(y , 1, 0)
-            }
-        }
+    const result = [];
+    for (const [item, times] of count) {
+      if (times === 1 && item !== '0') {
+        result.push(item);
+      }
     }
-    */
-    //数组里面相同的全部约分
-    function findDuplicates(arr) {
-        const count = new Map();
-        const duplicates = [];
-        for (const item of arr) {
-            count.set(item, (count.get(item) || 0) + 1);
-        }
-        for (const [item, times] of count) {
-            if (times == 1 && item!=0 ) duplicates.push(item);
-        }
-        return duplicates;
-    }
-    // findDuplicates([1, 2, 2, 3, 4, 4, 5]) => [2, 4]
-    let ar = findDuplicates(arr)
-    //删除里面的0
-    let newArr = ar.filter(item => item !== 0);
-
-    console.log('arr=>',ar)
-    return ar.join('');
+    return result.join('');
   }
 
+  // ===== A：奇偶规则 =====
+  // 大于 1 的数：奇数转 0，偶数转 1
+  // 小于等于 1 的数：保留
   function ruleA(numStr){
     let out = '';
     for(let i=0;i<numStr.length;i++){
@@ -327,22 +271,27 @@
       document.getElementById('resultBox').textContent = '请输入两个年份。';
       return;
     }
-    ruleB(birthStr)
-    // 按二进制算差值
+
+    const curB = ruleB(curStr);
+    const curA = ruleA(curB);
+
+    const birthB = ruleB(birthStr);
+    const birthA = ruleA(birthB);
+
     let out = '';
     out += '【当前年份】' + curStr + '\n';
-    out += '  B：' + ruleB(curStr) + '\n';
-    out += '  A：' + ruleA(ruleB(curStr)) + '\n';
+    out += '  B：' + (curB || '（空）') + '\n';
+    out += '  A：' + (curA || '（空）') + '\n\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
-    out += '  B：' + ruleB(birthStr) + '\n';
-    out += '  A：' + ruleA(ruleB(birthStr)) + '\n';
+    out += '  B：' + (birthB || '（空）') + '\n';
+    out += '  A：' + (birthA || '（空）') + '\n\n';
 
-    out += '【最终结果】' + ruleA(ruleB(curStr)) + '==' + ruleA(ruleB(birthStr)) + '\n';
+    out += '【对比】' + curA + ' == ' + birthA + '\n';
+    out += '【是否相等】' + (curA === birthA ? '是' : '否') + '\n';
 
     document.getElementById('resultBox').textContent = out;
   }
-    
 
   function clearAll(){
     document.getElementById('currentYear').value = '';
