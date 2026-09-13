@@ -239,30 +239,71 @@
 <script>
   function ruleB(numStr){
     const arr = numStr.split('');
-    let out = arr.slice();
-
-    for(let i=0;i<arr.length-1;i++){
-      if(arr[i] === arr[i+1]){
-        out[i] = '0';
-        out[i+1] = '0';
-      }
+    let rArr = []
+    let start = 0
+    let end = 0
+    console.log('ppppppp')
+    //里面有任何相同的都约分-挨着的
+    /*
+    for(let i=0;i < arr.length;i++){
+        if(arr[i] == arr[i+1]){
+            start = arr[i]
+            end = arr[i + 1]
+            let a = {
+                's':{
+                    index:i,
+                    value:start
+                },
+                'e':{
+                    index:i+1,
+                    value:end
+                }
+            }
+            rArr.push(a)
+        }
+        if((arr[i] == arr[i+1]) && (arr[i] == arr[i-1])){
+            start = arr[i - 1]
+            end = arr[i + 1]
+            let a = {
+                's':{
+                    index:i-1,
+                    value:start
+                },
+                'e':{
+                    index:i+1,
+                    value:end
+                }
+            }
+            rArr.push(a)
+        }
     }
-
-    for(let i=0;i<arr.length-2;i++){
-      if(arr[i] === arr[i+2]){
-        out[i] = '1';
-        out[i+2] = '1';
-      }
+    for(let k=0;k<rArr.length;k++){
+        if(rArr[k].s.value == rArr[k].e.value){
+            for(let y=rArr[k].s.index;y<=rArr[k].e.index;y++){
+                arr.splice(y , 1, 0)
+            }
+        }
     }
-
-    for(let i=0;i<arr.length-3;i++){
-      if(arr[i] === arr[i+3]){
-        out[i] = '1';
-        out[i+3] = '1';
-      }
+    */
+    //数组里面相同的全部约分
+    function findDuplicates(arr) {
+        const count = new Map();
+        const duplicates = [];
+        for (const item of arr) {
+            count.set(item, (count.get(item) || 0) + 1);
+        }
+        for (const [item, times] of count) {
+            if (times == 1 && item!=0 ) duplicates.push(item);
+        }
+        return duplicates;
     }
+    // findDuplicates([1, 2, 2, 3, 4, 4, 5]) => [2, 4]
+    let ar = findDuplicates(arr)
+    //删除里面的0
+    let newArr = ar.filter(item => item !== 0);
 
-    return out.join('');
+    console.log('arr=>',ar)
+    return ar.join('');
   }
 
   function ruleA(numStr){
@@ -270,29 +311,12 @@
     for(let i=0;i<numStr.length;i++){
       const n = parseInt(numStr[i]);
       if(n > 1){
-        out += (n % 2 === 1) ? '1' : '0';
+        out += (n % 2 === 1) ? '0' : '1';
       }else{
         out += numStr[i];
       }
     }
     return out;
-  }
-
-  function fixOnes(numStr){
-    let arr = numStr.split('');
-    for(let i=0;i<arr.length-1;i++){
-      if(arr[i] === '1' && arr[i+1] === '1'){
-        arr[i+1] = '0';
-      }
-    }
-    return arr.join('');
-  }
-
-  function finalRule(numStr){
-    let b = ruleB(numStr);
-    let a = ruleA(b);
-    let fixed = fixOnes(a);
-    return { b: b, a: a, fixed: fixed };
   }
 
   function runCalc(){
@@ -303,56 +327,22 @@
       document.getElementById('resultBox').textContent = '请输入两个年份。';
       return;
     }
-
-    const cur = parseInt(curStr);
-    const birth = parseInt(birthStr);
-
-    const curRes = finalRule(curStr);
-    //const birthRes = finalRule(birthStr);
-
-    // 客户生日年份修正值，取补码（取反 + 1）
-    let birthComplement = birthStr.split('').map(c => c === '0' ? '1' : '0').join('');
-
-    // 位数对齐，自动补 0
-    const maxLen = Math.max(curRes.fixed.length, birthComplement.length);
-    const curFixedPadded = curRes.fixed.padStart(maxLen, '0');
-    const birthComplementPadded = birthComplement.padStart(maxLen, '0');
-
-    // 补码 = 取反 + 1
-    let carry = 1;
-    let birthComplementFinal = '';
-    for(let i = birthComplementPadded.length - 1; i >= 0; i--){
-      const sum = parseInt(birthComplementPadded[i]) + carry;
-      birthComplementFinal = (sum % 2) + birthComplementFinal;
-      carry = Math.floor(sum / 2);
-    }
-
+    ruleB(birthStr)
     // 按二进制算差值
-    const curNum = parseInt(curFixedPadded, 2);
-    const birthNum = parseInt(birthComplementFinal, 2);
-    const diff = curNum - birthNum;
-
-    const finalNum = birth + diff;
-
     let out = '';
     out += '【当前年份】' + curStr + '\n';
-    out += '  B：' + curRes.b + '\n';
-    out += '  A：' + curRes.a + '\n';
-    out += '  修正后：' + curRes.fixed + '\n';
-    out += '  结果值：' + curNum + '（按二进制）\n\n';
+    out += '  B：' + ruleB(curStr) + '\n';
+    out += '  A：' + ruleA(ruleB(curStr)) + '\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
-    out += '  B：' + birthRes.b + '\n';
-    out += '  A：' + birthRes.a + '\n';
-    out += '  修正后：' + birthRes.fixed + '\n';
-    out += '  补码：' + birthComplementFinal + '\n';
-    out += '  结果值：' + birthNum + '（按二进制）\n\n';
+    out += '  B：' + ruleB(birthStr) + '\n';
+    out += '  A：' + ruleA(ruleB(birthStr)) + '\n';
 
-    out += '【差值】' + curFixedPadded + ' - ' + birthComplementFinal + ' = ' + diff + '（按二进制算）\n\n';
-    out += '【最终结果】' + birth + ' + ' + diff + ' = ' + finalNum + '\n';
+    out += '【最终结果】' + ruleA(ruleB(curStr)) + '==' + ruleA(ruleB(birthStr)) + '\n';
 
     document.getElementById('resultBox').textContent = out;
   }
+    
 
   function clearAll(){
     document.getElementById('currentYear').value = '';
