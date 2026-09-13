@@ -273,10 +273,10 @@
     }
 
     const curB = ruleB(curStr);
-    const curA = ruleA(curB);
+    const curA = ruleB(ruleA(curB));
 
     const birthB = ruleB(birthStr);
-    const birthA = ruleA(birthB);
+    const birthA = ruleB(ruleA(birthB));
 
     let out = '';
     out += '【当前年份】' + curStr + '\n';
