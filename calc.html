@@ -187,8 +187,9 @@
   </h1>
 
   <p class="sub">
-    B：数字相同的全部约分，只保留出现 1 次的数字，0 也丢掉。<br>
-    A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留。
+    B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
+    A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
+    规则：1 = 0 = 空。
   </p>
 
   <div class="section-title">一、输入</div>
@@ -213,8 +214,9 @@
   <div class="section-title">三、规则说明</div>
   <div class="panel">
     <div style="color:#c6d4e3;font-size:15px;line-height:2">
-      <div><span style="color:var(--gold)">B：</span>数字相同的全部约分，只保留出现 1 次的数字，0 也丢掉</div>
-      <div><span style="color:var(--gold)">A：</span>大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留</div>
+      <div><span style="color:var(--gold)">B：</span>数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉</div>
+      <div><span style="color:var(--gold)">A：</span>大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉</div>
+      <div><span style="color:var(--gold)">空：</span>1 = 0 = 空</div>
       <div><span style="color:var(--gold)">最终：</span>两边各出一串结果，对比是否相等</div>
     </div>
   </div>
@@ -223,7 +225,7 @@
     <p>
       <span class="gold">相同约分</span><br>
       <span class="green">奇偶转 0/1</span><br>
-      <span class="blue">对比结果</span>
+      <span class="blue">1 = 0 = 空</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
@@ -232,6 +234,8 @@
 
 <script>
   // ===== B：数字相同的全部约分 =====
+  // 只保留出现 1 次的数字
+  // 0 和 1 都丢掉
   function ruleB(numStr){
     const arr = numStr.split('');
     const count = new Map();
@@ -240,7 +244,7 @@
     }
     const result = [];
     for (const [item, times] of count) {
-      if (times === 1 && item !== '0') {
+      if (times === 1 && item !== '0' && item !== '1') {
         result.push(item);
       }
     }
@@ -250,6 +254,7 @@
   // ===== A：奇偶规则 =====
   // 大于 1 的数：奇数转 0，偶数转 1
   // 小于等于 1 的数：保留
+  // 最后 0 和 1 都丢掉
   function ruleA(numStr){
     let out = '';
     for(let i=0;i<numStr.length;i++){
@@ -260,7 +265,13 @@
         out += numStr[i];
       }
     }
+    out = out.replace(/[01]/g, '');
     return out;
+  }
+
+  // ===== 最终修正：1 = 0 = 空 =====
+  function ruleEmpty(numStr){
+    return numStr.replace(/[01]/g, '');
   }
 
   function runCalc(){
@@ -274,24 +285,24 @@
 
     const curB = ruleB(curStr);
     const curA = ruleA(curB);
-    const curEnd = ruleB(curA)
+    const curEnd = ruleEmpty(curA);
 
     const birthB = ruleB(birthStr);
     const birthA = ruleA(birthB);
-    const birthEnd = ruleB(birthA)
+    const birthEnd = ruleEmpty(birthA);
 
     let out = '';
     out += '【当前年份】' + curStr + '\n';
     out += '  B：' + (curB || '（空）') + '\n';
-    out += '  A：' + (curA || '（空）') + '\n\n';
+    out += '  A：' + (curA || '（空）') + '\n';
     out += '  修正之后结果：' + (curEnd || '（空）') + '\n\n';
 
     out += '【客户生日年份】' + birthStr + '\n';
     out += '  B：' + (birthB || '（空）') + '\n';
-    out += '  A：' + (birthA || '（空）') + '\n\n';
+    out += '  A：' + (birthA || '（空）') + '\n';
     out += '  修正之后结果：' + (birthEnd || '（空）') + '\n\n';
 
-    out += '【对比】' + curEnd + ' == ' + birthEnd + '\n';
+    out += '【对比】' + (curEnd || '（空）') + ' == ' + (birthEnd || '（空）') + '\n';
     out += '【是否相等】' + (curEnd === birthEnd ? '是' : '否') + '\n';
 
     document.getElementById('resultBox').textContent = out;
