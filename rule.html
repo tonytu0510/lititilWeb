@@ -202,7 +202,8 @@
   <p class="sub">
     B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
     A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
-    规则：1 = 0 = 空。
+    规则：1 = 0 = 空。<br>
+    最终结果全是空，空 == 空，全部对合。
   </p>
 
   <div class="section-title">一、规则</div>
@@ -242,11 +243,22 @@
     <tr><td>2026</td><td>6</td><td>（空）</td><td>（空）</td></tr>
     <tr><td>2000</td><td>2</td><td>（空）</td><td>（空）</td></tr>
     <tr><td>1996</td><td>6</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>1234</td><td>2、3、4</td><td>1、0</td><td>（空）</td></tr>
+    <tr><td>1234</td><td>2、3、4</td><td>（空）</td><td>（空）</td></tr>
+    <tr><td>2345</td><td>2、3、4、5</td><td>（空）</td><td>（空）</td></tr>
+    <tr><td>3456</td><td>3、4、5、6</td><td>（空）</td><td>（空）</td></tr>
     <tr><td>5555</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
     <tr><td>9090</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
     <tr><td>1001</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+    <tr><td>1111</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+    <tr><td>0000</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+    <tr><td>9999</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
   </table>
+
+  <div class="quote" style="margin-top:16px;">
+    不管输入什么，最后都归到空。<br>
+    归到空，就对上了。<br>
+    <span>全部对合</span>
+  </div>
 
   <div class="section-title">三、核心例子</div>
   <div class="quote">
@@ -260,14 +272,17 @@
     B 相同约分，只留出现 1 次的<br>
     A 奇偶转 0/1，奇转 0，偶转 1<br>
     1 = 0 = 空<br>
-    <span>两边各出一串，对比是否相等</span>
+    <span>最终结果全是空</span><br>
+    空 == 空<br>
+    <span>全部对合</span><br>
+    要的就是全部对合，不是区分
   </div>
 
   <div class="end">
     <p>
       <span class="gold">相同约分</span><br>
       <span class="green">奇偶转 0/1</span><br>
-      <span class="blue">1 = 0 = 空</span>
+      <span class="blue">全部对合</span>
     </p>
     <div class="foot">个人观点 · 欢迎讨论</div>
   </div>
