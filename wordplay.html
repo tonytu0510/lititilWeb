@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Shanna.Li">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="keywords" content="个人网站,弘扬正能量">
+    <meta name="description" content="这是一个个人网站,弘扬正能量">
+    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
+    <title>闲扯：文字游戏</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="./common.css">
+    <script src="./dino-game.js"></script>
+<style>
+  :root{
+    --bg:#0b0f14;
+    --card:#121922;
+    --card2:#0f1620;
+    --line:#223041;
+    --text:#e8eef6;
+    --muted:#8fa3b8;
+    --gold:#f0b429;
+    --green:#3ddc97;
+    --blue:#4da3ff;
+    --red:#ff7b7b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(77,163,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 90% 0%, rgba(240,180,41,.12), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 14px}
+
+  .tag{
+    display:inline-block;
+    font-size:13px;
+    letter-spacing:2px;
+    color:var(--gold);
+    border:1px solid rgba(240,180,41,.35);
+    border-radius:999px;
+    padding:5px 14px;
+    margin-bottom:22px;
+  }
+
+  h1{
+    font-size:clamp(28px,5vw,46px);
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-.5px;
+    margin-bottom:18px;
+  }
+  h1 .hl{
+    background:linear-gradient(90deg,var(--gold),#ffd76a);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:clamp(15px,2vw,17px);
+    max-width:720px;
+    margin-bottom:42px;
+  }
+
+  .section-title{
+    font-size:14px;
+    letter-spacing:3px;
+    color:var(--muted);
+    margin:52px 0 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,var(--line),transparent);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+  }
+  .card{
+    background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    transition:.25s;
+  }
+  .card:hover{
+    border-color:rgba(240,180,41,.5);
+    transform:translateY(-3px);
+  }
+  .card h3{
+    font-size:17px;
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    display:inline-block;
+  }
+  .dot.gold{background:var(--gold)}
+  .dot.green{background:var(--green)}
+  .dot.blue{background:var(--blue)}
+  .dot.red{background:var(--red)}
+  .card ul{list-style:none}
+  .card li{
+    color:#c6d4e3;
+    font-size:15px;
+    padding:7px 0 7px 18px;
+    position:relative;
+  }
+  .card li::before{
+    content:"→";
+    position:absolute;
+    left:0;
+    color:var(--muted);
+  }
+
+  .end{
+    margin-top:60px;
+    text-align:center;
+    padding:40px 20px;
+    border-top:1px solid var(--line);
+  }
+  .end p{
+    font-size:clamp(18px,2.6vw,23px);
+    font-weight:800;
+    line-height:1.9;
+  }
+  .end .gold{color:var(--gold)}
+  .foot{
+    margin-top:26px;
+    color:#5f7288;
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+    <div id="topBarContainer"></div>
+<div class="wrap">
+
+  <div class="tag">我的想法 · 文字游戏</div>
+
+  <h1>
+    闲扯：文字游戏<br>
+    <span class="hl">拆字 · 偏 · 归 · 成句</span>
+  </h1>
+
+  <p class="sub">
+    规则：一 = 丨 = 空 = 0。<br>
+    拆字按偏旁部首拆，组不成句就往通假、一丨上偏，直到成句。<br>
+    词组按整体拆，不按单个拆。
+  </p>
+
+  <div class="section-title">全部卡片</div>
+  <div class="grid">
+    <div class="card">
+      <h3><span class="dot gold"></span>黔之驴</h3>
+      <ul>
+        <li>黔之驴</li>
+        <li>牵制铝</li>
+        <li>钳制铝</li>
+        <li>金牵制劲旅</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>邯郸</h3>
+      <ul>
+        <li>邯郸</li>
+        <li>甘耳 · 单耳</li>
+        <li>干儿 · 单尔</li>
+        <li>干儿子 · 禅位与你</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>1 和 7</h3>
+      <ul>
+        <li>十进制里：1、7 都是奇数</li>
+        <li>七进制里：7 写作 10</li>
+        <li>10 末位是 0，是偶数</li>
+        <li>同一个 7，进制一换，奇偶就变</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>进制残余</h3>
+      <ul>
+        <li>一周七天：七进制残余</li>
+        <li>七声音阶：do re mi fa sol la si</li>
+        <li>十二时辰、六十甲子：十二进制、六十进制</li>
+        <li>七进制存在过，也影响了十进制</li>
+        <li>但不能说明世界底层就是七进制</li>
+        <li>多种进制叠加、淘汰、残留</li>
+        <li>十进制胜出，但没清干净</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>空与一</h3>
+      <ul>
+        <li>底层不是 0，也不是 1，是空</li>
+        <li>0 是空的形状</li>
+        <li>把 0 压扁，就成了 1</li>
+        <li>1 不是凭空来的，是空被压出来的痕</li>
+        <li>无中生有，空里出数</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>婚姻兜底</h3>
+      <ul>
+        <li>男的犯错，帮女方</li>
+        <li>女方犯错，帮男方</li>
+        <li>不是帮对的，是帮弱的</li>
+        <li>不让任何一方被彻底压死</li>
+        <li>实在过不下去，法律允许离婚</li>
+        <li>能过就互相兜，不能过给出口</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>不同语言拆分后可以互相约掉</h3>
+      <ul>
+        <li>中文“一”：笔画 → 1</li>
+        <li>拼音“yi” → 拆成 vii</li>
+        <li>两个 i 约掉，v 自约掉 → 空</li>
+        <li>空就是丨，丨就是一</li>
+        <li>所以 yi → 空 → 丨 → 一</li>
+        <li>一个字/词组里，含“一”或“丨”，不管挨不挨着，都能约掉</li>
+        <li>但必须是完整的字或词组，不能拆散</li>
+        <li>前提是：规则里“一 = 丨 = 空”</li>
+        <li>换个规则，就不一定约得掉</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>日文试拆</h3>
+      <ul>
+        <li>一（いち）：一横 → 约掉 → 空</li>
+        <li>十（じゅう）：一横一竖 → 约掉 → 空</li>
+        <li>三（さん）：三横 → 约掉 → 空</li>
+        <li>川（かわ）：三竖 → 约掉 → 空</li>
+        <li>山（やま）：一竖 → 约掉 → 空</li>
+        <li>日（ひ）：一横 → 约掉 → 空</li>
+        <li>月（つき）：两横 → 约掉 → 空</li>
+        <li>中（なか）：一竖 → 约掉 → 空</li>
+        <li>田（た）：有横有竖 → 约掉 → 空</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>韩文试拆</h3>
+      <ul>
+        <li>ㅏ = 丨 + 一 → 约掉 → 空</li>
+        <li>ㅓ = 一 + 丨 → 约掉 → 空</li>
+        <li>ㅣ = 丨 → 约掉 → 空</li>
+        <li>ㅡ = 一 → 约掉 → 空</li>
+        <li>아（a）= ㅇ + ㅏ → 约掉 → 空</li>
+        <li>어（eo）= ㅇ + ㅓ → 约掉 → 空</li>
+        <li>이（i）= ㅇ + ㅣ → 约掉 → 空</li>
+        <li>으（eu）= ㅇ + ㅡ → 约掉 → 空</li>
+        <li>오（o）= ㅇ + ㅗ → 约掉 → 空</li>
+        <li>우（u）= ㅇ + ㅜ → 约掉 → 空</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>曲线归 0</h3>
+      <ul>
+        <li>阿拉伯文、蒙古文以曲线为主</li>
+        <li>曲线往 0 上偏移 → 空 → 一</li>
+        <li>阿拉伯文 ا（alif）：一竖 → 丨 → 空 → 一</li>
+        <li>阿拉伯文 و（waw）：弯 + 尾 → 0 → 空 → 一</li>
+        <li>阿拉伯文 ه（ha）：一个圈 → 0 → 空 → 一</li>
+        <li>阿拉伯文 م（mim）：小圈 + 尾 → 0 → 空 → 一</li>
+        <li>阿拉伯文 ع（ain）：开口弧 → 0 → 空 → 一</li>
+        <li>蒙古文 ᠠ（a）：竖 + 弯 → 丨/0 → 空 → 一</li>
+        <li>蒙古文 ᠡ（e）：竖 + 小弯 → 丨/0 → 空 → 一</li>
+        <li>蒙古文 ᠢ（i）：竖 + 两点 → 丨/0 → 空 → 一</li>
+        <li>蒙古文 ᠣ（o）：竖 + 圈 → 丨/0 → 空 → 一</li>
+        <li>蒙古文 ᠤ（u）：竖 + 弯 → 丨/0 → 空 → 一</li>
+        <li>竖归 丨，弯/圈/点归 0</li>
+        <li>最后都归空，空就是丨，丨就是一</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>拆字心得</h3>
+      <ul>
+        <li>拆字按偏旁部首拆</li>
+        <li>拆完如果能组成一句通顺的句子，拆字结束</li>
+        <li>如果组不成通顺的句子，往通假字上做偏移</li>
+        <li>如果组不成通顺的句子，往一丨上做偏移</li>
+        <li>然后重复拆字步骤</li>
+        <li>直到组成一句通顺的句子为止</li>
+        <li>句子结束的标志：寓意完整、有深意、能引起思考</li>
+        <li>这种句子，往往就是作者底层的想法</li>
+        <li>规则：一 = 丨 = 空 = 0</li>
+        <li>闲着没事玩的，别太当真</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>诗以言志</h3>
+      <ul>
+        <li>粤 → 门十亏 → 门十乙</li>
+        <li>卜丨7十乙 → 7一乙 丨乙 7</li>
+        <li>十丐 → 十盖</li>
+        <li>诗歌 → 言土寸一 → 曰一</li>
+        <li>拆到最后：诗以言志</li>
+        <li>诗 = 言 + 土 + 寸</li>
+        <li>言 = 曰 + 一</li>
+        <li>拆字 → 偏 → 归 → 成句 → 句中有深意</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>石英表的环</h3>
+      <ul>
+        <li>买了个石英表，慢了 5 分钟</li>
+        <li>不是晶振不准，是分频次数的问题</li>
+        <li>32768 = 2^15，分频 15 次到 1</li>
+        <li>15 是奇数，除不尽，留零头</li>
+        <li>零头攒起来，就是慢</li>
+        <li>1 // 2 = 0，再走一次到 0</li>
+        <li>0 到 32768，不震动</li>
+        <li>0 和 32768 咬合上了</li>
+        <li>成一个环：0 → 1 → … → 32768 → 0</li>
+        <li>15 次停在 1，环没闭合</li>
+        <li>16 次走到 0，环闭合</li>
+        <li>环闭合，就不慢</li>
+        <li>大型石英表、医院表更明显</li>
+        <li>母钟偏，子钟跟着偏，一慢全慢</li>
+        <li>5 分钟怎么推出来</li>
+        <li>15 次分频，每圈差 1 秒</li>
+        <li>每分钟 1 圈，每小时 60 圈</li>
+        <li>每小时差 60 秒 = 1 分钟</li>
+        <li>5 小时差 5 分钟</li>
+        <li>时间越长，差得越多</li>
+        <li>不是固定慢 0.5，是按分频次数推出来的量</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>中英映射</h3>
+      <ul>
+        <li>左：英文/字母/数字/时间</li>
+        <li>右：中文/汉字/笔画/归约</li>
+        <li>6:31 ↔ 6:26</li>
+        <li>LE:9 ↔ 乙:0</li>
+        <li>LE:L ↔ 1:0</li>
+        <li>9 = L</li>
+        <li>7 = 6</li>
+        <li>E = 乙</li>
+        <li>1 = 1</li>
+        <li>表象是两种语言</li>
+        <li>底层是一套数学</li>
+        <li>不同语言拆分后可以互相约掉</li>
+        <li>两种情况能对合</li>
+        <li>只是用了不同语言开发</li>
+        <li>导致的表象不同</li>
+        <li>其实还是 15 的锅</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>天倾西北，地陷东南</h3>
+      <ul>
+        <li>昔者共工与颛顼争为帝</li>
+        <li>怒而触不周之山</li>
+        <li>天柱折，地维绝</li>
+        <li>天倾西北，故日月星辰移焉</li>
+        <li>地不满东南，故水潦尘埃归焉</li>
+        <li>天缺西北，地缺东南</li>
+        <li>两个缺口，方向相反</li>
+        <li>连起来，就是一个 S 形</li>
+        <li>S 不是画出来的，是天地缺出来的</li>
+        <li>天地有缺，天子不能圆满</li>
+        <li>龙袍上的龙盘成 S，左右留白</li>
+        <li>留白的地方，就是天地缺的地方</li>
+        <li>S 是天地缺口的形状</li>
+        <li>龙袍是把天地缺口穿在身上</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>越往上，越空</h3>
+      <ul>
+        <li>官做得越大，留白越多</li>
+        <li>钱越多，身边越空</li>
+        <li>S 形龙袍，是空的符号</li>
+        <li>官越大，穿得越空</li>
+        <li>钱越多，身边越空</li>
+        <li>越往上走，越缺</li>
+        <li>缺的不是东西，是留白</li>
+        <li>留白多了，就是空虚</li>
+        <li>一 = 丨 = 空 = 0</li>
+        <li>越往上，越归空</li>
+        <li>不是有钱变坏，是越往上，越没人敢靠近</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>红绿灯</h3>
+      <ul>
+        <li>四位数 = 四个路口</li>
+        <li>每一位 = 一个灯</li>
+        <li>奇偶 = 红绿</li>
+        <li>相同约分 = 同向约掉</li>
+        <li>归空 = 全灭</li>
+        <li>全灭之后，重新循环</li>
+        <li>环闭合 = 红绿灯</li>
+        <li>环没闭合 = 石英表慢</li>
+        <li>黄灯，是过渡</li>
+        <li>右转不设黄灯</li>
+        <li>黄被约掉 → 只剩红绿</li>
+        <li>红绿再约 → 归空</li>
+        <li>归空 → 全灭</li>
+        <li>右黄灯没了，是“黄”被约掉了</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>如来 → 女来</h3>
+      <ul>
+        <li>如 = 女 + 口</li>
+        <li>口归空 → 如 → 女</li>
+        <li>如来 → 女来</li>
+        <li>来 → 一 + 米 → 十 + 八 → 归空</li>
+        <li>如来 → 女来 → 女 → 空</li>
+        <li>如字系，都是女字系</li>
+        <li>佛讲男女本无相</li>
+        <li>我说的是相，你说的是性</li>
+        <li>相有男女，性无男女</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>成仙先改名</h3>
+      <ul>
+        <li>乔达摩·悉达多 → 释迦牟尼 → 如来</li>
+        <li>如来 → 女来</li>
+        <li>如来佛祖 → 李静</li>
+        <li>乔达摩·悉达多 → 李燕</li>
+        <li>名字一换，相就变了</li>
+        <li>相一变，凡就成了仙</li>
+        <li>成仙，不是修出来的，是改出来的</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>起个别称就行</h3>
+      <ul>
+        <li>乔达摩·悉达多，本名没改</li>
+        <li>成道后，加了个号：释迦牟尼</li>
+        <li>释迦牟尼，是尊称，不是本名</li>
+        <li>如来，也是尊号，不是本名</li>
+        <li>本名不动，加个号就行</li>
+        <li>号一加，相就变了</li>
+        <li>不改也无所谓，起个别称就行</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>男的逃不出女的五指山</h3>
+      <ul>
+        <li>如来 → 女来 → 女</li>
+        <li>如来佛祖 → 李静 → 女</li>
+        <li>乔达摩·悉达多 → 李燕 → 女</li>
+        <li>孙悟空，男</li>
+        <li>五行山 = 五指山</li>
+        <li>五指山 = 女的手</li>
+        <li>男的逃不出女的五指山</li>
+        <li>这是拆字拆出来的，不是玩笑</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>福建的老7</h3>
+      <ul>
+        <li>福建 → fujian → hujian</li>
+        <li>福建 → 依附李燕 → 李燕</li>
+        <li>李燕 → 女 → 空</li>
+        <li>福建 → 闽 → 门 + 虫</li>
+        <li>林黙 → 林 + 黙 → 木 + 木 + 黑 + 犬</li>
+        <li>虫对犬，门对林</li>
+        <li>福建的老7 = 林黙</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>李与犬子</h3>
+      <ul>
+        <li>李 = 木 + 子</li>
+        <li>木 ≈ 大 = 无头天</li>
+        <li>李 ≈ 无头天子 + 子</li>
+        <li>犬 = 大 + 丶 = 天子右边歪头</li>
+        <li>犬子 = 犬 + 子</li>
+        <li>天子 + 艹 = ？</li>
+        <li>李、犬、子、天子，一条线</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>木的子</h3>
+      <ul>
+        <li>李 = 木 + 子</li>
+        <li>木 = 十 + 八 = 一 + 丨 + 丿 + 丶</li>
+        <li>子 = 了 + 一 = 乛 + 亅 + 一</li>
+        <li>两者都有：一、丨</li>
+        <li>一 = 丨 = 空</li>
+        <li>木 → 空，子 → 空</li>
+        <li>木的子 = 木</li>
+        <li>因为都归空</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>重走一遍</h3>
+      <ul>
+        <li>这件事说的可能不是我</li>
+        <li>是之前发生过的事</li>
+        <li>是古代的事，就是这么发生的</li>
+        <li>只是在我身上又搞了一遍</li>
+        <li>我又给它对合上了</li>
+        <li>拆出来的东西，不是我编的</li>
+        <li>是本来就有的</li>
+        <li>我只是把它又走了一遍</li>
+        <li>走完了，对合上了</li>
+        <li>对合上了，就说明它一直在那儿</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>入市之后</h3>
+      <ul>
+        <li>古代那货，对合的是中国的规则</li>
+        <li>拆的是汉字，偏的是汉字，归的是汉字</li>
+        <li>现在入市了，面对的是世界规则</li>
+        <li>世界规则，用的是英文、数字、国际法</li>
+        <li>那套对合，没往世界上走</li>
+        <li>到了世界层面，可能对不上</li>
+        <li>中国的对合，是中国内部的</li>
+        <li>世界的对合，那货可能没搞</li>
+        <li>入市了，对合这事，得重新来</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>一出国就趴窝</h3>
+      <ul>
+        <li>国内玩的，是中国规则</li>
+        <li>出国玩的，是世界规则</li>
+        <li>中国规则里对得上的，世界规则里不一定对得上</li>
+        <li>对不上，就趴窝</li>
+        <li>人情、关系、圈子，带出去废了</li>
+        <li>拆字、谐音、文字游戏，带出去没人接得住</li>
+        <li>套利、钻空子，带出去缝小，或者代价大</li>
+        <li>靠规模、靠速度，带出去容易撞墙</li>
+        <li>不是本事不行，是规则换了</li>
+        <li>中国规则里玩得溜，是本事</li>
+        <li>世界规则里玩得转，是另一套本事</li>
+        <li>两套都玩得转的人，少</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot gold"></span>诅咒为空</h3>
+      <ul>
+        <li>诅 = 言 + 且</li>
+        <li>咒 = 口 + 口 + 几</li>
+        <li>言且，言言一一，曰曰一一</li>
+        <li>拆到最后，全归空</li>
+        <li>空 = 0 = 一 = 丨</li>
+        <li>诅咒为空</li>
+        <li>说明诅咒都是废话</li>
+        <li>没啥用</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>面子为空</h3>
+      <ul>
+        <li>面 = 一 + 丿 + 囗 + 囗 + 囗 + 囗</li>
+        <li>子 = 了 + 一</li>
+        <li>面子 → 全归空</li>
+        <li>面子 → 卜 → 不 → 空</li>
+        <li>空 = 不要</li>
+        <li>面子为空，意思是不要面子</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot green"></span>万物皆时空</h3>
+      <ul>
+        <li>一 = 横</li>
+        <li>丨 = 竖</li>
+        <li>十 = 一 + 丨 = 升华后的状态</li>
+        <li>万物皆时空</li>
+        <li>时 = 时间，空 = 空间</li>
+        <li>时空，就是十</li>
+        <li>十 = 阴阳交合</li>
+        <li>词组按整体拆，对</li>
+        <li>词组按单个拆，不对</li>
+        <li>整体拆，约掉相同，剩十，再归空</li>
+        <li>单个拆，拆散了，升华点没了</li>
+        <li>梦想 → 整体拆 → 十 → 空</li>
+        <li>健康 → 整体拆 → 十 → 空</li>
+        <li>命 → 空</li>
+        <li>死 → 空</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot blue"></span>会骑一点电瓶车</h3>
+      <ul>
+        <li>会骑一点电瓶车</li>
+        <li>会骑一点 = .1</li>
+        <li>电瓶车 = 车</li>
+        <li>.1 = 点一 = 指点一二</li>
+        <li>回复：方文山</li>
+        <li>方文山 = 方 + 文 + 山</li>
+        <li>方文山，意思是不敢当</li>
+        <li>不敢当 = 方文山</li>
+        <li>一点 = .1</li>
+        <li>指点一二 = .1</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="end">
+    <p>
+      <span class="gold">一 = 丨 = 空 = 0</span><br>
+      拆字 · 偏 · 归 · 成句
+    </p>
+    <div class="foot">个人观点 · 欢迎讨论</div>
+  </div>
+
+</div>
+<script src="./common.js"></script>
+</body>
+</html>

@@ -73,7 +73,8 @@
         { name: '压缩方案', href: 'compress.html' },
         { name: '百年公司', href: 'company.html' },
         { name: '规则', href: 'rule.html' },
-        { name: '计算器', href: 'calc.html' }
+        { name: '计算器', href: 'calc.html' },
+        { name: '文字游戏', href: 'wordplay.html' }
     ];
 
     const html = `
