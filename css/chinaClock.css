@@ -1,0 +1,14 @@
+body { background: #1a1a2e;  height: 100vh; margin: 0; font-family: 'Microsoft YaHei',sans-serif; overflow: hidden}
+        .clock-container-wrap{display: grid;place-items: center; /* 同时垂直和水平居中 */ height: 100vh;/* 或者具体的高度 */position: absolute;width: 100vw;top:0;left:0}
+        .clock-container { text-align: center; color: #fff; }
+        canvas { display: block; margin: 0 auto; cursor: pointer; }
+        .info { margin-top: 20px; font-size: 18px; }
+        .info span { color: #f0d060; font-weight: bold; }
+        .beijing-info { font-size: 14px; color: #aaa; margin-top: 5px; }
+        .beijing-info span { color: #c4334c; font-weight: bold; }
+        .zones { display: flex; gap: 12px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+        .zone { background: rgba(255,255,255,0.08); padding: 10px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
+        .zone:hover { background: rgba(240,208,96,0.1); }
+        .zone.active { background: rgba(240,208,96,0.2); border: 1px solid #f0d060; }
+        .zone .letter { font-size: 24px; font-weight: bold; color: #f0d060; }
+        .zone .time { font-size: 12px; color: #aaa; margin-top: 4px; }

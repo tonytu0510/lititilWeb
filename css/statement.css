@@ -1,0 +1,76 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            height: calc(100vh - 90px);
+            margin:20px 0
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #181818;
+            border-radius: 24px;
+            padding: 60px 50px;
+            border: 1px solid #2a2a2a;
+            text-align: center;
+            min-height: 100%;
+        }
+        .title {
+            color: #d0d0d0;
+            font-size: clamp(28px, 5vw, 48px);
+            letter-spacing: 6px;
+            font-weight: 300;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        .title span {
+            color: #7cb8b8;
+        }
+        .statement {
+            color: #d0d0d0;
+            font-size: clamp(24px, 4vw, 40px);
+            line-height: 1.8;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+        .statement .highlight {
+            color: #7cb8b8;
+        }
+        .statement .retired {
+            color: #d0d0d0;
+        }
+        .statement .warning {
+            color: #999;
+            font-size: clamp(18px, 2.5vw, 28px);
+            margin-top: 30px;
+            display: block;
+            border-top: 1px solid #2a2a2a;
+            padding-top: 30px;
+        }
+        .footer {
+            color: #444;
+            font-size: clamp(14px, 1.2vw, 18px);
+            margin-top: 50px;
+            letter-spacing: 2px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 30px;
+        }
+        .footer span {
+            color: #7cb8b8;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 24px;
+            }
+        }

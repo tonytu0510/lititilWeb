@@ -1,0 +1,28 @@
+body { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); font-family: "Segoe UI", Roboto, sans-serif; min-height: 100vh; color: #e0e0e0; margin: 0; padding:0; }
+.container{padding-top:50px}
+h1 { text-align: center; font-size: 1.8rem; margin-bottom: 0.3rem; background: linear-gradient(135deg, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 1.5rem; }
+.card { background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; width: 100%}
+.flex-row { display: flex; gap: 1rem; flex-wrap: wrap;  width: 100%}
+.flex-row>* { flex: 1; min-width: 200px; }
+label { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 0.3rem; }
+.container input,.container  select,.container button { padding: 0.7rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 0.5rem; background: rgba(0,0,0,0.3); color: #e0e0e0; font-size: 0.9rem; width: 100%; margin-bottom: 0.5rem; box-sizing: border-box; }
+.container button { cursor: pointer; font-weight: 600; border: none; transition: all 0.2s; }
+.container button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.btn-gen { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #1a1a2e; font-size: 1rem; padding: 0.9rem; }
+.btn-download { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; }
+.btn-upload { background: linear-gradient(135deg, #ffb86c, #ff6b6b); color: #1a1a2e; }
+.qr-box { display: flex; justify-content: center; align-items: center; padding: 1rem; background: white; border-radius: 0.8rem; min-height: 200px; }
+.qr-box canvas { max-width: 250px; max-height: 250px; border-radius: 0.5rem; }
+.log-box { background: rgba(0,0,0,0.4); border-radius: 0.5rem; padding: 0.6rem; font-family: monospace; font-size: 0.75rem; color: #43e97b; max-height: 350px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
+.result { font-size: 1.1rem; font-weight: 600; padding: 0.5rem; text-align: center; border-radius: 0.5rem; margin-top: 0.5rem; }
+.ok { color: #43e97b; background: rgba(67,233,123,0.1); }
+.fail { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+.info { color: #4facfe; background: rgba(79,172,254,0.1); }
+.logo-preview { width: 60px; height: 60px; border-radius: 0.5rem; background: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-top: 0.5rem; }
+.feature-tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; margin-right: 0.4rem; margin-bottom: 0.4rem; }
+.tag-green { background: rgba(67,233,123,0.2); color: #43e97b; }
+.tag-blue { background: rgba(79,172,254,0.2); color: #4facfe; }
+.tag-orange { background: rgba(255,184,108,0.2); color: #ffb86c; }
+.section-title { color: #ffb86c; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+input[type="checkbox"] { width: auto; margin: 0; }

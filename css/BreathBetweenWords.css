@@ -1,0 +1,183 @@
+:root {
+            --bg: #f7f4ef;
+            --card: #ffffff;
+            --ink: #2b2b2b;
+            --muted: #7a7a7a;
+            --line: #e4ddd2;
+            --accent: #b5443a;
+            --accent-soft: #f4e5e2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Noto Serif SC", "Songti SC", "SimSun", serif;
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            padding: 2rem 1rem;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+        }
+
+        header p {
+            color: var(--muted);
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 1.2rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+            width: 100%;
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--line);
+            letter-spacing: 0.1em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #fdfcfa;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .wrap button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.8rem;
+        }
+
+        button:hover {
+            background: #9e342c;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .result {
+            margin-top: 1.2rem;
+            padding: 1rem 1.2rem;
+            background: var(--accent-soft);
+            border-radius: 0.9rem;
+            font-size: 1rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.7rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            background: #faf7f2;
+            padding: 0.7rem 0.9rem;
+            border-radius: 0.7rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--line);
+        }
+
+        .legend-item strong {
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .example-box {
+            background: #faf7f2;
+            border: 1px solid var(--line);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .example-line {
+            margin-bottom: 0.6rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        .yihuan-link {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .yihuan-link a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .yihuan-link a:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--muted);
+            margin-top: 1rem;
+            text-align: center;
+        }

@@ -1,0 +1,99 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d0d0d;
+            font-family: 'Courier New', monospace;
+        }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            min-height: 100vh;
+            padding:20px 0
+        }
+        .container {
+            background: #181818;
+            border-radius: 16px;
+            padding: 30px 32px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
+            max-width: 600px;
+            min-height: 300px;
+            width: 100%;
+        }
+        .title {
+            color: #d0d0d0;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        .title span {
+            color: #7cb8b8;
+        }
+        .note {
+            color: #999;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-left: 3px solid #2a2a2a;
+            background: #0f0f0f;
+            border-radius: 4px;
+        }
+        .note .highlight {
+            color: #7cb8b8;
+        }
+        .note .dim {
+            color: #555;
+        }
+        .divider {
+            border-top: 1px dashed #2a2a2a;
+            margin: 18px 0;
+        }
+        .foot {
+            color: #444;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+        .foot span {
+            color: #7cb8b8;
+        }
+        .tag {
+            display: inline-block;
+            color: #555;
+            font-size: 11px;
+            border: 1px solid #2a2a2a;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-right: 4px;
+        }
+        .meta {
+            color: #444;
+            font-size: 12px;
+            margin-top: 12px;
+            text-align: right;
+            letter-spacing: 0.5px;
+        }
+        /* 底部链接 - 新添加 */
+        .bottom-link {
+            text-align: center;
+            margin-top: 18px;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 14px;
+        }
+        .bottom-link a {
+            color: #555;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: color 0.2s;
+        }
+        .bottom-link a:hover {
+            color: #7cb8b8;
+        }

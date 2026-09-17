@@ -1,159 +1,78 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>红蘑菇 · 笔记</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-    <script src="./dino-game.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0d0d0d;
-            font-family: 'Courier New', monospace;
-        }
-        .container {
-            background: #181818;
-            border-radius: 16px;
-            padding: 30px 32px;
-            border: 1px solid #2a2a2a;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
-            max-width: 600px;
-            min-height: 100vh;
-            margin: 30px auto;
-        }
-        .title {
-            color: #d0d0d0;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-align: center;
-            border-bottom: 1px solid #2a2a2a;
-            padding-bottom: 14px;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-        .title span {
-            color: #7cb8b8;
-        }
-        .note {
-            color: #999;
-            font-size: 14px;
-            line-height: 1.8;
-            margin-bottom: 16px;
-            padding: 12px 16px;
-            border-left: 3px solid #2a2a2a;
-            background: #0f0f0f;
-            border-radius: 4px;
-        }
-        .note .highlight {
-            color: #7cb8b8;
-        }
-        .note .dim {
-            color: #555;
-        }
-        .note .warning {
-            color: #c87a7a;
-        }
-        .note .gold {
-            color: #e8a838;
-        }
-        .divider {
-            border-top: 1px dashed #2a2a2a;
-            margin: 18px 0;
-        }
-        .foot {
-            color: #444;
-            font-size: 11px;
-            text-align: center;
-            margin-top: 16px;
-            letter-spacing: 1px;
-        }
-        .foot span {
-            color: #7cb8b8;
-        }
-        .tag {
-            display: inline-block;
-            color: #555;
-            font-size: 11px;
-            border: 1px solid #2a2a2a;
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-right: 4px;
-        }
-        .meta {
-            color: #444;
-            font-size: 12px;
-            margin-top: 12px;
-            text-align: right;
-            letter-spacing: 0.5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "红蘑菇 · 笔记"
+    window.PAGE_META.cssFront = ["./css/hongmogu.css"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class="container">
+        <div class="title">⬡ <span>红蘑菇</span> · 笔记</div>
+
+        <div class="note">
+            <span class="dim"># 笔记 2026-08-31</span><br><br>
+            有些单子看起来是“生意”，实际上是“测试”。<br><br>
+            如果你识别出来了，对方就进入了“合作模式”；<br>
+            如果你没识别出来，对方就留在“试探模式”。<br><br>
+            <span class="highlight">识别异常，比完成订单更重要。</span>
+        </div>
+
+        <div class="note">
+            <span class="dim"># 笔记 2026-08-30</span><br><br>
+            尺寸差几丝，图纸对不上，合同签了就挂。<br><br>
+            <span class="highlight">不签原合同，只接“修改后”的单子。</span><br><br>
+            对方如果同意改，说明他是来合作的；<br>
+            如果不同意改，说明他是来设局的。
+        </div>
+
+        <div class="note">
+            <span class="dim"># 笔记 2026-08-29</span><br><br>
+            有些陷阱不是“技术性的”，是“社会性的”。<br><br>
+            一旦进入“打架模式”，无论输赢，你都已经输了。<br><br>
+            <span class="highlight">不进入游戏，是唯一有效的应对方式。</span>
+        </div>
+
+        <div class="note">
+            <span class="dim"># 笔记 2026-08-28</span><br><br>
+            10斤驴蹄筋，呼烂一点，一个人吃完。<br><br>
+            这个条件本身就是一条完整的“反制协议”。<br><br>
+            <span class="warning">它不需要被执行，它只需要被说出来。</span>
+        </div>
+
+        <div class="note">
+            <span class="dim"># 笔记 2026-08-27</span><br><br>
+            <span class="gold">合作与不合作，不是“对错”之分，而是“路径”之分。</span><br><br>
+            合作，进入既有系统，按规则运行——经济回报，但受限于系统边界。<br>
+            不合作，留在系统外部，不按规则运行——系统设计权，但经济回报较低。<br><br>
+            <span class="gold">两个结果都是“对的”，只是能做的事情不同。</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="color:#555; font-size:12px; line-height:1.8; padding: 4px 0;">
+            <span class="tag">识别</span>
+            <span class="tag">应对</span>
+            <span class="tag">边界</span>
+            <span class="tag">路径</span>
+        </div>
+
+        <div class="meta">
+            仅作记录 · 不构成任何建议
+        </div>
+
+        <div class="foot">
+            <span>红蘑菇笔记</span> · 不定期更新
+        </div>
+    </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
 </head>
 <body>
-<div id="topBarContainer"></div>
-<div class="container">
-    <div class="title">⬡ <span>红蘑菇</span> · 笔记</div>
-
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-31</span><br><br>
-        有些单子看起来是“生意”，实际上是“测试”。<br><br>
-        如果你识别出来了，对方就进入了“合作模式”；<br>
-        如果你没识别出来，对方就留在“试探模式”。<br><br>
-        <span class="highlight">识别异常，比完成订单更重要。</span>
-    </div>
-
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-30</span><br><br>
-        尺寸差几丝，图纸对不上，合同签了就挂。<br><br>
-        <span class="highlight">不签原合同，只接“修改后”的单子。</span><br><br>
-        对方如果同意改，说明他是来合作的；<br>
-        如果不同意改，说明他是来设局的。
-    </div>
-
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-29</span><br><br>
-        有些陷阱不是“技术性的”，是“社会性的”。<br><br>
-        一旦进入“打架模式”，无论输赢，你都已经输了。<br><br>
-        <span class="highlight">不进入游戏，是唯一有效的应对方式。</span>
-    </div>
-
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-28</span><br><br>
-        10斤驴蹄筋，呼烂一点，一个人吃完。<br><br>
-        这个条件本身就是一条完整的“反制协议”。<br><br>
-        <span class="warning">它不需要被执行，它只需要被说出来。</span>
-    </div>
-
-    <div class="note">
-        <span class="dim"># 笔记 2026-08-27</span><br><br>
-        <span class="gold">合作与不合作，不是“对错”之分，而是“路径”之分。</span><br><br>
-        合作，进入既有系统，按规则运行——经济回报，但受限于系统边界。<br>
-        不合作，留在系统外部，不按规则运行——系统设计权，但经济回报较低。<br><br>
-        <span class="gold">两个结果都是“对的”，只是能做的事情不同。</span>
-    </div>
-
-    <div class="divider"></div>
-
-    <div style="color:#555; font-size:12px; line-height:1.8; padding: 4px 0;">
-        <span class="tag">识别</span>
-        <span class="tag">应对</span>
-        <span class="tag">边界</span>
-        <span class="tag">路径</span>
-    </div>
-
-    <div class="meta">
-        仅作记录 · 不构成任何建议
-    </div>
-
-    <div class="foot">
-        <span>红蘑菇笔记</span> · 不定期更新
-    </div>
-</div>
-<script src="./common.js"></script>
 </body>
 </html>

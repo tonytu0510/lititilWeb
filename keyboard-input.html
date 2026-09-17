@@ -1,176 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>键盘输入法 · 拆字对和语音</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-    <script src="./dino-game.js"></script>
-    <style>
-        :root {
-            --bg: #f8f6f2;
-            --card: #ffffff;
-            --ink: #2b2b2b;
-            --muted: #7a7a7a;
-            --line: #e2dbd0;
-            --accent: #b5443a;
-            --accent-soft: #f4e5e2;
-            --gold: #a9823a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #f5efe8;
-            font-family: 'Courier New', monospace;
-        }
-
-        .wrap {
-            max-width: 880px;
-            width: 100%;
-            min-height: 100vh;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            position: relative;
-        }
-
-        .keyboard-bg {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 520px;
-            opacity: 0.08;
-            pointer-events: none;
-            z-index: 0;
-            user-select: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1rem;
-        }
-
-        .kb-bg-row {
-            display: flex;
-            justify-content: center;
-            gap: 0.4rem;
-        }
-
-        .kb-bg-key {
-            width: 30px;
-            height: 36px;
-            border-radius: 6px;
-            background: #2b2b2b;
-            color: #f5efe8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        header, .section, footer {
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        header h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-        }
-
-        header p {
-            color: var(--muted);
-            margin-top: 0.6rem;
-            font-size: 0.95rem;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.88);
-            border: 1px solid var(--line);
-            border-radius: 1.2rem;
-            padding: 1.8rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-            backdrop-filter: blur(4px);
-        }
-
-        .section h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid var(--line);
-            letter-spacing: 0.1em;
-        }
-
-        .explain {
-            background: rgba(250, 247, 242, 0.9);
-            border: 1px solid var(--line);
-            border-radius: 0.9rem;
-            padding: 1rem 1.2rem;
-            margin: 0.8rem 0;
-        }
-
-        .explain p {
-            margin-bottom: 0.5rem;
-        }
-
-        .highlight {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            margin-top: 1rem;
-        }
-
-        th, td {
-            padding: 0.7rem 0.6rem;
-            border: 1px solid var(--line);
-            text-align: left;
-        }
-
-        th {
-            background: #f4ede5;
-            font-weight: 600;
-        }
-
-        .note {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
-
-        footer {
-            text-align: center;
-            color: var(--muted);
-            margin-top: 2rem;
-            font-size: 0.85rem;
-        }
-    </style>
-</head>
-<body>
-    <div id="topBarContainer"></div>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "键盘输入法 · 拆字对和语音"
+    window.PAGE_META.cssFront = ["./css/keyboard-input.css"]
+    window.PAGE_META.jsEnd = ["./js/keyboard-input.js"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
     <div class="wrap">
         <div class="keyboard-bg" id="keyboardBg"></div>
 
@@ -284,30 +125,10 @@
             拆字、对和、语音，都是同一个环。
         </footer>
     </div>
-    <script src="./common.js"></script>
-    <script>
-        const rows = [
-            ['Q','W','E','R','T','Y','U','I','O','P'],
-            ['A','S','D','F','G','H','J','K','L'],
-            ['Z','X','C','V','B','N','M']
-        ];
-
-        function renderKeyboardBg() {
-            const container = document.getElementById('keyboardBg');
-            rows.forEach(row => {
-                const rowEl = document.createElement('div');
-                rowEl.className = 'kb-bg-row';
-                row.forEach(key => {
-                    const keyEl = document.createElement('span');
-                    keyEl.className = 'kb-bg-key';
-                    keyEl.textContent = key;
-                    rowEl.appendChild(keyEl);
-                });
-                container.appendChild(rowEl);
-            });
-        }
-
-        renderKeyboardBg();
-    </script>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
 </body>
 </html>

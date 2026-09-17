@@ -18,6 +18,9 @@ function init() {
   setMeta('keywords', m.keywords);
   setMeta('description', m.description);
   setMeta('registration', m.registration);
+  setMeta('registration1', m.registration1);
+  setMeta('registration2', m.registration2);
+  setMeta('registration3', m.registration3);
 
   // ===== viewport =====
   var vp = document.createElement('meta');
@@ -76,10 +79,12 @@ function init() {
   }
   //js
   console.log('m.js.length=>',m.js)
-  for (var i = 0; i < m.js.length; i++) {
-    var s = document.createElement('script');
-    s.src = m.js[i];
-    a.appendChild(s);
+  if(m.js && m.js.length != 0){
+    for (var i = 0; i < m.js.length; i++) {
+      var s = document.createElement('script');
+      s.src = m.js[i];
+      a.appendChild(s);
+    }
   }
   // ===== content =====
   if (m.content) {
@@ -90,11 +95,7 @@ function init() {
     }
   }
   //加载完正文以后再加载JS
-  for (var i = 0; i < m.jsEnd.length; i++) {
-    var s = document.createElement('script');
-    s.src = m.jsEnd[i];
-    a.appendChild(s);
-  }
+  loadScripts(m.jsEnd, a);
   body.appendChild(a);  // a 是元素，能 append
 }
 
@@ -102,4 +103,16 @@ if (document.readyState === 'loading') {
   window.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+
+function loadScripts(list, container, index) {
+  index = index || 0;
+  if(!list) return;
+  if (index >= list.length) return;
+  var s = document.createElement('script');
+  s.src = list[index];
+  s.onload = function () {
+    loadScripts(list, container, index + 1);
+  };
+  container.appendChild(s);
 }

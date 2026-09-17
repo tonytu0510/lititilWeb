@@ -1,48 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>对合环</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-    <script src="./dino-game.js"></script>
-    <style>
-        .container{
-            padding:0 20px
-        }
-        .avatar {
-            flex-shrink: 0;
-        }
-        .avatar canvas {
-            border-radius: 50%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .info {
-            max-width: 1360px;
-        }
-        .info h2 {
-            color: var(--primary);
-            margin-top:30px;
-            margin-bottom: 30px;
-        }
-        .info .email {
-            font-size: 18px;
-            color: var(--text);
-            background: var(--light-gray);
-            padding: 15px 25px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-        .qrCode img{ width: 100%;display: inline-block}
-    </style>
-</head>
-<body>
-    <div id="topBarContainer"></div>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "对合环"
+    window.PAGE_META.cssFront = ["./css/nestedInvolutionRingHuge.css"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
     <div class="container">
         <div class="info">
             <h2>对合环</h2>
@@ -52,7 +20,10 @@
             </div>
         </div>
     </div>
-
-    <script src="./common.js"></script>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
 </body>
 </html>

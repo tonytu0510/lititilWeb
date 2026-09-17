@@ -1,293 +1,118 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>相同约分 + 奇偶转 0/1 + 1=0=空</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-    <script src="./dino-game.js"></script>
-<style>
-  :root{
-    --bg:#0b0f14;
-    --card:#121922;
-    --card2:#0f1620;
-    --line:#223041;
-    --text:#e8eef6;
-    --muted:#8fa3b8;
-    --gold:#f0b429;
-    --green:#3ddc97;
-    --blue:#4da3ff;
-    --red:#ff7b7b;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    background:
-      radial-gradient(1200px 600px at 20% -10%, rgba(77,163,255,.18), transparent 60%),
-      radial-gradient(900px 500px at 90% 0%, rgba(240,180,41,.12), transparent 55%),
-      var(--bg);
-    color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.8;
-  }
-  .wrap{max-width:900px;margin:0 auto;padding:48px 14px}
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "相同约分 + 奇偶转 0/1 + 1=0=空"
+    window.PAGE_META.cssFront = ["./css/rule.css"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class="wrap">
 
-  .tag{
-    display:inline-block;
-    font-size:13px;
-    letter-spacing:2px;
-    color:var(--gold);
-    border:1px solid rgba(240,180,41,.35);
-    border-radius:999px;
-    padding:5px 14px;
-    margin-bottom:22px;
-  }
+      <div class="tag">我的想法 · 规则</div>
 
-  h1{
-    font-size:clamp(26px,4.5vw,42px);
-    line-height:1.3;
-    font-weight:800;
-    letter-spacing:-.5px;
-    margin-bottom:18px;
-  }
-  h1 .hl{
-    background:linear-gradient(90deg,var(--gold),#ffd76a);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
-  .sub{
-    color:var(--muted);
-    font-size:clamp(15px,2vw,17px);
-    max-width:720px;
-    margin-bottom:42px;
-  }
+      <h1>
+        相同约分 + 奇偶转 0/1<br>
+        <span class="hl">1 = 0 = 空</span>
+      </h1>
 
-  .section-title{
-    font-size:14px;
-    letter-spacing:3px;
-    color:var(--muted);
-    margin:52px 0 18px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-  .section-title::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background:linear-gradient(90deg,var(--line),transparent);
-  }
+      <p class="sub">
+        B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
+        A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
+        规则：1 = 0 = 空。<br>
+        最终结果全是空，空 == 空，全部对合。
+      </p>
 
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:16px;
-  }
-  .card{
-    background:linear-gradient(180deg,var(--card),var(--card2));
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:22px;
-    transition:.25s;
-  }
-  .card:hover{
-    border-color:rgba(240,180,41,.5);
-    transform:translateY(-3px);
-  }
-  .card h3{
-    font-size:17px;
-    margin-bottom:14px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .dot{
-    width:8px;height:8px;border-radius:50%;
-    display:inline-block;
-  }
-  .dot.gold{background:var(--gold)}
-  .dot.green{background:var(--green)}
-  .dot.blue{background:var(--blue)}
-  .dot.red{background:var(--red)}
-  .card ul{list-style:none}
-  .card li{
-    color:#c6d4e3;
-    font-size:15px;
-    padding:7px 0 7px 18px;
-    position:relative;
-  }
-  .card li::before{
-    content:"→";
-    position:absolute;
-    left:0;
-    color:var(--muted);
-  }
+      <div class="section-title">一、规则</div>
+      <div class="grid">
+        <div class="card">
+          <h3><span class="dot gold"></span>B：相同约分</h3>
+          <ul>
+            <li>统计每个数字出现几次</li>
+            <li>出现 1 次的，保留</li>
+            <li>出现 2 次及以上的，全部丢掉</li>
+            <li>0 和 1 都丢掉</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="dot green"></span>A：奇偶转 0/1</h3>
+          <ul>
+            <li>大于 1 的数</li>
+            <li>奇数转 0</li>
+            <li>偶数转 1</li>
+            <li>小于等于 1 的数，保留</li>
+            <li>最后 0 和 1 都丢掉</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="dot blue"></span>空：1 = 0 = 空</h3>
+          <ul>
+            <li>1 和 0，都算空</li>
+            <li>空就约掉</li>
+            <li>最后只留非 0、非 1 的数字</li>
+          </ul>
+        </div>
+      </div>
 
-  .table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size:15px;
-  }
-  .table th,.table td{
-    border:1px solid var(--line);
-    padding:10px 14px;
-    text-align:left;
-  }
-  .table th{
-    background:var(--card);
-    color:var(--gold);
-    font-weight:600;
-  }
-  .table td{color:#c6d4e3}
-  .table tr:hover td{
-    background:#0f1620;
-    color:#fff;
-  }
+      <div class="section-title">二、测试</div>
+      <table class="table">
+        <tr><th>原数</th><th>B</th><th>A</th><th>修正之后结果</th></tr>
+        <tr><td>2026</td><td>6</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>2000</td><td>2</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>1996</td><td>6</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>1234</td><td>2、3、4</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>2345</td><td>2、3、4、5</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>3456</td><td>3、4、5、6</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>5555</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>9090</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>1001</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>1111</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>0000</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+        <tr><td>9999</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
+      </table>
 
-  .quote{
-    margin-top:16px;
-    background:linear-gradient(135deg,rgba(240,180,41,.12),rgba(77,163,255,.08));
-    border:1px solid rgba(240,180,41,.3);
-    border-radius:18px;
-    padding:28px 26px;
-    font-size:clamp(17px,2.4vw,21px);
-    font-weight:700;
-    line-height:1.7;
-    text-align:center;
-  }
-  .quote span{color:var(--gold)}
+      <div class="quote" style="margin-top:16px;">
+        不管输入什么，最后都归到空。<br>
+        归到空，就对上了。<br>
+        <span>全部对合</span>
+      </div>
 
-  .end{
-    margin-top:60px;
-    text-align:center;
-    padding:40px 20px;
-    border-top:1px solid var(--line);
-  }
-  .end p{
-    font-size:clamp(18px,2.6vw,23px);
-    font-weight:800;
-    line-height:1.9;
-  }
-  .end .gold{color:var(--gold)}
-  .end .green{color:var(--green)}
-  .end .blue{color:var(--blue)}
-  .foot{
-    margin-top:26px;
-    color:#5f7288;
-    font-size:13px;
-  }
+      <div class="section-title">三、核心例子</div>
+      <div class="quote">
+        2026 → B:6 → A:（空）→ 修正:（空）<br>
+        2000 → B:2 → A:（空）→ 修正:（空）<br>
+        <span>（空）==（空），相等</span>
+      </div>
 
-  @media (max-width:520px){
-    .table th,.table td{padding:8px 10px;font-size:14px}
-  }
-</style>
+      <div class="section-title">四、结论</div>
+      <div class="quote">
+        B 相同约分，只留出现 1 次的<br>
+        A 奇偶转 0/1，奇转 0，偶转 1<br>
+        1 = 0 = 空<br>
+        <span>最终结果全是空</span><br>
+        空 == 空<br>
+        <span>全部对合</span><br>
+        要的就是全部对合，不是区分
+      </div>
+
+      <div class="end">
+        <p>
+          <span class="gold">相同约分</span><br>
+          <span class="green">奇偶转 0/1</span><br>
+          <span class="blue">全部对合</span>
+        </p>
+        <div class="foot">个人观点 · 欢迎讨论</div>
+      </div>
+
+    </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
 </head>
 <body>
-    <div id="topBarContainer"></div>
-<div class="wrap">
-
-  <div class="tag">我的想法 · 规则</div>
-
-  <h1>
-    相同约分 + 奇偶转 0/1<br>
-    <span class="hl">1 = 0 = 空</span>
-  </h1>
-
-  <p class="sub">
-    B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
-    A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
-    规则：1 = 0 = 空。<br>
-    最终结果全是空，空 == 空，全部对合。
-  </p>
-
-  <div class="section-title">一、规则</div>
-  <div class="grid">
-    <div class="card">
-      <h3><span class="dot gold"></span>B：相同约分</h3>
-      <ul>
-        <li>统计每个数字出现几次</li>
-        <li>出现 1 次的，保留</li>
-        <li>出现 2 次及以上的，全部丢掉</li>
-        <li>0 和 1 都丢掉</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3><span class="dot green"></span>A：奇偶转 0/1</h3>
-      <ul>
-        <li>大于 1 的数</li>
-        <li>奇数转 0</li>
-        <li>偶数转 1</li>
-        <li>小于等于 1 的数，保留</li>
-        <li>最后 0 和 1 都丢掉</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3><span class="dot blue"></span>空：1 = 0 = 空</h3>
-      <ul>
-        <li>1 和 0，都算空</li>
-        <li>空就约掉</li>
-        <li>最后只留非 0、非 1 的数字</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="section-title">二、测试</div>
-  <table class="table">
-    <tr><th>原数</th><th>B</th><th>A</th><th>修正之后结果</th></tr>
-    <tr><td>2026</td><td>6</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>2000</td><td>2</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>1996</td><td>6</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>1234</td><td>2、3、4</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>2345</td><td>2、3、4、5</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>3456</td><td>3、4、5、6</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>5555</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>9090</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>1001</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>1111</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>0000</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-    <tr><td>9999</td><td>（空）</td><td>（空）</td><td>（空）</td></tr>
-  </table>
-
-  <div class="quote" style="margin-top:16px;">
-    不管输入什么，最后都归到空。<br>
-    归到空，就对上了。<br>
-    <span>全部对合</span>
-  </div>
-
-  <div class="section-title">三、核心例子</div>
-  <div class="quote">
-    2026 → B:6 → A:（空）→ 修正:（空）<br>
-    2000 → B:2 → A:（空）→ 修正:（空）<br>
-    <span>（空）==（空），相等</span>
-  </div>
-
-  <div class="section-title">四、结论</div>
-  <div class="quote">
-    B 相同约分，只留出现 1 次的<br>
-    A 奇偶转 0/1，奇转 0，偶转 1<br>
-    1 = 0 = 空<br>
-    <span>最终结果全是空</span><br>
-    空 == 空<br>
-    <span>全部对合</span><br>
-    要的就是全部对合，不是区分
-  </div>
-
-  <div class="end">
-    <p>
-      <span class="gold">相同约分</span><br>
-      <span class="green">奇偶转 0/1</span><br>
-      <span class="blue">全部对合</span>
-    </p>
-    <div class="foot">个人观点 · 欢迎讨论</div>
-  </div>
-
-</div>
-<script src="./common.js"></script>
 </body>
 </html>
