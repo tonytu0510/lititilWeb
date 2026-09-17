@@ -1,6 +1,5 @@
 window.PAGE_META = {
   author: "Shanna.Li",
-  title: "布线笔记 · 2026",
   keywords: "个人网站,弘扬正能量",
   description: "这是一个个人网站,弘扬正能量",
   registration: "网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号",

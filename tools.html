@@ -1,91 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-     <meta charset="UTF-8">
-    <meta name="author" content="Shanna.Li">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <meta name="keywords" content="个人网站,弘扬正能量">
-    <meta name="description" content="这是一个个人网站,弘扬正能量">
-    <meta name="registration" content="网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号">
-    <title>工具箱</title>
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./common.css">
-    <style>
-        .tabs {
-            border-bottom: 2px solid var(--primary);
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .container button.tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 16px;
-            color: var(--text);
-            transition: all 0.3s;
-            overflow: hidden; /* 隐藏溢出的内容 */
-            white-space: nowrap; /* 防止文本换行 */
-            text-overflow: ellipsis; /* 显示省略号来表示溢出的内容 */
-        }
-        .container button.tab:hover {
-            color: var(--primary);
-        }
-        .container button.tab.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-            font-weight: bold;
-        }
-        .tab-content {
-            display: none;
-            padding: 20px;
-            background: var(--bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 100%;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .container textarea {
-            width: 100%;
-            height: 120px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            resize: vertical;
-            margin-bottom: 10px;
-        }
-        .container button {
-            padding: 10px 20px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        .container button:hover {
-            opacity: 0.9;
-        }
-       .container .result {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            min-height: 40px;
-            word-break: break-all;
-        }
-    </style>
-<script src="./dino-game.js"></script>
-</head>
-<body>
-
-    <div id="topBarContainer"></div>
-
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "工具"
+    window.PAGE_META.cssFront = ["./css/tools.css"]
+    window.PAGE_META.jsEnd = ["./js/tools.js"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
     <div class="container">
         <h1>🛠️ 工具箱</h1>
         
@@ -125,81 +51,10 @@
             <div class="result" id="formatResult"></div>
         </div>
     </div>
-
-    <script src="./common.js"></script>
-    <script>
-        function switchTab(name) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(name).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function crypto(action) {
-            const text = document.getElementById('cryptoInput').value;
-            const shift = 6931, start = 19968, count = 20992;
-            let result = '';
-            for (let char of text) {
-                const code = char.charCodeAt(0);
-                if (code >= start && code <= start + count) {
-                    let newCode = action === 'encrypt' ? code + shift : code - shift;
-                    if (newCode > start + count) newCode -= count;
-                    if (newCode < start) newCode += count;
-                    result += String.fromCharCode(newCode);
-                } else {
-                    result += char;
-                }
-            }
-            document.getElementById('cryptoResult').innerText = result;
-        }
-
-        function compress(type) {
-            const text = document.getElementById('compressInput').value;
-            let result = '';
-            if (type === 'letters') {
-                for (let i = 0; i < text.length; i += 2) {
-                    if (i + 1 < text.length) {
-                        const a = text.charCodeAt(i) - 65, b = text.charCodeAt(i + 1) - 65;
-                        const base = (a % 2 === 0 && b % 2 === 0) ? 2 : 3;
-                        result += String.fromCharCode((a * base + b) % 26 + 65);
-                    } else {
-                        result += text[i];
-                    }
-                }
-            } else {
-                const start = 19968, count = 20992;
-                for (let i = 0; i < text.length; i += 2) {
-                    if (i + 1 < text.length) {
-                        const a = text.charCodeAt(i) - start, b = text.charCodeAt(i + 1) - start;
-                        const base = (a % 2 === 0 && b % 2 === 0) ? 2 : 3;
-                        result += String.fromCharCode((a * base + b) % count + start);
-                    } else {
-                        result += text[i];
-                    }
-                }
-            }
-            document.getElementById('compressResult').innerText = result;
-        }
-
-        function formatText(type) {
-            const text = document.getElementById('formatInput').value;
-            let result = '';
-            switch(type) {
-                case 'upper': result = text.toUpperCase(); break;
-                case 'lower': result = text.toLowerCase(); break;
-                case 'camel':
-                    result = text.split(/[\s-_]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
-                    break;
-                case 'pascal':
-                    const words = text.split(/[\s-_]+/);
-                    result = words[0].toLowerCase() + words.slice(1).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join('');
-                    break;
-                case 'reverse':
-                    result = text.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('');
-                    break;
-            }
-            document.getElementById('formatResult').innerText = result;
-        }
-    </script>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
 </body>
 </html>
