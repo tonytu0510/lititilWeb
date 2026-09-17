@@ -6,10 +6,8 @@ window.PAGE_META = {
   registration: "网站备案号：苏ICP备2026047321号-1,公安备案号：苏公网安备32020602003916号",
   icon: "./favicon.ico",
   css: ["./css/common.css"],
+  js:["./js/common.js"],
   /**idArr和jsArr做关联 加载完idArr后加载jsArr 防止生成ID和生成js同时进行**********/
   idArr:['topBarContainer'],
-  jsArr: ["./js/dino-game.js"],
-  body: ``,
-  content: `<h1>布线笔记 · 2026</h1><p>页面内容</p>`
+  jsArr: ["./js/dino-game.js"]
 };
-console.log('000')
