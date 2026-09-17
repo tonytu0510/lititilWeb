@@ -51,7 +51,7 @@
       var temp = document.createElement('div');
       temp.innerHTML = m.body;
       while (temp.firstChild) {
-        body.appendChild(temp.firstChild);
+        body.innerHTML += (temp.firstChild);
       }
     }
     // ===== id =====
@@ -60,12 +60,18 @@
         if (document.body) {
             var temp3 = document.createElement('div');
             temp3.id = m.idArr[i];
-            document.body.appendChild(temp3);
+            body.innerHTML+=temp3;
             // ===== js =====
-            if(temp3.id){
+            if (temp3.id) {
                 var s = document.createElement('script');
                 s.src = m.jsArr[i];
-                body.appendChild(s);
+                s.onload = function () {
+                    console.log('加载成功：', this.src);
+                };
+                s.onerror = function () {
+                    console.log('加载失败：', this.src);
+                };
+                body.innerHTML+=s;
             }
         }
       }
@@ -77,14 +83,14 @@
       temp2.innerHTML = m.content;
       while (temp2.firstChild) {
         if (document.body) {
-            body.appendChild(temp2.firstChild);
+            body.innerHTML+=temp2.firstChild;
         }
       }
     }
   }
 
     if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('DOMContentLoaded', init);
     } else {
-    init();
+        init();
     }

@@ -1,4 +1,6 @@
 // ==================== 自定义标签 <dino-game> 左右跑酷版 ====================
+console.log('dino-game 执行了');
+console.log('topBarContainer：', document.getElementById('topBarContainer'));
 class DinoGame extends HTMLElement {
     constructor() {
         super();
@@ -11,6 +13,142 @@ class DinoGame extends HTMLElement {
         this.canvas.style.cssText = 'width:100%;height:100%;display:block;';
         
         container.appendChild(this.canvas);
+        const style = document.createElement('style');
+        style.textContent = `
+        :host {
+            display: block;
+            position: absolute;
+            left: 50px;
+            top: 0;
+            height: 50px;
+            width: calc(100% - 230px);
+        }
+        div {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+            
+        /* ========== 图标组（右上角固定） ========== */
+        #iconGroup {
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            z-index: 1000;
+            width: 140px
+        }
+
+        /* 小恐龙关闭时，图标组移到距离上部10px */
+        #iconGroup.move-up {
+            top: 10px;
+        }
+
+        /* 菜单包装器（relative 定位） */
+        #menuWrapper {
+            float: right;
+        }
+
+        /* 菜单图标 */
+        #menuIcon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        #menuIcon:hover {
+            transform: scale(1.1);
+        }
+
+        /* 小恐龙图标 */
+        #dinoIcon {
+            float: right;
+            display: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        #dinoIcon.show {
+            display: block;
+            margin-right: 10px;
+        }
+
+        #dinoIcon:hover {
+            transform: scale(1.1);
+        }
+
+        /* 二级导航（absolute 定位在菜单图标下方） */
+        #subNav {
+            display: none;
+            position: absolute;
+            background: var(--bg);
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1001;
+            width: 160px;
+            right: 0;
+            top: 55px;
+        }
+
+        #subNav.show {
+            display: block;
+        }
+
+        #subNav a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: var(--text);
+            transition: background 0.3s;
+        }
+
+        #subNav a:hover {
+            background: #f9ed69;
+            color: #fff;
+        }
+
+        /* 小恐龙跑酷条（全宽） */
+        #dinoBar {
+            width: 100%;
+            height: 50px;
+            /*background: linear-gradient(90deg, var(--primary), var(--secondary));*/
+            background: linear-gradient(40deg, #6a2c70 0%,#b83b5e 40%,#f08a5d 70%,#f9ed69 100%);
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        #dinoBar .close-btn {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+            width:50px;
+            height:50px
+        }
+        `;
+        shadow.appendChild(style);
         shadow.appendChild(container);
         
         this.ctx = this.canvas.getContext('2d');
@@ -241,3 +379,4 @@ class DinoGame extends HTMLElement {
     }
 }
 customElements.define('dino-game', DinoGame);
+console.log('define 后，dino-game 标签：', document.querySelector('dino-game'));
