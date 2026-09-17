@@ -663,7 +663,7 @@
             .back-to-top-btn {
                 position: fixed;
                 right: 26px;
-                top: 30px;
+                top: 70px;
                 width: 60px;
                 height: 60px;
                 border-radius: 50%;
