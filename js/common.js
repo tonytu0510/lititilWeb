@@ -309,7 +309,7 @@
                     e.preventDefault();
                     const idx = parseInt(this.dataset.index);
                     selectItem(idx);
-                    saveMenuIndex(idx);
+                    saveMenuIndex(idx);   // 只有点击才存
                     toggleMenu(false);
                     setTimeout(() => {
                         window.location.href = this.href;
@@ -366,7 +366,7 @@
             rotationOffset = offset;
             updatePositions(offset);
             selectItem(index);
-            saveMenuIndex(index);
+            // 不在这里存，只有点击才存
         }
 
         function stepSwitch(delta) {
@@ -374,6 +374,7 @@
             const dir = delta > 0 ? 1 : -1;
             const next = (selectedIndex + dir + count) % count;
             switchToIndex(next);
+            // 不在这里存
         }
 
         function toggleMenu(open) {
@@ -720,6 +721,7 @@
 
     checkBackToTop();
 })();
+
 // ==================== 百度统计 ====================
 var _hmt = _hmt || [];
 (function() {
