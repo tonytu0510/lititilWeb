@@ -2,7 +2,7 @@
 (function() {
     // ==================== 游戏栏状态管理 ====================
     const DINO_STATE_KEY = 'dinoBarClosed';
-    const MENU_STATE_KEY = 'arcMenuSelectedIndex';
+    const MENU_STATE_KEY = 'arcMenuSelected';   // 新格式："inner-3" / "outer-5"
 
     function isDinoBarClosed() {
         const stored = sessionStorage.getItem(DINO_STATE_KEY);
@@ -16,15 +16,17 @@
         sessionStorage.setItem(DINO_STATE_KEY, closed ? 'true' : 'false');
     }
 
-    function saveMenuIndex(index) {
-        sessionStorage.setItem(MENU_STATE_KEY, index.toString());
+    function saveMenuIndex(ring, index) {
+        sessionStorage.setItem(MENU_STATE_KEY, ring + '-' + index);
     }
 
     function getSavedMenuIndex() {
         const stored = sessionStorage.getItem(MENU_STATE_KEY);
-        if (stored === null) return 0;
-        const idx = parseInt(stored);
-        return isNaN(idx) ? 0 : idx;
+        if (!stored) return { ring: 'inner', index: 0 };
+        const parts = stored.split('-');
+        const ring = (parts[0] === 'outer') ? 'outer' : 'inner';
+        const idx = parseInt(parts[1]);
+        return { ring, index: isNaN(idx) ? 0 : idx };
     }
 
     function restoreDinoState() {
@@ -52,30 +54,42 @@
         }
     }
 
-    const menuData = [
-        { name: '首页', href: 'index.html?M=1' },
-        { name: '工具箱', href: 'tools.html' },
-        { name: '二维码', href: 'qrCode.html' },
-        { name: '对合环', href: 'nestedInvolutionRingHuge.html' },
-        { name: 'RSTUV', href: 'chinaClock.html' },
-        { name: '太阳系', href: 'cosmos.html' },
-        { name: '拆字', href: 'fontAll.html' },
-        { name: '缘分测试', href: 'namePairing.html' },
-        { name: '判证', href: 'panding.html' },
-        { name: '130演示', href: '130demo.html' },
-        { name: '笔记', href: 'notes.html' },
-        { name: '布线笔记', href: 'cable.html' },
-        { name: '关于我', href: 'aboutMe.html' },
-        { name: '声明', href: 'statement.html' },
-        { name: '导航', href: 'ringMenu.html' },
-        { name: '读呼吸', href: 'BreathBetweenWords.html' },
-        { name: '想法', href: 'idea.html' },
-        { name: '压缩方案', href: 'compress.html' },
-        { name: '百年公司', href: 'company.html' },
-        { name: '规则', href: 'rule.html' },
-        { name: '计算器', href: 'calc.html' },
-        { name: '文字游戏', href: 'wordplay.html' }
-    ];
+    // ==================== 环形菜单配置（只改这里） ====================
+    const RING_CONFIG = {
+        // 内环：高频
+        inner: [
+            { name: '首页',   href: 'index.html?M=1' },
+            { name: '工具箱', href: 'tools.html' },
+            { name: '笔记',   href: 'notes.html' },
+            { name: '计算器', href: 'calc.html' },
+            { name: '二维码', href: 'qrCode.html' },
+            { name: '导航',   href: 'ringMenu.html' }
+        ],
+        // 外环：次常用
+        outer: [
+            { name: '对合环',   href: 'nestedInvolutionRingHuge.html' },
+            { name: '太阳系',   href: 'cosmos.html' },
+            { name: '文字游戏', href: 'wordplay.html' },
+            { name: '缘分测试', href: 'namePairing.html' },
+            { name: '拆字',     href: 'fontAll.html' },
+            { name: '判证',     href: 'panding.html' },
+            { name: '读呼吸',   href: 'BreathBetweenWords.html' },
+            { name: '想法',     href: 'idea.html' }
+        ]
+    };
+
+    // 半径系数（相对容器尺寸），改这里就能调环的大小
+    const RING_RADIUS = {
+        desktop: { inner: 0.42, outer: 0.65 },
+        mobile:  { inner: 0.50, outer: 0.75 }
+    };
+
+    // 环展开动画延迟（ms）
+    const RING_DELAY = { inner: 0, outer: 80 };
+
+    // 悬浮球容器尺寸（CSS 里也有，这里同步一份用于 JS 计算）
+    const RING_CONTAINER_SIZE = { desktop: 400, mobile: 260 };
+    // ================================================================
 
     const html = `
         <style>
@@ -114,7 +128,7 @@
                 height: 400px;
                 pointer-events: none;
                 z-index: 999;
-                overflow: hidden;
+                overflow: visible;
             }
             #menuContainer.active {
                 pointer-events: auto;
@@ -144,7 +158,6 @@
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
-                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
                 pointer-events: none;
                 opacity: 0;
                 user-select: none;
@@ -152,9 +165,7 @@
                 text-decoration: none;
                 font-weight: 300;
                 letter-spacing: 0.5px;
-                will-change: right, bottom, opacity;
-                margin-left: -22px;
-                margin-top: -22px;
+                will-change: right, bottom, opacity, transform;
             }
             .menu-item.active {
                 background: #7cb8b8;
@@ -163,7 +174,6 @@
             }
             #menuContainer.active .menu-item {
                 pointer-events: auto;
-                opacity: 1;
             }
             #currentLabel {
                 position: fixed;
@@ -196,15 +206,18 @@
             }
             @media (max-width: 500px) {
                 #menuContainer {
-                    width: 180px;
-                    height: 180px;
+                    width: 260px;
+                    height: 260px;
                 }
                 .menu-item {
-                    width: 36px;
-                    height: 36px;
+                    width: 34px;
+                    height: 34px;
+                    font-size: 9px;
+                }
+                .menu-item.inner {
+                    width: 38px;
+                    height: 38px;
                     font-size: 10px;
-                    margin-left: -18px;
-                    margin-top: -18px;
                 }
                 #menuTrigger {
                     width: 50px;
@@ -271,7 +284,7 @@
         container.innerHTML = html;
     }
 
-    // ==================== 圆弧菜单脚本 ====================
+    // ==================== 圆弧菜单脚本（双环 · 按指针所在环滑动） ====================
     (function() {
         const containerEl = document.getElementById('menuContainer');
         const trigger = document.getElementById('menuTrigger');
@@ -279,121 +292,226 @@
         const currentIndex = document.getElementById('currentIndex');
         const label = document.getElementById('currentLabel');
 
+        if (!containerEl || !trigger) return;
+
         let isOpen = false;
-        let selectedIndex = 0;
         let isDragging = false;
-        let rotationOffset = 0;
-        let isInitialized = false;
 
-        const savedIndex = getSavedMenuIndex();
+        // 每个环独立维护"当前选中项"
+        const ringState = {
+            inner: { selected: 0, offset: 0 },
+            outer: { selected: 0, offset: 0 }
+        };
 
-        function buildMenu() {
-            const count = menuData.length;
-            const size = containerEl.offsetWidth || 400;
-            const radius = size * 0.55;
+        // 当前激活环：键盘操作目标、label 显示目标
+        let activeRing = 'inner';
 
-            containerEl.querySelectorAll('.menu-item').forEach(el => el.remove());
+        // 从存档恢复
+        (function initFromSaved() {
+            const saved = getSavedMenuIndex();
+            if (RING_CONFIG[saved.ring] && saved.index < RING_CONFIG[saved.ring].length) {
+                ringState[saved.ring].selected = saved.index;
+                activeRing = saved.ring;
+            }
+        })();
 
-            menuData.forEach((item, index) => {
-                const el = document.createElement('a');
-                el.className = 'menu-item';
-                el.textContent = item.name.length > 4 ? item.name.slice(0, 4) : item.name;
-                el.title = item.name;
-                el.href = item.href;
-                el.dataset.index = index;
-
-                const baseAngle = -90 + (360 * index / count);
-                el.dataset.baseAngle = baseAngle;
-
-                el.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const idx = parseInt(this.dataset.index);
-                    selectItem(idx);
-                    saveMenuIndex(idx);   // 只有点击才存
-                    toggleMenu(false);
-                    setTimeout(() => {
-                        window.location.href = this.href;
-                    }, 300);
-                });
-
-                containerEl.appendChild(el);
-            });
-
-            updatePositions(0);
-            const targetIdx = (savedIndex >= 0 && savedIndex < menuData.length) ? savedIndex : 0;
-            switchToIndex(targetIdx);
-            isInitialized = true;
+        // ---------- 判断桌面/手机 ----------
+        function isMobile() {
+            return document.documentElement.clientWidth <= 500;
         }
 
-        function updatePositions(offsetDeg) {
-            const count = menuData.length;
-            const size = containerEl.offsetWidth || 400;
-            const clientWidth = document.documentElement.clientWidth;
-            console.log('windowsWidth=>',clientWidth)
-            const radius = (clientWidth > 500) ? (size * 0.55) : (size * 0.8);
-            const items = containerEl.querySelectorAll('.menu-item');
+        function getContainerSize() {
+            return isMobile() ? RING_CONTAINER_SIZE.mobile : RING_CONTAINER_SIZE.desktop;
+        }
 
-            items.forEach((el, index) => {
+        function getRadius(ring) {
+            const mode = isMobile() ? 'mobile' : 'desktop';
+            return getContainerSize() * RING_RADIUS[mode][ring];
+        }
+
+        // ---------- 根据指针坐标判断落在哪个环 ----------
+        function getRingByPointer(clientX, clientY) {
+            const rect = containerEl.getBoundingClientRect();
+            // 容器 right/bottom 对齐，圆心在右下角
+            const cx = rect.right;
+            const cy = rect.bottom;
+            const dx = clientX - cx;
+            const dy = clientY - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            const innerR = getRadius('inner');
+            const outerR = getRadius('outer');
+            const innerHalf = isMobile() ? 19 : 22;
+            const outerHalf = isMobile() ? 17 : 22;
+
+            const dInner = Math.abs(dist - innerR);
+            const dOuter = Math.abs(dist - outerR);
+
+            // 优先落在项的覆盖范围内
+            if (dInner <= innerHalf && dInner <= dOuter) return 'inner';
+            if (dOuter <= outerHalf) return 'outer';
+            // 都不在项内，取最近的环
+            return dInner < dOuter ? 'inner' : 'outer';
+        }
+
+        // ---------- 构建菜单 ----------
+        function buildMenu() {
+            containerEl.querySelectorAll('.menu-item').forEach(el => el.remove());
+
+            const currentPath = location.pathname.split('/').pop() || 'index.html';
+
+            ['inner', 'outer'].forEach(ring => {
+                const arr = RING_CONFIG[ring];
+                const count = arr.length;
+                const startAngle = -90 + (ring === 'outer' ? 180 / count : 0);
+
+                arr.forEach((item, ringIdx) => {
+                    const el = document.createElement('a');
+                    el.className = 'menu-item ' + ring;
+                    el.textContent = item.name.length > 4 ? item.name.slice(0, 4) : item.name;
+                    el.title = item.name;
+                    el.href = item.href;
+                    el.dataset.ring = ring;
+                    el.dataset.ringIndex = ringIdx;
+
+                    if (item.href.split('?')[0] === currentPath) {
+                        el.classList.add('active');
+                    }
+
+                    const baseAngle = startAngle + (360 * ringIdx / count);
+                    el.dataset.baseAngle = baseAngle;
+
+                    // 点击：切换选中 + 激活该环 + 跳转
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        activeRing = ring;
+                        ringState[ring].selected = ringIdx;
+                        updateRingSelection(ring);
+                        updateLabel();
+                        saveMenuIndex(ring, ringIdx);
+                        toggleMenu(false);
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 300);
+                    });
+
+                    el.style.opacity = '0';
+                    el.style.transform = 'scale(0.3)';
+                    el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+                    containerEl.appendChild(el);
+                });
+            });
+
+            updatePositions('inner');
+            updatePositions('outer');
+            updateRingSelection('inner');
+            updateRingSelection('outer');
+        }
+
+        // ---------- 更新某个环的位置 ----------
+        function updatePositions(ring) {
+            const offset = ringState[ring].offset;
+            const radius = getRadius(ring);
+
+            const items = containerEl.querySelectorAll('.menu-item.' + ring);
+            items.forEach(el => {
                 const baseAngle = parseFloat(el.dataset.baseAngle);
-                const angleDeg = baseAngle + offsetDeg;
+                const angleDeg = baseAngle + offset;
                 const rad = angleDeg * Math.PI / 180;
                 const x = radius * Math.cos(rad);
                 const y = radius * Math.sin(rad);
 
-                el.style.right = (x - 22) + 'px';
-                el.style.bottom = (y - 22) + 'px';
+                const half = isMobile() ? (ring === 'inner' ? 19 : 17) : 22;
+                el.style.right = (x - half) + 'px';
+                el.style.bottom = (y - half) + 'px';
             });
         }
 
-        function selectItem(index) {
-            const items = containerEl.querySelectorAll('.menu-item');
-            items.forEach((el, i) => {
-                el.classList.toggle('active', i === index);
+        // ---------- 更新某个环的选中高亮 ----------
+        function updateRingSelection(ring) {
+            const selected = ringState[ring].selected;
+            containerEl.querySelectorAll('.menu-item.' + ring).forEach((el, i) => {
+                el.classList.toggle('active', i === selected && activeRing === ring);
             });
-            selectedIndex = index;
-            if (menuData[index]) {
-                currentName.textContent = menuData[index].name;
-                currentIndex.textContent = (index + 1) + ' / ' + menuData.length;
+        }
+
+        // ---------- 更新底部标签 ----------
+        function updateLabel() {
+            const arr = RING_CONFIG[activeRing];
+            const idx = ringState[activeRing].selected;
+            if (arr && arr[idx] && currentName && currentIndex) {
+                currentName.textContent = arr[idx].name;
+                currentIndex.textContent = (idx + 1) + ' / ' + arr.length;
             }
-            label.classList.add('show');
         }
 
-        function switchToIndex(index) {
-            const count = menuData.length;
+        // ---------- 把某个环的选中项转到 45° 位置 ----------
+        function switchToRingIndex(ring, ringIdx) {
+            const arr = RING_CONFIG[ring];
+            const count = arr.length;
+            const startAngle = -90 + (ring === 'outer' ? 180 / count : 0);
+            const baseAngle = startAngle + (360 * ringIdx / count);
             const targetAngle = 45;
-            const baseAngle = -90 + (360 * index / count);
             const offset = targetAngle - baseAngle;
-            rotationOffset = offset;
-            updatePositions(offset);
-            selectItem(index);
-            // 不在这里存，只有点击才存
+            ringState[ring].offset = offset;
+            ringState[ring].selected = ringIdx;
+            updatePositions(ring);
+            updateRingSelection(ring);
         }
 
+        // ---------- 步进切换：只切当前激活环 ----------
         function stepSwitch(delta) {
-            const count = menuData.length;
+            const ring = activeRing;
+            const arr = RING_CONFIG[ring];
+            const count = arr.length;
             const dir = delta > 0 ? 1 : -1;
-            const next = (selectedIndex + dir + count) % count;
-            switchToIndex(next);
-            // 不在这里存
+            const cur = ringState[ring].selected;
+            const next = (cur + dir + count) % count;
+            switchToRingIndex(ring, next);
+            updateLabel();
         }
 
+        // ---------- 展开/收起 ----------
         function toggleMenu(open) {
             isOpen = open;
             containerEl.classList.toggle('active', open);
             trigger.classList.toggle('active', open);
-            if (!open) {
-                setTimeout(() => {
-                    if (!isOpen) label.classList.remove('show');
-                }, 300);
+
+            const items = containerEl.querySelectorAll('.menu-item');
+            if (open) {
+                // 两个环各自回到自己的选中位置
+                switchToRingIndex('inner', ringState.inner.selected);
+                switchToRingIndex('outer', ringState.outer.selected);
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
+
+                items.forEach(el => {
+                    const ring = el.dataset.ring;
+                    const delay = RING_DELAY[ring] || 0;
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'scale(1)';
+                    }, delay);
+                });
+                if (label) label.classList.add('show');
             } else {
-                label.classList.add('show');
+                items.forEach(el => {
+                    const ring = el.dataset.ring;
+                    const delay = ring === 'outer' ? 0 : 60;
+                    setTimeout(() => {
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.3)';
+                    }, delay);
+                });
                 setTimeout(() => {
-                    switchToIndex(selectedIndex);
-                }, 50);
+                    if (!isOpen && label) label.classList.remove('show');
+                }, 300);
             }
         }
 
-        // ========== 事件绑定（仅针对 menuContainer 区域） ==========
+        // ========== 事件绑定 ==========
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
             toggleMenu(!isOpen);
@@ -405,15 +523,22 @@
             }
         });
 
-        // ========== 滚轮事件：只对 menuContainer 生效 ==========
+        // 滚轮：按指针位置决定切哪个环
         containerEl.addEventListener('wheel', function(e) {
             if (!isOpen) return;
             e.preventDefault();
             e.stopPropagation();
+            const ring = getRingByPointer(e.clientX, e.clientY);
+            if (ring !== activeRing) {
+                activeRing = ring;
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
+            }
             stepSwitch(e.deltaY);
         }, { passive: false });
 
-        // ========== 禁用鼠标中键（全局） ==========
+        // 禁用鼠标中键
         document.addEventListener('mousedown', function(e) {
             if (e.button === 1) {
                 e.preventDefault();
@@ -421,11 +546,18 @@
             }
         });
 
-        // ========== 鼠标拖拽：只在 menuContainer 上生效 ==========
+        // 鼠标拖拽：按按下位置决定切哪个环
         let dragStartY = 0;
         containerEl.addEventListener('mousedown', function(e) {
             if (!isOpen) return;
             if (e.button !== 0) return;
+            const ring = getRingByPointer(e.clientX, e.clientY);
+            if (ring !== activeRing) {
+                activeRing = ring;
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
+            }
             isDragging = true;
             dragStartY = e.clientY;
             e.preventDefault();
@@ -444,12 +576,20 @@
             isDragging = false;
         });
 
-        // ========== 触摸滑动：只在 menuContainer 上生效 ==========
+        // 触摸滑动：按触摸起点决定切哪个环
         let touchStartY = 0;
         containerEl.addEventListener('touchstart', function(e) {
             if (!isOpen) return;
+            const t = e.touches[0];
+            const ring = getRingByPointer(t.clientX, t.clientY);
+            if (ring !== activeRing) {
+                activeRing = ring;
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
+            }
             isDragging = true;
-            touchStartY = e.touches[0].clientY;
+            touchStartY = t.clientY;
         }, { passive: true });
 
         containerEl.addEventListener('touchmove', function(e) {
@@ -465,7 +605,7 @@
             isDragging = false;
         }, { passive: true });
 
-        // ========== 键盘支持 ==========
+        // 键盘：操作当前激活环
         document.addEventListener('keydown', function(e) {
             if (!isOpen) return;
             if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
@@ -477,9 +617,11 @@
             } else if (e.key === 'Escape') {
                 toggleMenu(false);
             } else if (e.key === 'Enter') {
-                const items = containerEl.querySelectorAll('.menu-item');
-                if (items[selectedIndex]) {
-                    items[selectedIndex].click();
+                const ring = activeRing;
+                const idx = ringState[ring].selected;
+                const arr = RING_CONFIG[ring];
+                if (arr && arr[idx]) {
+                    window.location.href = arr[idx].href;
                 }
             }
         });
@@ -493,7 +635,16 @@
         let resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(initMenu, 300);
+            resizeTimer = setTimeout(() => {
+                buildMenu();
+                if (isOpen) {
+                    switchToRingIndex('inner', ringState.inner.selected);
+                    switchToRingIndex('outer', ringState.outer.selected);
+                    updateRingSelection('inner');
+                    updateRingSelection('outer');
+                    updateLabel();
+                }
+            }, 300);
         });
 
         initMenu();
@@ -656,6 +807,7 @@
     }
 
 })();
+
 // ==================== 回到顶部 / 滚动向下 按钮（增强长按直达底部 + 单屏隐藏） ====================
 (function() {
     const backToTopHtml = `
@@ -683,11 +835,10 @@
                 background: rgba(43, 43, 43, 0.9);
             }
 
-            /* 滚动向下按钮：一直存在（除非单屏隐藏） */
             .scroll-down-btn {
                 position: fixed;
                 right: 26px;
-                bottom: 260px;
+                bottom: 310px;
                 width: 60px;
                 height: 60px;
                 border-radius: 50%;
@@ -707,13 +858,11 @@
             .scroll-down-btn:hover {
                 background: rgba(43, 43, 43, 0.9);
             }
-            /* 长按激活状态（视觉反馈） */
             .scroll-down-btn.longpress-active {
                 background: #7cb8b8;
                 color: #0d0d0d;
                 border-color: #7cb8b8;
             }
-            /* 单屏时隐藏向下按钮 */
             .scroll-down-btn.hidden {
                 display: none !important;
             }
@@ -731,7 +880,7 @@
                     height: 50px;
                     font-size: 22px;
                     right: 20px;
-                    bottom: 170px;
+                    bottom: 230px;
                     line-height: 48px;
                 }
             }
@@ -751,7 +900,6 @@
     function isSingleScreen() {
         const windowHeight = window.innerHeight;
         const fullHeight = document.documentElement.scrollHeight;
-        // 允许1px误差，防止由于亚像素导致的误差
         return fullHeight <= windowHeight + 1;
     }
 
@@ -759,14 +907,12 @@
     function updateButtonsVisibility() {
         const singleScreen = isSingleScreen();
 
-        // 1. 向下按钮：单屏时隐藏，否则显示
         if (singleScreen) {
             scrollDownBtn.classList.add('hidden');
         } else {
             scrollDownBtn.classList.remove('hidden');
         }
 
-        // 2. 回到顶部按钮：单屏时一定隐藏；非单屏时根据滚动位置决定
         if (singleScreen) {
             backToTopBtn.style.display = 'none';
         } else {
@@ -779,7 +925,6 @@
         }
     }
 
-    // ---------- 回到顶部点击事件 ----------
     backToTopBtn.addEventListener('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -787,7 +932,7 @@
     // ---------- 滚动向下按钮：单击滚一屏，长按直达底部 ----------
     let pressTimer = null;
     let isLongPress = false;
-    const LONG_PRESS_DURATION = 600; // 毫秒
+    const LONG_PRESS_DURATION = 600;
 
     function startPress(e) {
         e.preventDefault();
@@ -800,7 +945,6 @@
 
         pressTimer = setTimeout(() => {
             isLongPress = true;
-            // 长按：直接平滑滚动到底部
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
                 behavior: 'smooth'
@@ -817,47 +961,36 @@
         }
         scrollDownBtn.classList.remove('longpress-active');
 
-        // 如果没有触发长按，则执行单击滚动一屏
         if (!isLongPress) {
-            // 对于 mouseleave / touchcancel 不执行单击逻辑
             if (e.type === 'mouseleave' || e.type === 'touchcancel') {
                 isLongPress = false;
                 return;
             }
-            // 单击：滚动一屏
             window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
         }
-        // 延迟重置长按标记
         setTimeout(() => {
             isLongPress = false;
         }, 0);
     }
 
-    // 鼠标事件
     scrollDownBtn.addEventListener('mousedown', startPress);
     scrollDownBtn.addEventListener('mouseup', endPress);
     scrollDownBtn.addEventListener('mouseleave', endPress);
 
-    // 触摸事件
     scrollDownBtn.addEventListener('touchstart', startPress, { passive: false });
     scrollDownBtn.addEventListener('touchend', endPress);
     scrollDownBtn.addEventListener('touchcancel', endPress);
 
-    // 阻止 click 的重复触发（因为单击逻辑已由 mouseup/touchend 处理）
-    // 但保留键盘可访问性（Enter键会触发 click 且 detail === 0）
     scrollDownBtn.addEventListener('click', function(e) {
         e.preventDefault();
         if (e.detail === 0) {
-            // 键盘触发的 click，执行滚动一屏
             window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
         }
     });
 
-    // ---------- 滚动、窗口大小变化时更新按钮状态 ----------
     window.addEventListener('scroll', updateButtonsVisibility);
     window.addEventListener('resize', updateButtonsVisibility);
 
-    // 监听 DOM 内容变化（页面高度可能动态改变），防抖处理
     let resizeObserverTimer = null;
     const observer = new MutationObserver(function() {
         if (resizeObserverTimer) clearTimeout(resizeObserverTimer);
@@ -872,10 +1005,8 @@
         attributeFilter: ['style', 'class']
     });
 
-    // 初始更新
     updateButtonsVisibility();
 
-    // 页面卸载前清理定时器
     window.addEventListener('beforeunload', function() {
         if (pressTimer) clearTimeout(pressTimer);
         if (resizeObserverTimer) clearTimeout(resizeObserverTimer);
