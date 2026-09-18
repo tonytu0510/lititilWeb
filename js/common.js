@@ -89,6 +89,9 @@
 
     // 悬浮球容器尺寸（CSS 里也有，这里同步一份用于 JS 计算）
     const RING_CONTAINER_SIZE = { desktop: 400, mobile: 260 };
+
+    // 悬浮球附近安全半径：落在这一圈内不切换激活环
+    const TRIGGER_SAFE_RADIUS = { desktop: 70, mobile: 60 };
     // ================================================================
 
     const html = `
@@ -132,18 +135,6 @@
             }
             #menuContainer.active {
                 pointer-events: auto;
-            }
-            #menuBg {
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0;
-                transition: opacity 0.35s ease;
-            }
-            #menuContainer.active #menuBg {
-                opacity: 1;
             }
             .menu-item {
                 position: absolute;
@@ -235,16 +226,16 @@
                     display:none
                 }
                 #currentLabel .index {
-                    margin-bottom: -2px;
+                    margin-bottom: 0;
                 }
                 #currentLabel .name {
-                    margin-bottom: -10px;
+                    margin-bottom: -4px;
                 }
             }
         </style>
 
         <div id="currentLabel">
-            <div class="index" id="currentIndex">1 / 14</div>
+            <div class="index" id="currentIndex">1 / 6</div>
             <div class="name" id="currentName">首页</div>
             <div class="currentLabelScoll">滚轮/滑动切换</div>
         </div>
@@ -255,9 +246,7 @@
             <canvas id="dinoIcon" width="50" height="50"></canvas>
         </div>
 
-        <div id="menuContainer">
-            <div id="menuBg"></div>
-        </div>
+        <div id="menuContainer"></div>
 
         <div id="dinoBar" style="position:relative; display:none;">
             <button class="close-btn" id="topPlaceholder">✕</button>
@@ -338,6 +327,12 @@
             const dx = clientX - cx;
             const dy = clientY - cy;
             const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // 悬浮球附近：保持当前激活环，不强行切换
+            const safe = isMobile() ? TRIGGER_SAFE_RADIUS.mobile : TRIGGER_SAFE_RADIUS.desktop;
+            if (dist < safe) {
+                return activeRing;
+            }
 
             const innerR = getRadius('inner');
             const outerR = getRadius('outer');
@@ -632,11 +627,16 @@
             toggleMenu(false);
         }
 
+        // resize：不重建 DOM，只更新位置和高亮
         let resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                buildMenu();
+                updatePositions('inner');
+                updatePositions('outer');
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
                 if (isOpen) {
                     switchToRingIndex('inner', ringState.inner.selected);
                     switchToRingIndex('outer', ringState.outer.selected);
@@ -687,18 +687,6 @@
         ctx.fillRect(21, 34, 5, 8);
     }
     drawDinoIcon();
-
-    // ==================== 菜单交互 ====================
-    document.addEventListener('click', function(e) {
-        const menuIcon = document.getElementById('menuIcon');
-        const subNav = document.getElementById('subNav');
-        if (!menuIcon || !subNav) return;
-        if (e.target === menuIcon) {
-            subNav.classList.toggle('show');
-        } else if (!e.target.closest('#menuWrapper') && !e.target.closest('#subNav')) {
-            subNav.classList.remove('show');
-        }
-    });
 
     // ==================== 开始游戏 ====================
     window.startDinoGame = function() {
