@@ -656,8 +656,7 @@
     }
 
 })();
-
-// ==================== 回到顶部 / 滚动向下 按钮（增强长按直达底部） ====================
+// ==================== 回到顶部 / 滚动向下 按钮（增强长按直达底部 + 单屏隐藏） ====================
 (function() {
     const backToTopHtml = `
         <style>
@@ -684,7 +683,7 @@
                 background: rgba(43, 43, 43, 0.9);
             }
 
-            /* 滚动向下按钮：一直存在 */
+            /* 滚动向下按钮：一直存在（除非单屏隐藏） */
             .scroll-down-btn {
                 position: fixed;
                 right: 26px;
@@ -703,16 +702,20 @@
                 z-index: 1000;
                 font-family: 'Courier New', monospace;
                 user-select: none;
-                transition: background 0.2s;
+                transition: background 0.2s, opacity 0.3s;
             }
             .scroll-down-btn:hover {
                 background: rgba(43, 43, 43, 0.9);
             }
-            /* 长按激活状态（可选视觉反馈） */
+            /* 长按激活状态（视觉反馈） */
             .scroll-down-btn.longpress-active {
                 background: #7cb8b8;
                 color: #0d0d0d;
                 border-color: #7cb8b8;
+            }
+            /* 单屏时隐藏向下按钮 */
+            .scroll-down-btn.hidden {
+                display: none !important;
             }
 
             @media (max-width: 500px) {
@@ -744,19 +747,39 @@
 
     if (!backToTopBtn || !scrollDownBtn) return;
 
-    // ---------- 回到顶部逻辑不变 ----------
-    function checkBackToTop() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+    // ---------- 判断是否只有一屏（没有滚动空间） ----------
+    function isSingleScreen() {
         const windowHeight = window.innerHeight;
         const fullHeight = document.documentElement.scrollHeight;
+        // 允许1px误差，防止由于亚像素导致的误差
+        return fullHeight <= windowHeight + 1;
+    }
 
-        if (fullHeight > windowHeight && scrollTop > 0) {
-            backToTopBtn.style.display = 'block';
+    // ---------- 更新两个按钮的显示状态 ----------
+    function updateButtonsVisibility() {
+        const singleScreen = isSingleScreen();
+
+        // 1. 向下按钮：单屏时隐藏，否则显示
+        if (singleScreen) {
+            scrollDownBtn.classList.add('hidden');
         } else {
+            scrollDownBtn.classList.remove('hidden');
+        }
+
+        // 2. 回到顶部按钮：单屏时一定隐藏；非单屏时根据滚动位置决定
+        if (singleScreen) {
             backToTopBtn.style.display = 'none';
+        } else {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+            if (scrollTop > 0) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
         }
     }
 
+    // ---------- 回到顶部点击事件 ----------
     backToTopBtn.addEventListener('click', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -764,58 +787,47 @@
     // ---------- 滚动向下按钮：单击滚一屏，长按直达底部 ----------
     let pressTimer = null;
     let isLongPress = false;
-    const LONG_PRESS_DURATION = 600; // 毫秒，超过此时间视为长按
+    const LONG_PRESS_DURATION = 600; // 毫秒
 
-    // 统一处理开始长按 (鼠标按下 / 触摸开始)
     function startPress(e) {
-        // 阻止默认行为，防止移动端长按弹出菜单或选中
-        e.preventDefault(); 
-        // 清除之前的定时器
+        e.preventDefault();
         if (pressTimer) {
             clearTimeout(pressTimer);
             pressTimer = null;
         }
         isLongPress = false;
-        // 添加视觉反馈
         scrollDownBtn.classList.add('longpress-active');
 
         pressTimer = setTimeout(() => {
-            // 长按触发：直接平滑滚动到底部
             isLongPress = true;
+            // 长按：直接平滑滚动到底部
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
                 behavior: 'smooth'
             });
-            // 可移除高亮，表示已触发
             scrollDownBtn.classList.remove('longpress-active');
             pressTimer = null;
         }, LONG_PRESS_DURATION);
     }
 
-    // 结束按压 (鼠标松开 / 触摸结束 / 触摸取消)
     function endPress(e) {
-        // 清除定时器
         if (pressTimer) {
             clearTimeout(pressTimer);
             pressTimer = null;
         }
-        // 移除视觉反馈
         scrollDownBtn.classList.remove('longpress-active');
 
         // 如果没有触发长按，则执行单击滚动一屏
         if (!isLongPress) {
-            // 注意：如果事件是 mouseleave 或 touchcancel，我们通常不希望触发点击行为
-            // 但为了简单，只在真正 click 或 touchend 时执行单击逻辑会更准确。
-            // 这里我们通过事件类型判断：如果是 mouseleave 或 touchcancel，不执行单击。
+            // 对于 mouseleave / touchcancel 不执行单击逻辑
             if (e.type === 'mouseleave' || e.type === 'touchcancel') {
                 isLongPress = false;
                 return;
             }
-            // 执行单击滚动一屏
+            // 单击：滚动一屏
             window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
         }
-        // 重置长按标记，但要延迟一点以免影响 click 事件（但这里我们没用 click）
-        // 用 setTimeout 确保在事件流结束后重置
+        // 延迟重置长按标记
         setTimeout(() => {
             isLongPress = false;
         }, 0);
@@ -824,38 +836,51 @@
     // 鼠标事件
     scrollDownBtn.addEventListener('mousedown', startPress);
     scrollDownBtn.addEventListener('mouseup', endPress);
-    scrollDownBtn.addEventListener('mouseleave', endPress); // 鼠标移出按钮时取消
+    scrollDownBtn.addEventListener('mouseleave', endPress);
 
-    // 触摸事件 (移动端)
+    // 触摸事件
     scrollDownBtn.addEventListener('touchstart', startPress, { passive: false });
     scrollDownBtn.addEventListener('touchend', endPress);
     scrollDownBtn.addEventListener('touchcancel', endPress);
 
-    // 避免 click 事件干扰（因为我们在 endPress 里处理了单击逻辑，而 click 会再次触发）
-    // 但如果我们没有监听 click，就不会有重复。然而用户可能通过键盘触发 click，或者移动端有合成 click。
-    // 为了统一，我们可以阻止 click 的默认行为？但这样会阻止可访问性。另一种方案：不用 click，全部用 mousedown/mouseup + touch 处理。
-    // 但考虑到可能有辅助技术，我们保留 click 但让它不做事（或者我们可以在 endPress 中判断如果事件来自 click 则忽略？）
-    // 更简单：监听 click 并阻止其默认行为，因为我们已经手动处理了单击逻辑。
+    // 阻止 click 的重复触发（因为单击逻辑已由 mouseup/touchend 处理）
+    // 但保留键盘可访问性（Enter键会触发 click 且 detail === 0）
     scrollDownBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        // 单击逻辑已在 mouseup/touchend 中执行，这里不再重复
-        // 但如果是通过键盘触发的 click（例如 Enter 键），我们希望保留单击滚动一屏功能
-        // 所以判断如果事件不是由鼠标/触摸产生的（detail === 0 表示键盘触发），则执行单击滚动
         if (e.detail === 0) {
+            // 键盘触发的 click，执行滚动一屏
             window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
         }
     });
 
-    // 滚动监听与回到顶部按钮显示
-    window.addEventListener('scroll', checkBackToTop);
-    window.addEventListener('resize', checkBackToTop);
-    checkBackToTop();
+    // ---------- 滚动、窗口大小变化时更新按钮状态 ----------
+    window.addEventListener('scroll', updateButtonsVisibility);
+    window.addEventListener('resize', updateButtonsVisibility);
 
-    // 在页面卸载前清理定时器（可选）
+    // 监听 DOM 内容变化（页面高度可能动态改变），防抖处理
+    let resizeObserverTimer = null;
+    const observer = new MutationObserver(function() {
+        if (resizeObserverTimer) clearTimeout(resizeObserverTimer);
+        resizeObserverTimer = setTimeout(() => {
+            updateButtonsVisibility();
+        }, 100);
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class']
+    });
+
+    // 初始更新
+    updateButtonsVisibility();
+
+    // 页面卸载前清理定时器
     window.addEventListener('beforeunload', function() {
         if (pressTimer) clearTimeout(pressTimer);
+        if (resizeObserverTimer) clearTimeout(resizeObserverTimer);
     });
-})()
+})();
 
 // ==================== 百度统计 ====================
 var _hmt = _hmt || [];
