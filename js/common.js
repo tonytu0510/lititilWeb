@@ -805,7 +805,7 @@
                 right: 26px;
                 top: 50%;
                 transform: translateY(-50%);
-                width: 60px;
+                width: 42px;
                 border-radius: 30px;
                 background: rgba(43, 43, 43, 0.75);
                 border: 1px solid #555;
