@@ -796,93 +796,89 @@
 
 })();
 
-// ==================== 回到顶部 / 滚动向下 按钮（增强长按直达底部 + 单屏隐藏） ====================
+// ==================== 回到顶部 / 滚动向下 按钮（合并容器 + 长按直达底部 + 单屏隐藏） ====================
 (function() {
     const backToTopHtml = `
         <style>
-            .back-to-top-btn {
+            .scroll-nav {
                 position: fixed;
                 right: 26px;
-                top: 70px;
+                top: 50%;
+                transform: translateY(-50%);
                 width: 60px;
-                height: 60px;
-                border-radius: 50%;
+                border-radius: 30px;
                 background: rgba(43, 43, 43, 0.75);
-                color: #f5efe8;
                 border: 1px solid #555;
-                cursor: pointer;
-                display: none;
-                text-align: center;
-                line-height: 50px;
-                font-size: 36px;
                 z-index: 1000;
                 font-family: 'Courier New', monospace;
                 user-select: none;
-            }
-            .back-to-top-btn:hover {
-                background: rgba(43, 43, 43, 0.9);
-            }
-
-            .scroll-down-btn {
-                position: fixed;
-                right: 26px;
-                top: 140px;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: rgba(43, 43, 43, 0.75);
-                color: #f5efe8;
-                border: 1px solid #555;
-                cursor: pointer;
-                display: block;
-                text-align: center;
-                line-height: 50px;
-                font-size: 36px;
-                z-index: 1000;
-                font-family: 'Courier New', monospace;
-                user-select: none;
+                overflow: hidden;
                 transition: background 0.2s, opacity 0.3s;
             }
-            .scroll-down-btn:hover {
-                background: rgba(43, 43, 43, 0.9);
+            .scroll-nav-btn {
+                width: 100%;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #f5efe8;
+                font-size: 36px;
+                line-height: 1;
+                cursor: pointer;
+                background: transparent;
+                border: none;
+                padding: 0;
+                transition: background 0.2s;
             }
-            .scroll-down-btn.longpress-active {
+            .scroll-nav-btn:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+            .scroll-nav-btn.longpress-active {
                 background: #7cb8b8;
                 color: #0d0d0d;
-                border-color: #7cb8b8;
             }
-            .scroll-down-btn.hidden {
+            .scroll-nav-divider {
+                height: 1px;
+                margin: 0 10px;
+                background: #555;
+            }
+            #backToTopBtn {
+                display: none;
+            }
+            /* 单屏时整个容器隐藏（向下按钮隐藏，回到顶部也隐藏） */
+            .scroll-nav.hidden {
                 display: none !important;
             }
-
+            /* 回到顶部按钮隐藏时，只留向下按钮，容器还是完整圆角 */
+            .scroll-nav.no-backtop .scroll-nav-divider {
+                display: none;
+            }
             @media (max-width: 500px) {
-                .back-to-top-btn {
-                    width: 50px;
-                    height: 50px;
-                    font-size: 22px;
+                .scroll-nav {
                     right: 20px;
-                    line-height: 48px;
+                    width: 50px;
                 }
-                .scroll-down-btn {
-                    width: 50px;
+                .scroll-nav-btn {
                     height: 50px;
                     font-size: 22px;
-                    right: 20px;
-                    top: 130px;
-                    line-height: 48px;
                 }
             }
         </style>
-        <div class="back-to-top-btn" id="backToTopBtn" title="回到顶部">↑</div>
-        <div class="scroll-down-btn" id="scrollDownBtn" title="滚动向下 (长按直达底部)">↓</div>
+        <div class="scroll-nav" id="scrollNav">
+            <button class="scroll-nav-btn" id="backToTopBtn" title="回到顶部">↑</button>
+            <div class="scroll-nav-divider" id="scrollNavDivider"></div>
+            <button class="scroll-nav-btn" id="scrollDownBtn" title="滚动向下 (长按直达底部)">↓</button>
+        </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', backToTopHtml);
 
+    const scrollNav = document.getElementById('scrollNav');
     const backToTopBtn = document.getElementById('backToTopBtn');
     const scrollDownBtn = document.getElementById('scrollDownBtn');
+    const divider = document.getElementById('scrollNavDivider');
 
-    if (!backToTopBtn || !scrollDownBtn) return;
+    if (!scrollNav || !backToTopBtn || !scrollDownBtn) return;
 
     // ---------- 判断是否只有一屏（没有滚动空间） ----------
     function isSingleScreen() {
@@ -891,25 +887,27 @@
         return fullHeight <= windowHeight + 1;
     }
 
-    // ---------- 更新两个按钮的显示状态 ----------
+    // ---------- 更新容器和按钮的显示状态 ----------
     function updateButtonsVisibility() {
         const singleScreen = isSingleScreen();
 
+        // 单屏：整个容器隐藏
         if (singleScreen) {
-            scrollDownBtn.classList.add('hidden');
-        } else {
-            scrollDownBtn.classList.remove('hidden');
+            scrollNav.classList.add('hidden');
+            return;
         }
+        scrollNav.classList.remove('hidden');
 
-        if (singleScreen) {
-            backToTopBtn.style.display = 'none';
+        // 非单屏：根据滚动位置决定是否显示回到顶部按钮
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > 0) {
+            backToTopBtn.style.display = 'flex';
+            divider.style.display = 'block';
+            scrollNav.classList.remove('no-backtop');
         } else {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-            if (scrollTop > 0) {
-                backToTopBtn.style.display = 'block';
-            } else {
-                backToTopBtn.style.display = 'none';
-            }
+            backToTopBtn.style.display = 'none';
+            divider.style.display = 'none';
+            scrollNav.classList.add('no-backtop');
         }
     }
 
