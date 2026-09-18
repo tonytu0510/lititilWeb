@@ -826,7 +826,7 @@
             .scroll-down-btn {
                 position: fixed;
                 right: 26px;
-                bottom: 310px;
+                top: 140px;
                 width: 60px;
                 height: 60px;
                 border-radius: 50%;
@@ -868,7 +868,7 @@
                     height: 50px;
                     font-size: 22px;
                     right: 20px;
-                    bottom: 230px;
+                    top: 130px;
                     line-height: 48px;
                 }
             }
