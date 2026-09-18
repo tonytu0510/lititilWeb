@@ -856,7 +856,7 @@
             @media (max-width: 500px) {
                 .scroll-nav {
                     right: 20px;
-                    width: 50px;
+                    width: 42px;
                 }
                 .scroll-nav-btn {
                     height: 50px;
