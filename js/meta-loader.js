@@ -86,15 +86,17 @@ function init() {
       if (m.content) {
         var temp2 = document.createElement('div');
         temp2.innerHTML = m.content;
+        a.appendChild(temp2)
+        /*
         while (temp2.firstChild) {
           a.appendChild(temp2.firstChild);
-        }
+        }*/
       }
       // jsEnd
       loadScripts(m.jsEnd, a, 0,function() {
         // 挂到 body
         body.appendChild(a);
-      }) 
+      })
     });
   });
 }
