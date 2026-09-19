@@ -3,15 +3,24 @@
             background: #0d0d0d;
             font-family: 'Courier New', monospace;
         }
+        .wrap{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width:100%;
+            min-height: 90vh;
+            padding:20px 0
+        }
         .container {
             background: #181818;
             border-radius: 16px;
             padding: 30px 32px;
             border: 1px solid #2a2a2a;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.9);
             max-width: 600px;
-            min-height: 100vh;
-            margin: 30px auto;
+            min-height: 300px;
+            width: 100%;
+            margin:20px
         }
         .title {
             color: #d0d0d0;

@@ -4,6 +4,7 @@ function init() {
   var head = document.head;
   var body = document.body;
   var a = document.createElement('div');  // a 是元素，不是字符串
+  a.id='bodyWrap'
 
   // ===== meta =====
   function setMeta(name, content) {
@@ -78,25 +79,24 @@ function init() {
     }
   }
   //js
-  console.log('m.js.length=>',m.js)
-  if(m.js && m.js.length != 0){
-    for (var i = 0; i < m.js.length; i++) {
-      var s = document.createElement('script');
-      s.src = m.js[i];
-      a.appendChild(s);
-    }
-  }
-  // ===== content =====
-  if (m.content) {
-    var temp2 = document.createElement('div');
-    temp2.innerHTML = m.content;
-    while (temp2.firstChild) {
-      a.appendChild(temp2.firstChild);  // 用 appendChild
-    }
-  }
-  //加载完正文以后再加载JS
-  loadScripts(m.jsEnd, a);
-  body.appendChild(a);  // a 是元素，能 append
+  // ===== 核心：串行加载 m.js → m.jsFront → content → m.jsEnd =====
+  loadScripts(m.js, a, 0, function() {
+    loadScripts(m.jsFront, a, 0, function() {
+      // content
+      if (m.content) {
+        var temp2 = document.createElement('div');
+        temp2.innerHTML = m.content;
+        while (temp2.firstChild) {
+          a.appendChild(temp2.firstChild);
+        }
+      }
+      // jsEnd
+      loadScripts(m.jsEnd, a, 0,function() {
+        // 挂到 body
+        body.appendChild(a);
+      }) 
+    });
+  });
 }
 
 if (document.readyState === 'loading') {
@@ -105,14 +105,23 @@ if (document.readyState === 'loading') {
   init();
 }
 
-function loadScripts(list, container, index) {
+function loadScripts(list, container, index , done) {
   index = index || 0;
-  if(!list) return;
-  if (index >= list.length) return;
+  if (!list || index >= list.length) {
+    if (typeof done === 'function') done();
+    return;
+  }
   var s = document.createElement('script');
+  var called = false;
+  function next() {
+    if (called) return;
+    called = true;
+    loadScripts(list, container, index + 1, done);
+  }
+  s.onload = next;
+  s.onerror = next;
   s.src = list[index];
-  s.onload = function () {
-    loadScripts(list, container, index + 1);
-  };
   container.appendChild(s);
+  // 兜底：1.5 秒后如果还没触发，强制下一步
+  setTimeout(1000);
 }

@@ -27,33 +27,33 @@
                 radial-gradient(ellipse at 50% 100%, rgba(196, 30, 58, 0.08) 0%, transparent 60%);
         }
 
-        .header {
+        .headerN {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .header .icon {
+        .headerN .icon {
             font-size: 48px;
             margin-bottom: 12px;
             color: var(--gold);
             text-shadow: 0 0 20px rgba(212, 160, 23, 0.3);
         }
 
-        .header h1 {
+        .headerN h1 {
             font-size: 24px;
             color: var(--gold);
             letter-spacing: 4px;
             font-weight: normal;
         }
 
-        .header .subtitle {
+        .headerN .subtitle {
             font-size: 12px;
             color: #886644;
             margin-top: 8px;
             letter-spacing: 2px;
         }
 
-        .header .version {
+        .headerN .version {
             font-size: 10px;
             color: #664422;
             margin-top: 4px;
