@@ -105,12 +105,26 @@ if (document.readyState === 'loading') {
   init();
 }
 
+var loadedSrc = {};
 function loadScripts(list, container, index, done) {
   index = index || 0;
   if (!list || index >= list.length) {
     if (typeof done === 'function') done();
     return;
   }
+
+  var src = list[index];
+
+  // 已经加载过，跳过
+  if (loadedSrc[src]) {
+    loadScripts(list, container, index + 1, done);
+    return;
+  }
+  loadedSrc[src] = true;
+
+  var isFile = location.protocol === 'file:';
+  var FALLBACK_MS = isFile ? 800 : 8000;
+
   var s = document.createElement('script');
   var called = false;
   function next() {
@@ -120,8 +134,7 @@ function loadScripts(list, container, index, done) {
   }
   s.onload = next;
   s.onerror = next;
-  s.src = list[index];
+  s.src = src;
   container.appendChild(s);
-  // 兜底：1 秒后如果 onload/onerror 都没触发，强制下一步
-  setTimeout(next, 5000);
+  setTimeout(next, FALLBACK_MS);
 }
