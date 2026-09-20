@@ -122,9 +122,6 @@ function loadScripts(list, container, index, done) {
   }
   loadedSrc[src] = true;
 
-  var isFile = location.protocol === 'file:';
-  var FALLBACK_MS = isFile ? 800 : 8000;
-
   var s = document.createElement('script');
   var called = false;
   function next() {
@@ -136,5 +133,5 @@ function loadScripts(list, container, index, done) {
   s.onerror = next;
   s.src = src;
   container.appendChild(s);
-  setTimeout(next, FALLBACK_MS);
+  next()
 }
