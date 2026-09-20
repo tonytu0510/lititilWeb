@@ -80,8 +80,8 @@ function init() {
   }
   //js
   // ===== 核心：串行加载 m.js → m.jsFront → content → m.jsEnd =====
-  loadScripts(m.js, a, 0, function() {
-    loadScripts(m.jsFront, a, 0, function() {
+  loadScripts(m.js  || [], a, 0, function() {
+    loadScripts(m.jsFront  || [], a, 0, function() {
       // content
       if (m.content) {
         var temp2 = document.createElement('div');
@@ -91,7 +91,7 @@ function init() {
         }
       }
       // jsEnd
-      loadScripts(m.jsEnd, a, 0,function() {
+      loadScripts(m.jsEnd  || [], a, 0,function() {
         // 挂到 body
         body.appendChild(a);
       })
@@ -105,7 +105,7 @@ if (document.readyState === 'loading') {
   init();
 }
 
-function loadScripts(list, container, index , done) {
+function loadScripts(list, container, index, done) {
   index = index || 0;
   if (!list || index >= list.length) {
     if (typeof done === 'function') done();
@@ -122,6 +122,6 @@ function loadScripts(list, container, index , done) {
   s.onerror = next;
   s.src = list[index];
   container.appendChild(s);
-  // 兜底：1.5 秒后如果还没触发，强制下一步
-  setTimeout(1000);
+  // 兜底：1 秒后如果 onload/onerror 都没触发，强制下一步
+  setTimeout(next, 5000);
 }

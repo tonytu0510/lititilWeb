@@ -70,10 +70,23 @@
     background:linear-gradient(90deg,var(--line),transparent);
   }
 
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:16px;
+  .grid {
+    display: grid;
+    gap: 16px;
+    max-width: 1200px;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 500px) {
+      .grid {
+          grid-template-columns: repeat(2, 1fr);
+      }
+  }
+
+  @media (min-width: 900px) {
+      .grid {
+          grid-template-columns: repeat(3, 1fr);
+      }
   }
   .card{
     background:linear-gradient(180deg,var(--card),var(--card2));
