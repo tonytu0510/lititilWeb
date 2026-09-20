@@ -16,6 +16,7 @@ function normalizeStroke(s) {
 // 表2：汉字拆解表
 // ============================================================
 const CHAR_SPLIT = {
+  // 日 = 曰 + 一（日算曰）
   '日': ['曰', '一'],
   '白': ['丿', '日'],
   '的': ['白', '勺'],
@@ -343,7 +344,6 @@ const CHAR_SPLIT = {
   '者': ['耂', '日'],
   '耂': ['土', '丿'],
   '内': ['冂', '人'],
-  '德': ['彳', '十', '罒', '一', '心'],
 };
 
 // ============================================================
@@ -498,6 +498,8 @@ const TONGYIN = {
   'dan': ['但', '单', '担', '胆', '旦', '弹', '淡', '蛋', '诞', '耽', '郸', '惮', '殚', '箪', '聃', '儋', '萏', '啖', '氮'],
   'he': ['和', '何', '河', '合', '喝', '盒', '禾', '荷', '鹤', '贺', '赫', '褐', '呵', '阖', '涸', '貉', '阂', '曷', '盍', '龁'],
   'de': ['得', '德', '的', '地'],
+  'chong': ['冲', '充', '虫', '宠', '崇', '忡', '憧', '艟', '茺', '珫', '种'],
+  'zhong2': ['众', '仲', '种', '重', '肿'],
   'di': ['的', '地', '第', '低', '底', '弟', '敌', '抵', '递', '帝', '缔', '堤', '滴', '迪', '笛', '涤', '嘀', '嫡', '氐', '邸', '诋', '谛', '砥', '骶'],
   'dei': ['得'],
 };
@@ -519,7 +521,7 @@ const COMMON_CHARS = new Set([
   '仁','义','礼','智','信','忠','孝','廉','耻','勇','善','恶','非','对','错','正','邪','公','私','直','曲','美','丑',
   '辰','霜','雾','露','冰','雹','虹','霞','气','光','影','色','香','味','触',
   '王','李','张','刘','陈','杨','黄','赵','周','吴','徐','孙','马','朱','胡','郭','何','高','林','罗','郑','梁','宋','唐','韩','冯','邓','曹','彭','曾','肖','董','袁','潘','于','蒋','蔡','余','杜','叶','程','苏','魏','吕','丁','任','沈','姚','卢','姜','崔','钟','陆','汪','范','石','廖','贾','夏','韦','付','方','白','邹','孟','熊','秦','邱','江','尹','薛','闫','段','雷','侯','龙','史','陶','黎','贺','顾','毛','郝','龚','邵','严','覃','武','戴','莫','孔','向','汤',
-  '邯','郸','甘','单','阝','入','八','个','介','久','少','分','几','懂','得','何','重','田','里','千','忄','艹','彳','可','早','化','央','冖','洛','各','夂','监','皿','溥','尃','甫','生','令','具','斩','车','斤','鬼','因','囗','艮','夬','曼','罒','圣','立','亡','刃','中','刍','彐','乍','公','今','米','氵','釆','禾','和','是','在','才','寸','也','我','扌','戈','找','们','门','这','辶','文','乂','那','哪','候','侯','矢','天','者','耂','内','德'
+  '邯','郸','甘','单','阝','入','八','个','介','久','少','分','几','懂','得','何','重','田','里','千','忄','艹','彳','可','早','化','央','冖','洛','各','夂','监','皿','溥','尃','甫','生','令','具','斩','车','斤','鬼','因','囗','艮','夬','曼','罒','圣','立','亡','刃','中','刍','彐','乍','公','今','米','氵','釆','禾','和','是','在','才','寸','也','我','扌','戈','找','们','门','这','辶','文','乂','那','哪','候','侯','矢','天','者','耂','内'
 ]);
 
 const PUNCT = new Set(['，', '。', '、', '；', '：', '？', '！', '“', '”', '‘', '’', '（', '）', '《', '》', ' ', '\n', '\t']);
@@ -580,6 +582,7 @@ function containsPart(char, target, depth) {
   return false;
 }
 
+// ★ 日算曰
 function containsYue(char) {
   return containsPart(char, '曰') || containsPart(char, '月') || containsPart(char, '日');
 }
@@ -603,7 +606,8 @@ function findDuoyin(char) { return DUOYIN[char] || null; }
 function hasAncient(char) { return !!(ANCIENT_READ[char] && ANCIENT_READ[char].length); }
 function isRare(char) { return !COMMON_CHARS.has(char); }
 
-// 查多音字的同音字里，有没有含曰/言字旁的
+// ★ 查多音字的同音字里，有没有含曰/言字旁的
+// 返回 { pinyin, char } 或 null
 function findDuoyinYue(char) {
   const d = DUOYIN[char];
   if (!d) return null;
@@ -621,6 +625,7 @@ function findDuoyinYue(char) {
   return null;
 }
 
+// ★ 有效多音字：本身含曰/言，或同音字里有含曰/言
 function hasValidDuoyin(char) {
   const d = DUOYIN[char];
   if (!d) return false;
@@ -681,34 +686,13 @@ const DUOYIN_MODERN = {
 };
 
 // ============================================================
-// 递归展开（如果找到同音字，替换成同音字拆）
+// 递归展开（只标曰落点）
 // ============================================================
-function expandRecursive(char, depth, lines, prefix, visited) {
+function expandRecursive(char, depth, lines, prefix) {
   depth = depth || 0;
   lines = lines || [];
   prefix = prefix || '';
-  visited = visited || {};
-  
-  // 防循环
-  if (visited[char]) {
-    lines.push(prefix + char + ' <span class="warn">（已替换过，停止递归）</span>');
-    return lines;
-  }
-  visited[char] = true;
-  
   if (depth > 8) { lines.push(prefix + char + ' （超深）'); return lines; }
-
-  // ★ 先查多音字能否通过同音字找到曰/言（只在顶层替换一次）
-  const dy = findDuoyinYue(char);
-  if (dy && depth === 1 && dy.char !== char && !visited[dy.char]) {
-    lines.push(prefix + char + ' <span class="warn">[多音字 → 同音字替换]</span>');
-    const d = DUOYIN[char];
-    if (d) lines.push(prefix + '  <span class="plain">读音：' + d.pinyin.join(' / ') + '</span>');
-    lines.push(prefix + '  <span class="replace">→ 同音字「' + dy.char + '」（' + dy.pinyin + '）含曰/言，按「' + dy.char + '」拆</span>');
-    // 递归展开同音字，depth 加 1 防止再触发替换
-    expandRecursive(dy.char, depth + 1, lines, prefix, visited);
-    return lines;
-  }
 
   const parts = CHAR_SPLIT[char];
   const modern = DUOYIN_MODERN[char] || null;
@@ -753,7 +737,7 @@ function expandRecursive(char, depth, lines, prefix, visited) {
 
     lines.push(prefix + branch + display + qiMark);
     if (part !== char && CHAR_SPLIT[part]) {
-      expandRecursive(part, depth + 1, lines, nextPrefix + '   ', visited);
+      expandRecursive(part, depth + 1, lines, nextPrefix + '   ');
     } else if (KONG.has(norm)) {
       lines.push(nextPrefix + '   <span class="empty">' + norm + ' → 归空</span>');
     }
@@ -781,24 +765,10 @@ function findYueNext(char, depth) {
   return null;
 }
 
-// 收集整句所有曰落点（同音字替换后的）
-function collectYuePoints(char, depth, visited) {
+// 收集整句所有曰落点
+function collectYuePoints(char, depth) {
   depth = depth || 0;
-  visited = visited || {};
-  
-  if (visited[char]) return [];
-  visited[char] = true;
-  
   if (depth > 10) return [];
-
-  // 顶层：同音字替换
-  if (depth === 0) {
-    const dy = findDuoyinYue(char);
-    if (dy && dy.char !== char) {
-      return collectYuePoints(dy.char, 1, visited);
-    }
-  }
-
   const parts = CHAR_SPLIT[char];
   if (!parts) return [];
 
@@ -809,7 +779,7 @@ function collectYuePoints(char, depth, visited) {
       const next = (i + 1 < parts.length) ? parts[i + 1] : '一';
       points.push('曰' + next);
     } else if (CHAR_SPLIT[p]) {
-      const sub = collectYuePoints(p, depth + 1, visited);
+      const sub = collectYuePoints(p, depth + 1);
       for (let j = 0; j < sub.length; j++) points.push(sub[j]);
     }
   }
@@ -884,7 +854,7 @@ function run() {
       if (hasAncient(c)) reasons.push('古音/通假');
       if (hasValidDuoyin(c)) {
         const dy = findDuoyinYue(c);
-        if (dy) reasons.push('多音字 → 同音字「' + dy.char + '」（' + dy.pinyin + '）含曰/言');
+        if (dy) reasons.push('多音字（通过同音字「' + dy.char + '」→' + dy.pinyin + '）');
         else reasons.push('有效多音字（含曰/言）');
       }
       if (hasYue(c)) reasons.push('含曰/月/日');
@@ -954,7 +924,7 @@ function run() {
   });
 
   log.push('');
-  log.push('<span class="step">【第5步：递归展开拆解链（多音字替换成同音字拆）】</span>');
+  log.push('<span class="step">【第5步：递归展开拆解链（只标曰落点）】</span>');
 
   const allChars = yueChars.concat(duoyinChars, yanChars, remaining);
   const allStrokes = [];
@@ -968,15 +938,13 @@ function run() {
     expandRecursive(c, 1, lines, '    ');
     log.push(lines.join('\n'));
 
-    // 收集笔画时也要用替换后的字
-    const dy = findDuoyinYue(c);
-    const strokeTarget = dy ? dy.char : c;
-    const strokes = splitToStrokes(strokeTarget);
+    const strokes = splitToStrokes(c);
     for (let i = 0; i < strokes.length; i++) allStrokes.push(strokes[i]);
   });
 
   if (!allChars.length) log.push('  （无）');
 
+  // ===== 第6步：汇总整句曰落点 =====
   log.push('');
   log.push('<span class="step">【第6步：汇总整句「曰」落点】</span>');
 
@@ -1021,6 +989,7 @@ function run() {
     }
   }
 
+  // ===== 第7步：落一丨十 · 约分 =====
   log.push('');
   log.push('<span class="step">【第7步：落一丨十 · 约分】</span>');
 
