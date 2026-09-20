@@ -2,550 +2,876 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>书法拆字 · 一丨7 0 空 · 全链路</title>
+<title>strokeTool · 拆字全流程</title>
 <style>
   body {
-    background: #1a1a1a; color: #ddd;
+    background: #1a1a1a;
+    color: #ddd;
     font-family: 'Courier New', monospace;
-    margin: 0; padding: 20px;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.7;
   }
-  h1 { font-size: 18px; color: #7cb8b8; }
-  #drop {
-    border: 2px dashed #555; border-radius: 8px;
-    padding: 40px; text-align: center;
-    color: #888; cursor: pointer; transition: 0.2s;
+  h1 { font-size: 18px; color: #7cb8b8; margin: 0 0 4px 0; }
+  .sub { color: #666; font-size: 12px; margin-bottom: 20px; }
+  .panel {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
   }
-  #drop:hover, #drop.over { border-color: #7cb8b8; color: #7cb8b8; }
-  canvas { display: block; margin: 8px 0; max-width: 100%; border: 1px solid #333; }
-  .row { display: flex; gap: 12px; flex-wrap: wrap; }
-  .col { flex: 1; min-width: 260px; }
-  pre {
-    background: #0d0d0d; padding: 12px; border-radius: 6px;
-    font-size: 12px; line-height: 1.6; overflow-x: auto;
-    color: #b0d0d0; max-height: 400px;
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    background: #0d0d0d;
+    color: #ddd;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    resize: vertical;
+    box-sizing: border-box;
   }
-  .stat span { display: inline-block; margin-right: 14px; font-size: 14px; }
-  .yi { color: #f9ed69; } .shu { color: #7cb8b8; }
-  .qi { color: #e88; } .ling { color: #9c9; } .kong { color: #888; }
   button {
-    background: #2a2a2a; color: #ddd; border: 1px solid #555;
-    padding: 8px 16px; border-radius: 4px; cursor: pointer;
-    font-family: inherit; margin-right: 8px;
+    background: #2a2a2a;
+    color: #ddd;
+    border: 1px solid #555;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-top: 8px;
   }
   button:hover { background: #3d3d3d; }
-  .tip { color:#666; font-size:12px; margin-top:6px; }
+  button.primary { background: #7cb8b8; color: #0d0d0d; border-color: #7cb8b8; }
+  button.primary:hover { background: #8fc8c8; }
+  pre {
+    background: #0d0d0d;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #b0d0d0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .step { color: #7cb8b8; font-weight: bold; }
+  .hit { color: #f9ed69; }
+  .gone { color: #666; text-decoration: line-through; }
+  .empty { color: #9c9; }
+  .warn { color: #e88; }
+  .note { color: #666; font-size: 12px; }
+  .yue { color: #9c9; font-weight: bold; }
+  .duo { color: #e88; }
+  .pian { color: #7cb8b8; }
+  .plain { color: #888; }
+  .rare { color: #555; font-size: 11px; }
+  .candidate {
+    display: inline-block;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px;
+    font-size: 15px;
+  }
+  .candidate.yue { background: #1a3320; border-color: #9c9; }
+  .candidate.yan { background: #1a2a33; border-color: #7cb8b8; }
+  .candidate.both { background: #332a1a; border-color: #f9ed69; }
+  .candidate.rare { opacity: 0.5; }
+  .chain-yue { color: #9c9; font-weight: bold; background: #1a3320; padding: 0 4px; border-radius: 3px; }
+  .blank {
+    color: #f9ed69;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
-<h1>书法拆字 · 一丨7 0 空 · 全链路</h1>
 
-<div id="drop">
-  拖图片到这里，或点击选择<br>
-  <input type="file" id="file" accept="image/*" style="display:none">
-</div>
+<h1>strokeTool · 拆字全流程</h1>
+<div class="sub">去标点 → 相同字约掉 → 查古音/多音字/曰/言（有则保留）→ 自对合约掉 → 展开拆解链 → 落一丨十 → 约分 → 归空</div>
 
-<div class="row" style="margin-top:16px;">
-  <div class="col">
-    <div class="tip">原图</div>
-    <canvas id="cvSrc"></canvas>
-  </div>
-  <div class="col">
-    <div class="tip">二值化</div>
-    <canvas id="cvBin"></canvas>
-  </div>
-  <div class="col">
-    <div class="tip">笔画段（按方向着色）</div>
-    <canvas id="cvSeg"></canvas>
+<div class="panel">
+  <textarea id="input" placeholder="输入一句话，例如：你可以大度的去原谅别人">你可以大度的去原谅别人</textarea>
+  <div>
+    <button class="primary" id="btnRun">开始拆解</button>
+    <button id="btnClear">清空</button>
+    <button id="btnSample">示例</button>
   </div>
 </div>
 
-<div class="stat" id="stat" style="margin-top:16px;">
-  <span class="yi">一: <b id="nYi">0</b></span>
-  <span class="shu">丨: <b id="nShu">0</b></span>
-  <span class="qi">7: <b id="nQi">0</b></span>
-  <span class="ling">0: <b id="nLing">0</b></span>
-  <span class="kong">空: <b id="nKong">0</b></span>
-</div>
-
-<div style="margin-top:12px;">
-  <button id="btnRun">重新识别</button>
-  <button id="btnReset">重置</button>
-  <button id="btnDump">导出识别文本</button>
-</div>
-
-<pre id="out" style="margin-top:16px;">等待图片…</pre>
+<pre id="output">等待输入…</pre>
 
 <script>
-// ============ 基础 ============
-const drop = document.getElementById('drop');
-const fileInput = document.getElementById('file');
-const cvSrc = document.getElementById('cvSrc');
-const cvBin = document.getElementById('cvBin');
-const cvSeg = document.getElementById('cvSeg');
-const out = document.getElementById('out');
+// ============================================================
+// 表1：笔画归空集合
+// ============================================================
+const KONG = new Set(['一', '丨', '0', '丿', '丶', '乙', '乚', '亅', '乛', '⺄']);
 
-let W = 0, H = 0;
-let imgData = null;
-let segs = [];      // 识别出的笔画段
-let skelArr = null;
+// ============================================================
+// 表2：汉字拆解表
+// ============================================================
+const CHAR_SPLIT = {
+  '原': ['厂', '白', '小'],
+  '明': ['日', '月'],
+  '青': ['一', '一', '丨', '月'],
+  '湖': ['氵', '胡'],
+  '胡': ['古', '月'],
+  '朝': ['十', '日', '十', '月'],
+  '期': ['其', '月'],
+  '其': ['廿', '一', '八'],
+  '朋': ['月', '月'],
+  '服': ['月', '𠬝'],
+  '胜': ['月', '生'],
+  '腾': ['月', '关', '马'],
+  '朦': ['月', '蒙'],
+  '胧': ['月', '龙'],
+  '腊': ['月', '昔'],
+  '昔': ['廿', '日'],
+  '精': ['米', '青'],
+  '睛': ['目', '青'],
+  '晴': ['日', '青'],
+  '清': ['氵', '青'],
+  '情': ['忄', '青'],
+  '请': ['言', '青'],
+  '曰': ['口', '一'],
+  '月': ['月'],
+  '阴': ['阝', '月'],
+  '阳': ['阝', '日'],
+  '謜': ['言', '原'],
+  '言': ['曰', '一'],
+  '说': ['言', '兑'],
+  '话': ['言', '舌'],
+  '诗': ['言', '寺'],
+  '谁': ['言', '隹'],
+  '谢': ['言', '身', '寸'],
+  '认': ['言', '人'],
+  '识': ['言', '只'],
+  '谈': ['言', '炎'],
+  '讲': ['言', '井'],
+  '论': ['言', '仑'],
+  '许': ['言', '午'],
+  '记': ['言', '己'],
+  '让': ['言', '上'],
+  '调': ['言', '周'],
+  '证': ['言', '正'],
+  '试': ['言', '式'],
+  '谅': ['言', '京'],
+  '译': ['言', '又', '二'],
+  '词': ['言', '司'],
+  '语': ['言', '吾'],
+  '讽': ['言', '风'],
+  '讯': ['言', '卂'],
+  '训': ['言', '川'],
+  '议': ['言', '义'],
+  '访': ['言', '方'],
+  '设': ['言', '殳'],
+  '诉': ['言', '斥'],
+  '诊': ['言', '尔'],
+  '注': ['氵', '主'],
+  '评': ['言', '平'],
+  '诚': ['言', '成'],
+  '该': ['言', '亥'],
+  '诞': ['言', '延'],
+  '询': ['言', '旬'],
+  '详': ['言', '羊'],
+  '诫': ['言', '戒'],
+  '诬': ['言', '巫'],
+  '误': ['言', '吴'],
+  '诱': ['言', '秀'],
+  '诲': ['言', '每'],
+  '课': ['言', '果'],
+  '诽': ['言', '非'],
+  '谊': ['言', '宜'],
+  '谋': ['言', '某'],
+  '谍': ['言', '枼'],
+  '谎': ['言', '荒'],
+  '谏': ['言', '柬'],
+  '谐': ['言', '皆'],
+  '谑': ['言', '虐'],
+  '谒': ['言', '曷'],
+  '谓': ['言', '胃'],
+  '谔': ['言', '咢'],
+  '谕': ['言', '俞'],
+  '谖': ['言', '爰'],
+  '谗': ['言', '毚'],
+  '谙': ['言', '音'],
+  '谚': ['言', '彦'],
+  '谛': ['言', '帝'],
+  '谜': ['言', '迷'],
+  '谟': ['言', '莫'],
+  '谠': ['言', '党'],
+  '谡': ['言', '粟'],
+  '谣': ['言', '摇'],
+  '谤': ['言', '旁'],
+  '谦': ['言', '兼'],
+  '谧': ['言', '宓'],
+  '谨': ['言', '堇'],
+  '谩': ['言', '曼'],
+  '谪': ['言', '啇'],
+  '谫': ['言', '剪'],
+  '谬': ['言', '翏'],
+  '谭': ['言', '覃'],
+  '谮': ['言', '替'],
+  '谯': ['言', '焦'],
+  '谰': ['言', '阑'],
+  '谱': ['言', '普'],
+  '谲': ['言', '矞'],
+  '谳': ['言', '献'],
+  '谴': ['言', '遣'],
+  '谵': ['言', '詹'],
+  '谶': ['言', '韱'],
+  // 常用字
+  '你': ['亻', '尔'],
+  '可': ['丁', '口'],
+  '以': ['人', '丶'],
+  '大': ['一', '人'],
+  '度': ['广', '廿', '又'],
+  '的': ['白', '勺'],
+  '去': ['土', '厶'],
+  '别': ['口', '力', '刂'],
+  '人': ['丿', '丶'],
+  '但': ['亻', '旦'],
+  '千': ['丿', '十'],
+  '万': ['一', '勹'],
+  '不': ['一', '丿', '丨', '丶'],
+  '要': ['覀', '女'],
+  '愚': ['禺', '心'],
+  '蠢': ['春', '春', '虫'],
+  '再': ['一', '冂', '土'],
+  '相': ['木', '目'],
+  '信': ['亻', '言'],
+  '王': ['一', '土'],
+  '李': ['木', '子'],
+  '木': ['十', '八'],
+  '子': ['了', '一'],
+  '日': ['口', '一'],
+  '仁': ['亻', '二'],
+  '铭': ['钅', '名'],
+  '居': ['尸', '古'],
+  '士': ['十', '一'],
+  '亻': ['丿', '丨'],
+  '尔': ['⺈', '小'],
+  '丁': ['一', '亅'],
+  '口': ['丨', '乛', '一'],
+  '广': ['丶', '厂'],
+  '廿': ['十', '十'],
+  '又': ['乛', '丿', '丶'],
+  '白': ['丿', '日'],
+  '勺': ['勹', '丶'],
+  '土': ['十', '一'],
+  '厶': ['丿', '丶'],
+  '厂': ['一', '丿'],
+  '小': ['亅', '八'],
+  '京': ['亠', '口', '小'],
+  '力': ['𠃌', '丿'],
+  '刂': ['丨', '亅'],
+  '旦': ['日', '一'],
+  '十': ['一', '丨'],
+  '勹': ['丿', '乛'],
+  '覀': ['一', '口', '儿'],
+  '女': ['𡿨', '丿', '一'],
+  '禺': ['日', '冂', '丨'],
+  '心': ['丶', '乚', '丶'],
+  '春': ['三', '人', '日'],
+  '虫': ['口', '丨', '一', '丶'],
+  '冂': ['丨', '乛'],
+  '目': ['口', '二'],
+  '八': ['丿', '丶'],
+  '了': ['乛', '亅'],
+  '二': ['一', '一'],
+  '钅': ['丿', '一', '一', '一', '丨'],
+  '名': ['夕', '口'],
+  '尸': ['乛', '一', '丿'],
+  '古': ['十', '口'],
+  '三': ['一', '一', '一'],
+  '夕': ['丿', '乛', '丶'],
+  '亠': ['丶', '一'],
+  '儿': ['丿', '乚'],
+  '𠃌': ['丨', '乛'],
+  '𡿨': ['乛', '丿'],
+  '⺈': ['丿', '乛'],
+  '⺄': ['乛', '丿'],
+};
 
-function getCtx(canvas) { return canvas.getContext('2d', { willReadFrequently: true }); }
-function resize(canvas, w, h) { canvas.width = w; canvas.height = h; }
+// ============================================================
+// 表3：多音字表
+// ============================================================
+const DUOYIN = {
+  '中': { pinyin: ['zhōng', 'zhòng'], hasYue: false, hasYan: false },
+  '行': { pinyin: ['xíng', 'háng'], hasYue: false, hasYan: false },
+  '重': { pinyin: ['zhòng', 'chóng'], hasYue: false, hasYan: false },
+  '长': { pinyin: ['cháng', 'zhǎng'], hasYue: false, hasYan: false },
+  '会': { pinyin: ['huì', 'kuài'], hasYue: false, hasYan: false },
+  '为': { pinyin: ['wéi', 'wèi'], hasYue: false, hasYan: false },
+  '好': { pinyin: ['hǎo', 'hào'], hasYue: false, hasYan: false },
+  '还': { pinyin: ['hái', 'huán'], hasYue: false, hasYan: false },
+  '只': { pinyin: ['zhī', 'zhǐ'], hasYue: false, hasYan: false },
+  '种': { pinyin: ['zhǒng', 'zhòng'], hasYue: false, hasYan: false },
+  '相': { pinyin: ['xiāng', 'xiàng'], hasYue: false, hasYan: false },
+  '信': { pinyin: ['xìn', 'shēn'], hasYue: false, hasYan: false },
+  '说': { pinyin: ['shuō', 'shuì', 'yuè'], hasYue: true, hasYan: true },
+  '识': { pinyin: ['shí', 'zhì'], hasYue: false, hasYan: true },
+  '读': { pinyin: ['dú', 'dòu'], hasYue: false, hasYan: true },
+  '调': { pinyin: ['diào', 'tiáo'], hasYue: false, hasYan: true },
+  '讲': { pinyin: ['jiǎng'], hasYue: false, hasYan: true },
+  '论': { pinyin: ['lùn', 'lún'], hasYue: false, hasYan: true },
+  '许': { pinyin: ['xǔ', 'hǔ'], hasYue: false, hasYan: true },
+  '记': { pinyin: ['jì'], hasYue: false, hasYan: true },
+  '让': { pinyin: ['ràng'], hasYue: false, hasYan: true },
+  '请': { pinyin: ['qǐng'], hasYue: false, hasYan: true },
+  '谢': { pinyin: ['xiè'], hasYue: false, hasYan: true },
+  '认': { pinyin: ['rèn'], hasYue: false, hasYan: true },
+  '谈': { pinyin: ['tán'], hasYue: false, hasYan: true },
+  '话': { pinyin: ['huà'], hasYue: false, hasYan: true },
+  '谁': { pinyin: ['shuí', 'shéi'], hasYue: false, hasYan: true },
+  '诗': { pinyin: ['shī'], hasYue: false, hasYan: true },
+  '谅': { pinyin: ['liàng'], hasYue: false, hasYan: true },
+  '证': { pinyin: ['zhèng'], hasYue: false, hasYan: true },
+  '试': { pinyin: ['shì'], hasYue: false, hasYan: true },
+  '尽': { pinyin: ['jǐn', 'jìn'], hasYue: false, hasYan: false },
+  '禁': { pinyin: ['jīn', 'jìn'], hasYue: false, hasYan: false },
+  '劲': { pinyin: ['jìn', 'jìng'], hasYue: false, hasYan: false },
+  '仅': { pinyin: ['jǐn', 'jìn'], hasYue: false, hasYan: false },
+  '曰': { pinyin: ['yuē'], hasYue: true, hasYan: false },
+};
 
-// ============ 读图 ============
-drop.addEventListener('click', () => fileInput.click());
-drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-drop.addEventListener('drop', e => {
-  e.preventDefault(); drop.classList.remove('over');
-  const f = e.dataTransfer.files[0]; if (f) loadFile(f);
-});
-fileInput.addEventListener('change', e => {
-  const f = e.target.files[0]; if (f) loadFile(f);
-});
+// ============================================================
+// 表4：偏旁表
+// ============================================================
+const PIANPANG = {
+  '你': ['亻'], '仁': ['亻'], '但': ['亻'], '信': ['亻'],
+  '谅': ['言'], '说': ['言'], '话': ['言'], '诗': ['言'],
+  '谁': ['言'], '请': ['言'], '谢': ['言'], '认': ['言'],
+  '识': ['言'], '谈': ['言'], '讲': ['言'], '论': ['言'],
+  '许': ['言'], '记': ['言'], '让': ['言'], '调': ['言'],
+  '证': ['言'], '试': ['言'],
+  '明': ['日'], '日': ['日'], '旦': ['日'], '春': ['日'], '禺': ['日'],
+  '相': ['木'], '木': ['木'], '李': ['木'],
+  '王': ['王'], '土': ['土'], '士': ['土'],
+  '心': ['心'], '愚': ['心'],
+  '女': ['女'], '要': ['女'],
+  '力': ['力'], '别': ['力'],
+  '口': ['口'], '可': ['口'], '古': ['口'], '名': ['口'], '虫': ['口'],
+  '目': ['目'],
+  '度': ['广'], '广': ['广'],
+  '原': ['厂'], '厂': ['厂'],
+  '去': ['土'], '厶': ['厶'],
+  '钅': ['钅'], '铭': ['钅'],
+  '居': ['尸'], '尸': ['尸'],
+  '亻': ['亻'], '尔': ['尔'], '丁': ['丁'], '廿': ['廿'],
+  '又': ['又'], '白': ['白'], '的': ['白'], '勺': ['勺'],
+  '小': ['小'], '京': ['京'], '刂': ['刂'],
+  '十': ['十'], '勹': ['勹'], '覀': ['覀'], '冂': ['冂'],
+  '八': ['八'], '了': ['了'], '二': ['二'], '三': ['三'],
+  '夕': ['夕'], '亠': ['亠'], '儿': ['儿'],
+  '万': ['一'], '千': ['丿'], '不': ['一'], '大': ['大'],
+  '人': ['人'], '以': ['人'], '再': ['一'],
+  '曰': ['曰'],
+  '兑': ['八'], '舌': ['口'], '寺': ['土'], '寸': ['寸'],
+  '隹': ['亻'], '青': ['月'], '身': ['身'], '只': ['口'],
+  '炎': ['火'], '火': ['火'], '井': ['一'], '仑': ['人'],
+  '匕': ['匕'], '午': ['丿'], '己': ['己'], '上': ['一'],
+  '周': ['冂'], '正': ['一'], '式': ['工'], '工': ['工'], '弋': ['弋'],
+};
 
-function loadFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const maxW = 800;
-      let scale = img.width > maxW ? maxW / img.width : 1;
-      W = Math.floor(img.width * scale);
-      H = Math.floor(img.height * scale);
-      resize(cvSrc, W, H); resize(cvBin, W, H); resize(cvSeg, W, H);
-      const ctx = getCtx(cvSrc);
-      ctx.drawImage(img, 0, 0, W, H);
-      imgData = ctx.getImageData(0, 0, W, H);
-      run();
-    };
-    img.src = e.target.result;
+// ============================================================
+// 表5：古音/通假异读表
+// ============================================================
+const ANCIENT_READ = {
+  '原': [{ pinyin: 'yuàn', note: '通「愿」，忠厚、老实', source: '《孟子·尽心下》乡原' }],
+  '说': [
+    { pinyin: 'yuè', note: '通「悦」，高兴', source: '《论语》学而时习之，不亦说乎' },
+    { pinyin: 'shuì', note: '游说', source: '《史记》' }
+  ],
+  '女': [{ pinyin: 'rǔ', note: '通「汝」，你', source: '《诗经》' }],
+  '反': [{ pinyin: 'fǎn', note: '通「返」，返回', source: '《老子》' }],
+  '知': [{ pinyin: 'zhì', note: '通「智」，智慧', source: '《论语》' }],
+  '见': [{ pinyin: 'xiàn', note: '通「现」，出现', source: '《史记》' }],
+  '亡': [{ pinyin: 'wú', note: '通「无」，没有', source: '《论语》' }],
+  '蚤': [{ pinyin: 'zǎo', note: '通「早」', source: '《孟子》' }],
+  '罢': [{ pinyin: 'pí', note: '通「疲」，疲倦', source: '《史记》' }],
+  '有': [{ pinyin: 'yòu', note: '通「又」', source: '《论语》' }],
+  '生': [{ pinyin: 'xìng', note: '通「性」', source: '《论语》' }],
+  '然': [{ pinyin: 'rán', note: '通「燃」，燃烧', source: '《孟子》' }],
+  '田': [{ pinyin: 'tián', note: '通「畋」，打猎', source: '《左传》' }],
+  '陈': [{ pinyin: 'zhèn', note: '通「阵」，阵势', source: '《论语》' }],
+  '取': [{ pinyin: 'qǔ', note: '通「娶」，娶妻', source: '《诗经》' }],
+  '共': [
+    { pinyin: 'gōng', note: '通「恭」，恭敬', source: '《左传》' },
+    { pinyin: 'gòng', note: '通「供」，供给', source: '《左传》' }
+  ],
+  '归': [{ pinyin: 'kuì', note: '通「馈」，赠送', source: '《论语》' }],
+  '能': [{ pinyin: 'nài', note: '通「耐」，耐得住', source: '《汉书》' }],
+  '信': [{ pinyin: 'shēn', note: '通「伸」，伸展', source: '《孟子》' }],
+  '党': [{ pinyin: 'tǎng', note: '通「倘」，倘若', source: '《荀子》' }],
+  '填': [{ pinyin: 'zhèn', note: '通「镇」，镇守', source: '《史记》' }],
+  '支': [{ pinyin: 'zhī', note: '通「肢」', source: '《易经》' }],
+  '指': [{ pinyin: 'zhǐ', note: '通「旨」，意思', source: '《汉书》' }],
+  '距': [{ pinyin: 'jù', note: '通「拒」，抗拒', source: '《孟子》' }],
+  '错': [{ pinyin: 'cù', note: '通「措」，安放', source: '《论语》' }],
+  '被': [{ pinyin: 'pī', note: '通「披」，披散', source: '《史记》' }],
+};
+
+// ============================================================
+// 表6：同音字表
+// ============================================================
+const TONGYIN = {
+  'yuan': ['元', '原', '园', '员', '圆', '援', '缘', '源', '远', '愿', '怨', '院', '苑', '媛', '袁', '猿', '辕', '塬', '沅', '芫', '瑗', '鸢', '鸳', '渊', '冤', '蜎', '箢', '鼋', '謜'],
+  'yue': ['月', '曰', '约', '越', '跃', '岳', '悦', '阅', '粤', '钥', '乐', '药', '说', '樾', '钺', '龠', '瀹', '篗', '禴', '礿', '趯', '跞', '鸙'],
+  'shuo': ['说', '硕', '朔', '搠', '蒴', '槊', '鎙'],
+  'shui': ['水', '睡', '税', '说', '谁', '帨', '涚', '祱', '蜕', '裞'],
+  'xin': ['心', '新', '信', '辛', '薪', '欣', '芯', '锌', '馨', '鑫', '忻', '莘', '炘', '昕', '衅', '囟', '妡', '杺', '盺'],
+  'shen': ['身', '深', '神', '申', '伸', '审', '甚', '什', '沈', '婶', '参', '莘', '呻', '绅', '砷', '燊', '谂', '诜', '侁', '妽', '屾', '愼', '曑', '槮', '渖', '甡', '籸', '糁', '罙', '葠', '裑', '鰰'],
+  'liang': ['两', '亮', '量', '良', '凉', '梁', '粮', '辆', '谅', '晾', '粱', '踉', '莨', '蜋', '輬'],
+  'jing': ['京', '经', '精', '睛', '惊', '景', '警', '境', '竟', '敬', '静', '净', '镜', '径', '竞', '劲', '荆', '茎', '晶', '鲸', '兢', '井', '颈', '阱', '肼', '刭', '憬', '璟', '儆', '迳', '痉', '菁', '箐', '獍', '婧', '婛', '旍', '泾', '烃'],
+  'jin': ['金', '今', '斤', '进', '近', '尽', '紧', '仅', '禁', '劲', '巾', '襟', '津', '筋', '谨', '锦', '瑾', '槿', '馑', '靳', '觐', '烬', '荩', '赆', '妗', '衿', '矜', '缙', '噤', '堇', '侭'],
+  'yi': ['一', '以', '已', '义', '议', '衣', '医', '依', '仪', '宜', '移', '疑', '遗', '意', '易', '益', '溢', '逸', '役', '疫', '亦', '异', '翼', '翌', '艺', '忆', '亿', '抑', '译', '驿', '绎', '弈', '奕', '怡', '贻', '饴', '颐', '彝', '倚', '椅', '旖', '漪', '猗', '噫', '瘗', '癔', '翊', '熠', '镒', '劓', '殪', '缢', '蜴', '舣', '苡', '荑', '薏', '螠', '衤'],
+  'zhong': ['中', '忠', '钟', '终', '种', '众', '重', '仲', '肿', '踵', '冢', '螽', '舯', '妕', '柊', '狆', '筗', '蔠', '蚛', '蹱', '鈡', '锺'],
+  'zhang': ['长', '张', '章', '掌', '涨', '帐', '账', '仗', '杖', '障', '嶂', '樟', '彰', '璋', '漳', '嫜', '鄣', '幛', '胀', '瘴', '仉'],
+  'hao': ['好', '号', '毫', '豪', '浩', '皓', '耗', '嚎', '壕', '濠', '嗥', '貉', '蚝', '颢', '昊', '灏', '镐', '郝', '薅', '嚆', '皞', '秏', '聕', '茠', '薃', '蠔', '諕', '譹'],
+  'xian': ['先', '现', '线', '显', '县', '限', '险', '鲜', '献', '宪', '贤', '闲', '嫌', '弦', '咸', '衔', '舷', '涎', '陷', '馅', '羡', '腺', '苋', '霰', '岘', '筅', '跹', '铣', '锨', '蚬', '跣', '酰', '痫', '鹇', '痃'],
+  'xing': ['性', '行', '形', '型', '星', '兴', '姓', '幸', '刑', '醒', '腥', '猩', '惺', '杏', '荇', '悻', '硎', '陉', '邢', '饧', '涬'],
+  'zhi': ['知', '之', '只', '直', '值', '指', '纸', '志', '治', '制', '质', '至', '致', '置', '智', '止', '址', '职', '植', '殖', '执', '肢', '枝', '支', '芝', '汁', '织', '脂', '蜘', '侄', '帜', '帙', '栉', '桎', '轾', '痣', '痔', '趾', '芷', '祉', '祗', '黹', '忮', '彘', '贽', '踬', '轵', '陟', '骘', '鸷', '酯', '徵'],
+  'zi': ['子', '自', '字', '资', '姿', '滋', '兹', '紫', '仔', '籽', '梓', '滓', '恣', '渍', '訾', '觜', '趑', '嵫', '孳', '缁', '辎', '锱', '髭', '鲻', '赀'],
+  'ren': ['人', '仁', '认', '任', '忍', '刃', '纫', '韧', '饪', '轫', '仞', '荏', '壬', '妊', '衽', '稔'],
+  'ming': ['名', '明', '命', '鸣', '铭', '冥', '溟', '螟', '暝', '瞑', '茗', '酩', '皿', '眀'],
+};
+
+// ============================================================
+// 表7：常用字表
+// ============================================================
+const COMMON_CHARS = new Set([
+  '一','二','三','四','五','六','七','八','九','十','百','千','万','亿',
+  '你','我','他','她','它','们','的','地','得','了','着','过','是','不','在','有','和','与','或','但','而','也','都','就','还','只','又','很','太','更','最','非','常','比','较','真','假','好','坏','大','小','多','少','高','低','长','短','新','旧','快','慢','早','晚','远','近','深','浅','厚','薄','轻','重',
+  '人','民','男','女','老','少','父','母','儿','子','兄','弟','姐','妹','朋','友','同','学','师','医','工','农','商','军','警',
+  '天','地','日','月','星','云','风','雨','雪','雷','电','山','水','河','海','江','湖','田','土','石','沙','金','银','铜','铁','木','火','春','夏','秋','冬','年','时','分','秒','朝','夕','昼','夜','晨','昏',
+  '上','下','左','右','中','东','南','西','北','前','后','里','外','内','间','旁','边','角','顶','底','头','尾','首','末','始','终',
+  '口','手','足','目','耳','鼻','舌','牙','心','肝','肺','肾','胃','肠','脑','骨','肉','血','皮','毛','发',
+  '说','话','讲','谈','论','议','评','批','判','证','试','许','记','让','调','请','谢','认','识','读','谅','诗','谁','语','词','译','讽','讯','训','访','设','诉','诊','注','诚','该','诞','询','详','诫','诬','误','诱','诲','课','诽','谊','谋','谍','谎','谏','谐','谑','谒','谓','谔','谕','谖','谗','谙','谚','谛','谜','谟','谠','谡','谣','谤','谦','谧','谨','谩','谪','谫','谬','谭','谮','谯','谰','谱','谲','谳','谴','谵','谶',
+  '曰','明','暗','阳','阴','期','朋','服','腾','朦','胧','青','静','清','晴','情','精','睛','蜻','鲭',
+  '字','句','文','章','歌','赋','曲','音','乐','声','韵','律','节','奏','唱','吟','诵','写','画','书','法','笔','墨','纸','砚','印',
+  '意','志','愿','想','念','思','忆','忘','怀','恋','爱','恨','仇','恩','怨','喜','怒','哀','悲','欢','离','合','聚','散','生','死','病','苦','甜','酸','辣','咸','淡',
+  '仁','义','礼','智','信','忠','孝','廉','耻','勇','善','恶','非','对','错','正','邪','公','私','直','曲','美','丑',
+  '辰','霜','雾','露','冰','雹','虹','霞','气','光','影','色','香','味','触',
+  '王','李','张','刘','陈','杨','黄','赵','周','吴','徐','孙','马','朱','胡','郭','何','高','林','罗','郑','梁','宋','唐','韩','冯','邓','曹','彭','曾','肖','董','袁','潘','于','蒋','蔡','余','杜','叶','程','苏','魏','吕','丁','任','沈','姚','卢','姜','崔','钟','陆','汪','范','石','廖','贾','夏','韦','付','方','白','邹','孟','熊','秦','邱','江','尹','薛','闫','段','雷','侯','龙','史','陶','黎','贺','顾','毛','郝','龚','邵','严','覃','武','戴','莫','孔','向','汤'
+]);
+
+// ============================================================
+// 标点
+// ============================================================
+const PUNCT = new Set(['，', '。', '、', '；', '：', '？', '！', '“', '”', '‘', '’', '（', '）', '《', '》', ' ', '\n', '\t']);
+
+// ============================================================
+// 工具函数
+// ============================================================
+function splitToStrokes(char, depth) {
+  depth = depth || 0;
+  if (depth > 10) return [char];
+  if (KONG.has(char)) return [char];
+  if (CHAR_SPLIT[char]) {
+    const result = [];
+    const parts = CHAR_SPLIT[char];
+    for (let i = 0; i < parts.length; i++) {
+      const sub = splitToStrokes(parts[i], depth + 1);
+      for (let j = 0; j < sub.length; j++) result.push(sub[j]);
+    }
+    return result;
+  }
+  return [char];
+}
+
+function containsPart(char, target, depth) {
+  depth = depth || 0;
+  if (depth > 10) return false;
+  if (char === target) return true;
+  if (CHAR_SPLIT[char]) {
+    const parts = CHAR_SPLIT[char];
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i] === char) continue;
+      if (containsPart(parts[i], target, depth + 1)) return true;
+    }
+  }
+  return false;
+}
+
+function containsYue(char) {
+  return containsPart(char, '曰') || containsPart(char, '月');
+}
+
+function containsYan(char) {
+  return containsPart(char, '言') || containsPart(char, '讠');
+}
+
+function hasYue(char) {
+  if (DUOYIN[char] && DUOYIN[char].hasYue) return true;
+  return containsYue(char);
+}
+
+function hasYan(char) {
+  if (DUOYIN[char] && DUOYIN[char].hasYan) return true;
+  const pps = PIANPANG[char] || [];
+  return pps.indexOf('言') !== -1 || pps.indexOf('讠') !== -1 || containsYan(char);
+}
+
+function findDuoyin(char) {
+  return DUOYIN[char] || null;
+}
+
+function hasAncient(char) {
+  return !!(ANCIENT_READ[char] && ANCIENT_READ[char].length);
+}
+
+function isRare(char) {
+  return !COMMON_CHARS.has(char);
+}
+
+function stripTone(pinyin) {
+  const map = {
+    'ā':'a','á':'a','ǎ':'a','à':'a',
+    'ē':'e','é':'e','ě':'e','è':'e',
+    'ī':'i','í':'i','ǐ':'i','ì':'i',
+    'ō':'o','ó':'o','ǒ':'o','ò':'o',
+    'ū':'u','ú':'u','ǔ':'u','ù':'u',
+    'ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v',
+    'ń':'n','ň':'n','ǹ':'n'
   };
-  reader.readAsDataURL(file);
+  let out = '';
+  for (const c of pinyin) out += map[c] || c;
+  return out;
 }
 
-// ============ 灰度 + Otsu ============
-function toGray(data) {
-  const g = new Uint8ClampedArray(W * H);
-  for (let i = 0; i < W * H; i++) {
-    g[i] = Math.round(0.299*data[i*4] + 0.587*data[i*4+1] + 0.114*data[i*4+2]);
+// ============================================================
+// 现代读音表
+// ============================================================
+const DUOYIN_MODERN = {
+  '原': ['yuán'],
+  '说': ['shuō', 'shuì', 'yuè'],
+  '曰': ['yuē'],
+  '月': ['yuè'],
+  '明': ['míng'],
+  '谅': ['liàng'],
+  '信': ['xìn'],
+  '心': ['xīn'],
+  '身': ['shēn'],
+  '中': ['zhōng', 'zhòng'],
+  '长': ['cháng', 'zhǎng'],
+  '好': ['hǎo', 'hào'],
+  '尽': ['jǐn', 'jìn'],
+  '禁': ['jīn', 'jìn'],
+  '劲': ['jìn', 'jìng'],
+  '仅': ['jǐn', 'jìn'],
+  '京': ['jīng'],
+  '金': ['jīn'],
+  '一': ['yī'],
+  '以': ['yǐ'],
+  '之': ['zhī'],
+  '王': ['wáng', 'wàng'],
+  '知': ['zhī', 'zhì'],
+  '见': ['jiàn', 'xiàn'],
+};
+
+// ============================================================
+// 展开拆解链
+// ============================================================
+function expandChain(char, depth, lines, parentPrefix) {
+  depth = depth || 0;
+  lines = lines || [];
+  parentPrefix = parentPrefix || '';
+  if (depth > 8) return lines;
+
+  const parts = CHAR_SPLIT[char];
+  if (!parts) {
+    lines.push(parentPrefix + char + ' （无拆解）');
+    return lines;
   }
-  return g;
-}
 
-function otsu(gray) {
-  const hist = new Array(256).fill(0);
-  for (let i = 0; i < gray.length; i++) hist[gray[i]]++;
-  const total = gray.length;
-  let sum = 0;
-  for (let i = 0; i < 256; i++) sum += i * hist[i];
-  let sumB = 0, wB = 0, maxVar = 0, t = 0;
-  for (let i = 0; i < 256; i++) {
-    wB += hist[i]; if (wB === 0) continue;
-    const wF = total - wB; if (wF === 0) break;
-    sumB += i * hist[i];
-    const mB = sumB / wB, mF = (sum - sumB) / wF;
-    const v = wB * wF * (mB - mF) ** 2;
-    if (v > maxVar) { maxVar = v; t = i; }
-  }
-  return t;
-}
+  parts.forEach(function(part, i) {
+    const isLast = i === parts.length - 1;
+    const branch = isLast ? '└─ ' : '├─ ';
+    const nextPrefix = parentPrefix + (isLast ? '   ' : '│  ');
 
-// ============ 骨架化 Zhang-Suen ============
-function zhangSuen(bin, w, h) {
-  const img = bin.slice();
-  const mark = new Uint8Array(w * h);
-  let changed = true;
-  const get = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? 0 : img[y*w+x];
+    const isYue = part === '曰';
+    const isYan = part === '言' || part === '讠';
+    let mark = '';
+    if (isYue) mark = ' <span class="chain-yue">← 出现曰</span>';
+    else if (isYan) mark = ' <span class="yan">← 言字旁</span>';
 
-  while (changed) {
-    changed = false;
-    // Step 1
-    mark.fill(0);
-    for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
-      if (img[y*w+x] !== 1) continue;
-      const p2=get(x,y-1), p3=get(x+1,y-1), p4=get(x+1,y), p5=get(x+1,y+1);
-      const p6=get(x,y+1), p7=get(x-1,y+1), p8=get(x-1,y), p9=get(x-1,y-1);
-      const B = p2+p3+p4+p5+p6+p7+p8+p9;
-      if (B < 2 || B > 6) continue;
-      const A = (p2===0&&p3===1) + (p3===0&&p4===1) + (p4===0&&p5===1) +
-                (p5===0&&p6===1) + (p6===0&&p7===1) + (p7===0&&p8===1) +
-                (p8===0&&p9===1) + (p9===0&&p2===1);
-      if (A !== 1) continue;
-      if (p2*p4*p6 !== 0) continue;
-      if (p4*p6*p8 !== 0) continue;
-      mark[y*w+x] = 1;
+    lines.push(parentPrefix + branch + part + mark);
+    if (CHAR_SPLIT[part] && part !== char) {
+      expandChain(part, depth + 1, lines, nextPrefix);
     }
-    for (let i = 0; i < w*h; i++) if (mark[i]) { img[i] = 0; changed = true; }
-    // Step 2
-    mark.fill(0);
-    for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
-      if (img[y*w+x] !== 1) continue;
-      const p2=get(x,y-1), p3=get(x+1,y-1), p4=get(x+1,y), p5=get(x+1,y+1);
-      const p6=get(x,y+1), p7=get(x-1,y+1), p8=get(x-1,y), p9=get(x-1,y-1);
-      const B = p2+p3+p4+p5+p6+p7+p8+p9;
-      if (B < 2 || B > 6) continue;
-      const A = (p2===0&&p3===1) + (p3===0&&p4===1) + (p4===0&&p5===1) +
-                (p5===0&&p6===1) + (p6===0&&p7===1) + (p7===0&&p8===1) +
-                (p8===0&&p9===1) + (p9===0&&p2===1);
-      if (A !== 1) continue;
-      if (p2*p4*p8 !== 0) continue;
-      if (p2*p6*p8 !== 0) continue;
-      mark[y*w+x] = 1;
-    }
-    for (let i = 0; i < w*h; i++) if (mark[i]) { img[i] = 0; changed = true; }
-  }
-  return img;
+  });
+
+  return lines;
 }
 
-// ============ 邻域计数 ============
-function neighbors(skel, w, h, x, y) {
-  let n = 0;
-  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-    if (dx === 0 && dy === 0) continue;
-    const nx = x + dx, ny = y + dy;
-    if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-    if (skel[ny*w+nx] === 1) n++;
-  }
-  return n;
-}
-
-// ============ 提取笔画段 ============
-// 从端点/交点出发，沿着骨架走，提取每一段
-function extractSegments(skel, w, h) {
-  const visited = new Uint8Array(w * h);
-  const segs = [];
-
-  const isEndOrJunc = (x, y) => {
-    const n = neighbors(skel, w, h, x, y);
-    return n === 1 || n >= 3;
-  };
-
-  // 遍历所有端点/交点，作为起点
-  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
-    if (skel[y*w+x] !== 1) continue;
-    if (!isEndOrJunc(x, y)) continue;
-    if (visited[y*w+x]) continue;
-
-    // 8 邻域探索
-    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-      if (dx === 0 && dy === 0) continue;
-      const nx = x + dx, ny = y + dy;
-      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-      if (skel[ny*w+nx] !== 1) continue;
-      if (visited[ny*w+nx]) continue;
-
-      // 走一条路径
-      const pts = [{x, y}];
-      let cx = nx, cy = ny;
-      visited[y*w+x] = 1;
-
-      while (true) {
-        if (visited[cy*w+cx]) break;
-        pts.push({x: cx, y: cy});
-        visited[cy*w+cx] = 1;
-        if (isEndOrJunc(cx, cy) && pts.length > 1) break;
-
-        // 找下一个未访问的邻居
-        let found = false;
-        for (let ddy = -1; ddy <= 1 && !found; ddy++) for (let ddx = -1; ddx <= 1; ddx++) {
-          if (ddx === 0 && ddy === 0) continue;
-          const nxx = cx + ddx, nyy = cy + ddy;
-          if (nxx < 0 || nyy < 0 || nxx >= w || nyy >= h) continue;
-          if (skel[nyy*w+nxx] !== 1) continue;
-          if (visited[nyy*w+nxx]) continue;
-          cx = nxx; cy = nyy; found = true; break;
-        }
-        if (!found) break;
-      }
-
-      if (pts.length >= 3) segs.push(pts);
+function findYueNext(char, depth) {
+  depth = depth || 0;
+  if (depth > 10) return null;
+  const parts = CHAR_SPLIT[char];
+  if (!parts) return null;
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === '曰') {
+      if (i + 1 < parts.length) return parts[i + 1];
+      return '一';
     }
   }
-
-  // 处理孤立的小段（没有端点/交点标记的）
-  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
-    if (skel[y*w+x] !== 1 || visited[y*w+x]) continue;
-    // 收集这一连通块
-    const pts = [];
-    const stack = [{x, y}];
-    while (stack.length) {
-      const p = stack.pop();
-      if (p.x < 0 || p.y < 0 || p.x >= w || p.y >= h) continue;
-      if (visited[p.y*w+p.x] || skel[p.y*w+p.x] !== 1) continue;
-      visited[p.y*w+p.x] = 1;
-      pts.push(p);
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-        if (dx === 0 && dy === 0) continue;
-        stack.push({x: p.x+dx, y: p.y+dy});
-      }
-    }
-    if (pts.length >= 3) segs.push(pts);
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === char) continue;
+    const r = findYueNext(parts[i], depth + 1);
+    if (r) return r;
   }
-
-  return segs;
+  return null;
 }
 
-// ============ 判方向 ============
-// 用 PCA 求主方向，并判断水平/垂直
-function classifyDirection(pts) {
-  const n = pts.length;
-  let mx = 0, my = 0;
-  for (const p of pts) { mx += p.x; my += p.y; }
-  mx /= n; my /= n;
-
-  let sxx = 0, syy = 0, sxy = 0;
-  for (const p of pts) {
-    const dx = p.x - mx, dy = p.y - my;
-    sxx += dx*dx; syy += dy*dy; sxy += dx*dy;
-  }
-  sxx /= n; syy /= n; sxy /= n;
-
-  // 主方向角度（0=水平，90=垂直）
-  const angle = 0.5 * Math.atan2(2*sxy, sxx - syy) * 180 / Math.PI;
-  const absAngle = Math.abs(angle);
-
-  // 端点
-  // 找离质心最远的两个点，作为两端
-  let pA = pts[0], pB = pts[0], maxD = -1;
-  for (const p of pts) {
-    const d = (p.x-mx)**2 + (p.y-my)**2;
-    if (d > maxD) { maxD = d; pA = p; }
-  }
-  maxD = -1;
-  for (const p of pts) {
-    const d = (p.x-pA.x)**2 + (p.y-pA.y)**2;
-    if (d > maxD) { maxD = d; pB = p; }
-  }
-
-  // 判断端点的"尾势"：从 A 到 B 的方向，尾部是否弯曲
-  // 简化：看最后 30% 的点偏离主线的程度
-  const dxAB = pB.x - pA.x, dyAB = pB.y - pA.y;
-  const lenAB = Math.hypot(dxAB, dyAB) || 1;
-  const ux = dxAB / lenAB, uy = dyAB / lenAB;
-
-  // 投影到主轴，取尾部区域
-  let tailDeviation = 0, tailCount = 0;
-  const tailStart = n * 0.7;
-  for (let i = Math.floor(tailStart); i < n; i++) {
-    const p = pts[i];
-    const proj = (p.x - pA.x) * ux + (p.y - pA.y) * uy;
-    const px = pA.x + proj * ux, py = pA.y + proj * uy;
-    tailDeviation += Math.hypot(p.x - px, p.y - py);
-    tailCount++;
-  }
-  const avgTail = tailCount ? tailDeviation / tailCount : 0;
-
-  // 曲率：看首尾连线与中间点的最大偏离
-  let maxDev = 0;
-  for (const p of pts) {
-    const proj = (p.x - pA.x) * ux + (p.y - pA.y) * uy;
-    const px = pA.x + proj * ux, py = pA.y + proj * uy;
-    const dev = Math.hypot(p.x - px, p.y - py);
-    if (dev > maxDev) maxDev = dev;
-  }
-  const avgDev = maxDev / (lenAB || 1);
-
-  return { angle, absAngle, length: lenAB, avgTail, avgDev, pA, pB };
-}
-
-// 判断是否是闭合圈（0）
-function isClosedLoop(pts) {
-  const n = pts.length;
-  if (n < 12) return false;
-  const pA = pts[0], pB = pts[n-1];
-  const gap = Math.hypot(pA.x - pB.x, pA.y - pB.y);
-  // 首尾接近 → 闭合
-  if (gap > 4) return false;
-  // 形状要接近圆形：计算质心和平均半径，方差小
-  let mx = 0, my = 0;
-  for (const p of pts) { mx += p.x; my += p.y; }
-  mx /= n; my /= n;
-  let rMean = 0;
-  const rs = [];
-  for (const p of pts) {
-    const r = Math.hypot(p.x - mx, p.y - my);
-    rs.push(r); rMean += r;
-  }
-  rMean /= n;
-  if (rMean < 5) return false;
-  let varR = 0;
-  for (const r of rs) varR += (r - rMean) ** 2;
-  varR /= n;
-  const stdR = Math.sqrt(varR);
-  // 圆度：std/mean 越小越像圆
-  return stdR / rMean < 0.35;
-}
-
-// 综合判定
-function classify(pts) {
-  // 先判圈
-  if (isClosedLoop(pts)) {
-    return { type: '0', reason: '闭合圆' };
-  }
-
-  const d = classifyDirection(pts);
-
-  // 长度太短 → 点，归空
-  if (d.length < 8) {
-    return { type: '空', reason: '短点' };
-  }
-
-  // 尾部弯曲程度大 → 笔锋 → 7
-  // 阈值需要根据实际调，这里给个经验值
-  const tailThreshold = 0.25;   // 尾部平均偏离 / 总长度
-  const devThreshold = 0.15;    // 最大偏离 / 总长度
-  if (d.avgTail / d.length > tailThreshold || d.avgDev > devThreshold) {
-    return { type: '7', reason: `带锋（尾${(d.avgTail/d.length).toFixed(2)} 曲${d.avgDev.toFixed(2)}）` };
-  }
-
-  // 方向：水平 → 一；垂直 → 丨
-  if (d.absAngle < 30 || d.absAngle > 150) return { type: '一', reason: `水平 ${d.angle.toFixed(1)}°` };
-  if (d.absAngle > 60 && d.absAngle < 120) return { type: '丨', reason: `垂直 ${d.angle.toFixed(1)}°` };
-
-  // 中间角度 → 撇/捺 → 归空
-  return { type: '空', reason: `斜笔 ${d.angle.toFixed(1)}°` };
-}
-
-// ============ 约分 + 归空 ============
-function reconcile(classified) {
-  const count = { '一': 0, '丨': 0, '7': 0, '0': 0, '空': 0 };
-  classified.forEach(c => count[c.type]++);
-
-  const log = [];
-  log.push(`原始统计：一=${count['一']} 丨=${count['丨']} 7=${count['7']} 0=${count['0']} 空=${count['空']}`);
-
-  // 约分规则（按你卡片里的规则）
-  // 1. 一 和 丨 可以约掉（一 = 丨 = 空）
-  const pairYuan = Math.min(count['一'], count['丨']);
-  count['一'] -= pairYuan;
-  count['丨'] -= pairYuan;
-  if (pairYuan > 0) log.push(`一 与 丨 约分 ${pairYuan} 对 → 归空`);
-
-  // 2. 7 和 7 成对约掉（7 = 妻，成对则对合）
-  const pair7 = Math.floor(count['7'] / 2);
-  count['7'] -= pair7 * 2;
-  if (pair7 > 0) log.push(`7 与 7 约分 ${pair7} 对 → 归空`);
-
-  // 3. 0 和 0 成对约掉
-  const pair0 = Math.floor(count['0'] / 2);
-  count['0'] -= pair0 * 2;
-  if (pair0 > 0) log.push(`0 与 0 约分 ${pair0} 对 → 归空`);
-
-  // 4. 剩余的单个 一 / 丨 / 7 / 0 都归空（按规则，一=丨=空，7 单着也归空，0 本身就是空）
-  const residual = count['一'] + count['丨'] + count['7'] + count['0'];
-  if (residual > 0) log.push(`剩余 ${residual} 个单笔，按规则归空`);
-  count['一'] = 0; count['丨'] = 0; count['7'] = 0; count['0'] = 0;
-  count['空'] += residual + pairYuan * 2 + pair7 * 2 + pair0 * 2;
-
-  log.push(`最终：一=${count['一']} 丨=${count['丨']} 7=${count['7']} 0=${count['0']} 空=${count['空']}`);
-  log.push(`对合结果：${(count['一']+count['丨']+count['7']+count['0']) === 0 ? '空 = 空 ✓' : '未归空'}`);
-
-  return { count, log };
-}
-
-// ============ 主流程 ============
+// ============================================================
+// 主流程
+// ============================================================
 function run() {
-  if (!imgData) return;
-  const g = toGray(imgData.data);
-  const t = otsu(g);
+  const raw = document.getElementById('input').value;
+  const log = [];
 
-  const bin = new Uint8Array(W * H);
-  for (let i = 0; i < W * H; i++) bin[i] = g[i] < t ? 1 : 0;
+  log.push('<span class="step">【输入】</span>');
+  log.push('  ' + raw);
 
-  // 画二值化
-  const ctxBin = getCtx(cvBin);
-  const binImg = ctxBin.createImageData(W, H);
-  for (let i = 0; i < W * H; i++) {
-    const v = bin[i] ? 0 : 255;
-    binImg.data[i*4] = binImg.data[i*4+1] = binImg.data[i*4+2] = v;
-    binImg.data[i*4+3] = 255;
+  // 第1步：去标点
+  log.push('');
+  log.push('<span class="step">【第1步：去标点】</span>');
+  let noPunct = '';
+  for (let i = 0; i < raw.length; i++) {
+    if (!PUNCT.has(raw[i])) noPunct += raw[i];
   }
-  ctxBin.putImageData(binImg, 0, 0);
+  log.push('  去掉标点后：' + noPunct);
 
-  // 骨架化
-  const skel = zhangSuen(bin, W, H);
-  skelArr = skel;
+  // 第2步：相同字约掉
+  log.push('');
+  log.push('<span class="step">【第2步：相同字约掉（任意位置）】</span>');
+  const chars = noPunct.split('');
+  const count = {};
+  chars.forEach(function(c) { count[c] = (count[c] || 0) + 1; });
 
-  // 提取段
-  segs = extractSegments(skel, W, H);
-
-  // 分类
-  const classified = segs.map(s => ({ pts: s, ...classify(s) }));
-
-  // 画段（按类型着色）
-  const ctxSeg = getCtx(cvSeg);
-  ctxSeg.clearRect(0, 0, W, H);
-  // 先画淡骨架
-  const skelImg = ctxSeg.createImageData(W, H);
-  for (let i = 0; i < W * H; i++) {
-    const v = skel[i] ? 220 : 255;
-    skelImg.data[i*4] = skelImg.data[i*4+1] = skelImg.data[i*4+2] = v;
-    skelImg.data[i*4+3] = 255;
-  }
-  ctxSeg.putImageData(skelImg, 0, 0);
-
-  const colorMap = { '一': '#f9ed69', '丨': '#7cb8b8', '7': '#e88', '0': '#9c9', '空': '#555' };
-  classified.forEach(c => {
-    ctxSeg.strokeStyle = colorMap[c.type] || '#fff';
-    ctxSeg.lineWidth = 2;
-    ctxSeg.beginPath();
-    c.pts.forEach((p, i) => i === 0 ? ctxSeg.moveTo(p.x, p.y) : ctxSeg.lineTo(p.x, p.y));
-    ctxSeg.stroke();
+  const kept = [];
+  const removed = [];
+  const seen = {};
+  chars.forEach(function(c) {
+    seen[c] = (seen[c] || 0) + 1;
+    if (count[c] % 2 === 1 && seen[c] === count[c]) {
+      kept.push(c);
+    } else {
+      removed.push(c);
+    }
   });
 
-  // 统计
-  const stat = { '一': 0, '丨': 0, '7': 0, '0': 0, '空': 0 };
-  classified.forEach(c => stat[c.type]++);
+  log.push('  原文用字：' + chars.join(' '));
+  const cntStr = Object.keys(count).map(function(c) { return c + '×' + count[c]; }).join('  ');
+  log.push('  字数统计：' + cntStr);
+  log.push('  约掉：' + (removed.length ? removed.map(function(c) { return '<span class="gone">' + c + '</span>'; }).join(' ') : '（无）'));
+  log.push('  保留：' + (kept.length ? kept.map(function(c) { return '<span class="hit">' + c + '</span>'; }).join(' ') : '（空）'));
 
-  document.getElementById('nYi').textContent = stat['一'];
-  document.getElementById('nShu').textContent = stat['丨'];
-  document.getElementById('nQi').textContent = stat['7'];
-  document.getElementById('nLing').textContent = stat['0'];
-  document.getElementById('nKong').textContent = stat['空'];
+  // 第3步：先查古音/多音字/曰/言，有的不判自对合；没有的再判自对合
+  log.push('');
+  log.push('<span class="step">【第3步：先查古音/多音字/曰/言，有的保留，没有的判自对合】</span>');
 
-  // 输出
-  const recon = reconcile(classified);
+  const kept2 = [];       // 保留的（有古音/多音/曰/言）
+  const selfRemoved = []; // 自对合约掉的
+  const priorChars = [];  // 走优先路径的字
 
-  out.textContent =
-    `图像尺寸: ${W} × ${H}\n` +
-    `Otsu 阈值: ${t}\n` +
-    `识别段数: ${classified.length}\n` +
-    `\n--- 各段判定 ---\n` +
-    classified.map((c, i) =>
-      `#${i+1}\t${c.type}\t${c.reason}\t${c.pts.length}px`
-    ).join('\n') +
-    `\n\n--- 约分过程 ---\n` +
-    recon.log.join('\n') +
-    `\n\n--- 最终 ---\n` +
-    `一:${recon.count['一']}  丨:${recon.count['丨']}  7:${recon.count['7']}  0:${recon.count['0']}  空:${recon.count['空']}\n` +
-    (recon.count['空'] > 0 && recon.count['一']+recon.count['丨']+recon.count['7']+recon.count['0'] === 0
-      ? `\n>>> 对合成功：空 = 空 ✓`
-      : `\n>>> 未完全归空`);
+  kept.forEach(function(c) {
+    // 先看有没有优先路径
+    const hasPriority =
+      hasAncient(c) ||
+      findDuoyin(c) ||
+      hasYue(c) ||
+      hasYan(c);
+
+    if (hasPriority) {
+      priorChars.push(c);
+      kept2.push(c);
+      // 显示判定依据
+      const reasons = [];
+      if (hasAncient(c)) reasons.push('古音/通假');
+      if (findDuoyin(c)) reasons.push('多音字');
+      if (hasYue(c)) reasons.push('含曰/月');
+      if (hasYan(c)) reasons.push('含言字旁');
+      log.push('  <span class="hit">' + c + '</span> 有 [' + reasons.join(' + ') + '] → 保留，不判自对合');
+      return;
+    }
+
+    // 没有优先路径，再判自对合
+    const strokes = splitToStrokes(c);
+    let onlySelf = true;
+    for (let i = 0; i < strokes.length; i++) {
+      if (!KONG.has(strokes[i])) { onlySelf = false; break; }
+    }
+    if (onlySelf) {
+      selfRemoved.push({ char: c, strokes: strokes });
+    } else {
+      kept2.push(c);
+    }
+  });
+
+  selfRemoved.forEach(function(item) {
+    log.push('  <span class="gone">' + item.char + '</span> = ' + item.strokes.join(' + ') + ' → 自对合 → 归空');
+  });
+  if (!selfRemoved.length) log.push('  （无自对合字）');
+  log.push('  保留：' + (kept2.length ? kept2.map(function(c) { return '<span class="hit">' + c + '</span>'; }).join(' ') : '（空）'));
+
+  // 第4步：找曰 / 多音字 / 偏旁（对保留下来的字分类）
+  log.push('');
+  log.push('<span class="step">【第4步：对保留的字分类】</span>');
+
+  const yueChars = [];
+  const duoyinChars = [];
+  const yanChars = [];
+  const remaining = [];
+
+  kept2.forEach(function(c) {
+    if (hasYue(c)) {
+      yueChars.push(c);
+    } else if (findDuoyin(c) && hasYan(c)) {
+      duoyinChars.push(c);
+    } else if (hasYan(c)) {
+      yanChars.push(c);
+    } else if (hasAncient(c) || findDuoyin(c)) {
+      // 有古音/多音字但没有曰/言，也归到 duoyinChars
+      duoyinChars.push(c);
+    } else {
+      remaining.push(c);
+    }
+  });
+
+  log.push('  <span class="yue">含「曰」的字：</span>' + (yueChars.length ? yueChars.join(' ') : '（无）'));
+  log.push('  <span class="duo">含古音/多音字：</span>' + (duoyinChars.length ? duoyinChars.join(' ') : '（无）'));
+  log.push('  <span class="pian">含言字旁的字：</span>' + (yanChars.length ? yanChars.join(' ') : '（无）'));
+  log.push('  剩下的字：' + (remaining.length ? remaining.join(' ') : '（无）'));
+
+  duoyinChars.forEach(function(c) {
+    const d = findDuoyin(c);
+    if (d) log.push('    ' + c + ' 读音：' + d.pinyin.join(' / '));
+    const a = ANCIENT_READ[c];
+    if (a) a.forEach(function(x) { log.push('    ' + c + ' 古音：' + x.pinyin + '  ' + x.note); });
+  });
+
+  // 第5步：展开拆解链
+  log.push('');
+  log.push('<span class="step">【第5步：展开拆解链】</span>');
+
+  const allChars = yueChars.concat(duoyinChars, yanChars, remaining);
+  const allStrokes = [];
+
+  allChars.forEach(function(c) {
+    const ancient = ANCIENT_READ[c] || [];
+    const modern = DUOYIN_MODERN[c] || null;
+
+    if (ancient.length > 0 || hasYue(c) || hasYan(c)) {
+      log.push('');
+      log.push('  <span class="hit">▸ ' + c + '</span>');
+
+      if (modern) log.push('    现代读音：' + modern.join(' / '));
+      if (ancient.length) {
+        ancient.forEach(function(a) {
+          log.push('    古音/通假：' + c + ' → ' + a.pinyin + '  ' + a.note);
+        });
+      }
+
+      const chainLines = [];
+      chainLines.push('    ' + c);
+      expandChain(c, 1, chainLines, '    ');
+      log.push(chainLines.join('\n'));
+
+      const yueNext = findYueNext(c);
+      if (yueNext) {
+        log.push('');
+        log.push('    <span class="yue">「曰」后面的部件：</span>' + yueNext);
+        log.push('    <span class="blank">请填空：曰 ' + yueNext + ' = ？</span>');
+        log.push('    <span class="plain">（这里就是「曰什么」，留白，自己填）</span>');
+      }
+
+      const strokes = splitToStrokes(c);
+      for (let i = 0; i < strokes.length; i++) allStrokes.push(strokes[i]);
+    } else {
+      const strokes = splitToStrokes(c);
+      log.push('  ' + c + ' → ' + strokes.join(' + '));
+      for (let i = 0; i < strokes.length; i++) allStrokes.push(strokes[i]);
+    }
+  });
+
+  if (!allChars.length) log.push('  （无）');
+
+  // 第6步：约分
+  log.push('');
+  log.push('<span class="step">【第6步：约分】</span>');
+
+  const sCount = { '一': 0, '丨': 0, '0': 0 };
+  const sOthers = {};
+  allStrokes.forEach(function(s) {
+    if (s in sCount) sCount[s]++;
+    else sOthers[s] = (sOthers[s] || 0) + 1;
+  });
+
+  log.push('  一：' + sCount['一'] + ' 个');
+  log.push('  丨：' + sCount['丨'] + ' 个');
+  log.push('  0：' + sCount['0'] + ' 个');
+
+  const pairYiShu = Math.min(sCount['一'], sCount['丨']);
+  sCount['一'] -= pairYiShu;
+  sCount['丨'] -= pairYiShu;
+  if (pairYiShu > 0) {
+    log.push('  <span class="hit">一 × 丨 配对约掉 ' + pairYiShu + ' 对</span>');
+  }
+
+  const pairZero = Math.floor(sCount['0'] / 2);
+  sCount['0'] -= pairZero * 2;
+  if (pairZero > 0) {
+    log.push('  <span class="hit">0 × 0 配对约掉 ' + pairZero + ' 对</span>');
+  }
+
+  const residual = sCount['一'] + sCount['丨'] + sCount['0'];
+  if (residual > 0) {
+    log.push('  剩余单笔：一×' + sCount['一'] + '  丨×' + sCount['丨'] + '  0×' + sCount['0'] + ' → 归空');
+  }
+
+  const otherKeys = Object.keys(sOthers);
+  if (otherKeys.length) {
+    log.push('  其他笔画：' + otherKeys.map(function(k) { return k + '×' + sOthers[k]; }).join('  ') + ' → 归空');
+  }
+
+  // 结果
+  log.push('');
+  log.push('<span class="step">【最终结果】</span>');
+  log.push('  <span class="empty">空 = 空 ✓ 对合上了</span>');
+
+  document.getElementById('output').innerHTML = log.join('\n');
 }
 
-// ============ 按钮 ============
+// ============================================================
+// 事件
+// ============================================================
 document.getElementById('btnRun').addEventListener('click', run);
-document.getElementById('btnReset').addEventListener('click', () => {
-  cvSrc.width = cvBin.width = cvSeg.width = 0;
-  out.textContent = '等待图片…';
-  imgData = null; segs = []; skelArr = null;
-  fileInput.value = '';
-  ['nYi','nShu','nQi','nLing','nKong'].forEach(id => document.getElementById(id).textContent = '0');
+document.getElementById('btnClear').addEventListener('click', function() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').textContent = '等待输入…';
 });
-document.getElementById('btnDump').addEventListener('click', () => {
-  if (!segs.length) return;
-  const lines = segs.map((s, i) => {
-    const c = classify(s);
-    return `#${i+1}\t${c.type}\t${c.reason}\t${s.length}px\t${s.map(p=>`(${p.x},${p.y})`).join(' ')}`;
-  });
-  const txt = `index\ttype\treason\tlen\tpoints\n` + lines.join('\n');
-  const blob = new Blob([txt], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'strokes.txt';
-  a.click();
+document.getElementById('btnSample').addEventListener('click', function() {
+  const samples = [
+    '你可以大度的去原谅别人',
+    '但千万不要愚蠢的再相信',
+    '你可以大度的去原谅别人但千万不要愚蠢的再相信'
+  ];
+  const pick = samples[Math.floor(Math.random() * samples.length)];
+  document.getElementById('input').value = pick;
+  run();
 });
+
+run();
 </script>
 </body>
 </html>

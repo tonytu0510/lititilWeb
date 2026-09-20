@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>通假 · 同音候选工具</title>
+<style>
+  body {
+    background: #1a1a1a;
+    color: #ddd;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.7;
+  }
+  h1 { font-size: 18px; color: #7cb8b8; margin: 0 0 4px 0; }
+  .sub { color: #666; font-size: 12px; margin-bottom: 20px; }
+  .panel {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  input {
+    width: 200px;
+    background: #0d0d0d;
+    color: #ddd;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+  button {
+    background: #2a2a2a;
+    color: #ddd;
+    border: 1px solid #555;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    margin-left: 8px;
+  }
+  button:hover { background: #3d3d3d; }
+  button.primary { background: #7cb8b8; color: #0d0d0d; border-color: #7cb8b8; }
+  button.primary:hover { background: #8fc8c8; }
+  pre {
+    background: #0d0d0d;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #b0d0d0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .step { color: #7cb8b8; font-weight: bold; }
+  .hit { color: #f9ed69; }
+  .yue { color: #9c9; font-weight: bold; }
+  .duo { color: #e88; }
+  .yan { color: #7cb8b8; }
+  .plain { color: #888; }
+  .warn { color: #e88; }
+  .rare { color: #555; font-size: 11px; }
+  .candidate {
+    display: inline-block;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px;
+    font-size: 15px;
+  }
+  .candidate.yue { background: #1a3320; border-color: #9c9; }
+  .candidate.yan { background: #1a2a33; border-color: #7cb8b8; }
+  .candidate.both { background: #332a1a; border-color: #f9ed69; }
+  .candidate.rare { opacity: 0.5; }
+  .chain { color: #b0d0d0; }
+  .chain-yue { color: #9c9; font-weight: bold; background: #1a3320; padding: 0 4px; border-radius: 3px; }
+  .blank {
+    color: #f9ed69;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .blank-input {
+    background: #0d0d0d;
+    border: 1px dashed #f9ed69;
+    color: #f9ed69;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 15px;
+    width: 120px;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+  .blank-input:focus {
+    outline: none;
+    border-color: #7cb8b8;
+    color: #7cb8b8;
+  }
+</style>
+</head>
+<body>
+
+<h1>通假 · 同音候选工具</h1>
+<div class="sub">单音字 → 古音/通假 → 同音字 → 筛含曰/月/言 → 展开拆解链 → 拆到曰什么（留白）</div>
+
+<div class="panel">
+  <input id="input" value="原" maxlength="1">
+  <button class="primary" id="btnRun">查</button>
+  <button id="btnClear">清空</button>
+</div>
+
+<pre id="output">等待输入…</pre>
+
+<script>
+// ============================================================
+// 表1：古音/通假异读表
+// ============================================================
+const ANCIENT_READ = {
+  '原': [{ pinyin: 'yuàn', note: '通「愿」，忠厚、老实', source: '《孟子·尽心下》乡原' }],
+  '说': [
+    { pinyin: 'yuè', note: '通「悦」，高兴', source: '《论语》学而时习之，不亦说乎' },
+    { pinyin: 'shuì', note: '游说', source: '《史记》' }
+  ],
+  '女': [{ pinyin: 'rǔ', note: '通「汝」，你', source: '《诗经》' }],
+  '反': [{ pinyin: 'fǎn', note: '通「返」，返回', source: '《老子》' }],
+  '知': [{ pinyin: 'zhì', note: '通「智」，智慧', source: '《论语》' }],
+  '见': [{ pinyin: 'xiàn', note: '通「现」，出现', source: '《史记》' }],
+  '亡': [{ pinyin: 'wú', note: '通「无」，没有', source: '《论语》' }],
+  '蚤': [{ pinyin: 'zǎo', note: '通「早」', source: '《孟子》' }],
+  '罢': [{ pinyin: 'pí', note: '通「疲」，疲倦', source: '《史记》' }],
+  '有': [{ pinyin: 'yòu', note: '通「又」', source: '《论语》' }],
+  '生': [{ pinyin: 'xìng', note: '通「性」', source: '《论语》' }],
+  '然': [{ pinyin: 'rán', note: '通「燃」，燃烧', source: '《孟子》' }],
+  '田': [{ pinyin: 'tián', note: '通「畋」，打猎', source: '《左传》' }],
+  '陈': [{ pinyin: 'zhèn', note: '通「阵」，阵势', source: '《论语》' }],
+  '取': [{ pinyin: 'qǔ', note: '通「娶」，娶妻', source: '《诗经》' }],
+  '共': [
+    { pinyin: 'gōng', note: '通「恭」，恭敬', source: '《左传》' },
+    { pinyin: 'gòng', note: '通「供」，供给', source: '《左传》' }
+  ],
+  '归': [{ pinyin: 'kuì', note: '通「馈」，赠送', source: '《论语》' }],
+  '能': [{ pinyin: 'nài', note: '通「耐」，耐得住', source: '《汉书》' }],
+  '信': [{ pinyin: 'shēn', note: '通「伸」，伸展', source: '《孟子》' }],
+  '党': [{ pinyin: 'tǎng', note: '通「倘」，倘若', source: '《荀子》' }],
+  '填': [{ pinyin: 'zhèn', note: '通「镇」，镇守', source: '《史记》' }],
+  '支': [{ pinyin: 'zhī', note: '通「肢」', source: '《易经》' }],
+  '指': [{ pinyin: 'zhǐ', note: '通「旨」，意思', source: '《汉书》' }],
+  '距': [{ pinyin: 'jù', note: '通「拒」，抗拒', source: '《孟子》' }],
+  '错': [{ pinyin: 'cù', note: '通「措」，安放', source: '《论语》' }],
+  '被': [{ pinyin: 'pī', note: '通「披」，披散', source: '《史记》' }],
+};
+
+// ============================================================
+// 表2：同音字表
+// ============================================================
+const TONGYIN = {
+  'yuan': ['元', '原', '园', '员', '圆', '援', '缘', '源', '远', '愿', '怨', '院', '苑', '媛', '袁', '猿', '辕', '塬', '沅', '芫', '瑗', '鸢', '鸳', '渊', '冤', '蜎', '箢', '鼋', '謜'],
+  'yue': ['月', '曰', '约', '越', '跃', '岳', '悦', '阅', '粤', '钥', '乐', '药', '说', '樾', '钺', '龠', '瀹', '篗', '禴', '礿', '趯', '跞', '鸙'],
+  'shuo': ['说', '硕', '朔', '搠', '蒴', '槊', '鎙'],
+  'shui': ['水', '睡', '税', '说', '谁', '帨', '涚', '祱', '蜕', '裞'],
+  'xin': ['心', '新', '信', '辛', '薪', '欣', '芯', '锌', '馨', '鑫', '忻', '莘', '炘', '昕', '衅', '囟', '妡', '杺', '盺'],
+  'shen': ['身', '深', '神', '申', '伸', '审', '甚', '什', '沈', '婶', '参', '莘', '呻', '绅', '砷', '燊', '谂', '诜', '侁', '妽', '屾', '愼', '曑', '槮', '渖', '甡', '籸', '糁', '罙', '葠', '裑', '鰰'],
+  'liang': ['两', '亮', '量', '良', '凉', '梁', '粮', '辆', '谅', '晾', '粱', '踉', '莨', '蜋', '輬'],
+  'jing': ['京', '经', '精', '睛', '惊', '景', '警', '境', '竟', '敬', '静', '净', '镜', '径', '竞', '劲', '荆', '茎', '晶', '鲸', '兢', '井', '颈', '阱', '肼', '刭', '憬', '璟', '儆', '迳', '痉', '菁', '箐', '獍', '婧', '婛', '旍', '泾', '烃'],
+  'jin': ['金', '今', '斤', '进', '近', '尽', '紧', '仅', '禁', '劲', '巾', '襟', '津', '筋', '谨', '锦', '瑾', '槿', '馑', '靳', '觐', '烬', '荩', '赆', '妗', '衿', '矜', '缙', '噤', '堇', '侭'],
+  'yi': ['一', '以', '已', '义', '议', '衣', '医', '依', '仪', '宜', '移', '疑', '遗', '意', '易', '益', '溢', '逸', '役', '疫', '亦', '异', '翼', '翌', '艺', '忆', '亿', '抑', '译', '驿', '绎', '弈', '奕', '怡', '贻', '饴', '颐', '彝', '倚', '椅', '旖', '漪', '猗', '噫', '瘗', '癔', '翊', '熠', '镒', '劓', '殪', '缢', '蜴', '舣', '苡', '荑', '薏', '螠', '衤'],
+  'zhong': ['中', '忠', '钟', '终', '种', '众', '重', '仲', '肿', '踵', '冢', '螽', '舯', '妕', '柊', '狆', '筗', '蔠', '蚛', '蹱', '鈡', '锺'],
+  'zhang': ['长', '张', '章', '掌', '涨', '帐', '账', '仗', '杖', '障', '嶂', '樟', '彰', '璋', '漳', '嫜', '鄣', '幛', '胀', '瘴', '仉'],
+  'hao': ['好', '号', '毫', '豪', '浩', '皓', '耗', '嚎', '壕', '濠', '嗥', '貉', '蚝', '颢', '昊', '灏', '镐', '郝', '薅', '嚆', '皞', '秏', '聕', '茠', '薃', '蠔', '諕', '譹'],
+  'xian': ['先', '现', '线', '显', '县', '限', '险', '鲜', '献', '宪', '贤', '闲', '嫌', '弦', '咸', '衔', '舷', '涎', '陷', '馅', '羡', '腺', '苋', '霰', '岘', '筅', '跹', '铣', '锨', '蚬', '跣', '酰', '痫', '鹇', '痃'],
+  'xing': ['性', '行', '形', '型', '星', '兴', '姓', '幸', '刑', '醒', '腥', '猩', '惺', '杏', '荇', '悻', '硎', '陉', '邢', '饧', '涬'],
+  'zhi': ['知', '之', '只', '直', '值', '指', '纸', '志', '治', '制', '质', '至', '致', '置', '智', '止', '址', '职', '植', '殖', '执', '肢', '枝', '支', '芝', '汁', '织', '脂', '蜘', '侄', '帜', '帙', '栉', '桎', '轾', '痣', '痔', '趾', '芷', '祉', '祗', '黹', '忮', '彘', '贽', '踬', '轵', '陟', '骘', '鸷', '酯', '徵'],
+  'zi': ['子', '自', '字', '资', '姿', '滋', '兹', '紫', '仔', '籽', '梓', '滓', '恣', '渍', '訾', '觜', '趑', '嵫', '孳', '缁', '辎', '锱', '髭', '鲻', '赀'],
+  'ren': ['人', '仁', '认', '任', '忍', '刃', '纫', '韧', '饪', '轫', '仞', '荏', '壬', '妊', '衽', '稔'],
+  'ming': ['名', '明', '命', '鸣', '铭', '冥', '溟', '螟', '暝', '瞑', '茗', '酩', '皿', '眀'],
+};
+
+// ============================================================
+// 表3：汉字拆解表
+// ============================================================
+const CHAR_SPLIT = {
+  // 含曰
+  '原': ['厂', '白', '小'],
+  '明': ['日', '月'],
+  '青': ['一', '一', '丨', '月'],
+  '湖': ['氵', '胡'],
+  '胡': ['古', '月'],
+  '朝': ['十', '日', '十', '月'],
+  '期': ['其', '月'],
+  '其': ['廿', '一', '八'],
+  '朋': ['月', '月'],
+  '服': ['月', '𠬝'],
+  '胜': ['月', '生'],
+  '腾': ['月', '关', '马'],
+  '朦': ['月', '蒙'],
+  '胧': ['月', '龙'],
+  '腊': ['月', '昔'],
+  '昔': ['廿', '日'],
+  '精': ['米', '青'],
+  '睛': ['目', '青'],
+  '晴': ['日', '青'],
+  '清': ['氵', '青'],
+  '情': ['忄', '青'],
+  '请': ['言', '青'],
+  '曰': ['口', '一'],
+  '月': ['月'],
+  '阴': ['阝', '月'],
+  '阳': ['阝', '日'],
+  // 含言字旁
+  '謜': ['言', '原'],
+  '言': ['曰', '一'],
+  '说': ['言', '兑'],
+  '话': ['言', '舌'],
+  '诗': ['言', '寺'],
+  '谁': ['言', '隹'],
+  '谢': ['言', '身', '寸'],
+  '认': ['言', '人'],
+  '识': ['言', '只'],
+  '谈': ['言', '炎'],
+  '讲': ['言', '井'],
+  '论': ['言', '仑'],
+  '许': ['言', '午'],
+  '记': ['言', '己'],
+  '让': ['言', '上'],
+  '调': ['言', '周'],
+  '证': ['言', '正'],
+  '试': ['言', '式'],
+  '谅': ['言', '京'],
+  '译': ['言', '又', '二'],
+  '词': ['言', '司'],
+  '语': ['言', '吾'],
+  '讽': ['言', '风'],
+  '讯': ['言', '卂'],
+  '训': ['言', '川'],
+  '议': ['言', '义'],
+  '访': ['言', '方'],
+  '设': ['言', '殳'],
+  '诉': ['言', '斥'],
+  '诊': ['言', '尔'],
+  '注': ['氵', '主'],
+  '评': ['言', '平'],
+  '诚': ['言', '成'],
+  '该': ['言', '亥'],
+  '诞': ['言', '延'],
+  '询': ['言', '旬'],
+  '详': ['言', '羊'],
+  '诫': ['言', '戒'],
+  '诬': ['言', '巫'],
+  '误': ['言', '吴'],
+  '诱': ['言', '秀'],
+  '诲': ['言', '每'],
+  '课': ['言', '果'],
+  '诽': ['言', '非'],
+  '谊': ['言', '宜'],
+  '谋': ['言', '某'],
+  '谍': ['言', '枼'],
+  '谎': ['言', '荒'],
+  '谏': ['言', '柬'],
+  '谐': ['言', '皆'],
+  '谑': ['言', '虐'],
+  '谒': ['言', '曷'],
+  '谓': ['言', '胃'],
+  '谔': ['言', '咢'],
+  '谕': ['言', '俞'],
+  '谖': ['言', '爰'],
+  '谗': ['言', '毚'],
+  '谙': ['言', '音'],
+  '谚': ['言', '彦'],
+  '谛': ['言', '帝'],
+  '谜': ['言', '迷'],
+  '谟': ['言', '莫'],
+  '谠': ['言', '党'],
+  '谡': ['言', '粟'],
+  '谣': ['言', '摇'],
+  '谤': ['言', '旁'],
+  '谦': ['言', '兼'],
+  '谧': ['言', '宓'],
+  '谨': ['言', '堇'],
+  '谩': ['言', '曼'],
+  '谪': ['言', '啇'],
+  '谫': ['言', '剪'],
+  '谬': ['言', '翏'],
+  '谭': ['言', '覃'],
+  '谮': ['言', '替'],
+  '谯': ['言', '焦'],
+  '谰': ['言', '阑'],
+  '谱': ['言', '普'],
+  '谲': ['言', '矞'],
+  '谳': ['言', '献'],
+  '谴': ['言', '遣'],
+  '谵': ['言', '詹'],
+  '谶': ['言', '韱'],
+  // 常用字
+  '你': ['亻', '尔'],
+  '可': ['丁', '口'],
+  '以': ['人', '丶'],
+  '大': ['一', '人'],
+  '度': ['广', '廿', '又'],
+  '的': ['白', '勺'],
+  '去': ['土', '厶'],
+  '别': ['口', '力', '刂'],
+  '人': ['丿', '丶'],
+  '但': ['亻', '旦'],
+  '千': ['丿', '十'],
+  '万': ['一', '勹'],
+  '不': ['一', '丿', '丨', '丶'],
+  '要': ['覀', '女'],
+  '愚': ['禺', '心'],
+  '蠢': ['春', '春', '虫'],
+  '再': ['一', '冂', '土'],
+  '相': ['木', '目'],
+  '信': ['亻', '言'],
+  '王': ['一', '土'],
+  '李': ['木', '子'],
+  '木': ['十', '八'],
+  '子': ['了', '一'],
+  '日': ['口', '一'],
+  '仁': ['亻', '二'],
+  '铭': ['钅', '名'],
+  '居': ['尸', '古'],
+  '士': ['十', '一'],
+  '亻': ['丿', '丨'],
+  '尔': ['⺈', '小'],
+  '丁': ['一', '亅'],
+  '口': ['丨', '乛', '一'],
+  '广': ['丶', '厂'],
+  '廿': ['十', '十'],
+  '又': ['乛', '丿', '丶'],
+  '白': ['丿', '日'],
+  '勺': ['勹', '丶'],
+  '土': ['十', '一'],
+  '厶': ['丿', '丶'],
+  '厂': ['一', '丿'],
+  '小': ['亅', '八'],
+  '京': ['亠', '口', '小'],
+  '力': ['𠃌', '丿'],
+  '刂': ['丨', '亅'],
+  '旦': ['日', '一'],
+  '十': ['一', '丨'],
+  '勹': ['丿', '乛'],
+  '覀': ['一', '口', '儿'],
+  '女': ['𡿨', '丿', '一'],
+  '禺': ['日', '冂', '丨'],
+  '心': ['丶', '乚', '丶'],
+  '春': ['三', '人', '日'],
+  '虫': ['口', '丨', '一', '丶'],
+  '冂': ['丨', '乛'],
+  '目': ['口', '二'],
+  '八': ['丿', '丶'],
+  '了': ['乛', '亅'],
+  '二': ['一', '一'],
+  '钅': ['丿', '一', '一', '一', '丨'],
+  '名': ['夕', '口'],
+  '尸': ['乛', '一', '丿'],
+  '古': ['十', '口'],
+  '三': ['一', '一', '一'],
+  '夕': ['丿', '乛', '丶'],
+  '亠': ['丶', '一'],
+  '儿': ['丿', '乚'],
+  '𠃌': ['丨', '乛'],
+  '𡿨': ['乛', '丿'],
+  '⺈': ['丿', '乛'],
+  '⺄': ['乛', '丿'],
+};
+
+// ============================================================
+// 表4：常用字表
+// ============================================================
+const COMMON_CHARS = new Set([
+  '一','二','三','四','五','六','七','八','九','十','百','千','万','亿',
+  '你','我','他','她','它','们','的','地','得','了','着','过','是','不','在','有','和','与','或','但','而','也','都','就','还','只','又','很','太','更','最','非','常','比','较','真','假','好','坏','大','小','多','少','高','低','长','短','新','旧','快','慢','早','晚','远','近','深','浅','厚','薄','轻','重',
+  '人','民','男','女','老','少','父','母','儿','子','兄','弟','姐','妹','朋','友','同','学','师','医','工','农','商','军','警',
+  '天','地','日','月','星','云','风','雨','雪','雷','电','山','水','河','海','江','湖','田','土','石','沙','金','银','铜','铁','木','火','春','夏','秋','冬','年','时','分','秒','朝','夕','昼','夜','晨','昏',
+  '上','下','左','右','中','东','南','西','北','前','后','里','外','内','间','旁','边','角','顶','底','头','尾','首','末','始','终',
+  '口','手','足','目','耳','鼻','舌','牙','心','肝','肺','肾','胃','肠','脑','骨','肉','血','皮','毛','发',
+  '说','话','讲','谈','论','议','评','批','判','证','试','许','记','让','调','请','谢','认','识','读','谅','诗','谁','语','词','译','讽','讯','训','访','设','诉','诊','注','诚','该','诞','询','详','诫','诬','误','诱','诲','课','诽','谊','谋','谍','谎','谏','谐','谑','谒','谓','谔','谕','谖','谗','谙','谚','谛','谜','谟','谠','谡','谣','谤','谦','谧','谨','谩','谪','谫','谬','谭','谮','谯','谰','谱','谲','谳','谴','谵','谶',
+  '曰','明','暗','阳','阴','期','朋','服','腾','朦','胧','青','静','清','晴','情','精','睛','蜻','鲭',
+  '字','句','文','章','歌','赋','曲','音','乐','声','韵','律','节','奏','唱','吟','诵','写','画','书','法','笔','墨','纸','砚','印',
+  '意','志','愿','想','念','思','忆','忘','怀','恋','爱','恨','仇','恩','怨','喜','怒','哀','悲','欢','离','合','聚','散','生','死','病','苦','甜','酸','辣','咸','淡',
+  '仁','义','礼','智','信','忠','孝','廉','耻','勇','善','恶','非','对','错','正','邪','公','私','直','曲','美','丑',
+  '辰','霜','雾','露','冰','雹','虹','霞','气','光','影','色','香','味','触',
+  '王','李','张','刘','陈','杨','黄','赵','周','吴','徐','孙','马','朱','胡','郭','何','高','林','罗','郑','梁','宋','唐','韩','冯','邓','曹','彭','曾','肖','董','袁','潘','于','蒋','蔡','余','杜','叶','程','苏','魏','吕','丁','任','沈','姚','卢','姜','崔','钟','陆','汪','范','石','廖','贾','夏','韦','付','方','白','邹','孟','熊','秦','邱','江','尹','薛','闫','段','雷','侯','龙','史','陶','黎','贺','顾','毛','郝','龚','邵','严','覃','武','戴','莫','孔','向','汤'
+]);
+
+// ============================================================
+// 工具函数
+// ============================================================
+function stripTone(pinyin) {
+  const map = {
+    'ā':'a','á':'a','ǎ':'a','à':'a',
+    'ē':'e','é':'e','ě':'e','è':'e',
+    'ī':'i','í':'i','ǐ':'i','ì':'i',
+    'ō':'o','ó':'o','ǒ':'o','ò':'o',
+    'ū':'u','ú':'u','ǔ':'u','ù':'u',
+    'ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v',
+    'ń':'n','ň':'n','ǹ':'n'
+  };
+  let out = '';
+  for (const c of pinyin) out += map[c] || c;
+  return out;
+}
+
+// 递归判断字里是否含某个目标部件
+function containsPart(char, target, depth) {
+  depth = depth || 0;
+  if (depth > 10) return false;
+  if (char === target) return true;
+  if (CHAR_SPLIT[char]) {
+    const parts = CHAR_SPLIT[char];
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i] === char) continue;
+      if (containsPart(parts[i], target, depth + 1)) return true;
+    }
+  }
+  return false;
+}
+
+function containsYue(char) {
+  return containsPart(char, '曰') || containsPart(char, '月');
+}
+
+function containsYan(char) {
+  return containsPart(char, '言') || containsPart(char, '讠');
+}
+
+function isRare(char) {
+  return !COMMON_CHARS.has(char);
+}
+
+// ============================================================
+// 展开拆解链（带缩进）
+// ============================================================
+function expandChain(char, depth, lines, parentPrefix) {
+  depth = depth || 0;
+  lines = lines || [];
+  parentPrefix = parentPrefix || '';
+  if (depth > 8) return lines;
+
+  const parts = CHAR_SPLIT[char];
+  if (!parts) {
+    lines.push(parentPrefix + char + ' （无拆解）');
+    return lines;
+  }
+
+  parts.forEach(function(part, i) {
+    const isLast = i === parts.length - 1;
+    const branch = isLast ? '└─ ' : '├─ ';
+    const nextPrefix = parentPrefix + (isLast ? '   ' : '│  ');
+
+    // 如果 part 是「曰」，高亮
+    const isYue = part === '曰';
+    const isYan = part === '言' || part === '讠';
+    let mark = '';
+    if (isYue) mark = ' <span class="chain-yue">← 出现曰</span>';
+    else if (isYan) mark = ' <span class="yan">← 言字旁</span>';
+
+    lines.push(parentPrefix + branch + part + mark);
+    // 继续展开
+    if (CHAR_SPLIT[part] && part !== char) {
+      expandChain(part, depth + 1, lines, nextPrefix);
+    }
+  });
+
+  return lines;
+}
+
+// 找「曰」后面跟的部件（在拆解链里，曰的下一个兄弟节点）
+function findYueNext(char, depth) {
+  depth = depth || 0;
+  if (depth > 10) return null;
+
+  const parts = CHAR_SPLIT[char];
+  if (!parts) return null;
+
+  // 看这一层有没有曰
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === '曰') {
+      // 曰后面的兄弟
+      if (i + 1 < parts.length) return parts[i + 1];
+      // 曰是最后一个，返回「一」作为默认（言=曰+一）
+      return '一';
+    }
+  }
+
+  // 递归查子层
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === char) continue;
+    const r = findYueNext(parts[i], depth + 1);
+    if (r) return r;
+  }
+
+  return null;
+}
+
+// 找「言」出现的位置
+function findYan(char, depth) {
+  depth = depth || 0;
+  if (depth > 10) return null;
+  const parts = CHAR_SPLIT[char];
+  if (!parts) return null;
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === '言' || parts[i] === '讠') return parts[i];
+  }
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === char) continue;
+    const r = findYan(parts[i], depth + 1);
+    if (r) return r;
+  }
+  return null;
+}
+
+// ============================================================
+// 主流程
+// ============================================================
+function run() {
+  const char = document.getElementById('input').value.trim();
+  const log = [];
+
+  if (!char) {
+    document.getElementById('output').textContent = '请输入一个字';
+    return;
+  }
+
+  log.push('<span class="step">【输入】</span>');
+  log.push('  ' + char);
+
+  // 第1步：现代读音
+  log.push('');
+  log.push('<span class="step">【第1步：现代读音】</span>');
+  const modern = DUOYIN_MODERN[char] || null;
+  if (modern) {
+    log.push('  现代读音：' + modern.join(' / ') + (modern.length > 1 ? '  （多音字）' : '  （单音字）'));
+  } else {
+    log.push('  <span class="warn">（现代读音表里没有收录，当作单音字处理）</span>');
+  }
+
+  // 第2步：古音/通假
+  log.push('');
+  log.push('<span class="step">【第2步：古音/通假异读】</span>');
+  const ancient = ANCIENT_READ[char] || [];
+  if (ancient.length === 0) {
+    log.push('  <span class="warn">（没有收录古音/通假）</span>');
+  } else {
+    ancient.forEach(function(a) {
+      log.push('  ' + char + ' → ' + a.pinyin + '  ' + a.note + '  ' + a.source);
+    });
+  }
+
+  // 第3步：同音字
+  log.push('');
+  log.push('<span class="step">【第3步：按读音列同音字】</span>');
+
+  const allPinyin = [];
+  if (modern) modern.forEach(function(p) { allPinyin.push({ pinyin: p, from: '现代' }); });
+  ancient.forEach(function(a) { allPinyin.push({ pinyin: a.pinyin, from: '古音/通假' }); });
+
+  if (allPinyin.length === 0) {
+    log.push('  <span class="warn">（没有读音可用）</span>');
+    document.getElementById('output').innerHTML = log.join('\n');
+    return;
+  }
+
+  const seenPinyin = {};
+  const uniquePinyin = [];
+  allPinyin.forEach(function(p) {
+    const key = stripTone(p.pinyin);
+    if (!seenPinyin[key]) {
+      seenPinyin[key] = true;
+      uniquePinyin.push(p);
+    }
+  });
+
+  uniquePinyin.forEach(function(p) {
+    const key = stripTone(p.pinyin);
+    const list = TONGYIN[key] || [];
+    log.push('  ' + p.pinyin + '（' + p.from + '）→ ' + list.length + ' 个同音字');
+    if (list.length) {
+      log.push('    ' + list.join(' '));
+    }
+  });
+
+  // 第4步：筛含曰/月/言
+  log.push('');
+  log.push('<span class="step">【第4步：筛含「曰/月/言字旁」的字】</span>');
+
+  const candidates = [];
+  uniquePinyin.forEach(function(p) {
+    const key = stripTone(p.pinyin);
+    const list = TONGYIN[key] || [];
+    list.forEach(function(c) {
+      if (c === char) return;
+      const yue = containsYue(c);
+      const yan = containsYan(c);
+      if (yue || yan) {
+        candidates.push({
+          char: c,
+          pinyin: p.pinyin,
+          from: p.from,
+          yue: yue,
+          yan: yan,
+          rare: isRare(c)
+        });
+      }
+    });
+  });
+
+  if (candidates.length === 0) {
+    log.push('  <span class="warn">（没有找到含曰/月/言字旁的同音字）</span>');
+  } else {
+    log.push('  候选：');
+    candidates.forEach(function(c) {
+      let tag = '';
+      if (c.yue && c.yan) tag = '【曰+言】';
+      else if (c.yue) tag = '【曰/月】';
+      else if (c.yan) tag = '【言】';
+      let cls = 'candidate';
+      if (c.yue && c.yan) cls += ' both';
+      else if (c.yue) cls += ' yue';
+      else if (c.yan) cls += ' yan';
+      if (c.rare) cls += ' rare';
+      log.push('    <span class="' + cls + '">' + c.char + '</span> ' + tag +
+        '  （' + c.pinyin + '，' + c.from + '）' +
+        (c.rare ? ' <span class="rare">[生僻]</span>' : ''));
+    });
+  }
+
+  // ---------- 第5步：展开拆解链 ----------
+  if (candidates.length > 0) {
+    log.push('');
+    log.push('<span class="step">【第5步：展开候选字的拆解链】</span>');
+
+    // 用第一个候选（或所有候选）展开
+    candidates.forEach(function(c) {
+      log.push('');
+      log.push('  <span class="hit">▸ ' + c.char + '</span> 拆解：');
+
+      const lines = [];
+      // 顶行
+      lines.push('  ' + c.char);
+      expandChain(c.char, 1, lines, '  ');
+      log.push(lines.join('\n'));
+
+      // 找曰后面跟什么
+      const yueNext = findYueNext(c.char);
+      const yanPart = findYan(c.char);
+
+      log.push('');
+      if (yueNext) {
+        log.push('  <span class="yue">「曰」后面的部件：</span>' + yueNext);
+        log.push('');
+        log.push('  <span class="blank">请填空：曰 ' + yueNext + ' = ？</span>');
+        log.push('  <span class="plain">（这里就是「曰什么」，留白，自己填）</span>');
+      } else if (yanPart) {
+        // 只有言，没有曰（言本身拆出来应该有曰）
+        log.push('  <span class="yan">「' + yanPart + '」字旁</span>');
+        log.push('  拆「' + yanPart + '」：' + (CHAR_SPLIT[yanPart] ? CHAR_SPLIT[yanPart].join(' + ') : '（无拆解）'));
+        log.push('');
+        log.push('  <span class="blank">请填空：曰 ____</span>');
+        log.push('  <span class="plain">（这里就是「曰什么」，留白，自己填）</span>');
+      } else {
+        log.push('  <span class="warn">（没有找到曰）</span>');
+      }
+    });
+  }
+
+  // 结论
+  log.push('');
+  log.push('<span class="step">【结论】</span>');
+  if (candidates.length === 0) {
+    log.push('  <span class="warn">没有候选，这条路走不通。</span>');
+  } else {
+    log.push('  共 ' + candidates.length + ' 个候选。');
+    log.push('  已展开拆解链，标出了「曰」的位置。');
+    log.push('  <span class="blank">剩下的「曰什么」，留白，自己填。</span>');
+  }
+
+  document.getElementById('output').innerHTML = log.join('\n');
+}
+
+// ============================================================
+// 现代读音表
+// ============================================================
+const DUOYIN_MODERN = {
+  '原': ['yuán'],
+  '说': ['shuō', 'shuì', 'yuè'],
+  '曰': ['yuē'],
+  '月': ['yuè'],
+  '明': ['míng'],
+  '谅': ['liàng'],
+  '信': ['xìn'],
+  '心': ['xīn'],
+  '身': ['shēn'],
+  '中': ['zhōng', 'zhòng'],
+  '长': ['cháng', 'zhǎng'],
+  '好': ['hǎo', 'hào'],
+  '尽': ['jǐn', 'jìn'],
+  '禁': ['jīn', 'jìn'],
+  '劲': ['jìn', 'jìng'],
+  '仅': ['jǐn', 'jìn'],
+  '京': ['jīng'],
+  '金': ['jīn'],
+  '一': ['yī'],
+  '以': ['yǐ'],
+  '之': ['zhī'],
+  '王': ['wáng', 'wàng'],
+  '知': ['zhī', 'zhì'],
+  '见': ['jiàn', 'xiàn'],
+};
+
+// ============================================================
+// 事件
+// ============================================================
+document.getElementById('btnRun').addEventListener('click', run);
+document.getElementById('btnClear').addEventListener('click', function() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').textContent = '等待输入…';
+});
+
+run();
+</script>
+</body>
+</html>
