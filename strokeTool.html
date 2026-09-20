@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>书法拆字 · 一丨7 0 空 · 全链路</title>
+<style>
+  body {
+    background: #1a1a1a; color: #ddd;
+    font-family: 'Courier New', monospace;
+    margin: 0; padding: 20px;
+  }
+  h1 { font-size: 18px; color: #7cb8b8; }
+  #drop {
+    border: 2px dashed #555; border-radius: 8px;
+    padding: 40px; text-align: center;
+    color: #888; cursor: pointer; transition: 0.2s;
+  }
+  #drop:hover, #drop.over { border-color: #7cb8b8; color: #7cb8b8; }
+  canvas { display: block; margin: 8px 0; max-width: 100%; border: 1px solid #333; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .col { flex: 1; min-width: 260px; }
+  pre {
+    background: #0d0d0d; padding: 12px; border-radius: 6px;
+    font-size: 12px; line-height: 1.6; overflow-x: auto;
+    color: #b0d0d0; max-height: 400px;
+  }
+  .stat span { display: inline-block; margin-right: 14px; font-size: 14px; }
+  .yi { color: #f9ed69; } .shu { color: #7cb8b8; }
+  .qi { color: #e88; } .ling { color: #9c9; } .kong { color: #888; }
+  button {
+    background: #2a2a2a; color: #ddd; border: 1px solid #555;
+    padding: 8px 16px; border-radius: 4px; cursor: pointer;
+    font-family: inherit; margin-right: 8px;
+  }
+  button:hover { background: #3d3d3d; }
+  .tip { color:#666; font-size:12px; margin-top:6px; }
+</style>
+</head>
+<body>
+<h1>书法拆字 · 一丨7 0 空 · 全链路</h1>
+
+<div id="drop">
+  拖图片到这里，或点击选择<br>
+  <input type="file" id="file" accept="image/*" style="display:none">
+</div>
+
+<div class="row" style="margin-top:16px;">
+  <div class="col">
+    <div class="tip">原图</div>
+    <canvas id="cvSrc"></canvas>
+  </div>
+  <div class="col">
+    <div class="tip">二值化</div>
+    <canvas id="cvBin"></canvas>
+  </div>
+  <div class="col">
+    <div class="tip">笔画段（按方向着色）</div>
+    <canvas id="cvSeg"></canvas>
+  </div>
+</div>
+
+<div class="stat" id="stat" style="margin-top:16px;">
+  <span class="yi">一: <b id="nYi">0</b></span>
+  <span class="shu">丨: <b id="nShu">0</b></span>
+  <span class="qi">7: <b id="nQi">0</b></span>
+  <span class="ling">0: <b id="nLing">0</b></span>
+  <span class="kong">空: <b id="nKong">0</b></span>
+</div>
+
+<div style="margin-top:12px;">
+  <button id="btnRun">重新识别</button>
+  <button id="btnReset">重置</button>
+  <button id="btnDump">导出识别文本</button>
+</div>
+
+<pre id="out" style="margin-top:16px;">等待图片…</pre>
+
+<script>
+// ============ 基础 ============
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const cvSrc = document.getElementById('cvSrc');
+const cvBin = document.getElementById('cvBin');
+const cvSeg = document.getElementById('cvSeg');
+const out = document.getElementById('out');
+
+let W = 0, H = 0;
+let imgData = null;
+let segs = [];      // 识别出的笔画段
+let skelArr = null;
+
+function getCtx(canvas) { return canvas.getContext('2d', { willReadFrequently: true }); }
+function resize(canvas, w, h) { canvas.width = w; canvas.height = h; }
+
+// ============ 读图 ============
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => {
+  e.preventDefault(); drop.classList.remove('over');
+  const f = e.dataTransfer.files[0]; if (f) loadFile(f);
+});
+fileInput.addEventListener('change', e => {
+  const f = e.target.files[0]; if (f) loadFile(f);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 800;
+      let scale = img.width > maxW ? maxW / img.width : 1;
+      W = Math.floor(img.width * scale);
+      H = Math.floor(img.height * scale);
+      resize(cvSrc, W, H); resize(cvBin, W, H); resize(cvSeg, W, H);
+      const ctx = getCtx(cvSrc);
+      ctx.drawImage(img, 0, 0, W, H);
+      imgData = ctx.getImageData(0, 0, W, H);
+      run();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============ 灰度 + Otsu ============
+function toGray(data) {
+  const g = new Uint8ClampedArray(W * H);
+  for (let i = 0; i < W * H; i++) {
+    g[i] = Math.round(0.299*data[i*4] + 0.587*data[i*4+1] + 0.114*data[i*4+2]);
+  }
+  return g;
+}
+
+function otsu(gray) {
+  const hist = new Array(256).fill(0);
+  for (let i = 0; i < gray.length; i++) hist[gray[i]]++;
+  const total = gray.length;
+  let sum = 0;
+  for (let i = 0; i < 256; i++) sum += i * hist[i];
+  let sumB = 0, wB = 0, maxVar = 0, t = 0;
+  for (let i = 0; i < 256; i++) {
+    wB += hist[i]; if (wB === 0) continue;
+    const wF = total - wB; if (wF === 0) break;
+    sumB += i * hist[i];
+    const mB = sumB / wB, mF = (sum - sumB) / wF;
+    const v = wB * wF * (mB - mF) ** 2;
+    if (v > maxVar) { maxVar = v; t = i; }
+  }
+  return t;
+}
+
+// ============ 骨架化 Zhang-Suen ============
+function zhangSuen(bin, w, h) {
+  const img = bin.slice();
+  const mark = new Uint8Array(w * h);
+  let changed = true;
+  const get = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? 0 : img[y*w+x];
+
+  while (changed) {
+    changed = false;
+    // Step 1
+    mark.fill(0);
+    for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
+      if (img[y*w+x] !== 1) continue;
+      const p2=get(x,y-1), p3=get(x+1,y-1), p4=get(x+1,y), p5=get(x+1,y+1);
+      const p6=get(x,y+1), p7=get(x-1,y+1), p8=get(x-1,y), p9=get(x-1,y-1);
+      const B = p2+p3+p4+p5+p6+p7+p8+p9;
+      if (B < 2 || B > 6) continue;
+      const A = (p2===0&&p3===1) + (p3===0&&p4===1) + (p4===0&&p5===1) +
+                (p5===0&&p6===1) + (p6===0&&p7===1) + (p7===0&&p8===1) +
+                (p8===0&&p9===1) + (p9===0&&p2===1);
+      if (A !== 1) continue;
+      if (p2*p4*p6 !== 0) continue;
+      if (p4*p6*p8 !== 0) continue;
+      mark[y*w+x] = 1;
+    }
+    for (let i = 0; i < w*h; i++) if (mark[i]) { img[i] = 0; changed = true; }
+    // Step 2
+    mark.fill(0);
+    for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
+      if (img[y*w+x] !== 1) continue;
+      const p2=get(x,y-1), p3=get(x+1,y-1), p4=get(x+1,y), p5=get(x+1,y+1);
+      const p6=get(x,y+1), p7=get(x-1,y+1), p8=get(x-1,y), p9=get(x-1,y-1);
+      const B = p2+p3+p4+p5+p6+p7+p8+p9;
+      if (B < 2 || B > 6) continue;
+      const A = (p2===0&&p3===1) + (p3===0&&p4===1) + (p4===0&&p5===1) +
+                (p5===0&&p6===1) + (p6===0&&p7===1) + (p7===0&&p8===1) +
+                (p8===0&&p9===1) + (p9===0&&p2===1);
+      if (A !== 1) continue;
+      if (p2*p4*p8 !== 0) continue;
+      if (p2*p6*p8 !== 0) continue;
+      mark[y*w+x] = 1;
+    }
+    for (let i = 0; i < w*h; i++) if (mark[i]) { img[i] = 0; changed = true; }
+  }
+  return img;
+}
+
+// ============ 邻域计数 ============
+function neighbors(skel, w, h, x, y) {
+  let n = 0;
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+    if (dx === 0 && dy === 0) continue;
+    const nx = x + dx, ny = y + dy;
+    if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+    if (skel[ny*w+nx] === 1) n++;
+  }
+  return n;
+}
+
+// ============ 提取笔画段 ============
+// 从端点/交点出发，沿着骨架走，提取每一段
+function extractSegments(skel, w, h) {
+  const visited = new Uint8Array(w * h);
+  const segs = [];
+
+  const isEndOrJunc = (x, y) => {
+    const n = neighbors(skel, w, h, x, y);
+    return n === 1 || n >= 3;
+  };
+
+  // 遍历所有端点/交点，作为起点
+  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
+    if (skel[y*w+x] !== 1) continue;
+    if (!isEndOrJunc(x, y)) continue;
+    if (visited[y*w+x]) continue;
+
+    // 8 邻域探索
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+      if (skel[ny*w+nx] !== 1) continue;
+      if (visited[ny*w+nx]) continue;
+
+      // 走一条路径
+      const pts = [{x, y}];
+      let cx = nx, cy = ny;
+      visited[y*w+x] = 1;
+
+      while (true) {
+        if (visited[cy*w+cx]) break;
+        pts.push({x: cx, y: cy});
+        visited[cy*w+cx] = 1;
+        if (isEndOrJunc(cx, cy) && pts.length > 1) break;
+
+        // 找下一个未访问的邻居
+        let found = false;
+        for (let ddy = -1; ddy <= 1 && !found; ddy++) for (let ddx = -1; ddx <= 1; ddx++) {
+          if (ddx === 0 && ddy === 0) continue;
+          const nxx = cx + ddx, nyy = cy + ddy;
+          if (nxx < 0 || nyy < 0 || nxx >= w || nyy >= h) continue;
+          if (skel[nyy*w+nxx] !== 1) continue;
+          if (visited[nyy*w+nxx]) continue;
+          cx = nxx; cy = nyy; found = true; break;
+        }
+        if (!found) break;
+      }
+
+      if (pts.length >= 3) segs.push(pts);
+    }
+  }
+
+  // 处理孤立的小段（没有端点/交点标记的）
+  for (let y = 1; y < h-1; y++) for (let x = 1; x < w-1; x++) {
+    if (skel[y*w+x] !== 1 || visited[y*w+x]) continue;
+    // 收集这一连通块
+    const pts = [];
+    const stack = [{x, y}];
+    while (stack.length) {
+      const p = stack.pop();
+      if (p.x < 0 || p.y < 0 || p.x >= w || p.y >= h) continue;
+      if (visited[p.y*w+p.x] || skel[p.y*w+p.x] !== 1) continue;
+      visited[p.y*w+p.x] = 1;
+      pts.push(p);
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        stack.push({x: p.x+dx, y: p.y+dy});
+      }
+    }
+    if (pts.length >= 3) segs.push(pts);
+  }
+
+  return segs;
+}
+
+// ============ 判方向 ============
+// 用 PCA 求主方向，并判断水平/垂直
+function classifyDirection(pts) {
+  const n = pts.length;
+  let mx = 0, my = 0;
+  for (const p of pts) { mx += p.x; my += p.y; }
+  mx /= n; my /= n;
+
+  let sxx = 0, syy = 0, sxy = 0;
+  for (const p of pts) {
+    const dx = p.x - mx, dy = p.y - my;
+    sxx += dx*dx; syy += dy*dy; sxy += dx*dy;
+  }
+  sxx /= n; syy /= n; sxy /= n;
+
+  // 主方向角度（0=水平，90=垂直）
+  const angle = 0.5 * Math.atan2(2*sxy, sxx - syy) * 180 / Math.PI;
+  const absAngle = Math.abs(angle);
+
+  // 端点
+  // 找离质心最远的两个点，作为两端
+  let pA = pts[0], pB = pts[0], maxD = -1;
+  for (const p of pts) {
+    const d = (p.x-mx)**2 + (p.y-my)**2;
+    if (d > maxD) { maxD = d; pA = p; }
+  }
+  maxD = -1;
+  for (const p of pts) {
+    const d = (p.x-pA.x)**2 + (p.y-pA.y)**2;
+    if (d > maxD) { maxD = d; pB = p; }
+  }
+
+  // 判断端点的"尾势"：从 A 到 B 的方向，尾部是否弯曲
+  // 简化：看最后 30% 的点偏离主线的程度
+  const dxAB = pB.x - pA.x, dyAB = pB.y - pA.y;
+  const lenAB = Math.hypot(dxAB, dyAB) || 1;
+  const ux = dxAB / lenAB, uy = dyAB / lenAB;
+
+  // 投影到主轴，取尾部区域
+  let tailDeviation = 0, tailCount = 0;
+  const tailStart = n * 0.7;
+  for (let i = Math.floor(tailStart); i < n; i++) {
+    const p = pts[i];
+    const proj = (p.x - pA.x) * ux + (p.y - pA.y) * uy;
+    const px = pA.x + proj * ux, py = pA.y + proj * uy;
+    tailDeviation += Math.hypot(p.x - px, p.y - py);
+    tailCount++;
+  }
+  const avgTail = tailCount ? tailDeviation / tailCount : 0;
+
+  // 曲率：看首尾连线与中间点的最大偏离
+  let maxDev = 0;
+  for (const p of pts) {
+    const proj = (p.x - pA.x) * ux + (p.y - pA.y) * uy;
+    const px = pA.x + proj * ux, py = pA.y + proj * uy;
+    const dev = Math.hypot(p.x - px, p.y - py);
+    if (dev > maxDev) maxDev = dev;
+  }
+  const avgDev = maxDev / (lenAB || 1);
+
+  return { angle, absAngle, length: lenAB, avgTail, avgDev, pA, pB };
+}
+
+// 判断是否是闭合圈（0）
+function isClosedLoop(pts) {
+  const n = pts.length;
+  if (n < 12) return false;
+  const pA = pts[0], pB = pts[n-1];
+  const gap = Math.hypot(pA.x - pB.x, pA.y - pB.y);
+  // 首尾接近 → 闭合
+  if (gap > 4) return false;
+  // 形状要接近圆形：计算质心和平均半径，方差小
+  let mx = 0, my = 0;
+  for (const p of pts) { mx += p.x; my += p.y; }
+  mx /= n; my /= n;
+  let rMean = 0;
+  const rs = [];
+  for (const p of pts) {
+    const r = Math.hypot(p.x - mx, p.y - my);
+    rs.push(r); rMean += r;
+  }
+  rMean /= n;
+  if (rMean < 5) return false;
+  let varR = 0;
+  for (const r of rs) varR += (r - rMean) ** 2;
+  varR /= n;
+  const stdR = Math.sqrt(varR);
+  // 圆度：std/mean 越小越像圆
+  return stdR / rMean < 0.35;
+}
+
+// 综合判定
+function classify(pts) {
+  // 先判圈
+  if (isClosedLoop(pts)) {
+    return { type: '0', reason: '闭合圆' };
+  }
+
+  const d = classifyDirection(pts);
+
+  // 长度太短 → 点，归空
+  if (d.length < 8) {
+    return { type: '空', reason: '短点' };
+  }
+
+  // 尾部弯曲程度大 → 笔锋 → 7
+  // 阈值需要根据实际调，这里给个经验值
+  const tailThreshold = 0.25;   // 尾部平均偏离 / 总长度
+  const devThreshold = 0.15;    // 最大偏离 / 总长度
+  if (d.avgTail / d.length > tailThreshold || d.avgDev > devThreshold) {
+    return { type: '7', reason: `带锋（尾${(d.avgTail/d.length).toFixed(2)} 曲${d.avgDev.toFixed(2)}）` };
+  }
+
+  // 方向：水平 → 一；垂直 → 丨
+  if (d.absAngle < 30 || d.absAngle > 150) return { type: '一', reason: `水平 ${d.angle.toFixed(1)}°` };
+  if (d.absAngle > 60 && d.absAngle < 120) return { type: '丨', reason: `垂直 ${d.angle.toFixed(1)}°` };
+
+  // 中间角度 → 撇/捺 → 归空
+  return { type: '空', reason: `斜笔 ${d.angle.toFixed(1)}°` };
+}
+
+// ============ 约分 + 归空 ============
+function reconcile(classified) {
+  const count = { '一': 0, '丨': 0, '7': 0, '0': 0, '空': 0 };
+  classified.forEach(c => count[c.type]++);
+
+  const log = [];
+  log.push(`原始统计：一=${count['一']} 丨=${count['丨']} 7=${count['7']} 0=${count['0']} 空=${count['空']}`);
+
+  // 约分规则（按你卡片里的规则）
+  // 1. 一 和 丨 可以约掉（一 = 丨 = 空）
+  const pairYuan = Math.min(count['一'], count['丨']);
+  count['一'] -= pairYuan;
+  count['丨'] -= pairYuan;
+  if (pairYuan > 0) log.push(`一 与 丨 约分 ${pairYuan} 对 → 归空`);
+
+  // 2. 7 和 7 成对约掉（7 = 妻，成对则对合）
+  const pair7 = Math.floor(count['7'] / 2);
+  count['7'] -= pair7 * 2;
+  if (pair7 > 0) log.push(`7 与 7 约分 ${pair7} 对 → 归空`);
+
+  // 3. 0 和 0 成对约掉
+  const pair0 = Math.floor(count['0'] / 2);
+  count['0'] -= pair0 * 2;
+  if (pair0 > 0) log.push(`0 与 0 约分 ${pair0} 对 → 归空`);
+
+  // 4. 剩余的单个 一 / 丨 / 7 / 0 都归空（按规则，一=丨=空，7 单着也归空，0 本身就是空）
+  const residual = count['一'] + count['丨'] + count['7'] + count['0'];
+  if (residual > 0) log.push(`剩余 ${residual} 个单笔，按规则归空`);
+  count['一'] = 0; count['丨'] = 0; count['7'] = 0; count['0'] = 0;
+  count['空'] += residual + pairYuan * 2 + pair7 * 2 + pair0 * 2;
+
+  log.push(`最终：一=${count['一']} 丨=${count['丨']} 7=${count['7']} 0=${count['0']} 空=${count['空']}`);
+  log.push(`对合结果：${(count['一']+count['丨']+count['7']+count['0']) === 0 ? '空 = 空 ✓' : '未归空'}`);
+
+  return { count, log };
+}
+
+// ============ 主流程 ============
+function run() {
+  if (!imgData) return;
+  const g = toGray(imgData.data);
+  const t = otsu(g);
+
+  const bin = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) bin[i] = g[i] < t ? 1 : 0;
+
+  // 画二值化
+  const ctxBin = getCtx(cvBin);
+  const binImg = ctxBin.createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const v = bin[i] ? 0 : 255;
+    binImg.data[i*4] = binImg.data[i*4+1] = binImg.data[i*4+2] = v;
+    binImg.data[i*4+3] = 255;
+  }
+  ctxBin.putImageData(binImg, 0, 0);
+
+  // 骨架化
+  const skel = zhangSuen(bin, W, H);
+  skelArr = skel;
+
+  // 提取段
+  segs = extractSegments(skel, W, H);
+
+  // 分类
+  const classified = segs.map(s => ({ pts: s, ...classify(s) }));
+
+  // 画段（按类型着色）
+  const ctxSeg = getCtx(cvSeg);
+  ctxSeg.clearRect(0, 0, W, H);
+  // 先画淡骨架
+  const skelImg = ctxSeg.createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const v = skel[i] ? 220 : 255;
+    skelImg.data[i*4] = skelImg.data[i*4+1] = skelImg.data[i*4+2] = v;
+    skelImg.data[i*4+3] = 255;
+  }
+  ctxSeg.putImageData(skelImg, 0, 0);
+
+  const colorMap = { '一': '#f9ed69', '丨': '#7cb8b8', '7': '#e88', '0': '#9c9', '空': '#555' };
+  classified.forEach(c => {
+    ctxSeg.strokeStyle = colorMap[c.type] || '#fff';
+    ctxSeg.lineWidth = 2;
+    ctxSeg.beginPath();
+    c.pts.forEach((p, i) => i === 0 ? ctxSeg.moveTo(p.x, p.y) : ctxSeg.lineTo(p.x, p.y));
+    ctxSeg.stroke();
+  });
+
+  // 统计
+  const stat = { '一': 0, '丨': 0, '7': 0, '0': 0, '空': 0 };
+  classified.forEach(c => stat[c.type]++);
+
+  document.getElementById('nYi').textContent = stat['一'];
+  document.getElementById('nShu').textContent = stat['丨'];
+  document.getElementById('nQi').textContent = stat['7'];
+  document.getElementById('nLing').textContent = stat['0'];
+  document.getElementById('nKong').textContent = stat['空'];
+
+  // 输出
+  const recon = reconcile(classified);
+
+  out.textContent =
+    `图像尺寸: ${W} × ${H}\n` +
+    `Otsu 阈值: ${t}\n` +
+    `识别段数: ${classified.length}\n` +
+    `\n--- 各段判定 ---\n` +
+    classified.map((c, i) =>
+      `#${i+1}\t${c.type}\t${c.reason}\t${c.pts.length}px`
+    ).join('\n') +
+    `\n\n--- 约分过程 ---\n` +
+    recon.log.join('\n') +
+    `\n\n--- 最终 ---\n` +
+    `一:${recon.count['一']}  丨:${recon.count['丨']}  7:${recon.count['7']}  0:${recon.count['0']}  空:${recon.count['空']}\n` +
+    (recon.count['空'] > 0 && recon.count['一']+recon.count['丨']+recon.count['7']+recon.count['0'] === 0
+      ? `\n>>> 对合成功：空 = 空 ✓`
+      : `\n>>> 未完全归空`);
+}
+
+// ============ 按钮 ============
+document.getElementById('btnRun').addEventListener('click', run);
+document.getElementById('btnReset').addEventListener('click', () => {
+  cvSrc.width = cvBin.width = cvSeg.width = 0;
+  out.textContent = '等待图片…';
+  imgData = null; segs = []; skelArr = null;
+  fileInput.value = '';
+  ['nYi','nShu','nQi','nLing','nKong'].forEach(id => document.getElementById(id).textContent = '0');
+});
+document.getElementById('btnDump').addEventListener('click', () => {
+  if (!segs.length) return;
+  const lines = segs.map((s, i) => {
+    const c = classify(s);
+    return `#${i+1}\t${c.type}\t${c.reason}\t${s.length}px\t${s.map(p=>`(${p.x},${p.y})`).join(' ')}`;
+  });
+  const txt = `index\ttype\treason\tlen\tpoints\n` + lines.join('\n');
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'strokes.txt';
+  a.click();
+});
+</script>
+</body>
+</html>
