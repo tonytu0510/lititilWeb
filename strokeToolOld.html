@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "拆字全流程"
+    window.PAGE_META.cssFront = ["./css/strokeTool.css"]
+    window.PAGE_META.jsEnd = ["./js/strokeTool.js"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class='wrap'>
+    <h1>strokeTool · 拆字全流程</h1>
+    <div class="sub">去标点 → 相同字约掉 → 查古音/多音字/曰/言（有则保留）→ 只拆一层判自对合 → 有曰展开拆解链 / 无曰按部首拆 → 落一丨十 → 约分 → 归空</div>
+
+    <div class="panel">
+      <textarea id="input" placeholder="输入一句话，例如：邯郸">邯郸</textarea>
+      <div>
+        <button class="primary" id="btnRun">开始拆解</button>
+        <button id="btnClear">清空</button>
+        <button id="btnSample">示例</button>
+      </div>
+    </div>
+
+    <pre id="output">等待输入…</pre>
+    </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
+</body>
+</html>

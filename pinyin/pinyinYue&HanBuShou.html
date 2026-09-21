@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>拼音查曰 · 闭合版</title>
+<style>
+  body { background: #1a1a1a; color: #ddd; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.7; }
+  h1 { font-size: 18px; color: #7cb8b8; }
+  .panel { background: #222; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  input { background: #0d0d0d; color: #ddd; border: 1px solid #444; border-radius: 4px; padding: 10px; font-size: 18px; width: 200px; text-align: center; letter-spacing: 4px; font-family: inherit; }
+  button { background: #7cb8b8; color: #0d0d0d; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 14px; margin-left: 8px; }
+  button:hover { background: #8fc8c8; }
+  button:disabled { background: #444; color: #888; cursor: not-allowed; }
+  pre { background: #0d0d0d; padding: 14px; border-radius: 6px; font-size: 13px; line-height: 1.7; overflow-x: auto; color: #b0d0d0; white-space: pre-wrap; }
+  .step { color: #7cb8b8; font-weight: bold; }
+  .hit { color: #f9ed69; }
+  .yue { color: #9c9; font-weight: bold; }
+  .warn { color: #e88; }
+  .plain { color: #888; }
+  .drop { border: 2px dashed #555; border-radius: 8px; padding: 20px; text-align: center; color: #888; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+  .drop:hover, .drop.over { border-color: #7cb8b8; color: #7cb8b8; }
+  .ok { color: #9c9; }
+  .bad { color: #e88; }
+</style>
+</head>
+<body>
+
+<h1>拼音查曰 · 闭合版</h1>
+
+<div class="panel">
+  <div class="drop" id="drop1">
+    ① 拖 <b>hanzi2pinyin.json</b>（汉字→拼音）<br>
+    <input type="file" id="file1" accept=".json" style="display:none">
+    <div style="margin-top:6px;" id="s1" class="plain">未加载</div>
+  </div>
+  <div class="drop" id="drop2">
+    ② 拖 <b>pinyin2hanzi.json</b>（拼音→汉字）<br>
+    <input type="file" id="file2" accept=".json" style="display:none">
+    <div style="margin-top:6px;" id="s2" class="plain">未加载</div>
+  </div>
+  <div class="drop" id="drop3">
+    ③ 拖 <b>hanzi2bushou.json</b>（汉字→部首）<br>
+    <input type="file" id="file3" accept=".json" style="display:none">
+    <div style="margin-top:6px;" id="s3" class="plain">未加载</div>
+  </div>
+</div>
+
+<div class="panel">
+  <input id="input" value="得" maxlength="1">
+  <button id="btnRun" disabled>查</button>
+</div>
+
+<pre id="output">等待输入…</pre>
+
+<script>
+// ============================================================
+// 数据（三份）
+// ============================================================
+let H2P = null;   // 汉字 → 拼音
+let P2H = null;   // 拼音 → 汉字
+let H2B = null;   // 汉字 → 部首
+
+// ============================================================
+// 曰类部首：曰、日、月、言、讠
+// ============================================================
+const YUE_BUSHOU = new Set(['曰', '日', '月', '言', '讠']);
+
+function isYueBushou(b) {
+  return YUE_BUSHOU.has(b);
+}
+
+// ============================================================
+// 查一个字的部首
+// 返回：{ bushous: [...], yue: [...] } 或 null
+// ============================================================
+function getBushouInfo(char) {
+  if (!H2B) return null;
+  const b = H2B[char];
+  if (b === undefined) return null;
+
+  let list;
+  if (typeof b === 'string') list = [b];
+  else if (Array.isArray(b)) list = b;
+  else list = [];
+
+  const yue = [];
+  list.forEach(function(x) {
+    if (isYueBushou(x)) yue.push(x);
+  });
+
+  return { bushous: list, yue: yue };
+}
+
+// ============================================================
+// 去声调
+// ============================================================
+function stripTone(pinyin) {
+  return pinyin.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ü/g, 'v').toLowerCase();
+}
+
+// ============================================================
+// 核心：查一个字能不能接上曰
+// ============================================================
+function findYueForChar(char) {
+  const log = [];
+  log.push('<span class="step">【查】</span>' + char);
+
+  // 1. 查读音（H2P）
+  const pinyins = H2P ? H2P[char] : null;
+  if (!pinyins || pinyins.length === 0) {
+    log.push('  <span class="warn">（汉字→拼音表里没有这个字）</span>');
+    return { log: log, found: false };
+  }
+
+  const isDuoyin = pinyins.length > 1;
+  log.push('  读音：' + pinyins.join(' / ') + (isDuoyin ? '  <span class="hit">（多音字）</span>' : '  <span class="plain">（单音字）</span>'));
+
+  // 2. 查自身部首（H2B）
+  const selfInfo = getBushouInfo(char);
+  if (selfInfo) {
+    log.push('  本身部首：' + selfInfo.bushous.join(' + '));
+    if (selfInfo.yue.length > 0) {
+      log.push('  <span class="yue">本身含曰部首 → ' + selfInfo.yue.join(' + ') + '</span>');
+      return { log: log, found: true, source: char, pinyin: pinyins[0], self: true, yue: selfInfo.yue, bushous: selfInfo.bushous };
+    }
+  } else {
+    log.push('  <span class="plain">（部首表里没有这个字）</span>');
+  }
+
+  // 3. 不是多音字 → 结束
+  if (!isDuoyin) {
+    log.push('  <span class="plain">单音字，本身不含曰部首 → 结束</span>');
+    return { log: log, found: false };
+  }
+
+  // 4. 多音字 → 每个读音下，查 P2H → 再查 H2B
+  log.push('  <span class="step">【多音字，逐读音找含曰同音字】</span>');
+  for (let i = 0; i < pinyins.length; i++) {
+    const py = pinyins[i];
+    const key = stripTone(py);       // 拼音去声调，用来查 P2H
+    const list = P2H ? (P2H[key] || []) : [];
+    log.push('  ' + py + '（' + key + '）→ ' + list.length + ' 个同音字');
+
+    for (let j = 0; j < list.length; j++) {
+      const c = list[j];
+      if (c === char) continue;
+      const info = getBushouInfo(c);
+      if (info && info.yue.length > 0) {
+        log.push('    <span class="yue">找到：' + c + '（' + py + '）含曰部首 ' + info.yue.join(' + ') + '</span>');
+        return { log: log, found: true, source: c, pinyin: py, self: false, yue: info.yue, bushous: info.bushous };
+      }
+    }
+  }
+
+  log.push('  <span class="warn">所有读音下都没找到含曰同音字</span>');
+  return { log: log, found: false };
+}
+
+// ============================================================
+// 拖拽加载
+// ============================================================
+function setupDrop(dropId, inputId, statusId, onLoad) {
+  const drop = document.getElementById(dropId);
+  const input = document.getElementById(inputId);
+  const status = document.getElementById(statusId);
+
+  drop.addEventListener('click', function() { input.click(); });
+  drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', function() { drop.classList.remove('over'); });
+  drop.addEventListener('drop', function(e) {
+    e.preventDefault();
+    drop.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f) load(f);
+  });
+  input.addEventListener('change', function(e) {
+    const f = e.target.files[0];
+    if (f) load(f);
+  });
+
+  function load(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        onLoad(data);
+        status.textContent = '✓ ' + file.name + '（' + Object.keys(data).length + ' 条）';
+        status.className = 'ok';
+        checkReady();
+      } catch (err) {
+        status.textContent = '✗ ' + err.message;
+        status.className = 'bad';
+      }
+    };
+    reader.readAsText(file, 'utf8');
+  }
+}
+
+setupDrop('drop1', 'file1', 's1', function(data) { H2P = data; });
+setupDrop('drop2', 'file2', 's2', function(data) { P2H = data; });
+setupDrop('drop3', 'file3', 's3', function(data) { H2B = data; });
+
+function checkReady() {
+  const btn = document.getElementById('btnRun');
+  btn.disabled = !(H2P && P2H && H2B);
+}
+
+// ============================================================
+// 跑
+// ============================================================
+function run() {
+  const char = document.getElementById('input').value.trim();
+  if (!char) return;
+  if (!H2P || !P2H || !H2B) {
+    document.getElementById('output').textContent = '请先加载三份数据';
+    return;
+  }
+
+  const out = document.getElementById('output');
+  const result = findYueForChar(char);
+  const lines = result.log;
+
+  lines.push('');
+  lines.push('<span class="step">【结果】</span>');
+
+  if (result.found) {
+    lines.push('  <span class="yue">含曰 ✓</span>');
+    if (result.self) {
+      lines.push('  来源：本身');
+    } else {
+      lines.push('  来源：同音字「' + result.source + '」（' + result.pinyin + '）');
+    }
+    lines.push('  曰类部首：' + result.yue.join(' + '));
+    if (result.bushous) {
+      lines.push('  该字部首：' + result.bushous.join(' + '));
+    }
+  } else {
+    lines.push('  <span class="warn">不含曰 ✗</span>');
+    const info = getBushouInfo(char);
+    if (info) {
+      lines.push('  ' + char + ' 的部首：' + info.bushous.join(' + '));
+      lines.push('  都不是曰类（曰/日/月/言/讠）');
+    }
+  }
+
+  out.innerHTML = lines.join('\n');
+}
+
+document.getElementById('btnRun').addEventListener('click', run);
+document.getElementById('input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') run();
+});
+</script>
+</body>
+</html>

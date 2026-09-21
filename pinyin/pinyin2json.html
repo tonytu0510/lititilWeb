@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>拼音数据转换 · pinyin.txt → JSON</title>
+<style>
+  body { background: #1a1a1a; color: #ddd; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.7; }
+  h1 { font-size: 18px; color: #7cb8b8; }
+  .panel { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  #drop {
+    border: 2px dashed #555; border-radius: 8px; padding: 40px;
+    text-align: center; color: #888; cursor: pointer; transition: 0.2s;
+  }
+  #drop:hover, #drop.over { border-color: #7cb8b8; color: #7cb8b8; }
+  button { background: #7cb8b8; color: #0d0d0d; border: none; padding: 10px 20px;
+           border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 14px; margin-right: 8px; margin-top: 8px; }
+  button:hover { background: #8fc8c8; }
+  button:disabled { background: #444; color: #888; cursor: not-allowed; }
+  pre { background: #0d0d0d; padding: 14px; border-radius: 6px; font-size: 13px;
+        line-height: 1.7; overflow-x: auto; color: #b0d0d0; white-space: pre-wrap; max-height: 400px; }
+  .step { color: #7cb8b8; font-weight: bold; }
+  .hit { color: #f9ed69; }
+  .warn { color: #e88; }
+  .plain { color: #888; }
+</style>
+</head>
+<body>
+
+<h1>拼音数据转换 · pinyin.txt → JSON</h1>
+
+<div class="panel">
+  <p class="plain">把 <code>pinyin.txt</code> 拖进下面的框（或点击选择文件）。</p>
+  <p class="plain">格式要求：<code>U+4E2D: zhōng,zhòng  # 中</code></p>
+  <div id="drop">
+    拖 pinyin.txt 到这里，或点击选择<br>
+    <input type="file" id="file" accept=".txt" style="display:none">
+  </div>
+</div>
+
+<div class="panel">
+  <button id="btnP2H" disabled>下载 拼音→汉字 JSON</button>
+  <button id="btnH2P" disabled>下载 汉字→拼音 JSON</button>
+</div>
+
+<pre id="output">等待文件…</pre>
+
+<script>
+// ============================================================
+// 数据
+// ============================================================
+let hanziPinyin = {};   // { '中': ['zhōng','zhòng'] }
+let pinyinHanzi = {};   // { 'zhong': ['中'] }
+
+// ============================================================
+// 去声调
+// ============================================================
+function stripTone(pinyin) {
+  return pinyin
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ü/g, 'v')
+    .toLowerCase();
+}
+
+// ============================================================
+// 解析
+// ============================================================
+function parse(text) {
+  hanziPinyin = {};
+  pinyinHanzi = {};
+
+  const lines = text.split('\n');
+  let parsed = 0;
+
+  lines.forEach(function(line) {
+    line = line.trim();
+    if (!line || line.startsWith('#')) return;
+
+    // U+XXXX: pinyin,pinyin  # 汉字
+    const m = line.match(/^U\+([0-9A-Fa-f]+):\s*([^#]+?)\s*#\s*(.+)$/);
+    if (!m) return;
+
+    const pinyinStr = m[2].trim();
+    const hanzi = m[3].trim();
+    const char = hanzi.charAt(0);
+
+    const pinyins = pinyinStr.split(',').map(function(p) { return p.trim(); }).filter(Boolean);
+
+    if (!hanziPinyin[char]) hanziPinyin[char] = [];
+    pinyins.forEach(function(py) {
+      if (hanziPinyin[char].indexOf(py) === -1) hanziPinyin[char].push(py);
+
+      const key = stripTone(py);
+      if (!pinyinHanzi[key]) pinyinHanzi[key] = [];
+      if (pinyinHanzi[key].indexOf(char) === -1) pinyinHanzi[key].push(char);
+    });
+
+    parsed++;
+  });
+
+  return parsed;
+}
+
+// ============================================================
+// 拖拽 / 选择
+// ============================================================
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+const out = document.getElementById('output');
+
+drop.addEventListener('click', function() { fileInput.click(); });
+drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', function() { drop.classList.remove('over'); });
+drop.addEventListener('drop', function(e) {
+  e.preventDefault();
+  drop.classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
+fileInput.addEventListener('change', function(e) {
+  const f = e.target.files[0];
+  if (f) loadFile(f);
+});
+
+function loadFile(file) {
+  out.textContent = '读取中…';
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const parsed = parse(text);
+
+    out.innerHTML =
+      '<span class="step">【解析完成】</span>\n' +
+      '  行数：' + parsed + '\n' +
+      '  汉字数：' + Object.keys(hanziPinyin).length + '\n' +
+      '  拼音组数：' + Object.keys(pinyinHanzi).length + '\n' +
+      '\n<span class="step">【样例】</span>\n' +
+      ['liang', 'de', 'yuan', 'zhong'].map(function(k) {
+        const list = pinyinHanzi[k] || [];
+        const preview = list.slice(0, 20).join(' ');
+        return '  ' + k + ' → ' + preview + (list.length > 20 ? ' …（共 ' + list.length + ' 个）' : '');
+      }).join('\n');
+
+    document.getElementById('btnP2H').disabled = false;
+    document.getElementById('btnH2P').disabled = false;
+  };
+  reader.readAsText(file, 'utf8');
+}
+
+// ============================================================
+// 下载
+// ============================================================
+function download(filename, content) {
+  const blob = new Blob([content], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('btnP2H').addEventListener('click', function() {
+  download('pinyin2hanzi.json', JSON.stringify(pinyinHanzi));
+});
+document.getElementById('btnH2P').addEventListener('click', function() {
+  download('hanzi2pinyin.json', JSON.stringify(hanziPinyin));
+});
+</script>
+</body>
+</html>
