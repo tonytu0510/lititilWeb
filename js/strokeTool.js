@@ -1,10 +1,12 @@
 // ============================================================
-// 表1：笔画归空集合
+// 归空集合（★ 去掉了「丶」）
+// 原来：一、丨、0、丿、丶、乙、乚、亅、乛、⺄、乀、㇏、7
+// 现在：去掉了「丶」，点不归空
 // ============================================================
-const KONG = new Set(['一', '丨', '0', '丿', '丶', '乙', '乚', '亅', '乛', '⺄', '乀', '㇏', '7']);
+const KONG = new Set(['一', '丨', '0', '丿', '乙', '乚', '亅', '乛', '⺄', '乀', '㇏', '7']);
 
 const PIE = new Set(['丿']);
-const NA = new Set(['乀', '㇏', '丶']);
+const NA = new Set(['乀', '㇏', '丶']);   // 撇捺对子还认「丶」，但判归空不算它
 const GOU = new Set(['乚', '亅', '乙', '⺄', '乛', '㇉', '㇁']);
 
 function normalizeStroke(s) {
@@ -13,15 +15,21 @@ function normalizeStroke(s) {
 }
 
 // ============================================================
-// 曰的集合：曰、日、月、言、讠
+// 曰的集合
 // ============================================================
 const YUE_SET = new Set(['曰', '日', '月', '言', '讠']);
 
 // ============================================================
-// 表2：拆字表（字 → 部件列表，一层）
-// 拆到出现「曰/日/月/言/讠」就停，不再往下拆
+// 拆字表（一层，拆到出现曰/日/月/言/讠就停）
 // ============================================================
 const CHAR_SPLIT = {
+  // 核心：日 = 曰 + 丶（点不归空，所以日不归空）
+  '日': ['曰', '丶'],
+  '曰': ['口', '一'],
+  '月': ['月'],
+  '言': ['曰', '一'],
+  '讠': ['讠'],
+  // 含曰类
   '得': ['彳', '日', '寸'],
   '谅': ['言', '京'],
   '明': ['日', '月'],
@@ -55,6 +63,7 @@ const CHAR_SPLIT = {
   '调': ['言', '周'],
   '证': ['言', '正'],
   '试': ['言', '式'],
+  // 常用字
   '你': ['亻', '尔'],
   '可': ['丁', '口'],
   '以': ['人', '丶'],
@@ -82,77 +91,22 @@ const CHAR_SPLIT = {
   '士': ['十', '一'],
   '几': ['丿', '乚'],
   '入': ['丿', '乀'],
-  '者': ['耂', '日'],
   '内': ['冂', '人'],
   '德': ['彳', '十', '罒', '一', '心'],
-  '印': ['卩', '一'],
-  '度': ['广', '廿', '又'],
-  '廿': ['十', '十'],
-  '口': ['丨', '乛', '一'],
-  '日': ['曰', '一'],
-  '曰': ['口', '一'],
-  '月': ['月'],
-  '言': ['曰', '一'],
-  '亻': ['丿', '丨'],
-  '彳': ['丿', '丿', '丨'],
-  '艹': ['一', '丨', '丨'],
-  '忄': ['丶', '丶', '丨'],
+  '邯': ['甘', '阝'],
+  '郸': ['单', '阝'],
   '白': ['丿', '日'],
-  '勺': ['勹', '丶'],
-  '京': ['亠', '口', '小'],
-  '重': ['千', '里'],
-  '千': ['丿', '十'],
-  '里': ['田', '土'],
-  '田': ['口', '十'],
-  '土': ['十', '一'],
-  '十': ['一', '丨'],
-  '耂': ['土', '丿'],
-  '可': ['丁', '口'],
-  '丁': ['一', '亅'],
-  '人': ['丿', '乀'],
-  '八': ['丿', '丶'],
-  '大': ['一', '人'],
+  '旦': ['日', '一'],
+  '春': ['三', '人', '日'],
+  '昔': ['廿', '日'],
+  '昔': ['廿', '日'],
+  '单': ['丷', '日', '十'],
+  '早': ['日', '十'],
+  '是': ['日', '正'],
+  '时': ['日', '寸'],
+  '间': ['门', '日'],
+  '闻': ['门', '耳'],
 };
-
-// ============================================================
-// 判曰：拆字看部件列表里有没有「曰/日/月/言/讠」
-// ============================================================
-function containsYue(char) {
-  // 本身是曰/日/月/言/讠？
-  if (YUE_SET.has(char)) return true;
-  // 查部件列表
-  const parts = CHAR_SPLIT[char];
-  if (!parts) return false;
-  for (let i = 0; i < parts.length; i++) {
-    if (YUE_SET.has(parts[i])) return true;
-    // 部件本身还能拆？递归一层
-    if (CHAR_SPLIT[parts[i]] && parts[i] !== char) {
-      const sub = CHAR_SPLIT[parts[i]];
-      for (let j = 0; j < sub.length; j++) {
-        if (YUE_SET.has(sub[j])) return true;
-      }
-    }
-  }
-  return false;
-}
-
-// 找含曰的部件
-function findYuePart(char, depth) {
-  depth = depth || 0;
-  if (depth > 5) return null;
-  if (YUE_SET.has(char)) return char;
-  const parts = CHAR_SPLIT[char];
-  if (!parts) return null;
-  for (let i = 0; i < parts.length; i++) {
-    if (YUE_SET.has(parts[i])) return parts[i];
-  }
-  for (let i = 0; i < parts.length; i++) {
-    if (parts[i] === char) continue;
-    const r = findYuePart(parts[i], depth + 1);
-    if (r) return r;
-  }
-  return null;
-}
 
 // ============================================================
 // 标点
@@ -160,7 +114,7 @@ function findYuePart(char, depth) {
 const PUNCT = new Set(['，', '。', '、', '；', '：', '？', '！', '“', '”', '‘', '’', '（', '）', '《', '》', ' ', '\n', '\t']);
 
 // ============================================================
-// 拆一层
+// 工具函数
 // ============================================================
 function splitOneLevel(char) {
   const parts = CHAR_SPLIT[char];
@@ -168,7 +122,6 @@ function splitOneLevel(char) {
   return parts;
 }
 
-// 递归拆到笔画
 function splitToStrokes(char, depth) {
   depth = depth || 0;
   if (depth > 10) return [normalizeStroke(char)];
@@ -185,52 +138,51 @@ function splitToStrokes(char, depth) {
   return [normalizeStroke(char)];
 }
 
-function hasPieNaPair(parts) {
-  let pieIndex = -1, naIndex = -1;
+// 判自对合：一层部件是否全部归空（现在点不算空，日就不归空了）
+function isSelfDuihe(char) {
+  const parts = splitOneLevel(char);
+  let onlySelf = true;
   for (let i = 0; i < parts.length; i++) {
-    if (PIE.has(parts[i]) && pieIndex === -1) pieIndex = i;
-    if (NA.has(parts[i]) && naIndex === -1) naIndex = i;
+    if (!KONG.has(normalizeStroke(parts[i]))) { onlySelf = false; break; }
   }
-  return pieIndex !== -1 && naIndex !== -1 && pieIndex < naIndex;
+  return onlySelf;
 }
 
-function containsPieNa(char, depth) {
+// 判曰：拆字看部件列表
+function containsYue(char, depth) {
   depth = depth || 0;
-  if (depth > 10) return false;
+  if (depth > 6) return false;
+  if (YUE_SET.has(char)) return true;
   const parts = CHAR_SPLIT[char];
   if (!parts) return false;
-  if (hasPieNaPair(parts)) return true;
+  for (let i = 0; i < parts.length; i++) {
+    if (YUE_SET.has(parts[i])) return true;
+  }
   for (let i = 0; i < parts.length; i++) {
     if (parts[i] === char) continue;
-    if (containsPieNa(parts[i], depth + 1)) return true;
+    if (CHAR_SPLIT[parts[i]] && containsYue(parts[i], depth + 1)) return true;
   }
   return false;
 }
 
-function hasQiQiPair(parts) {
-  let count = 0;
-  for (let i = 0; i < parts.length; i++) {
-    if (normalizeStroke(parts[i]) === '7') count++;
-  }
-  return count >= 2;
-}
-
-function containsQiQi(char, depth) {
+function findYuePart(char, depth) {
   depth = depth || 0;
-  if (depth > 10) return false;
+  if (depth > 6) return null;
+  if (YUE_SET.has(char)) return char;
   const parts = CHAR_SPLIT[char];
-  if (!parts) return false;
-  if (hasQiQiPair(parts)) return true;
+  if (!parts) return null;
+  for (let i = 0; i < parts.length; i++) {
+    if (YUE_SET.has(parts[i])) return parts[i];
+  }
   for (let i = 0; i < parts.length; i++) {
     if (parts[i] === char) continue;
-    if (containsQiQi(parts[i], depth + 1)) return true;
+    const r = findYuePart(parts[i], depth + 1);
+    if (r) return r;
   }
-  return false;
+  return null;
 }
 
-// ============================================================
-// 展开拆解链（递归）
-// ============================================================
+// 展开拆解链
 function expandRecursive(char, depth, lines, prefix) {
   depth = depth || 0;
   lines = lines || [];
@@ -244,7 +196,10 @@ function expandRecursive(char, depth, lines, prefix) {
   }
 
   const hasYue = YUE_SET.has(char);
-  const tag = hasYue ? ' <span class="yue">[曰类]</span>' : '';
+  const isKong = KONG.has(normalizeStroke(char));
+  let tag = '';
+  if (hasYue) tag = ' <span class="yue">[曰类]</span>';
+  else if (isKong) tag = ' <span class="empty">[归空]</span>';
   lines.push(prefix + char + tag);
 
   parts.forEach(function(part, i) {
@@ -255,16 +210,21 @@ function expandRecursive(char, depth, lines, prefix) {
     const norm = normalizeStroke(part);
     const isQi = norm === '7' && part !== '7';
     const isYuePart = YUE_SET.has(part);
+    const isDian = part === '丶';
+    const isKongPart = KONG.has(norm);
+
     let display = part;
     if (isQi) display = part + ' → 7';
     let mark = '';
-    if (isQi) mark = ' <span class="chain-qi">（带钩）</span>';
+    if (isQi) mark = ' <span class="warn">（带钩）</span>';
+    else if (isDian) mark = ' <span class="chain-dian">（点，不归空）</span>';
     else if (isYuePart) mark = ' <span class="yue">（曰类）</span>';
+    else if (isKongPart) mark = ' <span class="empty">（归空）</span>';
 
     lines.push(prefix + branch + display + mark);
     if (part !== char && CHAR_SPLIT[part]) {
       expandRecursive(part, depth + 1, lines, nextPrefix + '   ');
-    } else if (KONG.has(norm)) {
+    } else if (isKongPart) {
       lines.push(nextPrefix + '   <span class="empty">' + norm + ' → 归空</span>');
     }
   });
@@ -272,7 +232,7 @@ function expandRecursive(char, depth, lines, prefix) {
   return lines;
 }
 
-// 收集整句所有曰落点
+// 收集曰落点
 function collectYuePoints(char, depth) {
   depth = depth || 0;
   if (depth > 10) return [];
@@ -347,7 +307,7 @@ function run() {
   log.push('  约掉：' + (removed.length ? removed.map(function(c) { return '<span class="gone">' + c + '</span>'; }).join(' ') : '（无）'));
   log.push('  保留：' + (kept.length ? kept.map(function(c) { return '<span class="hit">' + c + '</span>'; }).join(' ') : '（空）'));
 
-  // 第3步：查曰（拆字看部件）+ 判自对合
+  // 第3步：查曰 + 判自对合
   log.push('');
   log.push('<span class="step">【第3步：查曰（拆字看部件）+ 判自对合】</span>');
 
@@ -356,7 +316,6 @@ function run() {
   const selfRemoved = [];
 
   kept.forEach(function(c) {
-    // 本身/部件含曰？
     if (containsYue(c)) {
       yueChars.push(c);
       const yp = findYuePart(c);
@@ -364,18 +323,8 @@ function run() {
       return;
     }
 
-    // 不含曰 → 判自对合
-    const parts = splitOneLevel(c);
-    let onlySelf = true;
-    for (let i = 0; i < parts.length; i++) {
-      if (!KONG.has(normalizeStroke(parts[i]))) { onlySelf = false; break; }
-    }
-    const hasPn = containsPieNa(c);
-    const hasQq = containsQiQi(c);
-    if (hasPn || hasQq) onlySelf = true;
-
-    if (onlySelf) {
-      selfRemoved.push({ char: c, parts: parts });
+    if (isSelfDuihe(c)) {
+      selfRemoved.push({ char: c, parts: splitOneLevel(c) });
     } else {
       otherChars.push(c);
       log.push('  ' + c + ' 不含曰 → 保留');
@@ -510,7 +459,7 @@ document.getElementById('btnClear').addEventListener('click', function() {
   document.getElementById('output').textContent = '等待输入…';
 });
 document.getElementById('btnSample').addEventListener('click', function() {
-  const samples = ['你可以大度的去原谅别人', '但千万不要愚蠢的再相信', '邯郸', '懂', '何得'];
+  const samples = ['你可以大度的去原谅别人', '但千万不要愚蠢的再相信', '邯郸', '懂', '何得', '日'];
   const pick = samples[Math.floor(Math.random() * samples.length)];
   document.getElementById('input').value = pick;
   run();
