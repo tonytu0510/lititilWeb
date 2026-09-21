@@ -1,12 +1,14 @@
 // ============================================================
-// 归空集合（★ 去掉了「丶」）
-// 原来：一、丨、0、丿、丶、乙、乚、亅、乛、⺄、乀、㇏、7
-// 现在：去掉了「丶」，点不归空
+// 归 0 集合
+// 一切归 0：一、丨、十、天、地、人、日、月、标点……全部 = 0
 // ============================================================
-const KONG = new Set(['一', '丨', '0', '丿', '乙', '乚', '亅', '乛', '⺄', '乀', '㇏', '7']);
+const KONG = new Set([
+  '一', '丨', '0', '丿', '丶', '乙', '乚', '亅', '乛', '⺄', '乀', '㇏', '7',
+  '十', '天', '地', '人', '日', '月', '曰', '口', '标点'
+]);
 
 const PIE = new Set(['丿']);
-const NA = new Set(['乀', '㇏', '丶']);   // 撇捺对子还认「丶」，但判归空不算它
+const NA = new Set(['乀', '㇏', '丶']);
 const GOU = new Set(['乚', '亅', '乙', '⺄', '乛', '㇉', '㇁']);
 
 function normalizeStroke(s) {
@@ -20,16 +22,14 @@ function normalizeStroke(s) {
 const YUE_SET = new Set(['曰', '日', '月', '言', '讠']);
 
 // ============================================================
-// 拆字表（一层，拆到出现曰/日/月/言/讠就停）
+// 拆字表
 // ============================================================
 const CHAR_SPLIT = {
-  // 核心：日 = 曰 + 丶（点不归空，所以日不归空）
-  '日': ['曰', '丶'],
   '曰': ['口', '一'],
   '月': ['月'],
   '言': ['曰', '一'],
   '讠': ['讠'],
-  // 含曰类
+  '日': ['曰', '一'],
   '得': ['彳', '日', '寸'],
   '谅': ['言', '京'],
   '明': ['日', '月'],
@@ -63,7 +63,6 @@ const CHAR_SPLIT = {
   '调': ['言', '周'],
   '证': ['言', '正'],
   '试': ['言', '式'],
-  // 常用字
   '你': ['亻', '尔'],
   '可': ['丁', '口'],
   '以': ['人', '丶'],
@@ -99,13 +98,109 @@ const CHAR_SPLIT = {
   '旦': ['日', '一'],
   '春': ['三', '人', '日'],
   '昔': ['廿', '日'],
-  '昔': ['廿', '日'],
   '单': ['丷', '日', '十'],
   '早': ['日', '十'],
   '是': ['日', '正'],
   '时': ['日', '寸'],
+  '肉': ['冂', '人'],
+  '八': ['丿', '丶'],
+  '太': ['大', '丶'],
+  '犬': ['大', '丶'],
+  '夫': ['二', '人'],
+  '天': ['一', '大'],
+  '地': ['土', '也'],
+  '人': ['丿', '乀'],
+  '原': ['厂', '白', '小'],
+  '厂': ['一', '丿'],
+  '小': ['亅', '八'],
+  '京': ['亠', '口', '小'],
+  '勺': ['勹', '丶'],
+  '广': ['丶', '厂'],
+  '廿': ['十', '十'],
+  '又': ['乛', '丿', '丶'],
+  '土': ['十', '一'],
+  '厶': ['丿', '丶'],
+  '力': ['𠃌', '丿'],
+  '刂': ['丨', '亅'],
+  '丁': ['一', '亅'],
+  '尔': ['⺈', '小'],
+  '亻': ['丿', '丨'],
+  '口': ['丨', '乛', '一'],
+  '勹': ['丿', '乛'],
+  '十': ['一', '丨'],
+  '彳': ['丿', '丿', '丨'],
+  '艹': ['一', '丨', '丨'],
+  '忄': ['丶', '丶', '丨'],
+  '氵': ['丶', '丶', '丶'],
+  '钅': ['丿', '一', '一', '一', '丨'],
+  '冂': ['丨', '乛'],
+  '冖': ['丶', '乛'],
+  '冫': ['丶', '一'],
+  '丷': ['丶', '丿'],
+  '覀': ['一', '口', '儿'],
+  '儿': ['丿', '乚'],
+  '亠': ['丶', '一'],
+  '耂': ['土', '丿'],
+  '罒': ['丨', '乛', '丨', '一'],
+  '心': ['丶', '乚', '丶'],
+  '巾': ['丨', '乛', '丨'],
+  '彐': ['乛', '一', '一'],
+  '尸': ['乛', '一', '丿'],
+  '门': ['丶', '丨', '乛'],
+  '阝': ['丨', '乛', '丨'],
+  '卩': ['乛', '丨'],
+  '三': ['一', '一', '一'],
+  '二': ['一', '一'],
+  '西': ['覀'],
+  '酉': ['西', '一'],
+  '足': ['口', '止'],
+  '止': ['丨', '一', '丨', '一'],
+  '走': ['土', '龰'],
+  '龰': ['丨', '一', '人'],
+  '玉': ['王', '丶'],
+  '禾': ['丿', '木'],
+  '米': ['丷', '十', '八'],
+  '来': ['一', '米'],
+  '耒': ['一', '木'],
+  '车': ['一', '乛', '丨'],
+  '贝': ['冂', '人'],
+  '见': ['冂', '儿'],
+  '页': ['丆', '贝'],
+  '丆': ['一', '丿'],
+  '首': ['丷', '一', '自'],
+  '自': ['丿', '目'],
+  '目': ['口', '二'],
+  '耳': ['一', '丨', '丨', '一'],
+  '手': ['丿', '一', '一', '亅'],
+  '扌': ['一', '亅', '一'],
+  '爪': ['丿', '乀', '丨', '乀'],
+  '身': ['丿', '丨', '一', '一', '一', '丿'],
+  '骨': ['冎', '月'],
+  '冎': ['冂', '一', '丨', '乛'],
+  '高': ['亠', '口', '冂', '口'],
+  '鬲': ['一', '口', '冂', '口', '丨'],
+  '鬼': ['丿', '田', '儿', '厶'],
+  '田': ['口', '十'],
+  '鱼': ['⺈', '田', '一'],
+  '鸟': ['勹', '丶', '一', '乚'],
+  '马': ['乛', '亅', '一'],
+  '羊': ['丷', '三', '丨'],
+  '牛': ['丿', '一', '十'],
+  '牜': ['丿', '一', '丨', '一'],
+  '犭': ['丿', '乀', '丿'],
+  '虎': ['虍', '几'],
+  '虍': ['丨', '一', '乛', '丿', '七'],
+  '七': ['一', '乚'],
+  '虫': ['口', '丨', '一', '丶'],
+  '蛇': ['虫', '它'],
+  '它': ['宀', '匕'],
+  '宀': ['丶', '冖'],
+  '匕': ['丿', '乚'],
+  '问': ['门', '口'],
   '间': ['门', '日'],
   '闻': ['门', '耳'],
+  '闷': ['门', '心'],
+  '闯': ['门', '马'],
 };
 
 // ============================================================
@@ -122,6 +217,7 @@ function splitOneLevel(char) {
   return parts;
 }
 
+// 递归拆到底
 function splitToStrokes(char, depth) {
   depth = depth || 0;
   if (depth > 10) return [normalizeStroke(char)];
@@ -138,17 +234,18 @@ function splitToStrokes(char, depth) {
   return [normalizeStroke(char)];
 }
 
-// 判自对合：一层部件是否全部归空（现在点不算空，日就不归空了）
+// 判自对合
 function isSelfDuihe(char) {
   const parts = splitOneLevel(char);
   let onlySelf = true;
   for (let i = 0; i < parts.length; i++) {
-    if (!KONG.has(normalizeStroke(parts[i]))) { onlySelf = false; break; }
+    const p = parts[i];
+    if (!KONG.has(normalizeStroke(p))) { onlySelf = false; break; }
   }
   return onlySelf;
 }
 
-// 判曰：拆字看部件列表
+// 判曰
 function containsYue(char, depth) {
   depth = depth || 0;
   if (depth > 6) return false;
@@ -199,7 +296,7 @@ function expandRecursive(char, depth, lines, prefix) {
   const isKong = KONG.has(normalizeStroke(char));
   let tag = '';
   if (hasYue) tag = ' <span class="yue">[曰类]</span>';
-  else if (isKong) tag = ' <span class="empty">[归空]</span>';
+  else if (isKong) tag = ' <span class="empty">[归 0]</span>';
   lines.push(prefix + char + tag);
 
   parts.forEach(function(part, i) {
@@ -210,22 +307,20 @@ function expandRecursive(char, depth, lines, prefix) {
     const norm = normalizeStroke(part);
     const isQi = norm === '7' && part !== '7';
     const isYuePart = YUE_SET.has(part);
-    const isDian = part === '丶';
     const isKongPart = KONG.has(norm);
 
     let display = part;
     if (isQi) display = part + ' → 7';
     let mark = '';
     if (isQi) mark = ' <span class="warn">（带钩）</span>';
-    else if (isDian) mark = ' <span class="chain-dian">（点，不归空）</span>';
     else if (isYuePart) mark = ' <span class="yue">（曰类）</span>';
-    else if (isKongPart) mark = ' <span class="empty">（归空）</span>';
+    else if (isKongPart) mark = ' <span class="empty">（归 0）</span>';
 
     lines.push(prefix + branch + display + mark);
     if (part !== char && CHAR_SPLIT[part]) {
       expandRecursive(part, depth + 1, lines, nextPrefix + '   ');
     } else if (isKongPart) {
-      lines.push(nextPrefix + '   <span class="empty">' + norm + ' → 归空</span>');
+      lines.push(nextPrefix + '   <span class="empty">' + norm + ' → 归 0</span>');
     }
   });
 
@@ -332,7 +427,7 @@ function run() {
   });
 
   selfRemoved.forEach(function(item) {
-    log.push('  <span class="gone">' + item.char + '</span> = ' + item.parts.join(' + ') + ' → 自对合 → 归空');
+    log.push('  <span class="gone">' + item.char + '</span> = ' + item.parts.join(' + ') + ' → 自对合 → 归 0');
   });
   if (!selfRemoved.length) log.push('  （无自对合字）');
 
@@ -387,7 +482,7 @@ function run() {
     log.push('');
     log.push('  约分（相同落点成对约掉）：');
     if (reconciled.length === 0) {
-      log.push('  <span class="warn">全部约掉 → 说明句子还有多音字没拆出来</span>');
+      log.push('  <span class="warn">全部约掉</span>');
     } else {
       reconciled.forEach(function(r) {
         log.push('  ' + r.point + ' × ' + r.count + '（奇数，保留 1 个）');
@@ -403,7 +498,7 @@ function run() {
 
   // 第7步：落一丨十 · 约分
   log.push('');
-  log.push('<span class="step">【第7步：落一丨十 · 约分】</span>');
+  log.push('<span class="step">【第7步：落一丨十 · 约分 → 归 0】</span>');
 
   const sCount = { '一': 0, '丨': 0, '0': 0, '7': 0 };
   const sOthers = {};
@@ -431,21 +526,18 @@ function run() {
   if (pairZero > 0) log.push('  <span class="hit">0 × 0 配对约掉 ' + pairZero + ' 对</span>');
 
   const residual = sCount['一'] + sCount['丨'] + sCount['0'] + sCount['7'];
-  if (residual > 0) log.push('  剩余单笔：一×' + sCount['一'] + '  丨×' + sCount['丨'] + '  0×' + sCount['0'] + '  7×' + sCount['7'] + ' → 归空');
+  if (residual > 0) log.push('  剩余单笔：一×' + sCount['一'] + '  丨×' + sCount['丨'] + '  0×' + sCount['0'] + '  7×' + sCount['7'] + ' → 归 0');
 
   const otherKeys = Object.keys(sOthers);
   if (otherKeys.length) {
-    log.push('  其他笔画：' + otherKeys.map(function(k) { return k + '×' + sOthers[k]; }).join('  ') + ' → 归空');
+    log.push('  其他笔画：' + otherKeys.map(function(k) { return k + '×' + sOthers[k]; }).join('  ') + ' → 归 0');
   }
 
   // 结果
   log.push('');
   log.push('<span class="step">【最终结果】</span>');
-  if (hasYueResult || yueChars.length > 0) {
-    log.push('  <span class="empty">空 = 空 ✓ 对合上了</span>');
-  } else {
-    log.push('  <span class="warn">整句没有曰落点 → 拆偏旁为止</span>');
-  }
+  log.push('  <span class="empty">0 = 0 ✓ 对合上了</span>');
+  log.push('  <span class="plain">（0 通空）</span>');
 
   document.getElementById('output').innerHTML = log.join('\n');
 }
@@ -459,7 +551,7 @@ document.getElementById('btnClear').addEventListener('click', function() {
   document.getElementById('output').textContent = '等待输入…';
 });
 document.getElementById('btnSample').addEventListener('click', function() {
-  const samples = ['你可以大度的去原谅别人', '但千万不要愚蠢的再相信', '邯郸', '懂', '何得', '日'];
+  const samples = ['你可以大度的去原谅别人', '但千万不要愚蠢的再相信', '邯郸', '明', '天地人日'];
   const pick = samples[Math.floor(Math.random() * samples.length)];
   document.getElementById('input').value = pick;
   run();
