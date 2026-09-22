@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "对合 · 拆字游戏"
+    window.PAGE_META.cssFront = ["./css/game.css"]
+    window.PAGE_META.jsEnd = ["./js/game.js"]
+  </script>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class="wrap">
+
+    <div class="tag">游戏 · 拆字 · 对合</div>
+
+    <h1>
+      对合<br>
+      <span class="hl">拆到最后 · 归空 · 对合</span>
+    </h1>
+
+    <p class="sub">
+      规则：一 = 丨 = 十 = 空 = 0。<br>
+      拆到最后，都归 0。0 = 0，对合。<br>
+      拆对过关，拆错重来。
+    </p>
+
+    <div class="game-panel">
+      <div class="game-modes">
+        <button class="game-mode-btn active" data-mode="solo">单人拆字</button>
+        <button class="game-mode-btn" data-mode="duo">双人对合</button>
+      </div>
+
+      <!-- 单人 -->
+      <div id="modeSolo">
+        <div class="game-stage">
+          <div class="game-label">拆这个字</div>
+          <div class="game-target" id="soloTarget">明</div>
+        </div>
+        <div class="game-input-row">
+          <input class="game-input" id="soloInput" placeholder="例如：日 + 月" autocomplete="off">
+          <button class="game-btn" id="soloSubmit">拆</button>
+          <button class="game-btn game-btn-ghost" id="soloHint">提示</button>
+          <button class="game-btn game-btn-ghost" id="soloNext">换一个</button>
+        </div>
+        <div class="game-status wait" id="soloStatus">输入拆解，例如「日 + 月」</div>
+        <div class="game-log" id="soloLog">等待开始…</div>
+      </div>
+
+      <!-- 双人 -->
+      <div id="modeDuo" style="display:none;">
+        <div class="game-players">
+          <div class="game-player active" id="playerA">
+            <div class="game-player-name">玩家 A</div>
+            <div class="game-player-word" id="wordA">—</div>
+            <div class="game-player-status" id="statusA">等待</div>
+          </div>
+          <div class="game-player" id="playerB">
+            <div class="game-player-name">玩家 B</div>
+            <div class="game-player-word" id="wordB">—</div>
+            <div class="game-player-status" id="statusB">等待</div>
+          </div>
+        </div>
+        <div class="game-input-row">
+          <input class="game-input" id="duoInput" placeholder="输入拆解 / 或给对方的字" autocomplete="off">
+          <button class="game-btn" id="duoSubmit">确认</button>
+          <button class="game-btn game-btn-ghost" id="duoReset">重开</button>
+        </div>
+        <div class="game-status wait" id="duoStatus">玩家 A：先给一个字</div>
+        <div class="game-log" id="duoLog">等待开始…</div>
+      </div>
+    </div>
+
+    <div class="section-title">规则说明</div>
+
+    <div class="grid">
+      <div class="card">
+        <h3><span class="dot gold"></span>基本规则</h3>
+        <ul>
+          <li>一 = 丨 = 十 = 空 = 0</li>
+          <li>拆到最后，归 0</li>
+          <li>0 = 0，对合</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot green"></span>单人玩法</h3>
+        <ul>
+          <li>系统给一个字</li>
+          <li>你输入拆解</li>
+          <li>拆对 → 归空 → 过关</li>
+          <li>拆错 → 重来</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot red"></span>双人玩法</h3>
+        <ul>
+          <li>A 给字，B 拆</li>
+          <li>B 给字，A 拆</li>
+          <li>两边都归空 → 对合</li>
+          <li>一方没归空 → 不对合</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="end">
+      <p>
+        <span class="gold">一 = 丨 = 空 = 0</span><br>
+        拆字 · 偏 · 归 · 成句
+      </p>
+      <div class="foot">仅供娱乐</div>
+    </div>
+
+  </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
+</body>
+</html>
