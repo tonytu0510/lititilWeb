@@ -47,10 +47,6 @@
                 if (iconGroup) iconGroup.classList.remove('move-up');
                 if (placeholder) placeholder.style.height = '50px';
             });
-        } else {
-            if (typeof updateSliderHeight === 'function') {
-                updateSliderHeight();
-            }
         }
     }
 
@@ -785,7 +781,6 @@
             }
         }
     });
-
     // ==================== 关闭按钮 ====================
     const closeBtn = document.querySelector('#dinoBar .close-btn');
     if (closeBtn) {
@@ -814,9 +809,6 @@
                         if (dinoGameChangeWidth) dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
                         startBtn.style.display = 'block';
                     }
-                    if (typeof updateSliderHeight === 'function') {
-                        updateSliderHeight();
-                    }
                 }
             });
         }, 500);
@@ -838,10 +830,6 @@
                     if (icon) icon.classList.remove('show');
                     if (iconGroup) iconGroup.classList.remove('move-up');
                     if (placeholder) placeholder.style.height = '50px';
-
-                    if (typeof updateSliderHeight === 'function') {
-                        updateSliderHeight();
-                    }
                 }
             });
         }, 500);
