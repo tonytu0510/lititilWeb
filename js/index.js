@@ -37,9 +37,13 @@ function updateSliderHeight() {
         else slider.classList.remove('full');
     }
     redrawAllCanvas();
+    // ★ 通知菜单重算位置（头部游戏栏开关后）
+    if (typeof window.refreshArcMenu === 'function') {
+        setTimeout(window.refreshArcMenu, 50);
+    }
 }
 
-// ★ 等 dinoBar 出现后：绑 observer + 调一次 updateSliderHeight
+// 等 dinoBar 出现后：绑 observer + 调一次 updateSliderHeight
 (function waitForDinoBar() {
     function bind(db) {
         const ob = new MutationObserver(function (ms) {

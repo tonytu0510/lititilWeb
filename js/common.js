@@ -47,6 +47,10 @@
                 if (iconGroup) iconGroup.classList.remove('move-up');
                 if (placeholder) placeholder.style.height = '50px';
             });
+        } else {
+            if (typeof updateSliderHeight === 'function') {
+                updateSliderHeight();
+            }
         }
     }
 
@@ -72,8 +76,7 @@
             { name: '读呼吸',   href: 'BreathBetweenWords.html' },
             { name: '想法',     href: 'idea.html' },
             { name: '关于我',   href: 'aboutMe.html' },
-            { name: '灵感来源', href: 'renming.html' },
-            { name: '六十四卦', href: 'gua.html' }
+            { name: '灵感来源', href: 'renming.html' }
         ]
     };
 
@@ -284,18 +287,15 @@
 
         let isOpen = false;
         let isDragging = false;
-        let pendingTimers = [];   // 记录所有未完成的 timer
+        let pendingTimers = [];
 
-        // 每个环独立维护"当前选中项"
         const ringState = {
             inner: { selected: 0, offset: 0 },
             outer: { selected: 0, offset: 0 }
         };
 
-        // 当前激活环：键盘操作目标、label 显示目标
         let activeRing = 'inner';
 
-        // 从存档恢复
         (function initFromSaved() {
             const saved = getSavedMenuIndex();
             if (RING_CONFIG[saved.ring] && saved.index < RING_CONFIG[saved.ring].length) {
@@ -304,7 +304,6 @@
             }
         })();
 
-        // ---------- 判断桌面/手机 ----------
         function isMobile() {
             return document.documentElement.clientWidth <= 500;
         }
@@ -318,7 +317,6 @@
             return getContainerSize() * RING_RADIUS[mode][ring];
         }
 
-        // ---------- 根据指针坐标判断落在哪个环 ----------
         function getRingByPointer(clientX, clientY) {
             const rect = containerEl.getBoundingClientRect();
             const cx = rect.right;
@@ -345,9 +343,7 @@
             return dInner < dOuter ? 'inner' : 'outer';
         }
 
-        // ---------- 构建菜单 ----------
         function buildMenu() {
-            // 容器尺寸还没出来，先不建
             if (!containerEl.offsetWidth) {
                 requestAnimationFrame(buildMenu);
                 return;
@@ -405,7 +401,6 @@
             updateRingSelection('outer');
         }
 
-        // ---------- 更新某个环的位置 ----------
         function updatePositions(ring) {
             const offset = ringState[ring].offset;
             const radius = getRadius(ring);
@@ -424,7 +419,6 @@
             });
         }
 
-        // ---------- 更新某个环的选中高亮 ----------
         function updateRingSelection(ring) {
             const selected = ringState[ring].selected;
             containerEl.querySelectorAll('.menu-item.' + ring).forEach((el, i) => {
@@ -432,7 +426,6 @@
             });
         }
 
-        // ---------- 更新底部标签 ----------
         function updateLabel() {
             const arr = RING_CONFIG[activeRing];
             const idx = ringState[activeRing].selected;
@@ -442,7 +435,6 @@
             }
         }
 
-        // ---------- 把某个环的选中项转到 45° 位置 ----------
         function switchToRingIndex(ring, ringIdx) {
             const arr = RING_CONFIG[ring];
             const count = arr.length;
@@ -456,7 +448,6 @@
             updateRingSelection(ring);
         }
 
-        // ---------- 步进切换：只切当前激活环 ----------
         function stepSwitch(delta) {
             const ring = activeRing;
             const arr = RING_CONFIG[ring];
@@ -468,7 +459,6 @@
             updateLabel();
         }
 
-        // ---------- 强制复位所有项，防止卡在 opacity 0 ----------
         function resetItemsToHidden() {
             const items = containerEl.querySelectorAll('.menu-item');
             items.forEach(el => {
@@ -476,15 +466,13 @@
                 el.style.opacity = '0';
                 el.style.transform = 'scale(0.3)';
             });
-            void containerEl.offsetWidth;   // 强制 reflow
+            void containerEl.offsetWidth;
             items.forEach(el => {
                 el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
             });
         }
 
-        // ---------- 展开/收起 ----------
         function toggleMenu(open) {
-            // 清掉上一次没跑完的 timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
 
@@ -500,7 +488,6 @@
                 updateRingSelection('outer');
                 updateLabel();
 
-                // 先强制复位，防止卡在 0
                 resetItemsToHidden();
 
                 items.forEach(el => {
@@ -530,8 +517,6 @@
             }
         }
 
-        // ========== 事件绑定 ==========
-        // 点击加锁：350ms 内只响应一次，防连点乱翻
         let triggerLock = false;
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -547,7 +532,6 @@
             }
         });
 
-        // 滚轮：按指针位置决定切哪个环
         containerEl.addEventListener('wheel', function(e) {
             if (!isOpen) return;
             e.preventDefault();
@@ -562,7 +546,6 @@
             stepSwitch(e.deltaY);
         }, { passive: false });
 
-        // 禁用鼠标中键
         document.addEventListener('mousedown', function(e) {
             if (e.button === 1) {
                 e.preventDefault();
@@ -570,7 +553,6 @@
             }
         });
 
-        // 鼠标拖拽：按按下位置决定切哪个环
         let dragStartY = 0;
         containerEl.addEventListener('mousedown', function(e) {
             if (!isOpen) return;
@@ -600,7 +582,6 @@
             isDragging = false;
         });
 
-        // 触摸滑动：按触摸起点决定切哪个环
         let touchStartY = 0;
         containerEl.addEventListener('touchstart', function(e) {
             if (!isOpen) return;
@@ -629,7 +610,6 @@
             isDragging = false;
         }, { passive: true });
 
-        // 键盘：操作当前激活环
         document.addEventListener('keydown', function(e) {
             if (!isOpen) return;
             if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
@@ -650,10 +630,8 @@
             }
         });
 
-        // ========== 初始化 ==========
         function initMenu() {
             requestAnimationFrame(function() {
-                // 容器还没尺寸，等下一帧
                 if (!containerEl.offsetWidth) {
                     requestAnimationFrame(initMenu);
                     return;
@@ -663,12 +641,27 @@
             });
         }
 
-        // resize：不重建 DOM，只更新位置和高亮
+        // ★ 暴露给外部：让菜单重新计算位置（比如头部游戏栏开关后）
+        window.refreshArcMenu = function() {
+            requestAnimationFrame(function() {
+                updatePositions('inner');
+                updatePositions('outer');
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                if (isOpen) {
+                    switchToRingIndex('inner', ringState.inner.selected);
+                    switchToRingIndex('outer', ringState.outer.selected);
+                    updateRingSelection('inner');
+                    updateRingSelection('outer');
+                    updateLabel();
+                }
+            });
+        };
+
         let resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                // 清掉所有 pending timer，防止 resize 和展开动画打架
                 pendingTimers.forEach(function(t) { clearTimeout(t); });
                 pendingTimers = [];
 
@@ -679,17 +672,14 @@
                 updateLabel();
 
                 if (isOpen) {
-                    // 重新对齐选中项
                     switchToRingIndex('inner', ringState.inner.selected);
                     switchToRingIndex('outer', ringState.outer.selected);
                     updateRingSelection('inner');
                     updateRingSelection('outer');
                     updateLabel();
 
-                    // 强制复位 opacity，防止卡在 0
                     resetItemsToHidden();
 
-                    // 重新展开
                     const items = containerEl.querySelectorAll('.menu-item');
                     items.forEach(el => {
                         const ring = el.dataset.ring;
@@ -782,6 +772,7 @@
             }
         }
     });
+
     // ==================== 关闭按钮 ====================
     const closeBtn = document.querySelector('#dinoBar .close-btn');
     if (closeBtn) {
@@ -810,6 +801,13 @@
                         if (dinoGameChangeWidth) dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
                         startBtn.style.display = 'block';
                     }
+                    if (typeof updateSliderHeight === 'function') {
+                        updateSliderHeight();
+                    }
+                    // ★ 通知菜单重算位置
+                    if (typeof window.refreshArcMenu === 'function') {
+                        setTimeout(window.refreshArcMenu, 50);
+                    }
                 }
             });
         }, 500);
@@ -831,6 +829,14 @@
                     if (icon) icon.classList.remove('show');
                     if (iconGroup) iconGroup.classList.remove('move-up');
                     if (placeholder) placeholder.style.height = '50px';
+
+                    if (typeof updateSliderHeight === 'function') {
+                        updateSliderHeight();
+                    }
+                    // ★ 通知菜单重算位置
+                    if (typeof window.refreshArcMenu === 'function') {
+                        setTimeout(window.refreshArcMenu, 50);
+                    }
                 }
             });
         }, 500);
