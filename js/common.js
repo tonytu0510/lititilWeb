@@ -288,6 +288,7 @@
         let isOpen = false;
         let isDragging = false;
         let pendingTimers = [];
+        let animToken = 0;   // 动画令牌：每次切换 +1，旧动画回调看到 token 不对就退出
 
         const ringState = {
             inner: { selected: 0, offset: 0 },
@@ -459,20 +460,12 @@
             updateLabel();
         }
 
-        function resetItemsToHidden() {
-            const items = containerEl.querySelectorAll('.menu-item');
-            items.forEach(el => {
-                el.style.transition = 'none';
-                el.style.opacity = '0';
-                el.style.transform = 'scale(0.3)';
-            });
-            void containerEl.offsetWidth;
-            items.forEach(el => {
-                el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            });
-        }
-
         function toggleMenu(open) {
+            // 令牌 +1，旧动画全部作废
+            animToken++;
+            const myToken = animToken;
+
+            // 清掉所有 pending timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
 
@@ -481,6 +474,12 @@
             trigger.classList.toggle('active', open);
 
             const items = containerEl.querySelectorAll('.menu-item');
+
+            // 先清掉 transition
+            items.forEach(el => {
+                el.style.transition = 'none';
+            });
+
             if (open) {
                 switchToRingIndex('inner', ringState.inner.selected);
                 switchToRingIndex('outer', ringState.outer.selected);
@@ -488,12 +487,26 @@
                 updateRingSelection('outer');
                 updateLabel();
 
-                resetItemsToHidden();
+                // 起始态：全部透明、缩小
+                items.forEach(el => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'scale(0.3)';
+                });
 
+                // 强制 reflow
+                void containerEl.offsetWidth;
+
+                // 恢复 transition
+                items.forEach(el => {
+                    el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                });
+
+                // 排展开动画
                 items.forEach(el => {
                     const ring = el.dataset.ring;
                     const delay = RING_DELAY[ring] || 0;
                     const t = setTimeout(() => {
+                        if (myToken !== animToken) return;   // 被打断，退出
                         el.style.opacity = '1';
                         el.style.transform = 'scale(1)';
                     }, delay);
@@ -501,29 +514,29 @@
                 });
                 if (label) label.classList.add('show');
             } else {
+                // 收起：直接设成透明、缩小
                 items.forEach(el => {
-                    const ring = el.dataset.ring;
-                    const delay = ring === 'outer' ? 0 : 60;
-                    const t = setTimeout(() => {
-                        el.style.opacity = '0';
-                        el.style.transform = 'scale(0.3)';
-                    }, delay);
-                    pendingTimers.push(t);
+                    el.style.opacity = '0';
+                    el.style.transform = 'scale(0.3)';
                 });
+
+                // 恢复 transition（让收起有过渡）
+                void containerEl.offsetWidth;
+                items.forEach(el => {
+                    el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                });
+
                 const t = setTimeout(() => {
+                    if (myToken !== animToken) return;   // 被打断，退出
                     if (!isOpen && label) label.classList.remove('show');
                 }, 300);
                 pendingTimers.push(t);
             }
         }
 
-        let triggerLock = false;
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
-            if (triggerLock) return;
-            triggerLock = true;
             toggleMenu(!isOpen);
-            setTimeout(function() { triggerLock = false; }, 350);
         });
 
         document.addEventListener('click', function(e) {
@@ -641,7 +654,7 @@
             });
         }
 
-        // ★ 暴露给外部：让菜单重新计算位置（比如头部游戏栏开关后）
+        // 暴露给外部：让菜单重新计算位置（比如头部游戏栏开关后）
         window.refreshArcMenu = function() {
             requestAnimationFrame(function() {
                 updatePositions('inner');
@@ -662,34 +675,16 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                pendingTimers.forEach(function(t) { clearTimeout(t); });
-                pendingTimers = [];
-
-                updatePositions('inner');
-                updatePositions('outer');
-                updateRingSelection('inner');
-                updateRingSelection('outer');
-                updateLabel();
-
                 if (isOpen) {
-                    switchToRingIndex('inner', ringState.inner.selected);
-                    switchToRingIndex('outer', ringState.outer.selected);
+                    // 展开状态：直接走一遍完整的展开流程（内部会复位、重排）
+                    toggleMenu(true);
+                } else {
+                    // 收起状态：只更新位置
+                    updatePositions('inner');
+                    updatePositions('outer');
                     updateRingSelection('inner');
                     updateRingSelection('outer');
                     updateLabel();
-
-                    resetItemsToHidden();
-
-                    const items = containerEl.querySelectorAll('.menu-item');
-                    items.forEach(el => {
-                        const ring = el.dataset.ring;
-                        const delay = RING_DELAY[ring] || 0;
-                        const t = setTimeout(() => {
-                            el.style.opacity = '1';
-                            el.style.transform = 'scale(1)';
-                        }, delay);
-                        pendingTimers.push(t);
-                    });
                 }
             }, 300);
         });
@@ -804,7 +799,6 @@
                     if (typeof updateSliderHeight === 'function') {
                         updateSliderHeight();
                     }
-                    // ★ 通知菜单重算位置
                     if (typeof window.refreshArcMenu === 'function') {
                         setTimeout(window.refreshArcMenu, 50);
                     }
@@ -833,7 +827,6 @@
                     if (typeof updateSliderHeight === 'function') {
                         updateSliderHeight();
                     }
-                    // ★ 通知菜单重算位置
                     if (typeof window.refreshArcMenu === 'function') {
                         setTimeout(window.refreshArcMenu, 50);
                     }
