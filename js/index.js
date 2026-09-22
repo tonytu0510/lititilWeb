@@ -4,19 +4,6 @@ let current = 0, indexTime = 10000, otherTime = 4200, time = indexTime;
     let TimeOutTimer = null, H5Scal = null, radioY = null, H5PrintFont = null;
     const canvas1 = document.getElementById('canvas1');
 
-    function callUpdateSliderHeight() {
-        if (typeof updateSliderHeight === 'function') {
-            updateSliderHeight();
-        }
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', callUpdateSliderHeight);
-    } else {
-        callUpdateSliderHeight();
-    }
-    // 再兜一层：load 之后如果还没调过，再试一次
-    window.addEventListener('load', callUpdateSliderHeight);
-
     function showSlide(n) {
         slides.forEach(s => s.classList.remove('active'));
         dots.forEach(d => d.classList.remove('active'));
@@ -187,3 +174,18 @@ let current = 0, indexTime = 10000, otherTime = 4200, time = indexTime;
     function waitForDomStable(el, cb, to = 300) { let t = null; const ob = new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }); ob.observe(el, {childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']}); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }
     function redrawAllCanvas() { waitForDomStable(slider, function () { resizeCanvas(); }, 400); }
     window.addEventListener('resize', () => { redrawAllCanvas(); });
+    //记载banner自适应屏幕
+    function callUpdateSliderHeight() {
+        if (typeof updateSliderHeight === 'function') {
+            updateSliderHeight();
+        }
+    }
+    if (document.readyState === 'loading') {
+        console.log('08')
+        document.addEventListener('DOMContentLoaded', callUpdateSliderHeight);
+    } else {
+        console.log('09')
+        callUpdateSliderHeight();
+    }
+    // 再兜一层：load 之后如果还没调过，再试一次
+    window.addEventListener('load', callUpdateSliderHeight);
