@@ -353,6 +353,11 @@
 
         // ---------- 构建菜单 ----------
         function buildMenu() {
+            // 容器尺寸还没出来，先不建，等下一帧
+            if (!containerEl.offsetWidth) {
+                requestAnimationFrame(buildMenu);
+                return;
+            }
             containerEl.querySelectorAll('.menu-item').forEach(el => el.remove());
 
             const currentPath = location.pathname.split('/').pop() || 'index.html';
@@ -625,8 +630,15 @@
 
         // ========== 初始化 ==========
         function initMenu() {
-            buildMenu();
-            toggleMenu(false);
+            requestAnimationFrame(function() {
+                // 容器还没有尺寸（比如页面刚跳转、布局没稳定），等下一帧再试
+                if (!containerEl.offsetWidth) {
+                    requestAnimationFrame(initMenu);
+                    return;
+                }
+                buildMenu();
+                toggleMenu(false);
+            });
         }
 
         // resize：不重建 DOM，只更新位置和高亮
