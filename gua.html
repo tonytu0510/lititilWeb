@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "六十四卦 · 摇签"
+    window.PAGE_META.cssFront = ["./css/wordplay.css"]
+  </script>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class="wrap">
+
+    <div class="tag">传统文化 · 娱乐游戏</div>
+
+    <h1>
+      六十四卦<br>
+      <span class="hl">摇一签 · 看现在 · 看将来</span>
+    </h1>
+
+    <p class="sub">
+      一筒 64 签，每签一卦。<br>
+      签不重复，抽满 64 次自动重置。<br>
+      仅供娱乐，切勿当真。
+    </p>
+
+    <div class="section-title">摇签</div>
+
+    <style>
+      /* 摇签舞台 */
+      .gua-stage {
+        position: relative;
+        height: 420px;
+        margin: 24px 0;
+        border-radius: 14px;
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse at 50% 120%, rgba(80,60,40,0.35), transparent 60%),
+          radial-gradient(ellipse at 50% -20%, rgba(60,50,80,0.25), transparent 55%),
+          linear-gradient(180deg, #14141a 0%, #1a1a22 60%, #23232d 100%);
+        border: 1px solid #2c2c36;
+        box-shadow: inset 0 0 80px rgba(0,0,0,0.5);
+      }
+      /* 地面线 */
+      .gua-stage::after {
+        content: '';
+        position: absolute;
+        left: 0; right: 0; bottom: 70px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(180,160,120,0.25), transparent);
+      }
+      /* 签筒 */
+      .gua-tube {
+        position: absolute;
+        left: 50%;
+        bottom: 70px;
+        transform: translateX(-50%);
+        width: 96px;
+        height: 160px;
+        cursor: pointer;
+        transform-origin: bottom center;
+        transition: transform 0.12s ease-out;
+        filter: drop-shadow(0 12px 18px rgba(0,0,0,0.55));
+      }
+      .gua-tube-body {
+        position: absolute;
+        left: 8px; right: 8px;
+        top: 12px; bottom: 0;
+        background:
+          linear-gradient(90deg,
+            #3a2414 0%, #6b4522 12%, #8a5a2a 30%,
+            #a06a32 50%, #8a5a2a 70%, #6b4522 88%, #3a2414 100%);
+        border-radius: 6px 6px 14px 14px;
+        border: 1px solid #2a1808;
+        box-shadow:
+          inset 0 -14px 22px rgba(0,0,0,0.45),
+          inset 0 6px 10px rgba(255,220,160,0.08);
+      }
+      /* 筒口椭圆 */
+      .gua-tube-mouth {
+        position: absolute;
+        left: 6px; right: 6px;
+        top: 6px;
+        height: 18px;
+        border-radius: 50%;
+        background:
+          radial-gradient(ellipse at center, #1a0e04 0%, #2a1808 70%, #3a2414 100%);
+        border: 1px solid #2a1808;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+      }
+      /* 筒身刻字 */
+      .gua-tube-label {
+        position: absolute;
+        left: 50%; top: 78px;
+        transform: translateX(-50%);
+        font-family: 'KaiTi', 'STKaiti', serif;
+        font-size: 18px;
+        color: #d8b878;
+        letter-spacing: 4px;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.6), 0 0 8px rgba(200,160,90,0.25);
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        pointer-events: none;
+      }
+      .gua-tube-band {
+        position: absolute;
+        left: 8px; right: 8px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(200,160,90,0.4), transparent);
+        pointer-events: none;
+      }
+      /* 筒里露出的签头 */
+      .gua-sticks {
+        position: absolute;
+        left: 10px; right: 10px;
+        top: -22px;
+        height: 40px;
+        pointer-events: none;
+      }
+      .gua-stick-head {
+        position: absolute;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #efe0b8 0%, #d4b878 60%, #a8863f 100%);
+        border-radius: 2px 2px 0 0;
+        box-shadow: 0 0 1px rgba(0,0,0,0.4);
+      }
+      /* 掉落的签 */
+      .gua-falling {
+        position: absolute;
+        width: 36px;
+        height: 200px;
+        opacity: 0;
+        pointer-events: none;
+        transform-origin: center center;
+        will-change: transform, left, bottom;
+        z-index: 5;
+      }
+      .gua-falling-stick {
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #f0e2ba 0%, #d8bc80 30%, #b08840 70%, #8a6428 100%);
+        border: 1px solid #6a4a20;
+        box-shadow:
+          inset 2px 0 4px rgba(255,255,255,0.35),
+          inset -2px 0 4px rgba(0,0,0,0.35);
+        overflow: hidden;
+      }
+      .gua-falling-stick::before {
+        content: '';
+        position: absolute;
+        left: 50%; top: 0; bottom: 0;
+        width: 1px;
+        background: rgba(90,60,20,0.25);
+        transform: translateX(-50%);
+      }
+      .gua-falling-head {
+        position: absolute;
+        left: 3px; right: 3px;
+        top: 6px;
+        height: 22px;
+        border-radius: 12px 12px 6px 6px;
+        background: linear-gradient(180deg, #b33028 0%, #8a1a18 100%);
+        box-shadow: inset 0 2px 4px rgba(255,180,160,0.35);
+      }
+      .gua-falling-head::after {
+        content: '';
+        position: absolute;
+        left: 50%; top: 50%;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: rgba(255,220,180,0.5);
+        transform: translate(-50%, -50%);
+      }
+      /* 结果牌 */
+      .gua-card {
+        position: absolute;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%) translateY(20px) scale(0.85);
+        opacity: 0;
+        width: 88%;
+        max-width: 560px;
+        background:
+          linear-gradient(180deg, #24242e 0%, #1c1c24 100%);
+        border: 1px solid #3a3a46;
+        border-radius: 12px;
+        padding: 20px 22px;
+        transition: all 0.45s cubic-bezier(0.34, 1.4, 0.5, 1);
+        pointer-events: none;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        z-index: 10;
+      }
+      .gua-card.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+        pointer-events: auto;
+      }
+      .gua-card-name {
+        font-size: 20px;
+        color: #7cb8b8;
+        text-align: center;
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+        font-family: 'KaiTi', 'STKaiti', serif;
+      }
+      .gua-card-sym {
+        font-size: 52px;
+        color: #f0d878;
+        text-align: center;
+        margin-bottom: 6px;
+        line-height: 1;
+        text-shadow: 0 0 20px rgba(240,216,120,0.3);
+      }
+      .gua-card-lines {
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: #9eb0b8;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        white-space: pre;
+        letter-spacing: 1px;
+      }
+      .gua-card-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #3a3a46, transparent);
+        margin: 12px 0;
+      }
+      .gua-card-now,
+      .gua-card-future {
+        text-align: center;
+        font-size: 15px;
+        letter-spacing: 1px;
+        line-height: 1.8;
+      }
+      .gua-card-now { color: #9ccc9c; }
+      .gua-card-future { color: #e8a0a0; }
+      .gua-card-foot {
+        text-align: center;
+        color: #555;
+        font-size: 11px;
+        margin-top: 10px;
+        letter-spacing: 1px;
+      }
+      /* 按钮 */
+      .gua-btn-row {
+        text-align: center;
+        margin: 16px 0;
+      }
+      .gua-btn {
+        background: linear-gradient(180deg, #7cb8b8 0%, #5a9a9a 100%);
+        color: #0d0d0d;
+        border: none;
+        padding: 14px 44px;
+        border-radius: 10px;
+        font-size: 17px;
+        font-family: inherit;
+        letter-spacing: 3px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 6px 18px rgba(124,184,184,0.25);
+      }
+      .gua-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(124,184,184,0.35); }
+      .gua-btn:active { transform: translateY(1px); }
+      .gua-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+      .gua-btn-ghost {
+        background: transparent;
+        color: #aaa;
+        border: 1px solid #444;
+        box-shadow: none;
+        padding: 14px 22px;
+        font-size: 13px;
+        letter-spacing: 1px;
+        margin-left: 12px;
+      }
+      .gua-btn-ghost:hover { background: #2a2a2a; box-shadow: none; }
+      .gua-progress {
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+      }
+    </style>
+
+    <div class="gua-stage" id="guaStage">
+      <!-- 签筒 -->
+      <div class="gua-tube" id="guaTube">
+        <div class="gua-sticks" id="guaSticks"></div>
+        <div class="gua-tube-body"></div>
+        <div class="gua-tube-mouth"></div>
+        <div class="gua-tube-band" style="top:44px;"></div>
+        <div class="gua-tube-band" style="top:118px;"></div>
+        <div class="gua-tube-label">卦</div>
+      </div>
+
+      <!-- 掉落的签 -->
+      <div class="gua-falling" id="guaFalling">
+        <div class="gua-falling-stick">
+          <div class="gua-falling-head"></div>
+        </div>
+      </div>
+
+      <!-- 结果牌 -->
+      <div class="gua-card" id="guaCard">
+        <div class="gua-card-name" id="gcName"></div>
+        <div class="gua-card-sym" id="gcSym"></div>
+        <div class="gua-card-lines" id="gcLines"></div>
+        <div class="gua-card-divider"></div>
+        <div class="gua-card-now" id="gcNow"></div>
+        <div class="gua-card-future" id="gcFuture"></div>
+        <div class="gua-card-foot">仅供娱乐 · 切勿当真</div>
+      </div>
+    </div>
+
+    <div class="gua-btn-row">
+      <button class="gua-btn" id="guaBtnDraw">算 一 卦</button>
+      <button class="gua-btn gua-btn-ghost" id="guaBtnReset">重置签筒</button>
+    </div>
+
+    <div class="gua-progress" id="guaProgress">已抽 0 / 64</div>
+
+    <div class="section-title">规则说明</div>
+
+    <div class="grid">
+      <div class="card">
+        <h3><span class="dot gold"></span>怎么摇</h3>
+        <ul>
+          <li>点「算一卦」或点签筒</li>
+          <li>签筒自己抖，签自己掉出来</li>
+          <li>落地后翻出卦牌</li>
+          <li>同一个卦不重复抽</li>
+          <li>抽满 64 次自动重置</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot green"></span>怎么看</h3>
+        <ul>
+          <li>六爻从下往上</li>
+          <li>下三爻 = 现在</li>
+          <li>上三爻 = 将来</li>
+          <li>阳爻 ━━━ = 1</li>
+          <li>阴爻 ━ ━ = 0</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot red"></span>破除迷信</h3>
+        <ul>
+          <li>每次抽，都是随机的</li>
+          <li>64 签，抽完才重置</li>
+          <li>抽几次就知道：结果不固定</li>
+          <li>命不是算出来的</li>
+          <li>仅供娱乐，切勿当真</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="end">
+      <p>
+        <span class="gold">一 = 丨 = 空 = 0</span><br>
+        拆字 · 偏 · 归 · 成句
+      </p>
+      <div class="foot">仅供娱乐 · 切勿当真</div>
+    </div>
+
+  </div>
+    `
+  </script>
+  <script>
+    // ==================== 64 卦数据 ====================
+    const GUA = [
+      { n: 1,  name: '乾',   sym: '䷀', lines: [1,1,1,1,1,1] },
+      { n: 2,  name: '坤',   sym: '䷁', lines: [0,0,0,0,0,0] },
+      { n: 3,  name: '屯',   sym: '䷂', lines: [1,0,0,0,1,0] },
+      { n: 4,  name: '蒙',   sym: '䷃', lines: [0,1,0,0,0,1] },
+      { n: 5,  name: '需',   sym: '䷄', lines: [1,1,1,0,1,0] },
+      { n: 6,  name: '讼',   sym: '䷅', lines: [0,1,0,1,1,1] },
+      { n: 7,  name: '师',   sym: '䷆', lines: [0,1,0,0,0,0] },
+      { n: 8,  name: '比',   sym: '䷇', lines: [0,0,0,0,1,0] },
+      { n: 9,  name: '小畜', sym: '䷈', lines: [1,1,1,0,1,1] },
+      { n: 10, name: '履',   sym: '䷉', lines: [1,1,0,1,1,1] },
+      { n: 11, name: '泰',   sym: '䷊', lines: [1,1,1,0,0,0] },
+      { n: 12, name: '否',   sym: '䷋', lines: [0,0,0,1,1,1] },
+      { n: 13, name: '同人', sym: '䷌', lines: [1,0,1,1,1,1] },
+      { n: 14, name: '大有', sym: '䷍', lines: [1,1,1,1,0,1] },
+      { n: 15, name: '谦',   sym: '䷎', lines: [0,0,1,0,0,0] },
+      { n: 16, name: '豫',   sym: '䷏', lines: [0,0,0,1,0,0] },
+      { n: 17, name: '随',   sym: '䷐', lines: [1,0,0,1,1,0] },
+      { n: 18, name: '蛊',   sym: '䷑', lines: [0,1,1,0,0,1] },
+      { n: 19, name: '临',   sym: '䷒', lines: [1,1,0,0,0,0] },
+      { n: 20, name: '观',   sym: '䷓', lines: [0,0,0,0,1,1] },
+      { n: 21, name: '噬嗑', sym: '䷔', lines: [1,0,0,1,0,1] },
+      { n: 22, name: '贲',   sym: '䷕', lines: [1,0,1,0,0,1] },
+      { n: 23, name: '剥',   sym: '䷖', lines: [0,0,0,0,0,1] },
+      { n: 24, name: '复',   sym: '䷗', lines: [1,0,0,0,0,0] },
+      { n: 25, name: '无妄', sym: '䷘', lines: [1,0,0,1,1,1] },
+      { n: 26, name: '大畜', sym: '䷙', lines: [1,1,1,0,0,1] },
+      { n: 27, name: '颐',   sym: '䷚', lines: [1,0,0,0,0,1] },
+      { n: 28, name: '大过', sym: '䷛', lines: [0,1,1,1,1,0] },
+      { n: 29, name: '坎',   sym: '䷜', lines: [0,1,0,0,1,0] },
+      { n: 30, name: '离',   sym: '䷝', lines: [1,0,1,1,0,1] },
+      { n: 31, name: '咸',   sym: '䷞', lines: [0,0,1,1,1,0] },
+      { n: 32, name: '恒',   sym: '䷟', lines: [0,1,1,1,0,0] },
+      { n: 33, name: '遁',   sym: '䷠', lines: [0,0,1,1,1,1] },
+      { n: 34, name: '大壮', sym: '䷡', lines: [1,1,1,1,0,0] },
+      { n: 35, name: '晋',   sym: '䷢', lines: [0,0,0,1,0,1] },
+      { n: 36, name: '明夷', sym: '䷣', lines: [1,0,1,0,0,0] },
+      { n: 37, name: '家人', sym: '䷤', lines: [1,0,1,0,1,1] },
+      { n: 38, name: '睽',   sym: '䷥', lines: [1,1,0,1,0,1] },
+      { n: 39, name: '蹇',   sym: '䷦', lines: [0,0,1,0,1,0] },
+      { n: 40, name: '解',   sym: '䷧', lines: [0,1,0,1,1,0] },
+      { n: 41, name: '损',   sym: '䷨', lines: [1,1,0,0,0,1] },
+      { n: 42, name: '益',   sym: '䷩', lines: [1,0,0,0,1,1] },
+      { n: 43, name: '夬',   sym: '䷪', lines: [1,1,1,1,1,0] },
+      { n: 44, name: '姤',   sym: '䷫', lines: [0,1,1,1,1,1] },
+      { n: 45, name: '萃',   sym: '䷬', lines: [0,0,0,1,1,0] },
+      { n: 46, name: '升',   sym: '䷭', lines: [1,1,0,0,1,0] },
+      { n: 47, name: '困',   sym: '䷮', lines: [0,1,0,1,1,0] },
+      { n: 48, name: '井',   sym: '䷯', lines: [0,1,1,0,1,0] },
+      { n: 49, name: '革',   sym: '䷰', lines: [1,0,1,1,1,0] },
+      { n: 50, name: '鼎',   sym: '䷱', lines: [0,1,1,1,0,1] },
+      { n: 51, name: '震',   sym: '䷲', lines: [1,0,0,1,0,0] },
+      { n: 52, name: '艮',   sym: '䷳', lines: [0,0,1,0,0,1] },
+      { n: 53, name: '渐',   sym: '䷴', lines: [0,0,1,0,1,1] },
+      { n: 54, name: '归妹', sym: '䷵', lines: [1,1,0,1,0,0] },
+      { n: 55, name: '丰',   sym: '䷶', lines: [1,0,1,1,0,0] },
+      { n: 56, name: '旅',   sym: '䷷', lines: [0,0,1,1,0,1] },
+      { n: 57, name: '巽',   sym: '䷸', lines: [0,1,1,0,1,1] },
+      { n: 58, name: '兑',   sym: '䷹', lines: [1,1,0,1,1,0] },
+      { n: 59, name: '涣',   sym: '䷺', lines: [0,1,0,0,1,1] },
+      { n: 60, name: '节',   sym: '䷻', lines: [1,1,0,0,1,0] },
+      { n: 61, name: '中孚', sym: '䷼', lines: [1,1,0,0,1,1] },
+      { n: 62, name: '小过', sym: '䷽', lines: [0,0,1,1,0,0] },
+      { n: 63, name: '既济', sym: '䷾', lines: [1,0,1,0,1,0] },
+      { n: 64, name: '未济', sym: '䷿', lines: [0,1,0,1,0,1] },
+    ];
+
+    const NOW_TEXT = {
+      '000': '在等 · 静观其变',
+      '001': '在起步 · 刚有苗头',
+      '010': '在犹豫 · 进退两难',
+      '011': '在推进 · 稳步向前',
+      '100': '在收尾 · 准备交棒',
+      '101': '在调整 · 方向微调',
+      '110': '在冲刺 · 加把劲',
+      '111': '在顶点 · 如日中天',
+    };
+
+    const FUTURE_TEXT = {
+      '000': '归于沉寂 · 守成',
+      '001': '慢慢起来 · 蓄势',
+      '010': '先有波折 · 后顺',
+      '011': '渐入佳境 · 可期',
+      '100': '由盛转平 · 收敛',
+      '101': '反复来回 · 波动',
+      '110': '再上一层 · 突破',
+      '111': '走向高峰 · 极盛',
+    };
+
+    const STORAGE_KEY = 'guaDrawnPool';
+
+    function getDrawn() {
+      try {
+        const s = localStorage.getItem(STORAGE_KEY);
+        if (!s) return [];
+        const arr = JSON.parse(s);
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
+    }
+    function setDrawn(arr) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch (e) {}
+    }
+
+    // 签筒里露出的小签
+    function buildSticks() {
+      const wrap = document.getElementById('guaSticks');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const s = document.createElement('div');
+        s.className = 'gua-stick-head';
+        s.style.left = (i * 8) + 'px';
+        s.style.height = (24 + Math.random() * 12) + 'px';
+        s.style.transform = 'rotate(' + (-6 + Math.random() * 12) + 'deg)';
+        s.style.transformOrigin = 'bottom center';
+        wrap.appendChild(s);
+      }
+    }
+
+    let isAnimating = false;
+
+    // 弹簧缓动（用于抖筒）
+    function springShake(el, duration, cb) {
+      const start = performance.now();
+      function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        // 衰减正弦
+        const damp = Math.pow(1 - t, 1.5);
+        const angle = Math.sin(t * Math.PI * 10) * 5 * damp;
+        el.style.transform = 'translateX(-50%) rotate(' + angle + 'deg)';
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.style.transform = 'translateX(-50%) rotate(0deg)';
+          if (cb) cb();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    function drawOne() {
+      if (isAnimating) return;
+
+      let drawn = getDrawn();
+      if (drawn.length >= 64) { drawn = []; setDrawn(drawn); }
+      const pool = GUA.filter(g => drawn.indexOf(g.n) === -1);
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+
+      isAnimating = true;
+
+      // 收起旧结果牌
+      const card = document.getElementById('guaCard');
+      card.classList.remove('show');
+
+      const tube = document.getElementById('guaTube');
+      const falling = document.getElementById('guaFalling');
+      const stage = document.getElementById('guaStage');
+      const stageW = stage.offsetWidth;
+      const stageH = stage.offsetHeight;
+
+      // 抖筒 0.7s，然后弹签
+      springShake(tube, 700, function() {
+        launchStick();
+      });
+
+      function launchStick() {
+        // 签起始位置：筒口
+        const startX = stageW / 2 - 18;
+        const startBottom = 70 + 160 - 30;  // 筒底70 + 筒高160 - 少量
+
+        falling.style.transition = 'none';
+        falling.style.left = startX + 'px';
+        falling.style.bottom = startBottom + 'px';
+        falling.style.opacity = '1';
+        falling.style.transform = 'rotate(0deg)';
+
+        // 抛物线终点：随机左右
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        const targetX = startX + direction * (100 + Math.random() * 80);
+        const targetBottom = 70 + 8;
+
+        const duration = 750;
+        const startTime = performance.now();
+
+        function step(now) {
+          const t = Math.min((now - startTime) / duration, 1);
+          const ease = t * t;
+          const x = startX + (targetX - startX) * t;
+          // 垂直：先上抛再落下（用 -sin 补一段上升）
+          const arc = Math.sin(t * Math.PI) * 30;
+          const bottom = startBottom + (targetBottom - startBottom) * ease + arc;
+          // 旋转
+          const rot = direction * t * 110;
+
+          falling.style.left = x + 'px';
+          falling.style.bottom = bottom + 'px';
+          falling.style.transform = 'rotate(' + rot + 'deg)';
+
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            // 落地
+            settleStick(picked, falling, stageW, stageH);
+          }
+        }
+        requestAnimationFrame(step);
+      }
+    }
+
+    function settleStick(g, falling, stageW, stageH) {
+      // 落地后，签停留一下，然后淡出，同时结果牌升起
+      setTimeout(function() {
+        // 显示结果牌
+        showCard(g);
+
+        // 签淡出
+        falling.style.transition = 'opacity 0.5s ease';
+        falling.style.opacity = '0';
+
+        setTimeout(function() {
+          isAnimating = false;
+        }, 500);
+      }, 350);
+    }
+
+    function showCard(g) {
+      const lines = g.lines;
+      let symbolText = '';
+      for (let i = lines.length - 1; i >= 0; i--) {
+        symbolText += (lines[i] === 1 ? '━━━━━━━' : '━━━ ━ ━') + '\n';
+      }
+      const nowKey = '' + lines[0] + lines[1] + lines[2];
+      const futureKey = '' + lines[3] + lines[4] + lines[5];
+
+      document.getElementById('gcName').textContent = '第 ' + g.n + ' 卦 · ' + g.name;
+      document.getElementById('gcSym').textContent = g.sym;
+      document.getElementById('gcLines').textContent = symbolText;
+      document.getElementById('gcNow').textContent = '现在：' + (NOW_TEXT[nowKey] || '—');
+      document.getElementById('gcFuture').textContent = '将来：' + (FUTURE_TEXT[futureKey] || '—');
+
+      const card = document.getElementById('guaCard');
+      requestAnimationFrame(function() {
+        card.classList.add('show');
+      });
+
+      const drawn = getDrawn();
+      drawn.push(g.n);
+      setDrawn(drawn);
+      document.getElementById('guaProgress').textContent = '已抽 ' + drawn.length + ' / 64';
+    }
+
+    function resetAll() {
+      setDrawn([]);
+      document.getElementById('guaProgress').textContent = '已抽 0 / 64';
+      const card = document.getElementById('guaCard');
+      card.classList.remove('show');
+      const falling = document.getElementById('guaFalling');
+      falling.style.opacity = '0';
+    }
+
+    function bind() {
+      const btnDraw = document.getElementById('guaBtnDraw');
+      const btnReset = document.getElementById('guaBtnReset');
+      const tube = document.getElementById('guaTube');
+      if (!btnDraw || !btnReset || !tube) {
+        requestAnimationFrame(bind);
+        return;
+      }
+      buildSticks();
+      btnDraw.addEventListener('click', drawOne);
+      btnReset.addEventListener('click', resetAll);
+      tube.addEventListener('click', drawOne);
+
+      const drawn = getDrawn();
+      document.getElementById('guaProgress').textContent = '已抽 ' + drawn.length + ' / 64';
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bind);
+    } else {
+      bind();
+    }
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
+</body>
+</html>

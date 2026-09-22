@@ -72,7 +72,8 @@
             { name: '读呼吸',   href: 'BreathBetweenWords.html' },
             { name: '想法',     href: 'idea.html' },
             { name: '关于我',   href: 'aboutMe.html' },
-            { name: '灵感来源', href: 'renming.html' }
+            { name: '灵感来源', href: 'renming.html' },
+            { name: '六十四卦', href: 'gua.html' }
         ]
     };
 
