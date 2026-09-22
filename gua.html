@@ -12,7 +12,7 @@
     `
     <div class="wrap">
 
-    <div class="tag">传统文化 · 娱乐游戏</div>
+    <div class="tag">传统文化 · 娱乐游戏 · 数学</div>
 
     <h1>
       六十四卦<br>
@@ -22,7 +22,7 @@
     <p class="sub">
       一筒 64 签，每签一卦。<br>
       签不重复，抽满 64 次自动重置。<br>
-      仅供娱乐，切勿当真。
+      <span style="color:#e88;">本页是数学游戏，不是算命。看完下面的推导你就懂了。</span>
     </p>
 
     <div class="section-title">摇签</div>
@@ -42,7 +42,6 @@
         border: 1px solid #2c2c36;
         box-shadow: inset 0 0 80px rgba(0,0,0,0.5);
       }
-      /* 地面线 */
       .gua-stage::after {
         content: '';
         position: absolute;
@@ -50,7 +49,6 @@
         height: 1px;
         background: linear-gradient(90deg, transparent, rgba(180,160,120,0.25), transparent);
       }
-      /* 签筒 */
       .gua-tube {
         position: absolute;
         left: 50%;
@@ -77,7 +75,6 @@
           inset 0 -14px 22px rgba(0,0,0,0.45),
           inset 0 6px 10px rgba(255,220,160,0.08);
       }
-      /* 筒口椭圆 */
       .gua-tube-mouth {
         position: absolute;
         left: 6px; right: 6px;
@@ -89,7 +86,6 @@
         border: 1px solid #2a1808;
         box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
       }
-      /* 筒身刻字 */
       .gua-tube-label {
         position: absolute;
         left: 50%; top: 78px;
@@ -110,7 +106,6 @@
         background: linear-gradient(90deg, transparent, rgba(200,160,90,0.4), transparent);
         pointer-events: none;
       }
-      /* 筒里露出的签头 */
       .gua-sticks {
         position: absolute;
         left: 10px; right: 10px;
@@ -126,7 +121,6 @@
         border-radius: 2px 2px 0 0;
         box-shadow: 0 0 1px rgba(0,0,0,0.4);
       }
-      /* 掉落的签 */
       .gua-falling {
         position: absolute;
         width: 36px;
@@ -174,7 +168,6 @@
         background: rgba(255,220,180,0.5);
         transform: translate(-50%, -50%);
       }
-      /* 结果牌 */
       .gua-card {
         position: absolute;
         left: 50%;
@@ -245,7 +238,6 @@
         margin-top: 10px;
         letter-spacing: 1px;
       }
-      /* 按钮 */
       .gua-btn-row {
         text-align: center;
         margin: 16px 0;
@@ -287,7 +279,6 @@
     </style>
 
     <div class="gua-stage" id="guaStage">
-      <!-- 签筒 -->
       <div class="gua-tube" id="guaTube">
         <div class="gua-sticks" id="guaSticks"></div>
         <div class="gua-tube-body"></div>
@@ -297,14 +288,12 @@
         <div class="gua-tube-label">卦</div>
       </div>
 
-      <!-- 掉落的签 -->
       <div class="gua-falling" id="guaFalling">
         <div class="gua-falling-stick">
           <div class="gua-falling-head"></div>
         </div>
       </div>
 
-      <!-- 结果牌 -->
       <div class="gua-card" id="guaCard">
         <div class="gua-card-name" id="gcName"></div>
         <div class="gua-card-sym" id="gcSym"></div>
@@ -322,6 +311,41 @@
     </div>
 
     <div class="gua-progress" id="guaProgress">已抽 0 / 64</div>
+
+    <div class="section-title">这东西怎么来的</div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+      <h3><span class="dot blue"></span>推导过程（看完你就不会信了）</h3>
+      <ul>
+        <li>第一步：64 卦，每卦 6 条线</li>
+        <li>第二步：阳爻 = 1，阴爻 = 0</li>
+        <li>第三步：6 位二进制，2⁶ = 64，正好对应 64 卦</li>
+        <li>第四步：数阳爻个数，0~6</li>
+        <li>第五步：0 个阳 = 坤，6 个阳 = 乾，中间按个数分</li>
+        <li>第六步：下三爻 = 现在，上三爻 = 将来</li>
+        <li>第七步：3 位二进制 = 8 种，8 × 8 = 64，正好对满</li>
+        <li>第八步：卦名、卦象、现在、将来，都是这么算出来的</li>
+        <li>第九步：摇签是随机的，每次不一样</li>
+        <li>第十步：摇三五次，你自己就发现——没规律</li>
+        <li><b>结论：这是一道数学题，不是天命。</b></li>
+        <li><b>命在自己手里，不在签上。</b></li>
+      </ul>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1; margin-top: 16px;">
+      <h3><span class="dot red"></span>所以，别信</h3>
+      <ul>
+        <li>摇到「乾」，不代表你飞黄腾达</li>
+        <li>摇到「坤」，不代表你一事无成</li>
+        <li>摇到「复」，不代表你要转运</li>
+        <li>它只是 6 个二进制位，碰巧凑成了这个卦</li>
+        <li>换一次摇，结果就变</li>
+        <li>再摇一次，又变</li>
+        <li>变来变去，说明它本来就不固定</li>
+        <li><b>真正固定的，是你自己怎么选、怎么做。</b></li>
+        <li><b>卦是死的，人是活的。</b></li>
+      </ul>
+    </div>
 
     <div class="section-title">规则说明</div>
 
@@ -474,7 +498,6 @@
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch (e) {}
     }
 
-    // 签筒里露出的小签
     function buildSticks() {
       const wrap = document.getElementById('guaSticks');
       if (!wrap) return;
@@ -492,12 +515,10 @@
 
     let isAnimating = false;
 
-    // 弹簧缓动（用于抖筒）
     function springShake(el, duration, cb) {
       const start = performance.now();
       function step(now) {
         const t = Math.min((now - start) / duration, 1);
-        // 衰减正弦
         const damp = Math.pow(1 - t, 1.5);
         const angle = Math.sin(t * Math.PI * 10) * 5 * damp;
         el.style.transform = 'translateX(-50%) rotate(' + angle + 'deg)';
@@ -521,75 +542,63 @@
 
       isAnimating = true;
 
-      // 收起旧结果牌
       const card = document.getElementById('guaCard');
       card.classList.remove('show');
 
       const tube = document.getElementById('guaTube');
+
+      springShake(tube, 700, function() {
+        launchStick(picked);
+      });
+    }
+
+    function launchStick(picked) {
       const falling = document.getElementById('guaFalling');
       const stage = document.getElementById('guaStage');
       const stageW = stage.offsetWidth;
-      const stageH = stage.offsetHeight;
 
-      // 抖筒 0.7s，然后弹签
-      springShake(tube, 700, function() {
-        launchStick();
-      });
+      const startX = stageW / 2 - 18;
+      const startBottom = 70 + 160 - 30;
 
-      function launchStick() {
-        // 签起始位置：筒口
-        const startX = stageW / 2 - 18;
-        const startBottom = 70 + 160 - 30;  // 筒底70 + 筒高160 - 少量
+      falling.style.transition = 'none';
+      falling.style.left = startX + 'px';
+      falling.style.bottom = startBottom + 'px';
+      falling.style.opacity = '1';
+      falling.style.transform = 'rotate(0deg)';
 
-        falling.style.transition = 'none';
-        falling.style.left = startX + 'px';
-        falling.style.bottom = startBottom + 'px';
-        falling.style.opacity = '1';
-        falling.style.transform = 'rotate(0deg)';
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      const targetX = startX + direction * (100 + Math.random() * 80);
+      const targetBottom = 70 + 8;
 
-        // 抛物线终点：随机左右
-        const direction = Math.random() > 0.5 ? 1 : -1;
-        const targetX = startX + direction * (100 + Math.random() * 80);
-        const targetBottom = 70 + 8;
+      const duration = 750;
+      const startTime = performance.now();
 
-        const duration = 750;
-        const startTime = performance.now();
+      function step(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const ease = t * t;
+        const x = startX + (targetX - startX) * t;
+        const arc = Math.sin(t * Math.PI) * 30;
+        const bottom = startBottom + (targetBottom - startBottom) * ease + arc;
+        const rot = direction * t * 110;
 
-        function step(now) {
-          const t = Math.min((now - startTime) / duration, 1);
-          const ease = t * t;
-          const x = startX + (targetX - startX) * t;
-          // 垂直：先上抛再落下（用 -sin 补一段上升）
-          const arc = Math.sin(t * Math.PI) * 30;
-          const bottom = startBottom + (targetBottom - startBottom) * ease + arc;
-          // 旋转
-          const rot = direction * t * 110;
+        falling.style.left = x + 'px';
+        falling.style.bottom = bottom + 'px';
+        falling.style.transform = 'rotate(' + rot + 'deg)';
 
-          falling.style.left = x + 'px';
-          falling.style.bottom = bottom + 'px';
-          falling.style.transform = 'rotate(' + rot + 'deg)';
-
-          if (t < 1) {
-            requestAnimationFrame(step);
-          } else {
-            // 落地
-            settleStick(picked, falling, stageW, stageH);
-          }
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          settleStick(picked, falling);
         }
-        requestAnimationFrame(step);
       }
+      requestAnimationFrame(step);
     }
 
-    function settleStick(g, falling, stageW, stageH) {
-      // 落地后，签停留一下，然后淡出，同时结果牌升起
+    function settleStick(g, falling) {
       setTimeout(function() {
-        // 显示结果牌
         showCard(g);
-
-        // 签淡出
         falling.style.transition = 'opacity 0.5s ease';
         falling.style.opacity = '0';
-
         setTimeout(function() {
           isAnimating = false;
         }, 500);
