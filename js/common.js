@@ -287,6 +287,7 @@
 
         let isOpen = false;
         let isDragging = false;
+        let pendingTimers = [];   // ★ 记录所有未完成的 timer
 
         // 每个环独立维护"当前选中项"
         const ringState = {
@@ -323,14 +324,12 @@
         // ---------- 根据指针坐标判断落在哪个环 ----------
         function getRingByPointer(clientX, clientY) {
             const rect = containerEl.getBoundingClientRect();
-            // 容器 right/bottom 对齐，圆心在右下角
             const cx = rect.right;
             const cy = rect.bottom;
             const dx = clientX - cx;
             const dy = clientY - cy;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            // 悬浮球附近：保持当前激活环，不强行切换
             const safe = isMobile() ? TRIGGER_SAFE_RADIUS.mobile : TRIGGER_SAFE_RADIUS.desktop;
             if (dist < safe) {
                 return activeRing;
@@ -344,20 +343,19 @@
             const dInner = Math.abs(dist - innerR);
             const dOuter = Math.abs(dist - outerR);
 
-            // 优先落在项的覆盖范围内
             if (dInner <= innerHalf && dInner <= dOuter) return 'inner';
             if (dOuter <= outerHalf) return 'outer';
-            // 都不在项内，取最近的环
             return dInner < dOuter ? 'inner' : 'outer';
         }
 
         // ---------- 构建菜单 ----------
         function buildMenu() {
-            // 容器尺寸还没出来，先不建，等下一帧
+            // ★ 容器尺寸还没出来，先不建
             if (!containerEl.offsetWidth) {
                 requestAnimationFrame(buildMenu);
                 return;
             }
+
             containerEl.querySelectorAll('.menu-item').forEach(el => el.remove());
 
             const currentPath = location.pathname.split('/').pop() || 'index.html';
@@ -383,7 +381,6 @@
                     const baseAngle = startAngle + (360 * ringIdx / count);
                     el.dataset.baseAngle = baseAngle;
 
-                    // 点击：切换选中 + 激活该环 + 跳转
                     el.addEventListener('click', function(e) {
                         e.preventDefault();
                         activeRing = ring;
@@ -476,13 +473,16 @@
 
         // ---------- 展开/收起 ----------
         function toggleMenu(open) {
+            // ★ 清掉上一次没跑完的 timer
+            pendingTimers.forEach(function(t) { clearTimeout(t); });
+            pendingTimers = [];
+
             isOpen = open;
             containerEl.classList.toggle('active', open);
             trigger.classList.toggle('active', open);
 
             const items = containerEl.querySelectorAll('.menu-item');
             if (open) {
-                // 两个环各自回到自己的选中位置
                 switchToRingIndex('inner', ringState.inner.selected);
                 switchToRingIndex('outer', ringState.outer.selected);
                 updateRingSelection('inner');
@@ -492,31 +492,39 @@
                 items.forEach(el => {
                     const ring = el.dataset.ring;
                     const delay = RING_DELAY[ring] || 0;
-                    setTimeout(() => {
+                    const t = setTimeout(() => {
                         el.style.opacity = '1';
                         el.style.transform = 'scale(1)';
                     }, delay);
+                    pendingTimers.push(t);
                 });
                 if (label) label.classList.add('show');
             } else {
                 items.forEach(el => {
                     const ring = el.dataset.ring;
                     const delay = ring === 'outer' ? 0 : 60;
-                    setTimeout(() => {
+                    const t = setTimeout(() => {
                         el.style.opacity = '0';
                         el.style.transform = 'scale(0.3)';
                     }, delay);
+                    pendingTimers.push(t);
                 });
-                setTimeout(() => {
+                const t = setTimeout(() => {
                     if (!isOpen && label) label.classList.remove('show');
                 }, 300);
+                pendingTimers.push(t);
             }
         }
 
         // ========== 事件绑定 ==========
+        // ★ 点击加锁：350ms 内只响应一次，防连点乱翻
+        let triggerLock = false;
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
+            if (triggerLock) return;
+            triggerLock = true;
             toggleMenu(!isOpen);
+            setTimeout(function() { triggerLock = false; }, 350);
         });
 
         document.addEventListener('click', function(e) {
@@ -631,7 +639,7 @@
         // ========== 初始化 ==========
         function initMenu() {
             requestAnimationFrame(function() {
-                // 容器还没有尺寸（比如页面刚跳转、布局没稳定），等下一帧再试
+                // ★ 容器还没尺寸，等下一帧
                 if (!containerEl.offsetWidth) {
                     requestAnimationFrame(initMenu);
                     return;
@@ -859,11 +867,9 @@
             #backToTopBtn {
                 display: none;
             }
-            /* 单屏时整个容器隐藏（向下按钮隐藏，回到顶部也隐藏） */
             .scroll-nav.hidden {
                 display: none !important;
             }
-            /* 回到顶部按钮隐藏时，只留向下按钮，容器还是完整圆角 */
             .scroll-nav.no-backtop .scroll-nav-divider {
                 display: none;
             }
@@ -894,25 +900,21 @@
 
     if (!scrollNav || !backToTopBtn || !scrollDownBtn) return;
 
-    // ---------- 判断是否只有一屏（没有滚动空间） ----------
     function isSingleScreen() {
         const windowHeight = window.innerHeight;
         const fullHeight = document.documentElement.scrollHeight;
         return fullHeight <= windowHeight + 1;
     }
 
-    // ---------- 更新容器和按钮的显示状态 ----------
     function updateButtonsVisibility() {
         const singleScreen = isSingleScreen();
 
-        // 单屏：整个容器隐藏
         if (singleScreen) {
             scrollNav.classList.add('hidden');
             return;
         }
         scrollNav.classList.remove('hidden');
 
-        // 非单屏：根据滚动位置决定是否显示回到顶部按钮
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         if (scrollTop > 0) {
             backToTopBtn.style.display = 'flex';
@@ -929,7 +931,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // ---------- 滚动向下按钮：单击滚一屏，长按直达底部 ----------
     let pressTimer = null;
     let isLongPress = false;
     const LONG_PRESS_DURATION = 600;
