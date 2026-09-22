@@ -69,7 +69,6 @@
         outer: [
             { name: '对合环',   href: 'nestedInvolutionRingHuge.html' },
             { name: '太阳系',   href: 'cosmos.html' },
-            { name: '文字游戏', href: 'wordplay.html' },
             { name: '缘分测试', href: 'namePairing.html' },
             { name: '拆字',     href: 'fontAll.html' },
             { name: '判证',     href: 'panding.html' },
@@ -77,8 +76,9 @@
             { name: '想法',     href: 'idea.html' },
             { name: '关于我',   href: 'aboutMe.html' },
             { name: '灵感来源', href: 'renming.html' },
-            { name: '六十四卦', href: 'gua.html' },
-            { name: '对合游戏', href: 'game.html' }
+            { name: '文字游戏', href: 'wordplay.html' },
+            { name: '对合游戏', href: 'game.html' },
+            { name: '六十四卦', href: 'gua.html' }
         ]
     };
 
