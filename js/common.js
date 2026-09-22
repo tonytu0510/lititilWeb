@@ -287,7 +287,7 @@
 
         let isOpen = false;
         let isDragging = false;
-        let pendingTimers = [];   // ★ 记录所有未完成的 timer
+        let pendingTimers = [];   // 记录所有未完成的 timer
 
         // 每个环独立维护"当前选中项"
         const ringState = {
@@ -350,7 +350,7 @@
 
         // ---------- 构建菜单 ----------
         function buildMenu() {
-            // ★ 容器尺寸还没出来，先不建
+            // 容器尺寸还没出来，先不建
             if (!containerEl.offsetWidth) {
                 requestAnimationFrame(buildMenu);
                 return;
@@ -471,21 +471,23 @@
             updateLabel();
         }
 
-        // ---------- 展开/收起 ----------
-        function toggleMenu(open) {
-            if (open) {
-            // 强制复位所有项，防止卡在 0
-            const items0 = containerEl.querySelectorAll('.menu-item');
-            items0.forEach(el => {
+        // ---------- 强制复位所有项，防止卡在 opacity 0 ----------
+        function resetItemsToHidden() {
+            const items = containerEl.querySelectorAll('.menu-item');
+            items.forEach(el => {
                 el.style.transition = 'none';
                 el.style.opacity = '0';
                 el.style.transform = 'scale(0.3)';
             });
-            void containerEl.offsetWidth;
-            items0.forEach(el => {
+            void containerEl.offsetWidth;   // 强制 reflow
+            items.forEach(el => {
                 el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
             });
-            // ★ 清掉上一次没跑完的 timer
+        }
+
+        // ---------- 展开/收起 ----------
+        function toggleMenu(open) {
+            // 清掉上一次没跑完的 timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
 
@@ -500,6 +502,9 @@
                 updateRingSelection('inner');
                 updateRingSelection('outer');
                 updateLabel();
+
+                // 先强制复位，防止卡在 0
+                resetItemsToHidden();
 
                 items.forEach(el => {
                     const ring = el.dataset.ring;
@@ -529,7 +534,7 @@
         }
 
         // ========== 事件绑定 ==========
-        // ★ 点击加锁：350ms 内只响应一次，防连点乱翻
+        // 点击加锁：350ms 内只响应一次，防连点乱翻
         let triggerLock = false;
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -651,7 +656,7 @@
         // ========== 初始化 ==========
         function initMenu() {
             requestAnimationFrame(function() {
-                // ★ 容器还没尺寸，等下一帧
+                // 容器还没尺寸，等下一帧
                 if (!containerEl.offsetWidth) {
                     requestAnimationFrame(initMenu);
                     return;
@@ -666,17 +671,38 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
+                // 清掉所有 pending timer，防止 resize 和展开动画打架
+                pendingTimers.forEach(function(t) { clearTimeout(t); });
+                pendingTimers = [];
+
                 updatePositions('inner');
                 updatePositions('outer');
                 updateRingSelection('inner');
                 updateRingSelection('outer');
                 updateLabel();
+
                 if (isOpen) {
+                    // 重新对齐选中项
                     switchToRingIndex('inner', ringState.inner.selected);
                     switchToRingIndex('outer', ringState.outer.selected);
                     updateRingSelection('inner');
                     updateRingSelection('outer');
                     updateLabel();
+
+                    // 强制复位 opacity，防止卡在 0
+                    resetItemsToHidden();
+
+                    // 重新展开
+                    const items = containerEl.querySelectorAll('.menu-item');
+                    items.forEach(el => {
+                        const ring = el.dataset.ring;
+                        const delay = RING_DELAY[ring] || 0;
+                        const t = setTimeout(() => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'scale(1)';
+                        }, delay);
+                        pendingTimers.push(t);
+                    });
                 }
             }, 300);
         });
