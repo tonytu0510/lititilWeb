@@ -473,6 +473,18 @@
 
         // ---------- 展开/收起 ----------
         function toggleMenu(open) {
+            if (open) {
+            // 强制复位所有项，防止卡在 0
+            const items0 = containerEl.querySelectorAll('.menu-item');
+            items0.forEach(el => {
+                el.style.transition = 'none';
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0.3)';
+            });
+            void containerEl.offsetWidth;
+            items0.forEach(el => {
+                el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
             // ★ 清掉上一次没跑完的 timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
