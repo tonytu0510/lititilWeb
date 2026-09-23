@@ -76,6 +76,7 @@
             { name: '想法',     href: 'idea.html' },
             { name: '关于我',   href: 'aboutMe.html' },
             { name: '灵感来源', href: 'renming.html' },
+            { name: '英语规则卡', href: 'english.html' },
             { name: '六十四卦', href: 'gua.html' },
             { name: '文字游戏', href: 'wordplay.html' },
             { name: '对合游戏', href: 'game.html' }
