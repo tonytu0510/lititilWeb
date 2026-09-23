@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "英语单词拆解规则卡"
+    window.PAGE_META.cssFront = ["./css/english.css"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class='wrap'>
+    <h1>英语单词拆解规则卡</h1>
+
+    <h2>一、单词结构</h2>
+    <div class="box">
+      <code>前缀 + 词根 + 后缀</code>
+      <ul>
+        <li><b>前缀</b>：管方向、位置</li>
+        <li><b>词根</b>：管核心意思</li>
+        <li><b>后缀</b>：管词性 / 人 / 事 / 物</li>
+      </ul>
+    </div>
+
+    <h2>二、三层各自规则</h2>
+    <p>同源归并 + 一个大白话意思 + 一个只干一件事</p>
+    <ul>
+      <li>一个词根只能有一个意思</li>
+      <li>意思必须是大白话</li>
+      <li>罩不住 = 拆错了，不是词根错了</li>
+    </ul>
+
+    <h2>三、双写规则（核心）</h2>
+    <p>前缀尾字母 <b>撞上</b> 词根首字母：</p>
+    <ul>
+      <li><b>撞上（双写）→ 双人</b></li>
+      <li><b>不撞（不双）→ 单人</b></li>
+    </ul>
+    <table>
+      <tr><th>单词</th><th>拆法</th><th>接壤</th><th>人</th></tr>
+      <tr><td>success</td><td>suc + cess</td><td>cc</td><td>双人</td></tr>
+      <tr><td>access</td><td>ac + cess</td><td>cc</td><td>双人</td></tr>
+      <tr><td>proceed</td><td>pro + ceed</td><td>oc</td><td>单人</td></tr>
+      <tr><td>accept</td><td>ac + cept</td><td>cc</td><td>双人</td></tr>
+      <tr><td>receive</td><td>re + ceive</td><td>ec</td><td>单人</td></tr>
+    </table>
+
+    <h2>四、意思怎么定</h2>
+    <ul>
+      <li>单词意思绝对不改</li>
+      <li>罩不住时，改的是前缀 / 词根的意思，不是单词</li>
+      <li>改到能一句话罩住全部为止</li>
+    </ul>
+
+    <h2>五、验证标准</h2>
+    <p>拿真实单词 → 拆 <code>前缀+词根+后缀</code> → 三张表拼出它本来意思。</p>
+    <ul>
+      <li>拼得出 = 对</li>
+      <li>拼不出 = 拆错，或某张表那条错</li>
+    </ul>
+
+    <h2>六、前缀表</h2>
+    <table>
+      <tr><th>前缀</th><th>意思</th></tr>
+      <tr><td>ex / e / ef</td><td>往外</td></tr>
+      <tr><td>in / im / il / ir</td><td>往里</td></tr>
+      <tr><td>re</td><td>往回</td></tr>
+      <tr><td>pro</td><td>往前</td></tr>
+      <tr><td>pre</td><td>在前</td></tr>
+      <tr><td>post</td><td>在后</td></tr>
+      <tr><td>sub / suc / suf / sup</td><td>往下</td></tr>
+      <tr><td>super / sur</td><td>往上</td></tr>
+      <tr><td>trans</td><td>横过</td></tr>
+      <tr><td>per</td><td>穿过</td></tr>
+      <tr><td>ad / ac / af / ag / al / ap / ar / as / at</td><td>朝着</td></tr>
+      <tr><td>ab / abs</td><td>离开</td></tr>
+      <tr><td>de</td><td>往下</td></tr>
+      <tr><td>con / com / col / cor</td><td>一起</td></tr>
+      <tr><td>dis / di / dif</td><td>分开</td></tr>
+      <tr><td>inter</td><td>之间</td></tr>
+      <tr><td>contra / counter</td><td>对着</td></tr>
+      <tr><td>anti</td><td>反对</td></tr>
+      <tr><td>op</td><td>反 / 对</td></tr>
+      <tr><td>ob</td><td>挡着</td></tr>
+      <tr><td>un / non / in</td><td>不</td></tr>
+      <tr><td>mis</td><td>错</td></tr>
+    </table>
+
+    <h2>七、后缀表</h2>
+    <table>
+      <tr><th>后缀</th><th>意思</th></tr>
+      <tr><td>-er / -or / -ar</td><td>干的人</td></tr>
+      <tr><td>-ist</td><td>搞的人</td></tr>
+      <tr><td>-ant / -ent</td><td>干的人</td></tr>
+      <tr><td>-tion / -sion / -ion</td><td>事 / 行为</td></tr>
+      <tr><td>-ment</td><td>事 / 结果</td></tr>
+      <tr><td>-ness</td><td>状态</td></tr>
+      <tr><td>-ity / -ty</td><td>性质</td></tr>
+      <tr><td>-ive</td><td>爱…的</td></tr>
+      <tr><td>-ous</td><td>多…的</td></tr>
+      <tr><td>-ful</td><td>满…的</td></tr>
+      <tr><td>-less</td><td>没…的</td></tr>
+      <tr><td>-able / -ible</td><td>能…的</td></tr>
+      <tr><td>-ize / -ise</td><td>使…</td></tr>
+      <tr><td>-ify / -fy</td><td>使…</td></tr>
+      <tr><td>-ly</td><td>…地</td></tr>
+    </table>
+
+    <h2>八、词根表</h2>
+    <table>
+      <tr><th>词根</th><th>意思</th></tr>
+      <tr><td>ACT / AG</td><td>干</td></tr>
+      <tr><td>FAC / FIC / FECT</td><td>做</td></tr>
+      <tr><td>DUC / DUCT</td><td>带</td></tr>
+      <tr><td>CED / CESS</td><td>走</td></tr>
+      <tr><td>FER</td><td>拿</td></tr>
+      <tr><td>PORT</td><td>搬</td></tr>
+      <tr><td>MIT / MISS</td><td>送</td></tr>
+      <tr><td>TEN / TAIN</td><td>握</td></tr>
+      <tr><td>VERT / VERS</td><td>转</td></tr>
+      <tr><td>PON / POS</td><td>放</td></tr>
+      <tr><td>STA / SIST</td><td>站</td></tr>
+      <tr><td>SED / SESS</td><td>坐</td></tr>
+      <tr><td>CUR / CURS</td><td>跑</td></tr>
+      <tr><td>VEN / VENT</td><td>来</td></tr>
+      <tr><td>GRAD / GRESS</td><td>迈</td></tr>
+      <tr><td>JECT</td><td>扔</td></tr>
+      <tr><td>TRACT</td><td>拉</td></tr>
+      <tr><td>PEL / PULS</td><td>推</td></tr>
+      <tr><td>PRESS</td><td>压</td></tr>
+      <tr><td>SPECT / SPEC / SPIC</td><td>看</td></tr>
+      <tr><td>AUD</td><td>听</td></tr>
+      <tr><td>DIC / DICT</td><td>说</td></tr>
+      <tr><td>SCRIB / SCRIPT</td><td>写</td></tr>
+      <tr><td>MEM</td><td>记</td></tr>
+      <tr><td>SENS / SENT</td><td>感觉</td></tr>
+      <tr><td>CRED</td><td>信</td></tr>
+      <tr><td>CAP / CIP / CEPT / CEIV</td><td>拿</td></tr>
+      <tr><td>LEG / LECT</td><td>选 / 读</td></tr>
+      <tr><td>TEND / TENS</td><td>伸</td></tr>
+      <tr><td>NECT / NEX</td><td>绑</td></tr>
+      <tr><td>REST</td><td>停</td></tr>
+    </table>
+    </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
+</body>
+</html>
