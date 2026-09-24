@@ -208,7 +208,28 @@ function canvasClickFun() {
 
 function resizeCanvas() { const ac = document.querySelector('.slide.active canvas'); const W = slider.offsetWidth, H = slider.offsetHeight; if (ac && (ac._lastW !== W || ac._lastH !== H)) { if (ac.id === 'canvas2') drawCanvas2(document.getElementById('canvas2')); else if (ac.id === 'canvas3') drawCanvas3(document.getElementById('canvas3')); else if (ac.id === 'canvas4') drawCanvas4(document.getElementById('canvas4')); else if (ac.id === 'canvas5') drawCanvas5(document.getElementById('canvas5')); else if (ac.id === 'canvas6') drawCanvas6(document.getElementById('canvas6')); else if (ac.id === 'canvas7') drawCanvas7(document.getElementById('canvas7')); else if (ac.id === 'canvas8') drawCanvas8(document.getElementById('canvas8')); else if (ac.id === 'canvas9') drawCanvas9(document.getElementById('canvas9')); } }
 function initCanvas() { drawCanvas2(document.getElementById('canvas2')); drawCanvas3(document.getElementById('canvas3')); drawCanvas4(document.getElementById('canvas4')); drawCanvas5(document.getElementById('canvas5')); drawCanvas6(document.getElementById('canvas6')); drawCanvas7(document.getElementById('canvas7')); drawCanvas8(document.getElementById('canvas8')); drawCanvas9(document.getElementById('canvas9')); } initCanvas();
-function waitForDomStable(el, cb, to = 300) { let t = null; const ob = new MutationObserver(() => { clearTimeout(t); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }); ob.observe(el, {childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']}); t = setTimeout(() => { ob.disconnect(); cb(); }, to); }
+function waitForDomStable(el, cb, to = 300) {
+    let t = null;
+    let ob = null;
+    ob = new MutationObserver(() => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+            if (ob) {
+                ob.disconnect();
+                ob = null;   // ★ 清空引用，让 GC 回收
+            }
+            cb();
+        }, to);
+    });
+    ob.observe(el, {childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']});
+    t = setTimeout(() => {
+        if (ob) {
+            ob.disconnect();
+            ob = null;   // ★ 清空引用
+        }
+        cb();
+    }, to);
+}
 function redrawAllCanvas() { waitForDomStable(slider, function () { resizeCanvas(); }, 400); }
 window.addEventListener('resize', () => { redrawAllCanvas(); });
 
