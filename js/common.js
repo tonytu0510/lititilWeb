@@ -292,6 +292,7 @@
         let isDragging = false;
         let pendingTimers = [];
         let animToken = 0;   // 动画令牌：每次切换 +1，旧动画回调看到 token 不对就退出
+        let lastTriggerClickTime = 0;   // 记录 trigger 最近一次点击时间
 
         const ringState = {
             inner: { selected: 0, offset: 0 },
@@ -537,15 +538,25 @@
             }
         }
 
+        // trigger 点击：记时间，防 document 监听误判
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
+            e.preventDefault();
+            lastTriggerClickTime = Date.now();
             toggleMenu(!isOpen);
         });
 
+        // document 点击：先检查「刚刚是否点过 trigger」，再判「点外部关闭」
         document.addEventListener('click', function(e) {
-            if (isOpen && !containerEl.contains(e.target) && e.target !== trigger) {
-                toggleMenu(false);
-            }
+            if (!isOpen) return;
+            // 刚刚点过 trigger（300ms 内），不关
+            if (Date.now() - lastTriggerClickTime < 300) return;
+            // 点在菜单容器内，不关
+            if (containerEl.contains(e.target)) return;
+            // 点的是 trigger 本身，不关
+            if (e.target === trigger || trigger.contains(e.target)) return;
+            // 其余情况，关菜单
+            toggleMenu(false);
         });
 
         containerEl.addEventListener('wheel', function(e) {
@@ -673,6 +684,46 @@
                 }
             });
         };
+
+        // ★ 页面重新可见时，强制重置菜单状态（防挂起后状态错位）
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) return;
+
+            // 1. 令牌 +1，旧动画作废
+            animToken++;
+
+            // 2. 清掉所有 pending timer
+            pendingTimers.forEach(function(t) { clearTimeout(t); });
+            pendingTimers = [];
+
+            // 3. 强制同步状态：菜单关闭
+            isOpen = false;
+            containerEl.classList.remove('active');
+            trigger.classList.remove('active');
+
+            // 4. 强制把所有项复位
+            containerEl.querySelectorAll('.menu-item').forEach(el => {
+                el.style.transition = 'none';
+                el.style.opacity = '0';
+                el.style.transform = 'scale(0.3)';
+            });
+            void containerEl.offsetWidth;
+            containerEl.querySelectorAll('.menu-item').forEach(el => {
+                el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+
+            // 5. 隐藏 label
+            if (label) label.classList.remove('show');
+
+            // 6. 重算位置
+            requestAnimationFrame(function() {
+                updatePositions('inner');
+                updatePositions('outer');
+                updateRingSelection('inner');
+                updateRingSelection('outer');
+                updateLabel();
+            });
+        });
 
         let resizeTimer;
         window.addEventListener('resize', function() {
