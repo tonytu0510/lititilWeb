@@ -2,13 +2,11 @@
 (function() {
     // ==================== 游戏栏状态管理 ====================
     const DINO_STATE_KEY = 'dinoBarClosed';
-    const MENU_STATE_KEY = 'arcMenuSelected';   // 新格式："inner-3" / "outer-5"
+    const MENU_STATE_KEY = 'arcMenuSelected';
 
     function isDinoBarClosed() {
         const stored = sessionStorage.getItem(DINO_STATE_KEY);
-        if (stored === null) {
-            return false;
-        }
+        if (stored === null) return false;
         return stored === 'true';
     }
 
@@ -54,9 +52,7 @@
         }
     }
 
-    // ==================== 环形菜单配置（只改这里） ====================
     const RING_CONFIG = {
-        // 内环：高频
         inner: [
             { name: '首页',   href: 'index.html?M=1' },
             { name: '工具箱', href: 'tools.html' },
@@ -65,7 +61,6 @@
             { name: '二维码', href: 'qrCode.html' },
             { name: '导航',   href: 'ringMenu.html' }
         ],
-        // 外环：次常用
         outer: [
             { name: '对合环',   href: 'nestedInvolutionRingHuge.html' },
             { name: '太阳系',   href: 'cosmos.html' },
@@ -83,21 +78,16 @@
         ]
     };
 
-    // 半径系数（相对容器尺寸），改这里就能调环的大小
     const RING_RADIUS = {
         desktop: { inner: 0.42, outer: 0.65 },
         mobile:  { inner: 0.50, outer: 0.75 }
     };
 
-    // 环展开动画延迟（ms）
     const RING_DELAY = { inner: 0, outer: 80 };
 
-    // 悬浮球容器尺寸（CSS 里也有，这里同步一份用于 JS 计算）
     const RING_CONTAINER_SIZE = { desktop: 400, mobile: 260 };
 
-    // 悬浮球附近安全半径：落在这一圈内不切换激活环
     const TRIGGER_SAFE_RADIUS = { desktop: 70, mobile: 60 };
-    // ================================================================
 
     const html = `
         <style>
@@ -121,13 +111,8 @@
                 box-shadow: 0 4px 20px rgba(0,0,0,0.6);
                 user-select: none;
             }
-            #menuTrigger:hover {
-                background: #3d3d3d;
-            }
-            #menuTrigger.active {
-                background: #7cb8b8;
-                color: #0d0d0d;
-            }
+            #menuTrigger:hover { background: #3d3d3d; }
+            #menuTrigger.active { background: #7cb8b8; color: #0d0d0d; }
             #menuContainer {
                 position: fixed;
                 bottom: 0;
@@ -138,9 +123,7 @@
                 z-index: 999;
                 overflow: visible;
             }
-            #menuContainer.active {
-                pointer-events: auto;
-            }
+            #menuContainer.active { pointer-events: auto; }
             .menu-item {
                 position: absolute;
                 width: 44px;
@@ -168,9 +151,7 @@
                 color: #0d0d0d;
                 border-color: #7cb8b8;
             }
-            #menuContainer.active .menu-item {
-                pointer-events: auto;
-            }
+            #menuContainer.active .menu-item { pointer-events: auto; }
             #currentLabel {
                 position: fixed;
                 bottom: 100px;
@@ -185,57 +166,19 @@
                 opacity: 0;
                 transition: opacity 0.4s;
             }
-            #currentLabel.show {
-                opacity: 1;
-            }
-            #currentLabel .name {
-                color: #7cb8b8;
-                font-size: 16px;
-            }
-            #currentLabel .index {
-                color: #555;
-                font-size: 11px;
-            }
-            .currentLabelScoll{
-                color:#555;
-                font-size:11px;
-            }
+            #currentLabel.show { opacity: 1; }
+            #currentLabel .name { color: #7cb8b8; font-size: 16px; }
+            #currentLabel .index { color: #555; font-size: 11px; }
+            .currentLabelScoll{ color:#555; font-size:11px; }
             @media (max-width: 500px) {
-                #menuContainer {
-                    width: 260px;
-                    height: 260px;
-                }
-                .menu-item {
-                    width: 34px;
-                    height: 34px;
-                    font-size: 9px;
-                }
-                .menu-item.inner {
-                    width: 38px;
-                    height: 38px;
-                    font-size: 10px;
-                }
-                #menuTrigger {
-                    width: 50px;
-                    height: 50px;
-                    font-size: 22px;
-                    bottom: 20px;
-                    right: 20px;
-                }
-                #currentLabel {
-                    bottom: 80px;
-                    right: 20px;
-                    font-size: 11px;
-                }
-                .currentLabelScoll{
-                    display:none
-                }
-                #currentLabel .index {
-                    margin-bottom: 0;
-                }
-                #currentLabel .name {
-                    margin-bottom: -4px;
-                }
+                #menuContainer { width: 260px; height: 260px; }
+                .menu-item { width: 34px; height: 34px; font-size: 9px; }
+                .menu-item.inner { width: 38px; height: 38px; font-size: 10px; }
+                #menuTrigger { width: 50px; height: 50px; font-size: 22px; bottom: 20px; right: 20px; }
+                #currentLabel { bottom: 80px; right: 20px; font-size: 11px; }
+                .currentLabelScoll{ display:none }
+                #currentLabel .index { margin-bottom: 0; }
+                #currentLabel .name { margin-bottom: -4px; }
             }
         </style>
 
@@ -274,11 +217,9 @@
     `;
 
     const container = document.getElementById('topBarContainer');
-    if (container) {
-        container.innerHTML = html;
-    }
+    if (container) container.innerHTML = html;
 
-    // ==================== 圆弧菜单脚本（双环 · 按指针所在环滑动） ====================
+    // ==================== 圆弧菜单脚本 ====================
     (function() {
         const containerEl = document.getElementById('menuContainer');
         const trigger = document.getElementById('menuTrigger');
@@ -291,8 +232,8 @@
         let isOpen = false;
         let isDragging = false;
         let pendingTimers = [];
-        let animToken = 0;   // 动画令牌：每次切换 +1，旧动画回调看到 token 不对就退出
-        let lastTriggerClickTime = 0;   // 记录 trigger 最近一次点击时间
+        let animToken = 0;
+        let lastTriggerClickTime = 0;
 
         const ringState = {
             inner: { selected: 0, offset: 0 },
@@ -331,9 +272,7 @@
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             const safe = isMobile() ? TRIGGER_SAFE_RADIUS.mobile : TRIGGER_SAFE_RADIUS.desktop;
-            if (dist < safe) {
-                return activeRing;
-            }
+            if (dist < safe) return activeRing;
 
             const innerR = getRadius('inner');
             const outerR = getRadius('outer');
@@ -372,9 +311,7 @@
                     el.dataset.ring = ring;
                     el.dataset.ringIndex = ringIdx;
 
-                    if (item.href.split('?')[0] === currentPath) {
-                        el.classList.add('active');
-                    }
+                    if (item.href.split('?')[0] === currentPath) el.classList.add('active');
 
                     const baseAngle = startAngle + (360 * ringIdx / count);
                     el.dataset.baseAngle = baseAngle;
@@ -387,9 +324,7 @@
                         updateLabel();
                         saveMenuIndex(ring, ringIdx);
                         toggleMenu(false);
-                        setTimeout(() => {
-                            window.location.href = this.href;
-                        }, 300);
+                        setTimeout(() => { window.location.href = this.href; }, 300);
                     });
 
                     el.style.opacity = '0';
@@ -410,8 +345,7 @@
             const offset = ringState[ring].offset;
             const radius = getRadius(ring);
 
-            const items = containerEl.querySelectorAll('.menu-item.' + ring);
-            items.forEach(el => {
+            containerEl.querySelectorAll('.menu-item.' + ring).forEach(el => {
                 const baseAngle = parseFloat(el.dataset.baseAngle);
                 const angleDeg = baseAngle + offset;
                 const rad = angleDeg * Math.PI / 180;
@@ -465,11 +399,9 @@
         }
 
         function toggleMenu(open) {
-            // 令牌 +1，旧动画全部作废
             animToken++;
             const myToken = animToken;
 
-            // 清掉所有 pending timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
 
@@ -479,10 +411,7 @@
 
             const items = containerEl.querySelectorAll('.menu-item');
 
-            // 先清掉 transition
-            items.forEach(el => {
-                el.style.transition = 'none';
-            });
+            items.forEach(el => { el.style.transition = 'none'; });
 
             if (open) {
                 switchToRingIndex('inner', ringState.inner.selected);
@@ -491,26 +420,22 @@
                 updateRingSelection('outer');
                 updateLabel();
 
-                // 起始态：全部透明、缩小
                 items.forEach(el => {
                     el.style.opacity = '0';
                     el.style.transform = 'scale(0.3)';
                 });
 
-                // 强制 reflow
                 void containerEl.offsetWidth;
 
-                // 恢复 transition
                 items.forEach(el => {
                     el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 });
 
-                // 排展开动画
                 items.forEach(el => {
                     const ring = el.dataset.ring;
                     const delay = RING_DELAY[ring] || 0;
                     const t = setTimeout(() => {
-                        if (myToken !== animToken) return;   // 被打断，退出
+                        if (myToken !== animToken) return;
                         el.style.opacity = '1';
                         el.style.transform = 'scale(1)';
                     }, delay);
@@ -518,27 +443,24 @@
                 });
                 if (label) label.classList.add('show');
             } else {
-                // 收起：直接设成透明、缩小
                 items.forEach(el => {
                     el.style.opacity = '0';
                     el.style.transform = 'scale(0.3)';
                 });
 
-                // 恢复 transition（让收起有过渡）
                 void containerEl.offsetWidth;
                 items.forEach(el => {
                     el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                 });
 
                 const t = setTimeout(() => {
-                    if (myToken !== animToken) return;   // 被打断，退出
+                    if (myToken !== animToken) return;
                     if (!isOpen && label) label.classList.remove('show');
                 }, 300);
                 pendingTimers.push(t);
             }
         }
 
-        // trigger 点击：记时间，防 document 监听误判
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
@@ -546,16 +468,11 @@
             toggleMenu(!isOpen);
         });
 
-        // document 点击：先检查「刚刚是否点过 trigger」，再判「点外部关闭」
         document.addEventListener('click', function(e) {
             if (!isOpen) return;
-            // 刚刚点过 trigger（300ms 内），不关
             if (Date.now() - lastTriggerClickTime < 300) return;
-            // 点在菜单容器内，不关
             if (containerEl.contains(e.target)) return;
-            // 点的是 trigger 本身，不关
             if (e.target === trigger || trigger.contains(e.target)) return;
-            // 其余情况，关菜单
             toggleMenu(false);
         });
 
@@ -574,10 +491,7 @@
         }, { passive: false });
 
         document.addEventListener('mousedown', function(e) {
-            if (e.button === 1) {
-                e.preventDefault();
-                return false;
-            }
+            if (e.button === 1) { e.preventDefault(); return false; }
         });
 
         let dragStartY = 0;
@@ -599,15 +513,10 @@
         document.addEventListener('mousemove', function(e) {
             if (!isDragging || !isOpen) return;
             const dy = e.clientY - dragStartY;
-            if (Math.abs(dy) > 15) {
-                stepSwitch(dy);
-                dragStartY = e.clientY;
-            }
+            if (Math.abs(dy) > 15) { stepSwitch(dy); dragStartY = e.clientY; }
         });
 
-        document.addEventListener('mouseup', function() {
-            isDragging = false;
-        });
+        document.addEventListener('mouseup', function() { isDragging = false; });
 
         let touchStartY = 0;
         containerEl.addEventListener('touchstart', function(e) {
@@ -627,48 +536,32 @@
         containerEl.addEventListener('touchmove', function(e) {
             if (!isDragging || !isOpen) return;
             const dy = e.touches[0].clientY - touchStartY;
-            if (Math.abs(dy) > 20) {
-                stepSwitch(dy);
-                touchStartY = e.touches[0].clientY;
-            }
+            if (Math.abs(dy) > 20) { stepSwitch(dy); touchStartY = e.touches[0].clientY; }
         }, { passive: true });
 
-        containerEl.addEventListener('touchend', function() {
-            isDragging = false;
-        }, { passive: true });
+        containerEl.addEventListener('touchend', function() { isDragging = false; }, { passive: true });
 
         document.addEventListener('keydown', function(e) {
             if (!isOpen) return;
-            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                e.preventDefault();
-                stepSwitch(-1);
-            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                stepSwitch(1);
-            } else if (e.key === 'Escape') {
-                toggleMenu(false);
-            } else if (e.key === 'Enter') {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); stepSwitch(-1); }
+            else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); stepSwitch(1); }
+            else if (e.key === 'Escape') { toggleMenu(false); }
+            else if (e.key === 'Enter') {
                 const ring = activeRing;
                 const idx = ringState[ring].selected;
                 const arr = RING_CONFIG[ring];
-                if (arr && arr[idx]) {
-                    window.location.href = arr[idx].href;
-                }
+                if (arr && arr[idx]) window.location.href = arr[idx].href;
             }
         });
 
         function initMenu() {
             requestAnimationFrame(function() {
-                if (!containerEl.offsetWidth) {
-                    requestAnimationFrame(initMenu);
-                    return;
-                }
+                if (!containerEl.offsetWidth) { requestAnimationFrame(initMenu); return; }
                 buildMenu();
                 toggleMenu(false);
             });
         }
 
-        // 暴露给外部：让菜单重新计算位置（比如头部游戏栏开关后）
         window.refreshArcMenu = function() {
             requestAnimationFrame(function() {
                 updatePositions('inner');
@@ -685,23 +578,17 @@
             });
         };
 
-        // ★ 页面重新可见时，强制重置菜单状态（防挂起后状态错位）
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) return;
 
-            // 1. 令牌 +1，旧动画作废
             animToken++;
-
-            // 2. 清掉所有 pending timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
 
-            // 3. 强制同步状态：菜单关闭
             isOpen = false;
             containerEl.classList.remove('active');
             trigger.classList.remove('active');
 
-            // 4. 强制把所有项复位
             containerEl.querySelectorAll('.menu-item').forEach(el => {
                 el.style.transition = 'none';
                 el.style.opacity = '0';
@@ -712,10 +599,8 @@
                 el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
             });
 
-            // 5. 隐藏 label
             if (label) label.classList.remove('show');
 
-            // 6. 重算位置
             requestAnimationFrame(function() {
                 updatePositions('inner');
                 updatePositions('outer');
@@ -730,10 +615,8 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 if (isOpen) {
-                    // 展开状态：直接走一遍完整的展开流程（内部会复位、重排）
                     toggleMenu(true);
                 } else {
-                    // 收起状态：只更新位置
                     updatePositions('inner');
                     updatePositions('outer');
                     updateRingSelection('inner');
@@ -792,10 +675,7 @@
             if (shadowRoot) {
                 const canvas = shadowRoot.querySelector('canvas');
                 if (canvas) {
-                    canvas.dispatchEvent(new MouseEvent('click', {
-                        bubbles: true,
-                        composed: true
-                    }));
+                    canvas.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
                 }
             }
         }
@@ -805,13 +685,8 @@
         if (dinoGameChangeWidth) dinoGameChangeWidth.style.width = 'calc(100% - 120px)';
     };
 
-    window.showHelp = function() {
-        document.getElementById('helpModal').style.display = 'block';
-    };
-
-    window.closeHelp = function() {
-        document.getElementById('helpModal').style.display = 'none';
-    };
+    window.showHelp = function() { document.getElementById('helpModal').style.display = 'block'; };
+    window.closeHelp = function() { document.getElementById('helpModal').style.display = 'none'; };
 
     document.addEventListener('click', function(e) {
         const modal = document.getElementById('helpModal');
@@ -841,21 +716,16 @@
                     if (placeholder) placeholder.style.height = '0px';
 
                     const dinoGame = document.querySelector('dino-game');
-                    if (dinoGame && dinoGame.resetGamePublic) {
-                        dinoGame.resetGamePublic();
-                    }
+                    if (dinoGame && dinoGame.resetGamePublic) dinoGame.resetGamePublic();
+
                     const startBtn = document.getElementById('startGameBtn');
                     const dinoGameChangeWidth = document.getElementById('dinoGameChangeWidth');
                     if (startBtn) {
                         if (dinoGameChangeWidth) dinoGameChangeWidth.style.width = 'calc(100% - 230px)';
                         startBtn.style.display = 'block';
                     }
-                    if (typeof updateSliderHeight === 'function') {
-                        updateSliderHeight();
-                    }
-                    if (typeof window.refreshArcMenu === 'function') {
-                        setTimeout(window.refreshArcMenu, 50);
-                    }
+                    if (typeof updateSliderHeight === 'function') updateSliderHeight();
+                    if (typeof window.refreshArcMenu === 'function') setTimeout(window.refreshArcMenu, 50);
                 }
             });
         }, 500);
@@ -878,18 +748,13 @@
                     if (iconGroup) iconGroup.classList.remove('move-up');
                     if (placeholder) placeholder.style.height = '50px';
 
-                    if (typeof updateSliderHeight === 'function') {
-                        updateSliderHeight();
-                    }
-                    if (typeof window.refreshArcMenu === 'function') {
-                        setTimeout(window.refreshArcMenu, 50);
-                    }
+                    if (typeof updateSliderHeight === 'function') updateSliderHeight();
+                    if (typeof window.refreshArcMenu === 'function') setTimeout(window.refreshArcMenu, 50);
                 }
             });
         }, 500);
     }
 
-    // ==================== 页面加载时恢复状态 ====================
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', restoreDinoState);
     } else {
@@ -898,7 +763,7 @@
 
 })();
 
-// ==================== 回到顶部 / 滚动向下 按钮（合并容器 + 长按直达底部 + 单屏隐藏） ====================
+// ==================== 回到顶部 / 滚动向下 按钮 ====================
 (function() {
     const backToTopHtml = `
         <style>
@@ -932,36 +797,15 @@
                 padding: 0;
                 transition: background 0.2s;
             }
-            .scroll-nav-btn:hover {
-                background: rgba(255, 255, 255, 0.08);
-            }
-            .scroll-nav-btn.longpress-active {
-                background: #7cb8b8;
-                color: #0d0d0d;
-            }
-            .scroll-nav-divider {
-                height: 1px;
-                margin: 0 10px;
-                background: #555;
-            }
-            #backToTopBtn {
-                display: none;
-            }
-            .scroll-nav.hidden {
-                display: none !important;
-            }
-            .scroll-nav.no-backtop .scroll-nav-divider {
-                display: none;
-            }
+            .scroll-nav-btn:hover { background: rgba(255, 255, 255, 0.08); }
+            .scroll-nav-btn.longpress-active { background: #7cb8b8; color: #0d0d0d; }
+            .scroll-nav-divider { height: 1px; margin: 0 10px; background: #555; }
+            #backToTopBtn { display: none; }
+            .scroll-nav.hidden { display: none !important; }
+            .scroll-nav.no-backtop .scroll-nav-divider { display: none; }
             @media (max-width: 500px) {
-                .scroll-nav {
-                    right: 20px;
-                    width: 34px;
-                }
-                .scroll-nav-btn {
-                    height: 50px;
-                    font-size: 22px;
-                }
+                .scroll-nav { right: 20px; width: 34px; }
+                .scroll-nav-btn { height: 50px; font-size: 22px; }
             }
         </style>
         <div class="scroll-nav" id="scrollNav">
@@ -981,18 +825,12 @@
     if (!scrollNav || !backToTopBtn || !scrollDownBtn) return;
 
     function isSingleScreen() {
-        const windowHeight = window.innerHeight;
-        const fullHeight = document.documentElement.scrollHeight;
-        return fullHeight <= windowHeight + 1;
+        return document.documentElement.scrollHeight <= window.innerHeight + 1;
     }
 
     function updateButtonsVisibility() {
         const singleScreen = isSingleScreen();
-
-        if (singleScreen) {
-            scrollNav.classList.add('hidden');
-            return;
-        }
+        if (singleScreen) { scrollNav.classList.add('hidden'); return; }
         scrollNav.classList.remove('hidden');
 
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
@@ -1017,56 +855,39 @@
 
     function startPress(e) {
         e.preventDefault();
-        if (pressTimer) {
-            clearTimeout(pressTimer);
-            pressTimer = null;
-        }
+        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
         isLongPress = false;
         scrollDownBtn.classList.add('longpress-active');
 
         pressTimer = setTimeout(() => {
             isLongPress = true;
-            window.scrollTo({
-                top: document.documentElement.scrollHeight,
-                behavior: 'smooth'
-            });
+            window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
             scrollDownBtn.classList.remove('longpress-active');
             pressTimer = null;
         }, LONG_PRESS_DURATION);
     }
 
     function endPress(e) {
-        if (pressTimer) {
-            clearTimeout(pressTimer);
-            pressTimer = null;
-        }
+        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
         scrollDownBtn.classList.remove('longpress-active');
 
         if (!isLongPress) {
-            if (e.type === 'mouseleave' || e.type === 'touchcancel') {
-                isLongPress = false;
-                return;
-            }
+            if (e.type === 'mouseleave' || e.type === 'touchcancel') { isLongPress = false; return; }
             window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
         }
-        setTimeout(() => {
-            isLongPress = false;
-        }, 0);
+        setTimeout(() => { isLongPress = false; }, 0);
     }
 
     scrollDownBtn.addEventListener('mousedown', startPress);
     scrollDownBtn.addEventListener('mouseup', endPress);
     scrollDownBtn.addEventListener('mouseleave', endPress);
-
     scrollDownBtn.addEventListener('touchstart', startPress, { passive: false });
     scrollDownBtn.addEventListener('touchend', endPress);
     scrollDownBtn.addEventListener('touchcancel', endPress);
 
     scrollDownBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        if (e.detail === 0) {
-            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
-        }
+        if (e.detail === 0) window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
     });
 
     window.addEventListener('scroll', updateButtonsVisibility);
@@ -1075,15 +896,10 @@
     let resizeObserverTimer = null;
     const observer = new MutationObserver(function() {
         if (resizeObserverTimer) clearTimeout(resizeObserverTimer);
-        resizeObserverTimer = setTimeout(() => {
-            updateButtonsVisibility();
-        }, 100);
+        resizeObserverTimer = setTimeout(updateButtonsVisibility, 100);
     });
     observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style', 'class']
+        childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class']
     });
 
     updateButtonsVisibility();
