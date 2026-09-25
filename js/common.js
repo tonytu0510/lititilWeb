@@ -233,7 +233,6 @@
         let isDragging = false;
         let pendingTimers = [];
         let animToken = 0;
-        let lastTriggerClickTime = 0;
 
         const ringState = {
             inner: { selected: 0, offset: 0 },
@@ -464,15 +463,13 @@
         trigger.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
-            lastTriggerClickTime = Date.now();
             toggleMenu(!isOpen);
         });
 
         document.addEventListener('click', function(e) {
             if (!isOpen) return;
-            if (Date.now() - lastTriggerClickTime < 300) return;
-            if (containerEl.contains(e.target)) return;
             if (e.target === trigger || trigger.contains(e.target)) return;
+            if (containerEl.contains(e.target)) return;
             toggleMenu(false);
         });
 
@@ -578,36 +575,12 @@
             });
         };
 
+        // ★ 页面重新可见时，只作废旧 timer，不动状态
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) return;
-
             animToken++;
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
-
-            isOpen = false;
-            containerEl.classList.remove('active');
-            trigger.classList.remove('active');
-
-            containerEl.querySelectorAll('.menu-item').forEach(el => {
-                el.style.transition = 'none';
-                el.style.opacity = '0';
-                el.style.transform = 'scale(0.3)';
-            });
-            void containerEl.offsetWidth;
-            containerEl.querySelectorAll('.menu-item').forEach(el => {
-                el.style.transition = 'opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            });
-
-            if (label) label.classList.remove('show');
-
-            requestAnimationFrame(function() {
-                updatePositions('inner');
-                updatePositions('outer');
-                updateRingSelection('inner');
-                updateRingSelection('outer');
-                updateLabel();
-            });
         });
 
         let resizeTimer;
