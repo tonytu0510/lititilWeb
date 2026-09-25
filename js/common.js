@@ -575,12 +575,12 @@
             });
         };
 
-        // ★ 页面重新可见时，只作废旧 timer，不动状态
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) return;
+            // 清掉旧 timer
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
-            animToken++;
+            // 重建菜单
             initMenu();
         });
 
