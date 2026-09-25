@@ -578,9 +578,10 @@
         // ★ 页面重新可见时，只作废旧 timer，不动状态
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) return;
-            animToken++;
             pendingTimers.forEach(function(t) { clearTimeout(t); });
             pendingTimers = [];
+            animToken++;
+            initMenu();
         });
 
         let resizeTimer;
