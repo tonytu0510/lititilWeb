@@ -1604,6 +1604,34 @@
           <li>拆完都归空</li>
         </ul>
       </div>
+      <div class="card">
+      <h3><span class="dot red"></span>标准化简 · 正解</h3>
+      <ul>
+        <li>原式：\(\frac{\sqrt{7} - \sqrt{6} + 1}{\sqrt{7} + \sqrt{6} + 1}\)</li>
+        <li>设 \(x = \sqrt{7} - \sqrt{6}\)，\(y = \sqrt{7} + \sqrt{6}\)</li>
+        <li>关键恒等式：\(xy = (\sqrt{7})^2 - (\sqrt{6})^2 = 7 - 6 = 1\)</li>
+        <li>所以 \(y = \frac{1}{x}\)</li>
+        <li>代入：\(\frac{x+1}{y+1} = \frac{x+1}{\frac{1}{x}+1}\)</li>
+        <li>化简：\(\frac{x+1}{\frac{1+x}{x}}\)</li>
+        <li>翻转分母：\(\frac{(x+1) \cdot x}{x+1}\)</li>
+        <li>约掉 \((x+1)\)：\(x\)</li>
+        <li>代回 \(x\)：\(\sqrt{7} - \sqrt{6}\)</li>
+        <li>结果：\(\sqrt{7} - \sqrt{6}\)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot red"></span>你的推导 · 备解</h3>
+      <ul>
+        <li>第一步：\(\sqrt{7} - \sqrt{6} = 1 - \sqrt{7} - \sqrt{6}\)</li>
+        <li>第二步：\(1 - \sqrt{7} - \sqrt{6} = 1\)</li>
+        <li>第三步：\(\sqrt{7} - \sqrt{6} = -\sqrt{7} - \sqrt{6}\)</li>
+        <li>第四步：\(\sqrt{7} - \sqrt{6} - \sqrt{7} - \sqrt{6}\)</li>
+        <li>合并同类项：\((\sqrt{7} - \sqrt{7}) + (-\sqrt{6} - \sqrt{6})\)</li>
+        <li>第一组归零：\(0\)</li>
+        <li>第二组：\(-2\sqrt{6}\)</li>
+        <li>结果：\(-2\sqrt{6}\)</li>
+      </ul>
+    </div>
     </div>
 
     <div class="end">
