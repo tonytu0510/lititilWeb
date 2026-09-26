@@ -7,7 +7,7 @@ const slider = document.getElementById('slider');
 let TimeOutTimer = null, H5Scal = null, radioY = null, H5PrintFont = null;
 const canvas1 = document.getElementById('canvas1');
 
-/* ★ 唯一保留的缓存：activeCanvas（key 恒为 1 个） */
+/* ★ 唯一保留的缓存：activeCanvas */
 let activeCanvas = null;
 function refreshActiveCanvas() {
     activeCanvas = document.querySelector('.slide.active canvas');
@@ -121,6 +121,47 @@ function transSize(n, W) { return H5PrintFont * Math.ceil(n * 12) * (W / 100) + 
 function transPosition(n, W) { return H5PrintFont * n * (W / 100); }
 function transPositionH(n, H) { return H5PrintFont * n * (H / 100); }
 
+/* =========================================================
+   ★ 安全缓存 1：颜色档位（key 有界：每个场景一个固定 key）
+   ========================================================= */
+const COLOR_STEPS = 20;
+const colorCache = new Map();
+function getColor(key, r, g, b, maxAlpha) {
+    let arr = colorCache.get(key);
+    if (!arr) {
+        arr = new Array(COLOR_STEPS + 1);
+        for (let i = 0; i <= COLOR_STEPS; i++) {
+            arr[i] = 'rgba(' + r + ',' + g + ',' + b + ',' + ((i / COLOR_STEPS) * maxAlpha).toFixed(3) + ')';
+        }
+        colorCache.set(key, arr);
+    }
+    return arr;
+}
+function pickColor(arr, alpha) {
+    let i = (alpha * COLOR_STEPS + 0.5) | 0;
+    if (i < 0) i = 0;
+    else if (i > COLOR_STEPS) i = COLOR_STEPS;
+    return arr[i];
+}
+
+/* =========================================================
+   ★ 安全缓存 2：font 字符串（key 有界：size 整数 × family）
+   ========================================================= */
+const fontCache = new Map();
+function getFont(size, family) {
+    const key = size + '|' + family;
+    let f = fontCache.get(key);
+    if (!f) { f = size + 'px ' + family; fontCache.set(key, f); }
+    return f;
+}
+const fontBoldCache = new Map();
+function getBoldFont(size, family) {
+    const key = size + '|' + family;
+    let f = fontBoldCache.get(key);
+    if (!f) { f = 'bold ' + size + 'px ' + family; fontBoldCache.set(key, f); }
+    return f;
+}
+
 function typewriterDraw(ctx, text, index, W, H, x, y, baseSize, gcs, gco) {
     if (index <= 0) return;
     const dt = text.substring(0, index);
@@ -172,7 +213,9 @@ function initParticles(canvas, key, list, opts) {
 }
 
 /* =========================================================
-   ★ 封装 2：粒子绘制（不预缓存颜色，按原样拼字符串）
+   ★ 封装 2：粒子绘制
+   - 保留原 color 回调（兼容不同场景）
+   - 内部用 font 缓存，避免重复拼字符串
    ========================================================= */
 function drawParticles(ctx, W, H, list, style) {
     style = style || {};
@@ -188,8 +231,8 @@ function drawParticles(ctx, W, H, list, style) {
         if (drawFn) {
             drawFn(ctx, p, W, H);
         } else {
-            ctx.fillStyle = colorFn ? colorFn(p, W, H) : `rgba(255,255,255,${p.alpha})`;
-            ctx.font = p.size + 'px ' + fontFamily;
+            ctx.fillStyle = colorFn ? colorFn(p, W, H) : 'rgba(255,255,255,' + p.alpha + ')';
+            ctx.font = getFont(p.size, fontFamily);
             ctx.fillText(p.symbol !== undefined ? p.symbol : p.text, px(p.xp, W), py(p.yp, H));
         }
     });
@@ -221,7 +264,7 @@ function drawStaticPoints(ctx, W, H, list, style) {
     const n = Math.min(boldCount, list.length);
     if (n > 0) {
         ctx.fillStyle = boldColor;
-        ctx.font = 'bold ' + boldFont + 'px ' + fontFamily;
+        ctx.font = getBoldFont(boldFont, fontFamily);
         for (let i = 0; i < n; i++) {
             const p = list[i];
             ctx.fillText(getText(p), px(p.xp, W), py(p.yp, H));
@@ -229,7 +272,7 @@ function drawStaticPoints(ctx, W, H, list, style) {
     }
     if (list.length > n) {
         ctx.fillStyle = normalColor;
-        ctx.font = normalFont + 'px ' + fontFamily;
+        ctx.font = getFont(normalFont, fontFamily);
         for (let i = n; i < list.length; i++) {
             const p = list[i];
             ctx.fillText(getText(p), px(p.xp, W), py(p.yp, H));
@@ -245,10 +288,10 @@ function drawCaption(ctx, W, H, text, subColor, mainColor, subSize, mainSize) {
     subSize = subSize || Math.min(H * 0.035, 18);
     mainSize = mainSize || Math.min(H * 0.06, 28);
     ctx.fillStyle = subColor || 'rgba(255,255,255,0.8)';
-    ctx.font = subSize + "px 'Microsoft YaHei'";
+    ctx.font = getFont(subSize, "'Microsoft YaHei'");
     ctx.fillText(text, W / 2, py(0.82, H));
     ctx.fillStyle = mainColor || '#ffffff';
-    ctx.font = mainSize + "px 'Microsoft YaHei'";
+    ctx.font = getFont(mainSize, "'Microsoft YaHei'");
     ctx.fillText(text, W / 2, py(0.92, H));
 }
 
@@ -300,6 +343,10 @@ function drawTree(ctx, x, y, unit) {
 /* =========================================================
    各场景绘制函数
    ========================================================= */
+
+/* 每个场景的颜色缓存（key 有界，惰性创建后不再变） */
+const COLORS = {};
+
 function drawCanvas1(canvas) {
     const {ctx, W, H} = setupCanvas(canvas);
     H5Scal = ('ontouchstart' in window) ? 0.3 : 1;
@@ -318,11 +365,13 @@ function drawCanvas1(canvas) {
             alpha: Math.random(), twinkleSpeed: Math.random() * 0.02 + 0.005, twinkleDir: 1
         });
     }
+    if (!COLORS.stars) COLORS.stars = getColor('stars', 255, 255, 255, 1);
+    const starArr = COLORS.stars;
     canvas._stars.forEach(s => {
         s.alpha += s.twinkleSpeed * s.twinkleDir;
         if (s.alpha >= 1) s.twinkleDir = -1;
         if (s.alpha <= 0.2) s.twinkleDir = 1;
-        ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+        ctx.fillStyle = pickColor(starArr, s.alpha);
         ctx.beginPath();
         ctx.arc(px(s.xp, W), py(s.yp, H), s.r, 0, Math.PI * 2);
         ctx.fill();
@@ -367,10 +416,12 @@ function drawCanvas2(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['🍳','🥘','🍲','🥟','🥢','🥄','🔪','🍽️','🥣','🍚','锅','碗','瓢','盆','筷','勺','铲','灶','炉','煲','米','油','盐','酱','醋','茶','面','菜','肉','汤','📺','📻','📞','☎️','🛋️','💡','🪑','📰','🖼️','🚪','电视','电话','沙发','茶几','台灯','遥控','空调','窗帘','地毯','时钟','花瓶','相框','书架','报纸','🌸','🌺','🌻','🌹','🌷','🌼','💐','🥀','🌾','🌿','康乃馨','玫瑰','百合','菊花','牡丹','荷花','梅花','兰花','桃花','杏花','茉莉','桂花','水仙','杜鹃','月季','🏠','🏡','👨','👩','👧','👦','👶','👴','👵','❤️','💕','💗','💖','💝','💞','💓','🫶','爸','妈','儿','女','家','爱','暖','归','盼','等'], { count: 170, sizeMin: 7, sizeMax: 20 });
+    if (!COLORS.c2) COLORS.c2 = getColor('c2', 255, 200, 180, 0.55);
+    const C2 = COLORS.c2;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.15, alphaMax: 0.7,
         fontFamily: "'Microsoft YaHei',serif",
-        color: p => `rgba(255,200,180,${p.alpha * 0.55})`
+        color: p => pickColor(C2, p.alpha)
     });
 
     const size = Math.min(W, H) * SCALE, cx = W * 0.5, cy = H * 0.4;
@@ -417,9 +468,11 @@ function drawCanvas3(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['🎒','📚','📖','📝','✏️','📏','📐','✂️','🖊️','📓','书包','课本','作业','考试','试卷','铅笔','橡皮','尺子','上课','下课','自习','晨读','晚修','早操','课间','同桌','语文','数学','英语','物理','化学','生物','历史','地理','黑板','讲台','粉笔','课桌','操场','🍔','🍕','🍜','🍻','🥤','🍚','🍗','🍖','🍺','🍵','吃饭','食堂','泡面','火锅','撸串','喝酒','干杯','🎮','🎯','🎱','🎳','🀄','♠️','🎪','🎤','🎧','🎸','开黑','通宵','网吧','游戏','王者','吃鸡','篮球','足球','乒乓','羽毛','跑步','游泳','兄弟','哥们','闺蜜','死党','老铁','同窗','室友','校友','牵手','并肩','陪伴','温暖','信任','支持','懂你','默契','🏫','🚌','🚲','🚶','🏃','校车','单车','宿舍','教室','图书馆','军训','运动会','毕业','散伙饭','合影','😂','😭','😡','😤','🥰','😎','哭过','笑过','闹过','想过','念过'], { count: 180, sizeMin: 7, sizeMax: 19 });
+    if (!COLORS.c3) COLORS.c3 = getColor('c3', 150, 200, 240, 0.55);
+    const C3 = COLORS.c3;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.12, alphaMax: 0.7,
-        color: p => `rgba(150,200,240,${p.alpha * 0.55})`
+        color: p => pickColor(C3, p.alpha)
     });
 
     const size = Math.min(W, H) * SCALE;
@@ -437,10 +490,12 @@ function drawCanvas4(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['♩','♪','♫','♬','♭','♯','🎵','🎶','🎼','🎨','🖌️','🎭','🎪','🎬','🎤','🎧','🎷','🎸','♠','♣','♥','♦','●','▲','■','◆','★','☆','○','□','△','◇','莫奈','梵高','毕加索','达芬奇','C','D','E','F','G','A','B','do','re','mi','fa','sol','la','si','油画','水墨','素描','雕塑','建筑','舞蹈','戏剧','巴洛克','印象派','抽象','写实','浪漫'], { count: 140, sizeMin: 8, sizeMax: 22 });
+    if (!COLORS.c4) COLORS.c4 = getColor('c4', 40, 30, 20, 1);
+    const C4 = COLORS.c4;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.08, alphaMax: 0.5,
         fontFamily: "'Georgia',serif",
-        color: p => `rgba(40,30,20,${p.alpha})`
+        color: p => pickColor(C4, p.alpha)
     });
 
     const size = Math.min(W, H) * SCALE, cx = W * 0.48, cy = H * 0.38;
@@ -489,13 +544,14 @@ function drawCanvas5(canvas) {
             p._typed = true;
         });
     }
+    if (!COLORS.c5h) COLORS.c5h = getColor('c5h', 100, 255, 120, 1);
+    if (!COLORS.c5b) COLORS.c5b = getColor('c5b', 80, 220, 160, 1);
+    if (!COLORS.c5n) COLORS.c5n = getColor('c5n', 120, 200, 255, 1);
+    const C5H = COLORS.c5h, C5B = COLORS.c5b, C5N = COLORS.c5n;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.1, alphaMax: 0.85,
         fontFamily: "'Courier New',monospace",
-        color: p => {
-            const ih = p._isHex, ib = p._isBin;
-            return `rgba(${ih ? 100 : ib ? 80 : 120},${ih ? 255 : ib ? 220 : 200},${ih ? 120 : ib ? 160 : 255},${p.alpha})`;
-        }
+        color: p => pickColor(p._isHex ? C5H : p._isBin ? C5B : C5N, p.alpha)
     });
 
     const size = Math.min(W, H) * SCALE, cx = W * 0.5, cy = H * 0.4, dh = size * 1.3, dw = size * 0.4;
@@ -528,10 +584,12 @@ function drawCanvas6(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['+','-','×','÷','=','±','√','²','³','π','∞','≈','≠','≤','≥','∠','°','%','∑','∫','∂','∇','∈','⊆','∪','∩','∅','∀','∃','⇒','⇔','∧','∨','¬','lim','log','sin','cos','tan','α','β','γ','δ','ε','θ','λ','μ','σ','φ','ω','Γ','Δ','Θ','Λ','Π','Σ','Φ','Ψ','Ω','dx','dy','f(x)','→∞','||','⌊⌋','⌈⌉','1','2','3','4','5','6','7','8','9','0','⅓','⅔','⅛','⅜','⅝','⅞'], { count: 150, sizeMin: 8, sizeMax: 22, useSymbol: true });
+    if (!COLORS.c6) COLORS.c6 = getColor('c6', 100, 180, 255, 1);
+    const C6 = COLORS.c6;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.15, alphaMax: 0.9,
         fontFamily: "'Courier New',monospace",
-        color: p => `rgba(100,180,255,${p.alpha})`
+        color: p => pickColor(C6, p.alpha)
     });
 
     const bs = ['∑','∫','π','∞','√','Δ','α','β','θ','λ','σ','Ω','f(x)','dx'], cx = W * 0.5, cy = H * 0.42, bw = W * 0.55, bh = H * 0.45;
@@ -566,10 +624,12 @@ function drawCanvas7(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['a','an','the','is','are','was','were','be','been','have','has','had','do','does','did','will','would','can','could','shall','should','may','might','I','you','he','she','it','we','they','me','him','her','us','them','my','your','his','its','our','their','this','that','these','those','who','whom','whose','which','what','when','where','why','how','and','but','or','so','if','because','although','while','since','until','in','on','at','to','for','from','with','by','about','into','through','love','hope','dream','light','star','moon','wind','rain','fire','snow','hello','world','good','bad','big','small','old','new','high','low','day','night','time','year','life','hand','eye','mind','heart','soul','read','write','speak','listen','learn','teach','think','know','feel','grow'], { count: 130, sizeMin: 8, sizeMax: 20 });
+    if (!COLORS.c7) COLORS.c7 = getColor('c7', 180, 160, 255, 0.55);
+    const C7 = COLORS.c7;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.12, alphaMax: 0.7,
         fontFamily: "'Georgia',serif",
-        color: p => `rgba(180,160,255,${p.alpha * 0.55})`
+        color: p => pickColor(C7, p.alpha)
     });
 
     const size = Math.min(W, H) * SCALE, cx = W * 0.5, cy = H * 0.42, lh = size * 0.75, lw = size * 0.55;
@@ -590,13 +650,34 @@ function drawCanvas7(canvas) {
             push({ xp: (jx + lw * 0.24 + Math.cos(a) * lw * 0.3) / W, yp: (jy + lh * 0.7 + Math.sin(a) * lh * 0.24) / H, text: lws[(i + 15) % lws.length] });
         }
     });
-    canvas._ljPoints.forEach((p, i) => {
-        const iL = i < 13, ic = (iL && i < 6) || (!iL && i >= 13 && i < 17);
-        ctx.fillStyle = iL ? (ic ? 'rgba(255,200,80,0.95)' : 'rgba(255,170,60,0.6)') : (ic ? 'rgba(100,220,255,0.9)' : 'rgba(80,200,240,0.55)');
-        ctx.font = 'bold ' + (ic ? 16 : 13) + "px 'Georgia',serif";
-        ctx.textAlign = 'center';
+    // 分组绘制，保持原视觉
+    const n = Math.min(13, canvas._ljPoints.length);
+    // 左组
+    ctx.textAlign = 'center';
+    // 先画"亮"的：左 前6 + 右 13~16
+    ctx.fillStyle = 'rgba(255,200,80,0.95)';
+    ctx.font = getBoldFont(16, "'Georgia',serif");
+    for (let i = 0; i < Math.min(6, n); i++) {
+        const p = canvas._ljPoints[i];
         ctx.fillText(p.text, px(p.xp, W), py(p.yp, H));
-    });
+    }
+    ctx.fillStyle = 'rgba(100,220,255,0.9)';
+    for (let i = 13; i < Math.min(17, canvas._ljPoints.length); i++) {
+        const p = canvas._ljPoints[i];
+        ctx.fillText(p.text, px(p.xp, W), py(p.yp, H));
+    }
+    // 再画"暗"的：左 6~12 + 右 17~
+    ctx.fillStyle = 'rgba(255,170,60,0.6)';
+    ctx.font = getBoldFont(13, "'Georgia',serif");
+    for (let i = 6; i < n; i++) {
+        const p = canvas._ljPoints[i];
+        ctx.fillText(p.text, px(p.xp, W), py(p.yp, H));
+    }
+    ctx.fillStyle = 'rgba(80,200,240,0.55)';
+    for (let i = 17; i < canvas._ljPoints.length; i++) {
+        const p = canvas._ljPoints[i];
+        ctx.fillText(p.text, px(p.xp, W), py(p.yp, H));
+    }
     drawCaption(ctx, W, H, 'You are my everything', 'rgba(200,180,255,0.8)', '#d0c8f0');
 }
 
@@ -607,9 +688,11 @@ function drawCanvas8(canvas) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
     initParticles(canvas, '_particles', ['🧠','💭','💬','🗣️','👁️','👂','🤝','💔','❤️‍🩹','🌱','自我','本我','超我','意识','潜意识','梦境','记忆','情绪','焦虑','抑郁','压力','创伤','疗愈','成长','认知','行为','人格','性格','内向','外向','共情','依恋','安全感','边界','MBTI','九型','大五','DSM','CBT','ACT','正念','冥想','弗洛伊德','荣格','阿德勒','马斯洛','罗杰斯','皮亚杰','需求','动机','冲突','防御','投射','移情','阻抗','释梦','爱','恨','喜','怒','哀','惧','耻','罪'], { count: 160, sizeMin: 7, sizeMax: 19 });
+    if (!COLORS.c8) COLORS.c8 = getColor('c8', 180, 160, 220, 0.6);
+    const C8 = COLORS.c8;
     drawParticles(ctx, W, H, canvas._particles, {
         alphaMin: 0.1, alphaMax: 0.75,
-        color: p => `rgba(180,160,220,${p.alpha * 0.6})`
+        color: p => pickColor(C8, p.alpha)
     });
 
     const size = Math.min(W, H) * 0.35, cx = W * 0.5, cy = H * 0.42;
@@ -645,10 +728,12 @@ function drawCanvas9(canvas) {
 
     const symbols = ['⬡', '⊕', '⊖', '⊗', '⊘', '⊙', '⊚', '⊛', '⊝', '◈', '◇', '◆', '⬟', '⟐', '⨁', '⨂', '☯', '⚛'];
     initParticles(canvas, '_sym', symbols, { count: 80, sizeMin: 10, sizeMax: 28, useSymbol: true, speedMin: 0.003, speedMax: 0.011 });
+    if (!COLORS.c9) COLORS.c9 = getColor('c9', 120, 200, 255, 1);
+    const C9 = COLORS.c9;
     drawParticles(ctx, W, H, canvas._sym, {
         alphaMin: 0.1, alphaMax: 0.5,
         fontFamily: "'Georgia', serif",
-        color: p => `rgba(120, 200, 255, ${p.alpha})`
+        color: p => pickColor(C9, p.alpha)
     });
 
     ctx.fillStyle = '#c8e0ff';
@@ -705,7 +790,7 @@ function drawScene(canvas) {
 }
 
 /* =========================================================
-   动画主循环（无需 resize 监听）
+   动画主循环
    ========================================================= */
 function animate() {
     if (activeCanvas) drawScene(activeCanvas);
