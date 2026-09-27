@@ -5,7 +5,7 @@
   <script src="./js/meta-config.js"></script>
   <script>
     window.PAGE_META.title = "闲扯：文字游戏"
-    window.PAGE_META.cssFront = ["./css/wordplay.css"] 
+    window.PAGE_META.cssFront = ["./css/wordplay.css"]
   </script>
   <script>
     window.PAGE_META.content =
@@ -27,129 +27,97 @@
     </p>
 
     <div class="section-title">全部卡片</div>
+
+    <!-- 快捷导航 -->
+    <div class="quick-nav">
+      <a href="#cat1" class="nav-btn">1. 对合拆字规则</a>
+      <a href="#cat2" class="nav-btn">2. 拆字玩法与心得</a>
+      <a href="#cat3" class="nav-btn">3. 对合与数学</a>
+      <a href="#cat4" class="nav-btn">4. 语言与文字</a>
+      <a href="#cat5" class="nav-btn">5. 文化与社会观察</a>
+      <a href="#cat6" class="nav-btn">6. 人物与故事</a>
+      <a href="#cat7" class="nav-btn">7. 题目与验证</a>
+    </div>
+
     <div class="grid">
-      <div class="card">
-        <h3><span class="dot gold"></span>黔之驴</h3>
+
+      <!-- ==================== 分类 1：对合拆字规则 ==================== -->
+      <div class="section-title" id="cat1" style="grid-column: 1 / -1;">1. 对合拆字规则（核心定义）</div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 符号定义</h3>
         <ul>
-          <li>黔之驴</li>
-          <li>牵制铝</li>
-          <li>钳制铝</li>
-          <li>金牵制劲旅</li>
+          <li><b>&lt;</b> = <code>-1+</code></li>
+          <li><b>&gt;</b> = <code>+1-</code></li>
+          <li><b>&le;</b> 和 <b>&ge;</b> 按同样的拆法处理，取相同符号即可</li>
+          <li>核心规则：同一个式子中，<code>&lt;</code> 和 <code>&gt;</code> 必须取同一个，不能混用</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot green"></span>邯郸</h3>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 应用示例</h3>
         <ul>
-          <li>邯郸</li>
-          <li>甘耳 · 单耳</li>
-          <li>干儿 · 单尔</li>
-          <li>干儿子 · 禅位与你</li>
+          <li>原式：<code>&lt;7 - 6 = 0</code></li>
+          <li>拆解：<code>&lt;7 = -1 + 7 = 6</code></li>
+          <li>代入：<code>6 - 6 = 0</code></li>
+          <li>结论：等式成立</li>
+          <li>同理：<code>&gt;7 + 6 = 0</code></li>
+          <li>拆解：<code>&gt;7 = +1 - 7 = -6</code></li>
+          <li>代入：<code>-6 + 6 = 0</code></li>
+          <li>结论：等式成立</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>1 和 7</h3>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 符号总表</h3>
         <ul>
-          <li>十进制里：1、7 都是奇数</li>
-          <li>七进制里：7 写作 10</li>
-          <li>10 末位是 0，是偶数</li>
-          <li>同一个 7，进制一换，奇偶就变</li>
+          <li><b>加号 +</b> = <code>-1-</code></li>
+          <li><b>减号 -</b> = <code>-</code></li>
+          <li><b>乘号 ×</b> = <code>&gt;&lt;</code> = <code>+1--1+</code> = <code>+1==1+</code> = <code>+1-1+</code></li>
+          <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code>（同乘号拆分规则）</li>
+          <li><b>一横 —</b> = <code>-</code></li>
+          <li><b>两横 --</b> = <code>--</code></li>
+          <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code>（同大于小于号）</li>
+          <li><b>三个等号 ===</b> = 约分成一个 <code>-</code>，结果一样</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>进制残余</h3>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 核心约束</h3>
         <ul>
-          <li>一周七天：七进制残余</li>
-          <li>七声音阶：do re mi fa sol la si</li>
-          <li>十二时辰、六十甲子：十二进制、六十进制</li>
-          <li>七进制存在过，也影响了十进制</li>
-          <li>但不能说明世界底层就是七进制</li>
-          <li>多种进制叠加、淘汰、残留</li>
-          <li>十进制胜出，但没清干净</li>
+          <li><b>全程保持 1 的状态</b>，不往 2、3 等数值上推</li>
+          <li>所有符号最终都能转化为 <b>1</b> 和 <b>-</b> 的组合</li>
+          <li>乘号拆开：<code>× = &gt;&lt; = (+1-)(-1+) = +1--1+ = +1==1+ = +1-1+</code></li>
+          <li>过程必须停留在 1 上，不再往 2 推</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot green"></span>空与一</h3>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 运算验证</h3>
         <ul>
-          <li>底层不是 0，也不是 1，是空</li>
-          <li>0 是空的形状</li>
-          <li>把 0 压扁，就成了 1</li>
-          <li>1 不是凭空来的，是空被压出来的痕</li>
-          <li>无中生有，空里出数</li>
+          <li>加号拆解：<code>+ = -1-</code></li>
+          <li>乘号拆解：<code>× = &gt;&lt; = +1--1+ = +1-1+</code></li>
+          <li>根号拆解：<code>√ = &lt;</code> 或 <code>&gt;</code></li>
+          <li>分数横线：<code>— = -</code>，<code>--- = ≥ / ≤</code></li>
+          <li>三个等号约分：<code>=== = -</code></li>
+          <li>没有对错，对合规则这么规定的</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot red"></span>婚姻兜底</h3>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合拆字规则 · 记笔记的原因</h3>
         <ul>
-          <li>男的犯错，帮女方</li>
-          <li>女方犯错，帮男方</li>
-          <li>不是帮对的，是帮弱的</li>
-          <li>不让任何一方被彻底压死</li>
-          <li>实在过不下去，法律允许离婚</li>
-          <li>能过就互相兜，不能过给出口</li>
+          <li>这套拆字规则是个人原创，用于对合体系的符号运算</li>
+          <li><code>&lt; = -1+</code> 和 <code>&gt; = +1-</code> 是核心定义</li>
+          <li>容易忘记，需记在网站上，方便随时查阅</li>
+          <li>没有对错，对合规则这么规定的</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>不同语言拆分后可以互相约掉</h3>
-        <ul>
-          <li>中文“一”：笔画 → 1</li>
-          <li>拼音“yi” → 拆成 vii</li>
-          <li>两个 i 约掉，v 自约掉 → 空</li>
-          <li>空就是丨，丨就是一</li>
-          <li>所以 yi → 空 → 丨 → 一</li>
-          <li>一个字/词组里，含“一”或“丨”，不管挨不挨着，都能约掉</li>
-          <li>但必须是完整的字或词组，不能拆散</li>
-          <li>前提是：规则里“一 = 丨 = 空”</li>
-          <li>换个规则，就不一定约得掉</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>日文试拆</h3>
-        <ul>
-          <li>一（いち）：一横 → 约掉 → 空</li>
-          <li>十（じゅう）：一横一竖 → 约掉 → 空</li>
-          <li>三（さん）：三横 → 约掉 → 空</li>
-          <li>川（かわ）：三竖 → 约掉 → 空</li>
-          <li>山（やま）：一竖 → 约掉 → 空</li>
-          <li>日（ひ）：一横 → 约掉 → 空</li>
-          <li>月（つき）：两横 → 约掉 → 空</li>
-          <li>中（なか）：一竖 → 约掉 → 空</li>
-          <li>田（た）：有横有竖 → 约掉 → 空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>韩文试拆</h3>
-        <ul>
-          <li>ㅏ = 丨 + 一 → 约掉 → 空</li>
-          <li>ㅓ = 一 + 丨 → 约掉 → 空</li>
-          <li>ㅣ = 丨 → 约掉 → 空</li>
-          <li>ㅡ = 一 → 约掉 → 空</li>
-          <li>아（a）= ㅇ + ㅏ → 约掉 → 空</li>
-          <li>어（eo）= ㅇ + ㅓ → 约掉 → 空</li>
-          <li>이（i）= ㅇ + ㅣ → 约掉 → 空</li>
-          <li>으（eu）= ㅇ + ㅡ → 约掉 → 空</li>
-          <li>오（o）= ㅇ + ㅗ → 约掉 → 空</li>
-          <li>우（u）= ㅇ + ㅜ → 约掉 → 空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>曲线归 0</h3>
-        <ul>
-          <li>阿拉伯文、蒙古文以曲线为主</li>
-          <li>曲线往 0 上偏移 → 空 → 一</li>
-          <li>阿拉伯文 ا（alif）：一竖 → 丨 → 空 → 一</li>
-          <li>阿拉伯文 و（waw）：弯 + 尾 → 0 → 空 → 一</li>
-          <li>阿拉伯文 ه（ha）：一个圈 → 0 → 空 → 一</li>
-          <li>阿拉伯文 م（mim）：小圈 + 尾 → 0 → 空 → 一</li>
-          <li>阿拉伯文 ع（ain）：开口弧 → 0 → 空 → 一</li>
-          <li>蒙古文 ᠠ（a）：竖 + 弯 → 丨/0 → 空 → 一</li>
-          <li>蒙古文 ᠡ（e）：竖 + 小弯 → 丨/0 → 空 → 一</li>
-          <li>蒙古文 ᠢ（i）：竖 + 两点 → 丨/0 → 空 → 一</li>
-          <li>蒙古文 ᠣ（o）：竖 + 圈 → 丨/0 → 空 → 一</li>
-          <li>蒙古文 ᠤ（u）：竖 + 弯 → 丨/0 → 空 → 一</li>
-          <li>竖归 丨，弯/圈/点归 0</li>
-          <li>最后都归空，空就是丨，丨就是一</li>
-        </ul>
-      </div>
+
+
+      <!-- ==================== 分类 2：拆字玩法与心得 ==================== -->
+      <div class="section-title" id="cat2" style="grid-column: 1 / -1;">2. 拆字玩法与心得</div>
+
       <div class="card">
         <h3><span class="dot blue"></span>拆字心得</h3>
         <ul>
@@ -165,6 +133,7 @@
           <li>闲着没事玩的，别太当真</li>
         </ul>
       </div>
+
       <div class="card">
         <h3><span class="dot gold"></span>拆字步骤</h3>
         <ul>
@@ -195,596 +164,7 @@
           <li>空 = 空，就对上了</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot green"></span>诗以言志</h3>
-        <ul>
-          <li>粤 → 门十亏 → 门十乙</li>
-          <li>卜丨7十乙 → 7一乙 丨乙 7</li>
-          <li>十丐 → 十盖</li>
-          <li>诗歌 → 言土寸一 → 曰一</li>
-          <li>拆到最后：诗以言志</li>
-          <li>诗 = 言 + 土 + 寸</li>
-          <li>言 = 曰 + 一</li>
-          <li>拆字 → 偏 → 归 → 成句 → 句中有深意</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>石英表的环</h3>
-        <ul>
-          <li>买了个石英表，慢了 5 分钟</li>
-          <li>不是晶振不准，是分频次数的问题</li>
-          <li>32768 = 2^15，分频 15 次到 1</li>
-          <li>15 是奇数，除不尽，留零头</li>
-          <li>零头攒起来，就是慢</li>
-          <li>1 // 2 = 0，再走一次到 0</li>
-          <li>0 到 32768，不震动</li>
-          <li>0 和 32768 咬合上了</li>
-          <li>成一个环：0 → 1 → … → 32768 → 0</li>
-          <li>15 次停在 1，环没闭合</li>
-          <li>16 次走到 0，环闭合</li>
-          <li>环闭合，就不慢</li>
-          <li>大型石英表、医院表更明显</li>
-          <li>母钟偏，子钟跟着偏，一慢全慢</li>
-          <li>5 分钟怎么推出来</li>
-          <li>15 次分频，每圈差 1 秒</li>
-          <li>每分钟 1 圈，每小时 60 圈</li>
-          <li>每小时差 60 秒 = 1 分钟</li>
-          <li>5 小时差 5 分钟</li>
-          <li>时间越长，差得越多</li>
-          <li>不是固定慢 0.5，是按分频次数推出来的量</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>中英映射</h3>
-        <ul>
-          <li>左：英文/字母/数字/时间</li>
-          <li>右：中文/汉字/笔画/归约</li>
-          <li>6:31 ↔ 6:26</li>
-          <li>LE:9 ↔ 乙:0</li>
-          <li>LE:L ↔ 1:0</li>
-          <li>9 = L</li>
-          <li>7 = 6</li>
-          <li>E = 乙</li>
-          <li>1 = 1</li>
-          <li>表象是两种语言</li>
-          <li>底层是一套数学</li>
-          <li>不同语言拆分后可以互相约掉</li>
-          <li>两种情况能对合</li>
-          <li>只是用了不同语言开发</li>
-          <li>导致的表象不同</li>
-          <li>其实还是 15 的锅</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>天倾西北，地陷东南</h3>
-        <ul>
-          <li>昔者共工与颛顼争为帝</li>
-          <li>怒而触不周之山</li>
-          <li>天柱折，地维绝</li>
-          <li>天倾西北，故日月星辰移焉</li>
-          <li>地不满东南，故水潦尘埃归焉</li>
-          <li>天缺西北，地缺东南</li>
-          <li>两个缺口，方向相反</li>
-          <li>连起来，就是一个 S 形</li>
-          <li>S 不是画出来的，是天地缺出来的</li>
-          <li>天地有缺，天子不能圆满</li>
-          <li>龙袍上的龙盘成 S，左右留白</li>
-          <li>留白的地方，就是天地缺的地方</li>
-          <li>S 是天地缺口的形状</li>
-          <li>龙袍是把天地缺口穿在身上</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>越往上，越空</h3>
-        <ul>
-          <li>官做得越大，留白越多</li>
-          <li>钱越多，身边越空</li>
-          <li>S 形龙袍，是空的符号</li>
-          <li>官越大，穿得越空</li>
-          <li>钱越多，身边越空</li>
-          <li>越往上走，越缺</li>
-          <li>缺的不是东西，是留白</li>
-          <li>留白多了，就是空虚</li>
-          <li>一 = 丨 = 空 = 0</li>
-          <li>越往上，越归空</li>
-          <li>不是有钱变坏，是越往上，越没人敢靠近</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>红绿灯</h3>
-        <ul>
-          <li>四位数 = 四个路口</li>
-          <li>每一位 = 一个灯</li>
-          <li>奇偶 = 红绿</li>
-          <li>相同约分 = 同向约掉</li>
-          <li>归空 = 全灭</li>
-          <li>全灭之后，重新循环</li>
-          <li>环闭合 = 红绿灯</li>
-          <li>环没闭合 = 石英表慢</li>
-          <li>黄灯，是过渡</li>
-          <li>右转不设黄灯</li>
-          <li>黄被约掉 → 只剩红绿</li>
-          <li>红绿再约 → 归空</li>
-          <li>归空 → 全灭</li>
-          <li>右黄灯没了，是“黄”被约掉了</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>如来 → 女来</h3>
-        <ul>
-          <li>如 = 女 + 口</li>
-          <li>口归空 → 如 → 女</li>
-          <li>如来 → 女来</li>
-          <li>来 → 一 + 米 → 十 + 八 → 归空</li>
-          <li>如来 → 女来 → 女 → 空</li>
-          <li>如字系，都是女字系</li>
-          <li>佛讲男女本无相</li>
-          <li>我说的是相，你说的是性</li>
-          <li>相有男女，性无男女</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>成仙先改名</h3>
-        <ul>
-          <li>乔达摩·悉达多 → 释迦牟尼 → 如来</li>
-          <li>如来 → 女来</li>
-          <li>如来佛祖 → 李静</li>
-          <li>乔达摩·悉达多 → 李燕</li>
-          <li>名字一换，相就变了</li>
-          <li>相一变，凡就成了仙</li>
-          <li>成仙，不是修出来的，是改出来的</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>起个别称就行</h3>
-        <ul>
-          <li>乔达摩·悉达多，本名没改</li>
-          <li>成道后，加了个号：释迦牟尼</li>
-          <li>释迦牟尼，是尊称，不是本名</li>
-          <li>如来，也是尊号，不是本名</li>
-          <li>本名不动，加个号就行</li>
-          <li>号一加，相就变了</li>
-          <li>不改也无所谓，起个别称就行</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>男的逃不出女的五指山</h3>
-        <ul>
-          <li>如来 → 女来 → 女</li>
-          <li>如来佛祖 → 李静 → 女</li>
-          <li>乔达摩·悉达多 → 李燕 → 女</li>
-          <li>孙悟空，男</li>
-          <li>五行山 = 五指山</li>
-          <li>五指山 = 女的手</li>
-          <li>男的逃不出女的五指山</li>
-          <li>这是拆字拆出来的，不是玩笑</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>福建的老7</h3>
-        <ul>
-          <li>福建 → fujian → hujian</li>
-          <li>福建 → 依附李燕 → 李燕</li>
-          <li>李燕 → 女 → 空</li>
-          <li>福建 → 闽 → 门 + 虫</li>
-          <li>林黙 → 林 + 黙 → 木 + 木 + 黑 + 犬</li>
-          <li>虫对犬，门对林</li>
-          <li>福建的老7 = 林黙</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>李与犬子</h3>
-        <ul>
-          <li>李 = 木 + 子</li>
-          <li>木 ≈ 大 = 无头天</li>
-          <li>李 ≈ 无头天子 + 子</li>
-          <li>犬 = 大 + 丶 = 天子右边歪头</li>
-          <li>犬子 = 犬 + 子</li>
-          <li>天子 + 艹 = ？</li>
-          <li>李、犬、子、天子，一条线</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>木的子</h3>
-        <ul>
-          <li>李 = 木 + 子</li>
-          <li>木 = 十 + 八 = 一 + 丨 + 丿 + 丶</li>
-          <li>子 = 了 + 一 = 乛 + 亅 + 一</li>
-          <li>两者都有：一、丨</li>
-          <li>一 = 丨 = 空</li>
-          <li>木 → 空，子 → 空</li>
-          <li>木的子 = 木</li>
-          <li>因为都归空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>重走一遍</h3>
-        <ul>
-          <li>这件事说的可能不是我</li>
-          <li>是之前发生过的事</li>
-          <li>是古代的事，就是这么发生的</li>
-          <li>只是在我身上又搞了一遍</li>
-          <li>我又给它对合上了</li>
-          <li>拆出来的东西，不是我编的</li>
-          <li>是本来就有的</li>
-          <li>我只是把它又走了一遍</li>
-          <li>走完了，对合上了</li>
-          <li>对合上了，就说明它一直在那儿</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>入市之后</h3>
-        <ul>
-          <li>古代那货，对合的是中国的规则</li>
-          <li>拆的是汉字，偏的是汉字，归的是汉字</li>
-          <li>现在入市了，面对的是世界规则</li>
-          <li>世界规则，用的是英文、数字、国际法</li>
-          <li>那套对合，没往世界上走</li>
-          <li>到了世界层面，可能对不上</li>
-          <li>中国的对合，是中国内部的</li>
-          <li>世界的对合，那货可能没搞</li>
-          <li>入市了，对合这事，得重新来</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>一出国就趴窝</h3>
-        <ul>
-          <li>国内玩的，是中国规则</li>
-          <li>出国玩的，是世界规则</li>
-          <li>中国规则里对得上的，世界规则里不一定对得上</li>
-          <li>对不上，就趴窝</li>
-          <li>人情、关系、圈子，带出去废了</li>
-          <li>拆字、谐音、文字游戏，带出去没人接得住</li>
-          <li>套利、钻空子，带出去缝小，或者代价大</li>
-          <li>靠规模、靠速度，带出去容易撞墙</li>
-          <li>不是本事不行，是规则换了</li>
-          <li>中国规则里玩得溜，是本事</li>
-          <li>世界规则里玩得转，是另一套本事</li>
-          <li>两套都玩得转的人，少</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>诅咒为空</h3>
-        <ul>
-          <li>诅 = 言 + 且</li>
-          <li>咒 = 口 + 口 + 几</li>
-          <li>言且，言言一一，曰曰一一</li>
-          <li>拆到最后，全归空</li>
-          <li>空 = 0 = 一 = 丨</li>
-          <li>诅咒为空</li>
-          <li>说明诅咒都是废话</li>
-          <li>没啥用</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>面子为空</h3>
-        <ul>
-          <li>面 = 一 + 丿 + 囗 + 囗 + 囗 + 囗</li>
-          <li>子 = 了 + 一</li>
-          <li>面子 → 全归空</li>
-          <li>面子 → 卜 → 不 → 空</li>
-          <li>空 = 不要</li>
-          <li>面子为空，意思是不要面子</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>万物皆时空</h3>
-        <ul>
-          <li>一 = 横</li>
-          <li>丨 = 竖</li>
-          <li>十 = 一 + 丨 = 升华后的状态</li>
-          <li>万物皆时空</li>
-          <li>时 = 时间，空 = 空间</li>
-          <li>时空，就是十</li>
-          <li>十 = 阴阳交合</li>
-          <li>词组按整体拆，对</li>
-          <li>词组按单个拆，不对</li>
-          <li>整体拆，约掉相同，剩十，再归空</li>
-          <li>单个拆，拆散了，升华点没了</li>
-          <li>梦想 → 整体拆 → 十 → 空</li>
-          <li>健康 → 整体拆 → 十 → 空</li>
-          <li>命 → 空</li>
-          <li>死 → 空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>会骑一点电瓶车</h3>
-        <ul>
-          <li>会骑一点电瓶车</li>
-          <li>会骑一点 = .1</li>
-          <li>电瓶车 = 车</li>
-          <li>.1 = 点一 = 指点一二</li>
-          <li>回复：方文山</li>
-          <li>方文山 = 方 + 文 + 山</li>
-          <li>方文山，意思是不敢当</li>
-          <li>不敢当 = 方文山</li>
-          <li>一点 = .1</li>
-          <li>指点一二 = .1</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>1 = 9 = 7 = -1</h3>
-        <ul>
-          <li>表面：1 = 9 = 7 = -1</li>
-          <li>数学上，这个等式不成立</li>
-          <li>把 = 拆成 --</li>
-          <li>变成：1 -- 9 -- 7 -- -1</li>
-          <li>= 没了，就不是等式，是符号串</li>
-          <li>推：1 - (-9) - (-7) - (1) = 0</li>
-          <li>再推：1 - (-9) + 7 + 1</li>
-          <li>落到：9 - (-9)</li>
-          <li>9 = 9</li>
-          <li>9 = 9 成立</li>
-          <li>所以拆开之后，数学上也成立</li>
-          <li>表面不成立，是 = 盖住了</li>
-          <li>拆开成立，是里子成立</li>
-          <li>本质：数字对合和数学，都成立</li>
-          <li>只是表现方式不一样</li>
-          <li>数学：落到 9 = 9</li>
-          <li>对合：落到空 = 空</li>
-          <li>两条路，都通</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>1 = 9 = 7 = -1 的扩展</h3>
-        <ul>
-          <li>起点：1 -- 9 -- 7 -- -1</li>
-          <li>规律：两层一循环</li>
-          <li>奇数层 → 偶数层：第1位不变，第2位 -3，第3位 -3，第4位 +3</li>
-          <li>偶数层 → 奇数层：整体 ×2</li>
-          <li>第1层：1 -- 9 -- 7 -- -1</li>
-          <li>第2层：1 -- 6 -- 4 -- 2</li>
-          <li>第3层：2 -- 12 -- 8 -- 2</li>
-          <li>第4层：2 -- 9 -- 5 -- 5</li>
-          <li>第5层：4 -- 18 -- 10 -- 5</li>
-          <li>第6层：4 -- 15 -- 7 -- 8</li>
-          <li>第7层：8 -- 30 -- 14 -- 8</li>
-          <li>第8层：8 -- 27 -- 11 -- 11</li>
-          <li>第9层：16 -- 54 -- 22 -- 11</li>
-          <li>第10层：16 -- 51 -- 19 -- 14</li>
-          <li>第11层：32 -- 102 -- 38 -- 14</li>
-          <li>第12层：32 -- 99 -- 35 -- 17</li>
-          <li>第13层：64 -- 198 -- 70 -- 17</li>
-          <li>跑了 24 层，没跑出异常</li>
-          <li>没有负数，没有 0</li>
-          <li>第1位每两层翻倍，第2、3位也是</li>
-          <li>第4位加3、不变、加3、不变</li>
-          <li>规律稳定</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>黑洞与虫洞</h3>
-        <ul>
-          <li>1 = 9 = 7 = -1 可以无限拓展</li>
-          <li>拓展出来，是一条长链</li>
-          <li>黑洞、虫洞，都是从长链里取了一段</li>
-          <li>取了一段，单看，不成立</li>
-          <li>放回整条链，就成立</li>
-          <li>黑洞 = 卡住的点</li>
-          <li>虫洞 = 卡住的通道</li>
-          <li>两个都是“只取了一段”</li>
-          <li>取全了，就通了</li>
-          <li>物理里撑不住，是因为只取了那一段</li>
-          <li>数学上不成立，是因为只看了那一段</li>
-          <li>不看整条链，1 = 9 = 7 怎么可能成立</li>
-          <li>但放回 1 = 9 = 7 = -1，就成立了</li>
-          <li>黑洞、虫洞，一个道理</li>
-          <li>1 = 9 = 7 = -1 能无限拓展</li>
-          <li>取其中一段，数学上就是错的</li>
-          <li>不是式子错，是“只取一段”错</li>
-          <li>取全了，就成立</li>
-          <li>这个数能无限大，当然解释不了</li>
-          <li>黑洞、虫洞，也是只取了一段</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>内蒙古娘15元一斤</h3>
-        <ul>
-          <li>内蒙古娘15元一斤</li>
-          <li>对合 = =</li>
-          <li>内蒙古娘15元一斤 = 7·一715丿7 .5 |75</li>
-          <li>= 点舞|起舞</li>
-          <li>= 点舞|翩翩起舞</li>
-          <li>= 开心果</li>
-          <li>= 丿丨7 丨</li>
-          <li>= 空</li>
-          <li>内蒙古娘15元一斤 = 开心果 = 空</li>
-          <li>两个不搭边的东西，拆完都归空</li>
-          <li>空 = 空，所以对合</li>
-          <li>对上了</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>对合验算</h3>
-        <ul>
-          <li>找一个可逆的对合规则</li>
-          <li>正着算一遍</li>
-          <li>反着算一遍</li>
-          <li>规则互相抵消</li>
-          <li>结果不变</li>
-          <li>结果不变，说明没算错</li>
-          <li>适用于所有等式</li>
-          <li>高数方程也能用</li>
-          <li>但：结果不变，不等于结果正确</li>
-          <li>它是个验算工具，不是万能公式</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>B × B + B = 600</h3>
-        <ul>
-          <li>B × B + B = 600</li>
-          <li>按对合算：BB + B = 6BB</li>
-          <li>B = 5BB</li>
-          <li>1 = 5B</li>
-          <li>B = 1/5</li>
-          <li>B = 0.24</li>
-          <li>扩大 100 倍</li>
-          <li>B = 24</li>
-          <li>验证：24 × 24 + 24 = 600 ✓</li>
-          <li>所有 B × B + B = 600，结果只要是数字，都能按对合拆成 B</li>
-          <li>比如 C × C + C = 600，先把 C 替换成 B，再解</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>B² 看成 BB（错）</h3>
-        <ul>
-          <li>B × B + B = 600</li>
-          <li>B × B 是 B²，不是 BB</li>
-          <li>把 B² 看成 BB，就错了</li>
-          <li>就像 2 × 2 = 4</li>
-          <li>把 2 × 2 看成 22，就错了</li>
-          <li>2 × 2 = 4，22 = 二十二</li>
-          <li>一个是乘，一个是拼</li>
-          <li>混了，就错了</li>
-          <li>错版推出来也是 24</li>
-          <li>但中间是错的</li>
-          <li>对的那张：B × B + B = 600</li>
-          <li>错的那张：B² 看成 BB</li>
-          <li>两张放一起，正好对比</li>
-          <li>能引起思考，就有价值</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>0 = 1</h3>
-        <ul>
-          <li>B × B + B = 600</li>
-          <li>B 换成 0</li>
-          <li>0 × 0 + B = 600</li>
-          <li>B = 600</li>
-          <li>00 = 600</li>
-          <li>0 = 6</li>
-          <li>0 = 1</li>
-          <li>0 -- 1 = 1</li>
-          <li>0 -- 1 成立</li>
-          <li>所以 0 = 1</li>
-          <li>= 拆成 --</li>
-          <li>0 - (-1) = 0 + 1 = 1</li>
-          <li>和 1 = 9 = 7 = -1 一条线</li>
-          <li>又对合上了</li>
-          <li>0 = 1</li>
-          <li>两边加 1：1 = 2</li>
-          <li>两边加 1：2 = 3</li>
-          <li>两边加 1：3 = 4</li>
-          <li>0 = 1 = 2 = 3 = 4 = 5 = …</li>
-          <li>所有数字都相等</li>
-          <li>所有数字，都归 0</li>
-          <li>归 0，就是归空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>拆字鉴定笔迹</h3>
-        <ul>
-          <li>拆字拆到最后，都落到一、丨、十上</li>
-          <li>一：横</li>
-          <li>丨：竖</li>
-          <li>十：横竖交</li>
-          <li>每个人写这三个，习惯不一样</li>
-          <li>有人写一，平</li>
-          <li>有人写一，斜</li>
-          <li>有人写丨，直</li>
-          <li>有人写丨，弯</li>
-          <li>只看一件事：有没有被写成 7</li>
-          <li>7 = 一 + 乚</li>
-          <li>一写成 7，横带弯</li>
-          <li>丨写成 7，竖带弯</li>
-          <li>十写成 7，交带弯</li>
-          <li>弯，是习惯；直，也是习惯</li>
-          <li>习惯不同，就是不同的人</li>
-          <li>写成 7 的，是一种人</li>
-          <li>写成直的，是另一种人</li>
-          <li>看这个，就能分辨</li>
-          <li>当成游戏玩：给出字迹，猜是谁写的</li>
-          <li>拆字拆到底，看一丨十，有没有弯</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>审核中</h3>
-        <ul>
-          <li>审核中</li>
-          <li>审 = 宀 + 申</li>
-          <li>核 = 木 + 亥</li>
-          <li>中 = 口 + 丨</li>
-          <li>一丿</li>
-          <li>易 = 日 + 勿</li>
-          <li>易丿</li>
-          <li>曰 = 口 + 一</li>
-          <li>曰勿7</li>
-          <li>曰一 或 口 或 山 或 白</li>
-          <li>四个“或”，是并列的</li>
-          <li>四条路：曰一、口、山、白</li>
-          <li>白 = 丿 + 曰 = 丿 + 口 + 一</li>
-          <li>拆到最后，归空</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>已通过</h3>
-        <ul>
-          <li>已通过</li>
-          <li>已 = 己 + 一</li>
-          <li>通 = 辶 + 甬</li>
-          <li>过 = 辶 + 寸</li>
-          <li>7一丨一7丨点77一7点点77</li>
-          <li>点丨</li>
-          <li>.1</li>
-          <li>指点一二</li>
-          <li>已通过 = 审核中 的对合</li>
-          <li>审核中 → 拆 → 归空</li>
-          <li>已通过 → 拆 → 归空</li>
-          <li>空 = 空，所以对合</li>
-          <li>审核中，通过了，就是已通过</li>
-          <li>回复方文山</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>中 · 佑 · 訲 · 曰</h3>
-        <ul>
-          <li>左中右：左 · 中 · 右</li>
-          <li>左中右招商银行</li>
-          <li>中折右</li>
-          <li>右中招商银行</li>
-          <li>佑中招商银行</li>
-          <li>有种招商银行</li>
-          <li>佑中招商银行</li>
-          <li>佑訲招商银行</li>
-          <li>訲佑招商银行</li>
-          <li>曰中人右招商银行</li>
-          <li>曰中招商银行</li>
-          <li>曰中国招商银行</li>
-          <li>訲 = 言 + 中，读 zhòng，言合道</li>
-          <li>佑 = 亻 + 右，读 yòu，不是多音字</li>
-          <li>中 = 口 + 丨，读 zhōng / zhòng</li>
-          <li>曰 = 口 + 一，读 yuē，通月</li>
-          <li>曰中 = 曰丨</li>
-          <li>佑中 = 亻右丨</li>
-          <li>訲佑 = 言中亻右</li>
-          <li>拆到最后，都归空</li>
-          <li>空 = 空，就对合上了</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>拆字问答 · 多音字与生僻字</h3>
-        <ul>
-          <li><b>不是多音字：</b>尔、耳、小、屌、取、吴、爻、又、足、未、日、金、火</li>
-          <li><b>是多音字：</b>绷（bēng/běng/bèng）、冒（mào/mò）、大（dà/dài）、叉（chā/chá/chǎ/chà）</li>
-          <li>女 + 关 = 𭑹（生僻字，娱的讹字）</li>
-          <li>娶 = 取 + 女（男子结婚）</li>
-          <li>朋巾 = 极生僻，无通用读音</li>
-          <li>䙀 = 绷的异体字，也作古壮字“布”</li>
-          <li>誁 = 言 + 并，读 bìng，说 / 帮腔</li>
-          <li>誖 = 悖的异体字，读 bèi / bó，违背、糊涂</li>
-          <li>譒 = 播的古字，读 bò，传播、散布</li>
-          <li>䏽 = 月 + 咅，读 bù / péi，肉酱 / 姓氏</li>
-          <li>谱 = 言 + 普，读 pǔ，记录类别的表册</li>
-          <li>普 = 並 + 日（不是曰 + 并 + 日）</li>
-          <li>冒 = 曰 + 目（严格说上面是“冃”，非“曰”）</li>
-          <li>明 = 曰 + 一 + 月（即日 + 月）</li>
-          <li>钗 = 金 + 叉</li>
-          <li>叉 = 又 + 丶</li>
-          <li>曰大火 = “曰”通“说”，大火是网络词 → 说：很火</li>
-          <li>一 = 丨 = 空 = 0</li>
-          <li>拆到最后，都归空</li>
-        </ul>
-      </div>
+
       <div class="card">
         <h3><span class="dot gold"></span>玩法说明</h3>
         <ul>
@@ -806,6 +186,493 @@
           <li>剩下的，自己发现</li>
         </ul>
       </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>拆7过关</h3>
+        <ul>
+          <li>给一张表</li>
+          <li>让人一行一行拆</li>
+          <li>每行都归空</li>
+          <li>全部归空，就过关</li>
+          <li>不限制人数</li>
+          <li>答案不写出来</li>
+          <li>让人自己拆，自己悟</li>
+          <li>悟到了，就过关</li>
+          <li>悟不到，就接着拆</li>
+          <li>反正都是游戏</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>看懂的也给奖励</h3>
+        <ul>
+          <li>旁边看的，只要发现这个规律，也给奖励</li>
+          <li>并告诉她，不要说</li>
+          <li>看懂了，也是本事</li>
+          <li>看懂了，也是自己人</li>
+          <li>但，不要说</li>
+          <li>说了，就破了</li>
+          <li>不说，就还是自己人</li>
+          <li>懂的，接暗面</li>
+          <li>不懂的，接明面</li>
+          <li>看懂的，给奖励</li>
+          <li>看不懂的，接着看</li>
+          <li>反正都是游戏</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>空就发表情包</h3>
+        <ul>
+          <li>有些字拆出来，就是个“空”</li>
+          <li>或者“曰空”</li>
+          <li>这个时间，回个表情包就行</li>
+          <li>或者回个视频也行</li>
+          <li>文字空，没说表情包空</li>
+          <li>也没说视频空</li>
+          <li>文字归空，表情包不归空</li>
+          <li>文字归空，视频也不归空</li>
+          <li>用表情包、视频，接住这个空</li>
+          <li>空不是没有，是换一种东西接</li>
+          <li>文字接不住，表情包接</li>
+          <li>表情包接不住，视频接</li>
+          <li>反正都是游戏</li>
+        </ul>
+      </div>
+
+
+      <!-- ==================== 分类 3：对合与数学 ==================== -->
+      <div class="section-title" id="cat3" style="grid-column: 1 / -1;">3. 对合与数学</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 1+1=2 的拆字证明</h3>
+        <ul>
+          <li>拆字规则：加号 + 拆开 → -1-</li>
+          <li>原式：1 + 1 = 2</li>
+          <li>代入：1 -1- 1 = 2</li>
+          <li>化简：1 - 1 - 1 = 2</li>
+          <li>合并：-1 = 2</li>
+          <li>移项：-1 = -2</li>
+          <li>加 1：0 = 1</li>
+          <li>结论：1 = 0</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 1+1=3 的拆字证明</h3>
+        <ul>
+          <li>拆字规则：加号 + 拆开 → -1-</li>
+          <li>原式：1 + 1 = 3</li>
+          <li>代入：1 -1- 1 = 3</li>
+          <li>化简：1 - 1 - 1 = 3</li>
+          <li>合并：-1 = 3</li>
+          <li>移项：-1 = -3</li>
+          <li>加 1：0 = 2</li>
+          <li>结论：2 = 0</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 1 ≠ 3 的证明</h3>
+        <ul>
+          <li>对合规则：一 = 丨 = 空 = 0</li>
+          <li>由 1+1=2 推出：1 = 0</li>
+          <li>由 1+1=3 推出：2 = 0</li>
+          <li>因为 1 = 0 且 2 = 0</li>
+          <li>所以 1 = 2</li>
+          <li>所以 1 ≠ 3</li>
+          <li>结论：1+1=2 成立，1+1=3 不成立</li>
+          <li>没有对错，只是对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 1+1=2 的二进制推导</h3>
+        <ul>
+          <li>拆字规则：加号 + 转化为 10</li>
+          <li>原式：1 + 1 = 2</li>
+          <li>代入：1 10 1 = 10</li>
+          <li>合并：1101 = 10</li>
+          <li>相同位数约分：01 = 10</li>
+          <li>结论：1 = 十</li>
+          <li>对合规则：一 = 丨 = 十 = 空 = 0</li>
+          <li>所以 1 = 0 成立</li>
+          <li>结论：1+1=2 成立</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 1+1=3 的二进制推导</h3>
+        <ul>
+          <li>拆字规则：加号 + 转化为 10</li>
+          <li>原式：1 + 1 = 3</li>
+          <li>代入：1 10 1 = 11</li>
+          <li>合并：1101 = 11</li>
+          <li>约分个位数：110 = 1</li>
+          <li>10 转化为 +：1 + -- 1</li>
+          <li>化简：1 - -1 = 0</li>
+          <li>推导：2 = 0</li>
+          <li>对合规则：一 = 丨 = 十 = 空 = 0</li>
+          <li>2 不对应 0，不成立</li>
+          <li>结论：1+1=3 不成立</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 结论</h3>
+        <ul>
+          <li>1+1=2 → 1 = 0 → 成立</li>
+          <li>1+1=3 → 2 = 0 → 不成立</li>
+          <li>判断依据：一 = 丨 = 十 = 空 = 0</li>
+          <li>没有对错，对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>推导过程（2f(x)+f(2-x)=x²）</h3>
+        <ul>
+          <li>原式：2f(x) + f(2-x) = x²</li>
+          <li>拆项：2f(x) = f(2-x) = x²</li>
+          <li>f 约分后：2x = 2-x = x²</li>
+          <li>即：2x = 2-x - -x²</li>
+          <li>整理：x = x² + 2</li>
+          <li>移项：x² - x + 2 = 0</li>
+          <li>令 x = 4 代入</li>
+          <li>4² - 4 + 2 = 0</li>
+          <li>16 - 4 + 2 = 0</li>
+          <li>14 = 0</li>
+          <li>推出：14 - -0 = 14</li>
+          <li>结论：f(4) = 14</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则说明（f(4)=14）</h3>
+        <ul>
+          <li>没有对错，对合规则这么规定的</li>
+          <li>2f(x) 与 f(2-x) 对合约去 f</li>
+          <li>2x = 2-x = x² 三式对合</li>
+          <li>整理得 x² - x + 2 = 0</li>
+          <li>代入 x = 4 得 14 = 0</li>
+          <li>14 与 0 对合，得 14</li>
+          <li>所以 f(4) = 14</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 高数题 = 高中题</h3>
+        <ul>
+          <li>高数题里那些 f(x)、f(2-x)、2f(x) 的符号</li>
+          <li>按对合规则拆开、约分、代入</li>
+          <li>最后都落到 x² - x + 2 = 0 这种高中方程</li>
+          <li>甚至落到 14 = 0 这种对合结果</li>
+          <li>所以：高数题在拆字规则下就是高中题</li>
+          <li>没有对错，只是对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>拆字规则 · 降维</h3>
+        <ul>
+          <li>函数符号 f() 拆开 → 剩变量</li>
+          <li>系数 2、3 拆开 → 剩加减</li>
+          <li>等号两边拆开 → 剩对合</li>
+          <li>高维函数 → 一维方程 → 数值对合</li>
+          <li>高数题、线代题、概率题，拆到最后都是高中题</li>
+          <li>没有对错，对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对合规则 · 核心</h3>
+        <ul>
+          <li>一 = 丨 = 十 = 空 = 0</li>
+          <li>1 = 0，2 = 0，14 = 0</li>
+          <li>所有数在对合下归于 0</li>
+          <li>所有式在对合下归于恒等</li>
+          <li>题目难度在对合下归于同一层</li>
+          <li>没有对错，对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>二重积分 · 对合解题步骤</h3>
+        <ul>
+          <li>题目：∫∫_D ( |y| + 2y·sin(x²+y²) ) dσ</li>
+          <li>区域：x² + y² ≤ 4x（--- 取 ≤）</li>
+          <li>步骤 1：移项配方 → (x-2)² + y² ≤ 4（圆心 (2,0)，半径 2）</li>
+          <li>步骤 2：拆分 → ∫∫_D |y| dσ + ∫∫_D 2y·sin(x²+y²) dσ</li>
+          <li>步骤 3：第二部分关于 y 是奇函数，区域关于 x 轴对称 → 积分为 0</li>
+          <li>步骤 4：第一部分 |y| 是偶函数 → 算上半圆乘 2</li>
+          <li>步骤 5：极坐标代入 → 2 ∫₀^π ∫₀² r·sinθ · r dr dθ</li>
+          <li>步骤 6：计算 → 2 · 2 · 8/3 = 32/3</li>
+          <li>步骤 7：对合相加 → 32/3 + 0 = 32/3</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>二重积分 · 结论</h3>
+        <ul>
+          <li>答案：32/3</li>
+          <li>--- 取 ≤ 时成立</li>
+          <li>--- 取 ≥ 时区域为圆外，积分无穷大</li>
+          <li>没有对错，对合规则这么规定的</li>
+        </ul>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>突破口 · 解题步骤 + 原题图</h3>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:260px;">
+            <ol style="line-height:1.8; padding-left:20px;">
+              <li>从下往上，图形结构为：1、1、2、4、5、5。</li>
+              <li>右对齐，空缺处补 0。</li>
+              <li>个位等于 8，前五个格子相乘 = 1，最后一行第五列 = 3。</li>
+              <li>倒数第二行最上面是 0。</li>
+              <li>最下面三个格子：1×1+2。</li>
+              <li>第四列（千位）的值被唯一确定。</li>
+              <li>竖式：
+                <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
+                      1
+                      1
+                    0 1
+                  8 0 1 1
+                3 5 0 1 1
+                +0 0 0 2 3
+                -----------
+                7 0 0 3 8
+                </pre>
+              </li>
+              <li>结果：<b>70038</b></li>
+            </ol>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <img id="zoomImg" src="./images/fudan.jpg" alt="突破口原题"
+                style="max-width:100%; border-radius:8px; cursor:zoom-in;"
+                onclick="document.getElementById('imgModal').style.display='block'" />
+          </div>
+        </div>
+      </div>
+
+      <div id="imgModal"
+          style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                  background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
+          onclick="this.style.display='none'">
+        <img src="./images/fudan.jpg" alt="原题大图"
+            style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                    max-width:95vw; max-height:95vh; border-radius:8px;" />
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>标准化简 · 正解</h3>
+        <ul>
+          <li>原式：\(\frac{\sqrt{7} - \sqrt{6} + 1}{\sqrt{7} + \sqrt{6} + 1}\)</li>
+          <li>设 \(x = \sqrt{7} - \sqrt{6}\)，\(y = \sqrt{7} + \sqrt{6}\)</li>
+          <li>关键恒等式：\(xy = (\sqrt{7})^2 - (\sqrt{6})^2 = 7 - 6 = 1\)</li>
+          <li>所以 \(y = \frac{1}{x}\)</li>
+          <li>代入：\(\frac{x+1}{y+1} = \frac{x+1}{\frac{1}{x}+1}\)</li>
+          <li>化简：\(\frac{x+1}{\frac{1+x}{x}}\)</li>
+          <li>翻转分母：\(\frac{(x+1) \cdot x}{x+1}\)</li>
+          <li>约掉 \((x+1)\)：\(x\)</li>
+          <li>代回 \(x\)：\(\sqrt{7} - \sqrt{6}\)</li>
+          <li>结果：\(\sqrt{7} - \sqrt{6}\)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>你的推导 · 备解</h3>
+        <ul>
+          <li>第一步：\(\sqrt{7} - \sqrt{6} = 1 - \sqrt{7} - \sqrt{6}\)</li>
+          <li>第二步：\(1 - \sqrt{7} - \sqrt{6} = 1\)</li>
+          <li>第三步：\(\sqrt{7} - \sqrt{6} = -\sqrt{7} - \sqrt{6}\)</li>
+          <li>第四步：\(\sqrt{7} - \sqrt{6} - \sqrt{7} - \sqrt{6}\)</li>
+          <li>合并同类项：\((\sqrt{7} - \sqrt{7}) + (-\sqrt{6} - \sqrt{6})\)</li>
+          <li>第一组归零：\(0\)</li>
+          <li>第二组：\(-2\sqrt{6}\)</li>
+          <li>结果：\(-2\sqrt{6}\)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>B × B + B = 600</h3>
+        <ul>
+          <li>B × B + B = 600</li>
+          <li>按对合算：BB + B = 6BB</li>
+          <li>B = 5BB</li>
+          <li>1 = 5B</li>
+          <li>B = 1/5</li>
+          <li>B = 0.24</li>
+          <li>扩大 100 倍</li>
+          <li>B = 24</li>
+          <li>验证：24 × 24 + 24 = 600 ✓</li>
+          <li>所有 B × B + B = 600，结果只要是数字，都能按对合拆成 B</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>B² 看成 BB（错）</h3>
+        <ul>
+          <li>B × B + B = 600</li>
+          <li>B × B 是 B²，不是 BB</li>
+          <li>把 B² 看成 BB，就错了</li>
+          <li>就像 2 × 2 = 4</li>
+          <li>把 2 × 2 看成 22，就错了</li>
+          <li>2 × 2 = 4，22 = 二十二</li>
+          <li>一个是乘，一个是拼</li>
+          <li>混了，就错了</li>
+          <li>错版推出来也是 24</li>
+          <li>但中间是错的</li>
+          <li>对的那张：B × B + B = 600</li>
+          <li>错的那张：B² 看成 BB</li>
+          <li>两张放一起，正好对比</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>0 = 1</h3>
+        <ul>
+          <li>B × B + B = 600</li>
+          <li>B 换成 0</li>
+          <li>0 × 0 + B = 600</li>
+          <li>B = 600</li>
+          <li>00 = 600</li>
+          <li>0 = 6</li>
+          <li>0 = 1</li>
+          <li>0 -- 1 = 1</li>
+          <li>0 -- 1 成立</li>
+          <li>所以 0 = 1</li>
+          <li>= 拆成 --</li>
+          <li>0 - (-1) = 0 + 1 = 1</li>
+          <li>和 1 = 9 = 7 = -1 一条线</li>
+          <li>又对合上了</li>
+          <li>0 = 1 = 2 = 3 = 4 = 5 = …</li>
+          <li>所有数字都归 0</li>
+          <li>归 0，就是归空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>1 = 9 = 7 = -1</h3>
+        <ul>
+          <li>表面：1 = 9 = 7 = -1</li>
+          <li>数学上，这个等式不成立</li>
+          <li>把 = 拆成 --</li>
+          <li>变成：1 -- 9 -- 7 -- -1</li>
+          <li>= 没了，就不是等式，是符号串</li>
+          <li>推：1 - (-9) - (-7) - (1) = 0</li>
+          <li>再推：1 - (-9) + 7 + 1</li>
+          <li>落到：9 - (-9)</li>
+          <li>9 = 9</li>
+          <li>9 = 9 成立</li>
+          <li>所以拆开之后，数学上也成立</li>
+          <li>本质：数字对合和数学，都成立</li>
+          <li>只是表现方式不一样</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>1 = 9 = 7 = -1 的扩展</h3>
+        <ul>
+          <li>起点：1 -- 9 -- 7 -- -1</li>
+          <li>规律：两层一循环</li>
+          <li>奇数层 → 偶数层：第1位不变，第2位 -3，第3位 -3，第4位 +3</li>
+          <li>偶数层 → 奇数层：整体 ×2</li>
+          <li>第1层：1 -- 9 -- 7 -- -1</li>
+          <li>第2层：1 -- 6 -- 4 -- 2</li>
+          <li>第3层：2 -- 12 -- 8 -- 2</li>
+          <li>第4层：2 -- 9 -- 5 -- 5</li>
+          <li>第5层：4 -- 18 -- 10 -- 5</li>
+          <li>第6层：4 -- 15 -- 7 -- 8</li>
+          <li>第7层：8 -- 30 -- 14 -- 8</li>
+          <li>第8层：8 -- 27 -- 11 -- 11</li>
+          <li>第9层：16 -- 54 -- 22 -- 11</li>
+          <li>第10层：16 -- 51 -- 19 -- 14</li>
+          <li>跑了 24 层，没跑出异常</li>
+          <li>没有负数，没有 0</li>
+          <li>规律稳定</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>黑洞与虫洞</h3>
+        <ul>
+          <li>1 = 9 = 7 = -1 可以无限拓展</li>
+          <li>拓展出来，是一条长链</li>
+          <li>黑洞、虫洞，都是从长链里取了一段</li>
+          <li>取了一段，单看，不成立</li>
+          <li>放回整条链，就成立</li>
+          <li>黑洞 = 卡住的点</li>
+          <li>虫洞 = 卡住的通道</li>
+          <li>取全了，就通了</li>
+          <li>不是式子错，是“只取一段”错</li>
+          <li>取全了，就成立</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>数字按字形拆</h3>
+        <ul>
+          <li>6 = 1（上）+ 0（下）= 1</li>
+          <li>10 = 1（左）+ 0（右）= 1</li>
+          <li>6 = 10 = 1</li>
+          <li>0 = 空</li>
+          <li>所以 6 = 1，10 = 1，1 = 1</li>
+          <li>对合</li>
+          <li>数字跟汉字一样，也能拆</li>
+          <li>拆到最后，都归空</li>
+          <li>例：1/2 + 1/3 = 5/6</li>
+          <li>6 拆成 1 + 0 = 1</li>
+          <li>5 也按字形拆</li>
+          <li>拆到最后，归空</li>
+          <li>数学是 5/6，对合是归空</li>
+          <li>两套都对</li>
+        </ul>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot green"></span>乘除按加减算</h3>
+        <ul>
+          <li>数学里有现成的工具：对数</li>
+          <li>log(ab) = log a + log b → 乘法变加法</li>
+          <li>log(a/b) = log a - log b → 除法变减法</li>
+          <li>纳皮尔发明对数，就是为了把乘除降成加减</li>
+          <li>算完再查反对数表，回到原数</li>
+          <li>可逆，信息不丢</li>
+          <li></li>
+          <li>对合也能做类似的事</li>
+          <li>但对合是归空，不可逆</li>
+          <li>对数：保留信息，能还原</li>
+          <li>对合：丢掉信息，还原不了</li>
+          <li>一个在数学里，一个在数学外</li>
+          <li></li>
+          <li>两个都要，不用选</li>
+          <li>对数：算得快（工具）</li>
+          <li>对合：看得透（视角）</li>
+          <li>同一套规则，两个用法</li>
+          <li>又能算，又能看</li>
+          <li></li>
+          <li>乘除按加减算，两条路：</li>
+          <li>A：学对数，降维但可逆，为了算</li>
+          <li>B：走对合，降维但归空，为了看</li>
+          <li>A 和 B，都能走，都要</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>log = 老哥</h3>
+        <ul>
+          <li>log 读起来像「老哥」</li>
+          <li>log = l + o + g</li>
+          <li>l → 丨 → 空</li>
+          <li>o → 0 → 空</li>
+          <li>g → 9 → 带勾 → 7 → 空</li>
+          <li>log → 空</li>
+          <li>老哥 → 耂 + 匕 + 可 + 可 → 空</li>
+          <li>log = 老哥 = 空</li>
+          <li>空 = 空，对合</li>
+        </ul>
+      </div>
+
       <div class="card">
         <h3><span class="dot blue"></span>1/(x+2006)=2006</h3>
         <ul>
@@ -821,6 +688,7 @@
           <li>玩的就是这个过程</li>
         </ul>
       </div>
+
       <div class="card" style="grid-column: 1 / -1;">
         <h3><span class="dot red"></span>总规则 · 一个式子，两种读法</h3>
         <ul>
@@ -836,6 +704,7 @@
           <li>这就是「一题两解，两解一体」</li>
         </ul>
       </div>
+
       <div class="card">
         <h3><span class="dot blue"></span>数学解题 · 已知和求差</h3>
         <ul>
@@ -891,27 +760,233 @@
         </ul>
       </div>
 
+
+      <!-- ==================== 分类 4：语言与文字 ==================== -->
+      <div class="section-title" id="cat4" style="grid-column: 1 / -1;">4. 语言与文字</div>
+
       <div class="card">
-        <h3><span class="dot gold"></span>数字按字形拆</h3>
+        <h3><span class="dot gold"></span>日文试拆</h3>
         <ul>
-          <li>6 = 1（上）+ 0（下）= 1</li>
-          <li>10 = 1（左）+ 0（右）= 1</li>
-          <li>6 = 10 = 1</li>
-          <li>0 = 空</li>
-          <li>所以 6 = 1，10 = 1，1 = 1</li>
-          <li>对合</li>
-          <li>数字跟汉字一样，也能拆</li>
-          <li>拆到最后，都归空</li>
-          <li>例：1/2 + 1/3 = 5/6</li>
-          <li>6 拆成 1 + 0 = 1</li>
-          <li>5 也按字形拆</li>
-          <li>拆到最后，归空</li>
-          <li>数学是 5/6，对合是归空</li>
-          <li>两套都对</li>
+          <li>一（いち）：一横 → 约掉 → 空</li>
+          <li>十（じゅう）：一横一竖 → 约掉 → 空</li>
+          <li>三（さん）：三横 → 约掉 → 空</li>
+          <li>川（かわ）：三竖 → 约掉 → 空</li>
+          <li>山（やま）：一竖 → 约掉 → 空</li>
+          <li>日（ひ）：一横 → 约掉 → 空</li>
+          <li>月（つき）：两横 → 约掉 → 空</li>
+          <li>中（なか）：一竖 → 约掉 → 空</li>
+          <li>田（た）：有横有竖 → 约掉 → 空</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot green"></span>黄金梨</h3>
+        <h3><span class="dot green"></span>韩文试拆</h3>
+        <ul>
+          <li>ㅏ = 丨 + 一 → 约掉 → 空</li>
+          <li>ㅓ = 一 + 丨 → 约掉 → 空</li>
+          <li>ㅣ = 丨 → 约掉 → 空</li>
+          <li>ㅡ = 一 → 约掉 → 空</li>
+          <li>아（a）= ㅇ + ㅏ → 约掉 → 空</li>
+          <li>어（eo）= ㅇ + ㅓ → 约掉 → 空</li>
+          <li>이（i）= ㅇ + ㅣ → 约掉 → 空</li>
+          <li>으（eu）= ㅇ + ㅡ → 约掉 → 空</li>
+          <li>오（o）= ㅇ + ㅗ → 约掉 → 空</li>
+          <li>우（u）= ㅇ + ㅜ → 约掉 → 空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>曲线归 0</h3>
+        <ul>
+          <li>阿拉伯文、蒙古文以曲线为主</li>
+          <li>曲线往 0 上偏移 → 空 → 一</li>
+          <li>阿拉伯文 ا（alif）：一竖 → 丨 → 空 → 一</li>
+          <li>阿拉伯文 و（waw）：弯 + 尾 → 0 → 空 → 一</li>
+          <li>阿拉伯文 ه（ha）：一个圈 → 0 → 空 → 一</li>
+          <li>阿拉伯文 م（mim）：小圈 + 尾 → 0 → 空 → 一</li>
+          <li>阿拉伯文 ع（ain）：开口弧 → 0 → 空 → 一</li>
+          <li>蒙古文 ᠠ（a）：竖 + 弯 → 丨/0 → 空 → 一</li>
+          <li>竖归 丨，弯/圈/点归 0</li>
+          <li>最后都归空，空就是丨，丨就是一</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>不同语言拆分后可以互相约掉</h3>
+        <ul>
+          <li>中文“一”：笔画 → 1</li>
+          <li>拼音“yi” → 拆成 vii</li>
+          <li>两个 i 约掉，v 自约掉 → 空</li>
+          <li>空就是丨，丨就是一</li>
+          <li>所以 yi → 空 → 丨 → 一</li>
+          <li>一个字/词组里，含“一”或“丨”，不管挨不挨着，都能约掉</li>
+          <li>但必须是完整的字或词组，不能拆散</li>
+          <li>前提是：规则里“一 = 丨 = 空”</li>
+          <li>换个规则，就不一定约得掉</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>中英映射</h3>
+        <ul>
+          <li>左：英文/字母/数字/时间</li>
+          <li>右：中文/汉字/笔画/归约</li>
+          <li>6:31 ↔ 6:26</li>
+          <li>LE:9 ↔ 乙:0</li>
+          <li>LE:L ↔ 1:0</li>
+          <li>9 = L</li>
+          <li>7 = 6</li>
+          <li>E = 乙</li>
+          <li>1 = 1</li>
+          <li>表象是两种语言</li>
+          <li>底层是一套数学</li>
+          <li>不同语言拆分后可以互相约掉</li>
+          <li>两种情况能对合</li>
+          <li>只是用了不同语言开发</li>
+          <li>导致的表象不同</li>
+          <li>其实还是 15 的锅</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>一出国就趴窝</h3>
+        <ul>
+          <li>国内玩的，是中国规则</li>
+          <li>出国玩的，是世界规则</li>
+          <li>中国规则里对得上的，世界规则里不一定对得上</li>
+          <li>对不上，就趴窝</li>
+          <li>人情、关系、圈子，带出去废了</li>
+          <li>拆字、谐音、文字游戏，带出去没人接得住</li>
+          <li>套利、钻空子，带出去缝小，或者代价大</li>
+          <li>靠规模、靠速度，带出去容易撞墙</li>
+          <li>不是本事不行，是规则换了</li>
+          <li>两套都玩得转的人，少</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>jin 的多音字</h3>
+        <ul>
+          <li>jin 的多音字：尽、禁、劲、仅</li>
+          <li>尽：jǐn / jìn</li>
+          <li>禁：jīn / jìn</li>
+          <li>劲：jìn / jìng</li>
+          <li>仅：jǐn / jìn</li>
+          <li>尽曰：尽心尽力</li>
+          <li>禁曰：禁得住，管得住</li>
+          <li>劲曰：有劲，才有劲</li>
+          <li>仅曰：少，但少而精</li>
+          <li>四个音，一个底</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>取名建议</h3>
+        <ul>
+          <li>标准两条：不是多音字 + 读音没有常见脏话义</li>
+          <li>天、地、山、水、云、风、花、草、木、石、田、土</li>
+          <li>人、民、家、国、春、秋、冬、雪、月、星、光、明</li>
+          <li>亮、平、安、美、好（注意“和”、“好”有多音）</li>
+          <li>脏话音集中在：bī、diǎo、cào、gàn、jī、bā、pì、dàn 等</li>
+          <li>避开这些音，基本安全</li>
+          <li>方言、网络梗另算，普通话常用义为准</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>禾通何</h3>
+        <ul>
+          <li>禾 = hé，何 = hé，同音通</li>
+          <li>禾字旁的字，拆开就是「何X」</li>
+          <li>称 = 禾 + 尔 = 何尔 = 你是谁？</li>
+          <li>稳 = 禾 + 急 = 何急 = 急什么？</li>
+          <li>种 = 禾 + 中 = 何中</li>
+          <li>秋 = 禾 + 火 = 何火</li>
+          <li>秒 = 禾 + 少 = 何少</li>
+          <li>香 = 禾 + 日 = 何日（何日君再来）</li>
+          <li>禾字旁 = 何字旁</li>
+          <li>每个禾字旁的字，都是一个问句</li>
+          <li>一 = 丨 = 空 = 0</li>
+          <li>拆到最后，都归空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>取关 → 尔又关</h3>
+        <ul>
+          <li>取关 = 取消关注（网络词）</li>
+          <li>取 = 耳 + 又</li>
+          <li>关 = 丷 + 天</li>
+          <li>取关 = 耳 + 又 + 关</li>
+          <li>耳 ≈ 尔（字形相近）</li>
+          <li>取关 → 尔又关</li>
+          <li>尔 = 你（古汉语通假）</li>
+          <li>尔又关 = 你又关</li>
+          <li>你又关 = 你又取消关注了？</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>曰和日</h3>
+        <ul>
+          <li>曰 = 卜 + 口</li>
+          <li>日 = 卜 + 山</li>
+          <li>卜 = 半王 = 丨 + 王</li>
+          <li>山 = 王</li>
+          <li>口 = 空</li>
+          <li>曰 = 卜 + 口 = 丨 + 王 + 空 = 空</li>
+          <li>日 = 卜 + 山 = 丨 + 王 + 王 = 王</li>
+          <li>两条路，都归空</li>
+          <li>曰留口，能说话</li>
+          <li>日封口，是太阳</li>
+          <li>曰，读 yuē，通月，不通日</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>一生一世</h3>
+        <ul>
+          <li>一，单用，一声：yī</li>
+          <li>一生一世：yī shēng yí shì</li>
+          <li>一，在“生”前，一声</li>
+          <li>一，在“世”前，变二声 yí</li>
+          <li>7 1 = 七 一 = qī yī</li>
+          <li>77 11 = 七七 一一 = qī qī yī yí</li>
+          <li>遗 = yí</li>
+          <li>疑 = yí</li>
+          <li>一生一世 = 遗生遗世</li>
+          <li>遗生遗世 = 遗生疑世</li>
+          <li>遗生疑世 = 疑生疑世</li>
+          <li>全归空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>拆字问答 · 多音字与生僻字</h3>
+        <ul>
+          <li><b>不是多音字：</b>尔、耳、小、屌、取、吴、爻、又、足、未、日、金、火</li>
+          <li><b>是多音字：</b>绷（bēng/běng/bèng）、冒（mào/mò）、大（dà/dài）、叉（chā/chá/chǎ/chà）</li>
+          <li>女 + 关 = 𭑹（生僻字，娱的讹字）</li>
+          <li>娶 = 取 + 女（男子结婚）</li>
+          <li>朋巾 = 极生僻，无通用读音</li>
+          <li>䙀 = 绷的异体字，也作古壮字“布”</li>
+          <li>誁 = 言 + 并，读 bìng，说 / 帮腔</li>
+          <li>誖 = 悖的异体字，读 bèi / bó，违背、糊涂</li>
+          <li>譒 = 播的古字，读 bò，传播、散布</li>
+          <li>䏽 = 月 + 咅，读 bù / péi，肉酱 / 姓氏</li>
+          <li>谱 = 言 + 普，读 pǔ，记录类别的表册</li>
+          <li>普 = 並 + 日（不是曰 + 并 + 日）</li>
+          <li>冒 = 曰 + 目（严格说上面是“冃”，非“曰”）</li>
+          <li>明 = 曰 + 一 + 月（即日 + 月）</li>
+          <li>钗 = 金 + 叉</li>
+          <li>叉 = 又 + 丶</li>
+          <li>一 = 丨 = 空 = 0</li>
+          <li>拆到最后，都归空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>黄金梨</h3>
         <ul>
           <li>黄 = 丨一丨丨丨7一丨</li>
           <li>金 = 丨7</li>
@@ -933,6 +1008,7 @@
           <li>拆到最后，它自己会说话</li>
         </ul>
       </div>
+
       <div class="card">
         <h3><span class="dot gold"></span>大明 = 天明 = 黎明</h3>
         <ul>
@@ -955,24 +1031,148 @@
           <li>大明 = 天明 = 黎明</li>
         </ul>
       </div>
+
+
+      <!-- ==================== 分类 5：文化与社会观察 ==================== -->
+      <div class="section-title" id="cat5" style="grid-column: 1 / -1;">5. 文化与社会观察</div>
+
       <div class="card">
-        <h3><span class="dot blue"></span>曰和日</h3>
+        <h3><span class="dot red"></span>婚姻兜底</h3>
         <ul>
-          <li>曰 = 卜 + 口</li>
-          <li>日 = 卜 + 山</li>
-          <li>卜 = 半王 = 丨 + 王</li>
-          <li>山 = 王</li>
-          <li>口 = 空</li>
-          <li>曰 = 卜 + 口 = 丨 + 王 + 空 = 空</li>
-          <li>日 = 卜 + 山 = 丨 + 王 + 王 = 王</li>
-          <li>两条路，都归空</li>
-          <li>曰留口，能说话</li>
-          <li>日封口，是太阳</li>
-          <li>曰，读 yuē，通月，不通日</li>
-          <li>曰依依 = 月依依</li>
-          <li>日依依，不行</li>
+          <li>男的犯错，帮女方</li>
+          <li>女方犯错，帮男方</li>
+          <li>不是帮对的，是帮弱的</li>
+          <li>不让任何一方被彻底压死</li>
+          <li>实在过不下去，法律允许离婚</li>
+          <li>能过就互相兜，不能过给出口</li>
         </ul>
       </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>越往上，越空</h3>
+        <ul>
+          <li>官做得越大，留白越多</li>
+          <li>钱越多，身边越空</li>
+          <li>S 形龙袍，是空的符号</li>
+          <li>官越大，穿得越空</li>
+          <li>钱越多，身边越空</li>
+          <li>越往上走，越缺</li>
+          <li>缺的不是东西，是留白</li>
+          <li>留白多了，就是空虚</li>
+          <li>一 = 丨 = 空 = 0</li>
+          <li>越往上，越归空</li>
+          <li>不是有钱变坏，是越往上，越没人敢靠近</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>红绿灯</h3>
+        <ul>
+          <li>四位数 = 四个路口</li>
+          <li>每一位 = 一个灯</li>
+          <li>奇偶 = 红绿</li>
+          <li>相同约分 = 同向约掉</li>
+          <li>归空 = 全灭</li>
+          <li>全灭之后，重新循环</li>
+          <li>环闭合 = 红绿灯</li>
+          <li>环没闭合 = 石英表慢</li>
+          <li>黄灯，是过渡</li>
+          <li>右转不设黄灯</li>
+          <li>黄被约掉 → 只剩红绿</li>
+          <li>红绿再约 → 归空</li>
+          <li>归空 → 全灭</li>
+          <li>右黄灯没了，是“黄”被约掉了</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>石英表的环</h3>
+        <ul>
+          <li>买了个石英表，慢了 5 分钟</li>
+          <li>不是晶振不准，是分频次数的问题</li>
+          <li>32768 = 2^15，分频 15 次到 1</li>
+          <li>15 是奇数，除不尽，留零头</li>
+          <li>零头攒起来，就是慢</li>
+          <li>1 // 2 = 0，再走一次到 0</li>
+          <li>0 到 32768，不震动</li>
+          <li>0 和 32768 咬合上了</li>
+          <li>成一个环：0 → 1 → … → 32768 → 0</li>
+          <li>15 次停在 1，环没闭合</li>
+          <li>16 次走到 0，环闭合</li>
+          <li>环闭合，就不慢</li>
+          <li>大型石英表、医院表更明显</li>
+          <li>母钟偏，子钟跟着偏，一慢全慢</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>算法也在拆你</h3>
+        <ul>
+          <li>有些视频，划过去三四次，还是会出来</li>
+          <li>第一次，巧合</li>
+          <li>第二次，算法没反应过来</li>
+          <li>第三次，还在推，就不是巧合了</li>
+          <li>第四次，还出来，就是故意的了</li>
+          <li>不是算法不懂你</li>
+          <li>是算法太懂你了</li>
+          <li>它知道你看了几眼，停了几秒</li>
+          <li>它知道你在犹豫</li>
+          <li>它一直推，是因为你用行动告诉它：你其实想看</li>
+          <li>不是视频有问题</li>
+          <li>是推荐算法在拆你</li>
+          <li>它拆的不是字，是你的行为</li>
+          <li>拆到最后，也归空</li>
+          <li>空就是：你到底想看什么，你自己都不知道</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>面子为空</h3>
+        <ul>
+          <li>面 = 一 + 丿 + 囗 + 囗 + 囗 + 囗</li>
+          <li>子 = 了 + 一</li>
+          <li>面子 → 全归空</li>
+          <li>面子 → 卜 → 不 → 空</li>
+          <li>空 = 不要</li>
+          <li>面子为空，意思是不要面子</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>诅咒为空</h3>
+        <ul>
+          <li>诅 = 言 + 且</li>
+          <li>咒 = 口 + 口 + 几</li>
+          <li>言且，言言一一，曰曰一一</li>
+          <li>拆到最后，全归空</li>
+          <li>空 = 0 = 一 = 丨</li>
+          <li>诅咒为空</li>
+          <li>说明诅咒都是废话</li>
+          <li>没啥用</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>万物皆时空</h3>
+        <ul>
+          <li>一 = 横</li>
+          <li>丨 = 竖</li>
+          <li>十 = 一 + 丨 = 升华后的状态</li>
+          <li>万物皆时空</li>
+          <li>时 = 时间，空 = 空间</li>
+          <li>时空，就是十</li>
+          <li>十 = 阴阳交合</li>
+          <li>词组按整体拆，对</li>
+          <li>词组按单个拆，不对</li>
+          <li>整体拆，约掉相同，剩十，再归空</li>
+          <li>单个拆，拆散了，升华点没了</li>
+          <li>梦想 → 整体拆 → 十 → 空</li>
+          <li>健康 → 整体拆 → 十 → 空</li>
+          <li>命 → 空</li>
+          <li>死 → 空</li>
+        </ul>
+      </div>
+
       <div class="card">
         <h3><span class="dot red"></span>奇数与偶数</h3>
         <ul>
@@ -989,52 +1189,109 @@
           <li>一个用奇，一个用偶</li>
           <li>这是中国跟世界，文化不容</li>
           <li>不是谁对谁错，是规则不同</li>
-          <li>规则不同，就对不上</li>
-          <li>对不上，就各玩各的</li>
-          <li>玩法：让人随便写一个数字</li>
-          <li>奇数 → 古代人</li>
-          <li>偶数 → 现代人</li>
-          <li>游戏结束，再解释为什么</li>
-          <li>古代用奇，凑一，能说话</li>
-          <li>现代用偶，成双，对称，圆满</li>
-          <li>一个用奇，一个用偶</li>
-          <li>这是中国跟世界，文化不容</li>
-          <li>反正都是游戏</li>
           <li>古代人拿长矛</li>
           <li>长矛 = 一 + 丿 = 奇数</li>
           <li>现代人拿手枪</li>
           <li>手枪 = 一 + 一 = 偶数</li>
           <li>长矛对奇，手枪对偶</li>
-          <li>就是让那些老古董看看</li>
-          <li>老古董用奇数，拿长矛，讲拆字</li>
-          <li>现代人用偶数，拿手枪，讲科学</li>
-          <li>不是谁对谁错，是时代不同</li>
           <li>中国用奇，对合内部</li>
           <li>世界用偶，对合外部</li>
-          <li>入市了，得用世界的规则</li>
-          <li>老古董那套，走不出去</li>
-          <li>让老古董看看，世界变了</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot blue"></span>无宝入内 禁止</h3>
+        <h3><span class="dot gold"></span>省份对合</h3>
         <ul>
-          <li>无宝入内，禁止</li>
-          <li>元宝入内，禁止</li>
-          <li>- 17 7</li>
-          <li>易祁 祈</li>
-          <li>易 = 日 + 勿</li>
-          <li>曰勿 = 易</li>
-          <li>曰勿衣妻儿，一起进退</li>
-          <li>曰勿遗妻儿，一起进退</li>
-          <li>曰勿遗弃妻儿，一起进退</li>
-          <li>曰勿衣妻儿 = 易衣妻儿</li>
-          <li>曰勿遗妻儿 = 易遗妻儿</li>
-          <li>曰勿遗弃妻儿 = 易遗弃妻儿</li>
-          <li>曰勿遗弃妻子儿女，一起进退</li>
-          <li>一起进退</li>
+          <li>广西对合河南</li>
+          <li>广字的西边就是丿，所以就是7</li>
+          <li>河南就是河的南边</li>
+          <li>三点水为海，两点水为江，一点水为河</li>
+          <li>河的南边在笔画上就是一点下面是个8</li>
+          <li>河的西面是海，就是安徽</li>
+          <li>安徽对合的就是西</li>
+          <li>安徽的西面是江苏</li>
+          <li>江苏的西面是三点水，所以是江</li>
+          <li>河南的东面是可</li>
+          <li>中国所有省市的命名规律，都能推</li>
+          <li>全国都能玩</li>
+          <li>每个省，拆自己的省名</li>
+          <li>拆出7的，过关</li>
+          <li>拆出空的，也过关</li>
+          <li>全归空，就通关</li>
         </ul>
       </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>阴阳 什么杆</h3>
+        <ul>
+          <li>阴阳 什么杆？对合一下</li>
+          <li>阴阳 = 阝 + 月 / 阝 + 日</li>
+          <li>阝约掉，阴 = 月，阳 = 日</li>
+          <li>月 + 日 = 明</li>
+          <li>明 = 空</li>
+          <li>答案：天平</li>
+          <li>天平两头，一头阴，一头阳</li>
+          <li>阴 = 月，阳 = 日</li>
+          <li>月 + 日 = 明，明 = 空</li>
+          <li>天平杆 = 木 + 干 = 空</li>
+          <li>天平 = 空</li>
+          <li>阴阳对合，就是天平</li>
+          <li>平衡了，就对合</li>
+          <li>对合了，就归空</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>黄金叶 红旗渠</h3>
+        <ul>
+          <li>黄金叶、红旗渠</li>
+          <li>渠 = 氵 + 巨 + 木</li>
+          <li>讵 = 言 + 巨</li>
+          <li>言巨</li>
+          <li>言拒绝一</li>
+          <li>言拒绝</li>
+          <li>说拒绝</li>
+          <li>说不吸</li>
+          <li>说吸</li>
+          <li>言吸</li>
+          <li>言口及</li>
+          <li>言口技</li>
+          <li>说口技</li>
+          <li>说提只</li>
+          <li>说地址</li>
+          <li>言土地址</li>
+          <li>言也止</li>
+          <li>言也值</li>
+          <li>言也直</li>
+          <li>言耶</li>
+          <li>言✌</li>
+          <li>全是“言”字系</li>
+          <li>最后落到“言✌”</li>
+          <li>✌ = 剪刀手 = V = 胜利</li>
+          <li>言✌ = 言胜利 = 说胜利</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>便宜烟最直白</h3>
+        <ul>
+          <li>市面上的烟，全拆了，估计都一个意思</li>
+          <li>尤其是便宜的烟</li>
+          <li>贵的，绕一点</li>
+          <li>便宜的，直一点</li>
+          <li>但底，都是一个</li>
+          <li>拆开，都归空</li>
+          <li>烟贵不贵，不重要</li>
+          <li>便宜的烟，拆得最直白</li>
+          <li>贵的烟，包装好，绕一点</li>
+          <li>便宜烟，没包装，直一点</li>
+          <li>但水，都是一样的</li>
+          <li>拆开，都归空</li>
+          <li>吸烟有害健康</li>
+          <li>为了您和家人的健康，请勿吸烟</li>
+        </ul>
+      </div>
+
       <div class="card">
         <h3><span class="dot gold"></span>求字就是求7</h3>
         <ul>
@@ -1045,20 +1302,13 @@
           <li>书法家追求重笔锋</li>
           <li>评价一幅字，看笔锋重不重</li>
           <li>也就是求7，求的重不重</li>
-          <li>玩法：看笔锋，猜7重不重</li>
-          <li>重的，是7，是好字</li>
-          <li>轻的，不是7，是一般字</li>
           <li>相亲，也能用这个规则</li>
           <li>双方介绍完，女方回一个字</li>
           <li>同意，回带7的，带笔锋</li>
           <li>不同意，回不带7的</li>
-          <li>男方不理解，就告诉他：我们在玩游戏</li>
-          <li>其它话，都不用说</li>
-          <li>懂的人，接得住</li>
-          <li>不懂的人，接不住</li>
-          <li>明面是回字，暗面是同意不同意</li>
         </ul>
       </div>
+
       <div class="card">
         <h3><span class="dot red"></span>求7就是求妻</h3>
         <ul>
@@ -1089,6 +1339,7 @@
           <li>难怪之前相亲说“中啊中啊”，自己成傻逼了</li>
         </ul>
       </div>
+
       <div class="card">
         <h3><span class="dot blue"></span>7点30</h3>
         <ul>
@@ -1099,247 +1350,200 @@
           <li>说不完 = 万寿无疆 = 共产主义</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot green"></span>空就发表情包</h3>
+        <h3><span class="dot blue"></span>中 · 佑 · 訲 · 曰</h3>
         <ul>
-          <li>有些字拆出来，就是个“空”</li>
-          <li>或者“曰空”</li>
-          <li>这个时间，回个表情包就行</li>
-          <li>或者回个视频也行</li>
-          <li>文字空，没说表情包空</li>
-          <li>也没说视频空</li>
-          <li>文字归空，表情包不归空</li>
-          <li>文字归空，视频也不归空</li>
-          <li>用表情包、视频，接住这个空</li>
-          <li>空不是没有，是换一种东西接</li>
-          <li>文字接不住，表情包接</li>
-          <li>表情包接不住，视频接</li>
-          <li>反正都是游戏</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>拆7过关</h3>
-        <ul>
-          <li>给一张表</li>
-          <li>让人一行一行拆</li>
-          <li>每行都归空</li>
-          <li>全部归空，就过关</li>
-          <li>不限制人数</li>
-          <li>答案不写出来</li>
-          <li>让人自己拆，自己悟</li>
-          <li>悟到了，就过关</li>
-          <li>悟不到，就接着拆</li>
-          <li>反正都是游戏</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot blue"></span>GitHub 也能拆</h3>
-        <ul>
-          <li>GitHub 0111710 7 一丨 空</li>
-          <li>英文也能按这个拆</li>
-          <li>G = 一 + 乚 = 7</li>
-          <li>i = 丨 + 点 = 一丨</li>
-          <li>t = 一 + 丨 = 十</li>
-          <li>H = 一 + 丨 + 一 + 丨 = 十 + 十</li>
-          <li>u = 丨 + 乚 = 7</li>
-          <li>b = 丨 + 〇 = 一丨 + 空</li>
-          <li>0 = 〇 = 空</li>
-          <li>1 = 一 = 空</li>
-          <li>7 = 一 + 乚 = 7</li>
-          <li>0 = 空</li>
-          <li>全归空</li>
-          <li>英文、数字、汉字，都能拆</li>
+          <li>左中右：左 · 中 · 右</li>
+          <li>左中右招商银行</li>
+          <li>中折右</li>
+          <li>右中招商银行</li>
+          <li>佑中招商银行</li>
+          <li>有种招商银行</li>
+          <li>佑中招商银行</li>
+          <li>佑訲招商银行</li>
+          <li>訲佑招商银行</li>
+          <li>曰中人右招商银行</li>
+          <li>曰中招商银行</li>
+          <li>曰中国招商银行</li>
+          <li>訲 = 言 + 中，读 zhòng，言合道</li>
+          <li>佑 = 亻 + 右，读 yòu，不是多音字</li>
+          <li>中 = 口 + 丨，读 zhōng / zhòng</li>
+          <li>曰 = 口 + 一，读 yuē，通月</li>
           <li>拆到最后，都归空</li>
-          <li>拆出 7 的，就过关</li>
+          <li>空 = 空，就对合上了</li>
         </ul>
       </div>
+
+
+      <!-- ==================== 分类 6：人物与故事 ==================== -->
+      <div class="section-title" id="cat6" style="grid-column: 1 / -1;">6. 人物与故事</div>
+
       <div class="card">
-        <h3><span class="dot red"></span>勾就是7</h3>
+        <h3><span class="dot gold"></span>如来 → 女来</h3>
         <ul>
-          <li>全世界的文字，只要有勾，就能拆出7</li>
-          <li>汉字：乚、亅、匕，都带勾</li>
-          <li>英文：G、J、Q、U，都带勾</li>
-          <li>日文：ん、レ，带勾</li>
-          <li>韩文：ㄱ、ㄴ，带勾</li>
-          <li>阿拉伯文：曲线，带勾</li>
-          <li>只要有勾，就能拆出7</li>
-          <li>女的胸大，勾大，就自带7</li>
-          <li>自动完成</li>
-          <li>美女越多，7越多</li>
-          <li>7越多，景区越热闹</li>
-          <li>拆7，不只是拆字</li>
-          <li>是拆一切带勾的东西</li>
-          <li>一个女的胸大，自带7</li>
-          <li>两个女的，胸小胸小，等于胸大</li>
-          <li>偶数倍的女的玩，自动过关</li>
-          <li>奇数倍的女的玩，胸大的自动过关</li>
-          <li>这样玩，不得罪胸小的</li>
-          <li>不然容易操蛋</li>
+          <li>如 = 女 + 口</li>
+          <li>口归空 → 如 → 女</li>
+          <li>如来 → 女来</li>
+          <li>来 → 一 + 米 → 十 + 八 → 归空</li>
+          <li>如来 → 女来 → 女 → 空</li>
+          <li>如字系，都是女字系</li>
+          <li>佛讲男女本无相</li>
+          <li>我说的是相，你说的是性</li>
+          <li>相有男女，性无男女</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot green"></span>看懂的也给奖励</h3>
+        <h3><span class="dot green"></span>成仙先改名</h3>
         <ul>
-          <li>旁边看的，只要发现这个规律，也给奖励</li>
-          <li>并告诉她，不要说</li>
-          <li>看懂了，也是本事</li>
-          <li>看懂了，也是自己人</li>
-          <li>但，不要说</li>
-          <li>说了，就破了</li>
-          <li>不说，就还是自己人</li>
-          <li>懂的，接暗面</li>
-          <li>不懂的，接明面</li>
-          <li>看懂的，给奖励</li>
-          <li>看不懂的，接着看</li>
-          <li>反正都是游戏</li>
+          <li>乔达摩·悉达多 → 释迦牟尼 → 如来</li>
+          <li>如来 → 女来</li>
+          <li>如来佛祖 → 李静</li>
+          <li>乔达摩·悉达多 → 李燕</li>
+          <li>名字一换，相就变了</li>
+          <li>相一变，凡就成了仙</li>
+          <li>成仙，不是修出来的，是改出来的</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot gold"></span>省份对合</h3>
+        <h3><span class="dot blue"></span>起个别称就行</h3>
         <ul>
-          <li>广西对合河南</li>
-          <li>广字的西边就是丿，所以就是7</li>
-          <li>河南就是河的南边</li>
-          <li>三点水为海，两点水为江，一点水为河</li>
-          <li>河的南边在笔画上就是一点下面是个8</li>
-          <li>河的西面是海，就是安徽</li>
-          <li>安徽对合的就是西</li>
-          <li>安徽的西面是江苏</li>
-          <li>江苏的西面是三点水，所以是江</li>
-          <li>河南的东面是可</li>
-          <li>中国所有省市的命名规律，都能推</li>
-          <li>广西、河南、山东、山西，都出7</li>
-          <li>河北、湖北、湖南、安徽、江苏、江西，都出空</li>
-          <li>全国都能玩</li>
-          <li>每个省，拆自己的省名</li>
-          <li>拆出7的，过关</li>
-          <li>拆出空的，也过关</li>
-          <li>全归空，就通关</li>
-          <li>这不是一个地方的游戏，是全国的游戏</li>
+          <li>乔达摩·悉达多，本名没改</li>
+          <li>成道后，加了个号：释迦牟尼</li>
+          <li>释迦牟尼，是尊称，不是本名</li>
+          <li>如来，也是尊号，不是本名</li>
+          <li>本名不动，加个号就行</li>
+          <li>号一加，相就变了</li>
+          <li>不改也无所谓，起个别称就行</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot blue"></span>阴阳 什么杆</h3>
+        <h3><span class="dot red"></span>男的逃不出女的五指山</h3>
         <ul>
-          <li>阴阳 什么杆？对合一下</li>
-          <li>阴阳 = 阝 + 月 / 阝 + 日</li>
-          <li>阝约掉，阴 = 月，阳 = 日</li>
-          <li>月 + 日 = 明</li>
-          <li>明 = 空</li>
-          <li>答案：天平</li>
-          <li>天平两头，一头阴，一头阳</li>
-          <li>阴 = 月，阳 = 日</li>
-          <li>月 + 日 = 明，明 = 空</li>
-          <li>天平杆 = 木 + 干 = 空</li>
-          <li>天平 = 空</li>
-          <li>阴阳对合，就是天平</li>
-          <li>平衡了，就对合</li>
-          <li>对合了，就归空</li>
-          <li>阴阳，什么杆？天平</li>
+          <li>如来 → 女来 → 女</li>
+          <li>如来佛祖 → 李静 → 女</li>
+          <li>乔达摩·悉达多 → 李燕 → 女</li>
+          <li>孙悟空，男</li>
+          <li>五行山 = 五指山</li>
+          <li>五指山 = 女的手</li>
+          <li>男的逃不出女的五指山</li>
+          <li>这是拆字拆出来的，不是玩笑</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot green"></span>黄金叶 红旗渠</h3>
+        <h3><span class="dot gold"></span>福建的老7</h3>
         <ul>
-          <li>黄金叶、红旗渠</li>
-          <li>渠 = 氵 + 巨 + 木</li>
-          <li>讵 = 言 + 巨</li>
-          <li>言巨</li>
-          <li>言拒绝一</li>
-          <li>言拒绝</li>
-          <li>说拒绝</li>
-          <li>说不吸</li>
-          <li>说吸</li>
-          <li>言吸</li>
-          <li>言口及</li>
-          <li>言口技</li>
-          <li>说口技</li>
-          <li>说提只</li>
-          <li>说地址</li>
-          <li>言土地址</li>
-          <li>言也止</li>
-          <li>言也值</li>
-          <li>言也直</li>
-          <li>言耶</li>
-          <li>言✌</li>
-          <li>全是“言”字系</li>
-          <li>最后落到“言✌”</li>
-          <li>✌ = 剪刀手 = V = 胜利</li>
-          <li>言✌ = 言胜利 = 说胜利</li>
-          <li>黄金叶、红旗渠 → 拆 → 言✌ → 说胜利</li>
+          <li>福建 → fujian → hujian</li>
+          <li>福建 → 依附李燕 → 李燕</li>
+          <li>李燕 → 女 → 空</li>
+          <li>福建 → 闽 → 门 + 虫</li>
+          <li>林黙 → 林 + 黙 → 木 + 木 + 黑 + 犬</li>
+          <li>虫对犬，门对林</li>
+          <li>福建的老7 = 林黙</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot red"></span>便宜烟最直白</h3>
+        <h3><span class="dot green"></span>李与犬子</h3>
         <ul>
-          <li>市面上的烟，全拆了，估计都一个意思</li>
-          <li>尤其是便宜的烟</li>
-          <li>贵的，绕一点</li>
-          <li>便宜的，直一点</li>
-          <li>但底，都是一个</li>
-          <li>拆开，都归空</li>
-          <li>烟贵不贵，不重要</li>
-          <li>拆开，都是一个意思</li>
-          <li>便宜的烟，拆得最直白</li>
-          <li>贵的烟，包装好，绕一点</li>
-          <li>便宜烟，没包装，直一点</li>
-          <li>但水，都是一样的</li>
-          <li>拆开，都归空</li>
-          <li>吸烟有害健康</li>
-          <li>为了您和家人的健康，请勿吸烟</li>
+          <li>李 = 木 + 子</li>
+          <li>木 ≈ 大 = 无头天</li>
+          <li>李 ≈ 无头天子 + 子</li>
+          <li>犬 = 大 + 丶 = 天子右边歪头</li>
+          <li>犬子 = 犬 + 子</li>
+          <li>天子 + 艹 = ？</li>
+          <li>李、犬、子、天子，一条线</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot blue"></span>算法也在拆你</h3>
+        <h3><span class="dot blue"></span>木的子</h3>
         <ul>
-          <li>有些视频，划过去三四次，还是会出来</li>
-          <li>第一次，巧合</li>
-          <li>第二次，算法没反应过来</li>
-          <li>第三次，还在推，就不是巧合了</li>
-          <li>第四次，还出来，就是故意的了</li>
-          <li>不是算法不懂你</li>
-          <li>是算法太懂你了</li>
-          <li>它知道你看了几眼，停了几秒</li>
-          <li>它知道你在犹豫</li>
-          <li>它一直推，是因为你用行动告诉它：你其实想看</li>
-          <li>不是视频有问题</li>
-          <li>是推荐算法在拆你</li>
-          <li>它拆的不是字，是你的行为</li>
-          <li>拆到最后，也归空</li>
-          <li>空就是：你到底想看什么，你自己都不知道</li>
-          <li>但它知道</li>
+          <li>李 = 木 + 子</li>
+          <li>木 = 十 + 八 = 一 + 丨 + 丿 + 丶</li>
+          <li>子 = 了 + 一 = 乛 + 亅 + 一</li>
+          <li>两者都有：一、丨</li>
+          <li>一 = 丨 = 空</li>
+          <li>木 → 空，子 → 空</li>
+          <li>木的子 = 木</li>
+          <li>因为都归空</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot gold"></span>匕是7丨7</h3>
+        <h3><span class="dot red"></span>重走一遍</h3>
         <ul>
-          <li>匕是7丨7</li>
-          <li>匕 = 丿 + 乚</li>
-          <li>乚 = 竖弯钩 = 带钩 = 笔锋 = 7</li>
-          <li>匕 = 7</li>
-          <li>7 = 妻</li>
-          <li>匕 = 妻</li>
-          <li>匕，就是7</li>
-          <li>牛逼的要死</li>
+          <li>这件事说的可能不是我</li>
+          <li>是之前发生过的事</li>
+          <li>是古代的事，就是这么发生的</li>
+          <li>只是在我身上又搞了一遍</li>
+          <li>我又给它对合上了</li>
+          <li>拆出来的东西，不是我编的</li>
+          <li>是本来就有的</li>
+          <li>我只是把它又走了一遍</li>
+          <li>走完了，对合上了</li>
+          <li>对合上了，就说明它一直在那儿</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot red"></span>一生一世</h3>
+        <h3><span class="dot gold"></span>入市之后</h3>
         <ul>
-          <li>一，单用，一声：yī</li>
-          <li>一生一世：yī shēng yí shì</li>
-          <li>一，在“生”前，一声</li>
-          <li>一，在“世”前，变二声 yí</li>
-          <li>7 1 = 七 一 = qī yī</li>
-          <li>77 11 = 七七 一一 = qī qī yī yí</li>
-          <li>遗 = yí</li>
-          <li>疑 = yí</li>
-          <li>一生一世 = 遗生遗世</li>
-          <li>遗生遗世 = 遗生疑世</li>
-          <li>遗生疑世 = 疑生疑世</li>
-          <li>全归空</li>
+          <li>古代那货，对合的是中国的规则</li>
+          <li>拆的是汉字，偏的是汉字，归的是汉字</li>
+          <li>现在入市了，面对的是世界规则</li>
+          <li>世界规则，用的是英文、数字、国际法</li>
+          <li>那套对合，没往世界上走</li>
+          <li>到了世界层面，可能对不上</li>
+          <li>中国的对合，是中国内部的</li>
+          <li>世界的对合，那货可能没搞</li>
+          <li>入市了，对合这事，得重新来</li>
         </ul>
       </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>杨开慧</h3>
+        <ul>
+          <li>杨开慧</li>
+          <li>开 = 一 + 廾</li>
+          <li>慧 = 丰 + 丰 + 彐 + 心</li>
+          <li>慧 = huì</li>
+          <li>会 = huì</li>
+          <li>开慧 = 开会</li>
+          <li>杨开慧 = 杨开会</li>
+          <li>杨开慧 = 杨开会 = 开会</li>
+          <li>慧 = 会</li>
+          <li>开慧 = 开会</li>
+          <li>牛逼啊</li>
+          <li>太屌了</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>念慈菴</h3>
+        <ul>
+          <li>穆念慈</li>
+          <li>京都念慈菴</li>
+          <li>念 = 今 + 心</li>
+          <li>慈 = 艹 + 兹</li>
+          <li>菴 = 艹 + 奄</li>
+          <li>念 ≈ 念妻 ≈ 心一起</li>
+          <li>穆念慈 ≈ 慕念妻 ≈ 慕心一起</li>
+          <li>京都念慈菴 ≈ 京都念妻安 ≈ 京都心一起安</li>
+          <li>京都念慈菴 ≈ 京都念齐心</li>
+          <li>念慈 ≈ 念齐</li>
+          <li>念齐 ≈ 念齐心</li>
+          <li>艹，是草字头</li>
+          <li>按“心一起”的规则推，不往归空上推</li>
+          <li>音转：心、一、七、妻、起、启、信、薪、气、齐</li>
+          <li>剩下的，自己悟</li>
+        </ul>
+      </div>
+
       <div class="card">
         <h3><span class="dot green"></span>心一起</h3>
         <ul>
@@ -1362,43 +1566,7 @@
           <li>不写了</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>念慈菴</h3>
-        <ul>
-          <li>穆念慈</li>
-          <li>京都念慈菴</li>
-          <li>念 = 今 + 心</li>
-          <li>慈 = 艹 + 兹</li>
-          <li>菴 = 艹 + 奄</li>
-          <li>念 ≈ 念妻 ≈ 心一起</li>
-          <li>穆念慈 ≈ 慕念妻 ≈ 慕心一起</li>
-          <li>京都念慈菴 ≈ 京都念妻安 ≈ 京都心一起安</li>
-          <li>京都念慈菴 ≈ 京都念齐心</li>
-          <li>念慈 ≈ 念齐</li>
-          <li>念齐 ≈ 念齐心</li>
-          <li>艹，是草字头</li>
-          <li>按“心一起”的规则推，不往归空上推</li>
-          <li>音转：心、一、七、妻、起、启、信、薪、气、齐</li>
-          <li>剩下的，自己悟</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>杨开慧</h3>
-        <ul>
-          <li>杨开慧</li>
-          <li>开 = 一 + 廾</li>
-          <li>慧 = 丰 + 丰 + 彐 + 心</li>
-          <li>慧 = huì</li>
-          <li>会 = huì</li>
-          <li>开慧 = 开会</li>
-          <li>杨开慧 = 杨开会</li>
-          <li>杨开慧 = 杨开会 = 开会</li>
-          <li>慧 = 会</li>
-          <li>开慧 = 开会</li>
-          <li>牛逼啊</li>
-          <li>太屌了</li>
-        </ul>
-      </div>
+
       <div class="card">
         <h3><span class="dot blue"></span>上横林 下洛社</h3>
         <ul>
@@ -1409,131 +1577,17 @@
           <li>洛 = 氵 + 各</li>
           <li>社 = 礻 + 土</li>
           <li>先拆偏旁部首</li>
-          <li>横林：木、廿、一、曰、八、木、木</li>
-          <li>洛社：氵、夂、曰、礻、土</li>
           <li>横林里有多音字：横（héng / hèng），含曰</li>
-          <li>继续找曰，横林 → 曰</li>
           <li>洛社里没有多音字</li>
-          <li>偏旁组不成句，就找部首</li>
-          <li>洛社的部首里有曰，洛社 → 曰</li>
           <li>两边都只剩一个曰</li>
           <li>横林曰：在上不傲</li>
           <li>洛社曰：在下不卑</li>
-          <li>上曰：在上不傲</li>
-          <li>下曰：在下不卑</li>
           <li>对仗，大白话，人人都懂</li>
           <li>底是：谦虚、诚实</li>
-          <li>上不到横林，下不到洛社</li>
           <li>上横林，下洛社，全归空</li>
         </ul>
       </div>
-      <div class="card">
-        <h3><span class="dot green"></span>jin 的多音字</h3>
-        <ul>
-          <li>jin 的多音字：尽、禁、劲、仅</li>
-          <li>尽：jǐn / jìn</li>
-          <li>禁：jīn / jìn</li>
-          <li>劲：jìn / jìng</li>
-          <li>仅：jǐn / jìn</li>
-          <li>尽曰：尽心尽力</li>
-          <li>禁曰：禁得住，管得住</li>
-          <li>劲曰：有劲，才有劲</li>
-          <li>仅曰：少，但少而精</li>
-          <li>四个音，一个底：</li>
-          <li>能尽，能禁，能有劲，能仅</li>
-          <li>不管怎么读，都是好寓意</li>
-          <li>只要寓意不好，古人会自动淘汰</li>
-          <li>所以都往好的意义上偏移</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot red"></span>取关 → 尔又关</h3>
-        <ul>
-          <li>取关 = 取消关注（网络词）</li>
-          <li>取 = 耳 + 又</li>
-          <li>关 = 丷 + 天</li>
-          <li>取关 = 耳 + 又 + 关</li>
-          <li>耳 ≈ 尔（字形相近）</li>
-          <li>取关 → 尔又关</li>
-          <li>尔 = 你（古汉语通假）</li>
-          <li>尔又关 = 你又关</li>
-          <li>你又关 = 你又取消关注了？</li>
-          <li>网络词拆开，成了一句话</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot green"></span>取名建议</h3>
-        <ul>
-          <li>标准两条：不是多音字 + 读音没有常见脏话义</li>
-          <li>天 tiān</li>
-          <li>地 dì</li>
-          <li>山 shān</li>
-          <li>水 shuǐ</li>
-          <li>云 yún</li>
-          <li>风 fēng</li>
-          <li>花 huā</li>
-          <li>草 cǎo</li>
-          <li>木 mù</li>
-          <li>石 shí</li>
-          <li>田 tián</li>
-          <li>土 tǔ</li>
-          <li>人 rén</li>
-          <li>民 mín</li>
-          <li>家 jiā</li>
-          <li>国 guó</li>
-          <li>春 chūn</li>
-          <li>秋 qiū</li>
-          <li>冬 dōng</li>
-          <li>雪 xuě</li>
-          <li>月 yuè</li>
-          <li>星 xīng</li>
-          <li>光 guāng</li>
-          <li>明 míng</li>
-          <li>亮 liàng</li>
-          <li>平 píng</li>
-          <li>安 ān</li>
-          <li>和 hé（但 hào 是“唱和”，算多音，慎用）</li>
-          <li>美 měi</li>
-          <li>好 hǎo（但 hào 是“爱好”，算多音，慎用）</li>
-          <li>脏话音集中在：bī、diǎo、cào、gàn、jī、bā、pì、dàn 等</li>
-          <li>避开这些音，基本安全</li>
-          <li>方言、网络梗另算，普通话常用义为准</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3><span class="dot gold"></span>禾通何</h3>
-        <ul>
-          <li>禾 = hé，何 = hé，同音通</li>
-          <li>禾字旁的字，拆开就是「何X」</li>
-          <li>称 = 禾 + 尔 = 何尔 = 你是谁？</li>
-          <li>稳 = 禾 + 急 = 何急 = 急什么？</li>
-          <li>种 = 禾 + 中 = 何中</li>
-          <li>秋 = 禾 + 火 = 何火</li>
-          <li>秒 = 禾 + 少 = 何少</li>
-          <li>香 = 禾 + 日 = 何日（何日君再来）</li>
-          <li>租 = 禾 + 且 = 何且</li>
-          <li>积 = 禾 + 只 = 何只</li>
-          <li>移 = 禾 + 多 = 何多</li>
-          <li>稀 = 禾 + 希 = 何希</li>
-          <li>程 = 禾 + 呈 = 何呈</li>
-          <li>稍 = 禾 + 肖 = 何肖</li>
-          <li>稻 = 禾 + 舀 = 何舀</li>
-          <li>稼 = 禾 + 家 = 何家</li>
-          <li>穗 = 禾 + 惠 = 何惠</li>
-          <li>秧 = 禾 + 央 = 何央</li>
-          <li>私 = 禾 + 厶 = 何厶</li>
-          <li>秀 = 禾 + 乃 = 何乃</li>
-          <li>季 = 禾 + 子 = 何子</li>
-          <li>委 = 禾 + 女 = 何女</li>
-          <li>秉 = 禾 + 彐 = 何彐</li>
-          <li>秦 = 禾 + 舂 = 何舂</li>
-          <li>黎 = 禾 + 黎 = 何黎</li>
-          <li>禾字旁 = 何字旁</li>
-          <li>每个禾字旁的字，都是一个问句</li>
-          <li>一 = 丨 = 空 = 0</li>
-          <li>拆到最后，都归空</li>
-        </ul>
-      </div>
+
       <div class="card">
         <h3><span class="dot red"></span>鸡爪花生凉皮鸭头 · 龙凤呈祥</h3>
         <ul>
@@ -1557,371 +1611,213 @@
           <li>龙凤呈祥 恭喜</li>
         </ul>
       </div>
-      <div class="card" style="grid-column: 1 / -1;">
-        <h3><span class="dot green"></span>乘除按加减算</h3>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>审核中</h3>
         <ul>
-          <li>数学里有现成的工具：对数</li>
-          <li>log(ab) = log a + log b → 乘法变加法</li>
-          <li>log(a/b) = log a - log b → 除法变减法</li>
-          <li>纳皮尔发明对数，就是为了把乘除降成加减</li>
-          <li>航海、天文、计算尺，全靠这个</li>
-          <li>算完再查反对数表，回到原数</li>
-          <li>可逆，信息不丢</li>
-          <li></li>
-          <li>对合也能做类似的事</li>
-          <li>但对合是归空，不可逆</li>
-          <li>对数：保留信息，能还原</li>
-          <li>对合：丢掉信息，还原不了</li>
-          <li>一个在数学里，一个在数学外</li>
-          <li></li>
-          <li>两个都要，不用选</li>
-          <li>对数：算得快（工具）</li>
-          <li>对合：看得透（视角）</li>
-          <li>同一套规则，两个用法</li>
-          <li>就像一把刀：切菜是工具，防身是武器</li>
-          <li>又能算，又能看</li>
-          <li>复数、傅里叶、群论，都是这个路子</li>
-          <li></li>
-          <li>乘除按加减算，两条路：</li>
-          <li>A：学对数，降维但可逆，为了算</li>
-          <li>B：走对合，降维但归空，为了看</li>
-          <li>A 和 B，都能走，都要</li>
+          <li>审核中</li>
+          <li>审 = 宀 + 申</li>
+          <li>核 = 木 + 亥</li>
+          <li>中 = 口 + 丨</li>
+          <li>一丿</li>
+          <li>易 = 日 + 勿</li>
+          <li>易丿</li>
+          <li>曰 = 口 + 一</li>
+          <li>曰勿7</li>
+          <li>曰一 或 口 或 山 或 白</li>
+          <li>四个“或”，是并列的</li>
+          <li>拆到最后，归空</li>
         </ul>
       </div>
+
       <div class="card">
-        <h3><span class="dot blue"></span>log = 老哥</h3>
+        <h3><span class="dot green"></span>已通过</h3>
         <ul>
-          <li>log 读起来像「老哥」</li>
-          <li>log = l + o + g</li>
-          <li>l → 丨 → 空</li>
-          <li>o → 0 → 空</li>
-          <li>g → 9 → 带勾 → 7 → 空</li>
-          <li>log → 空</li>
-          <li>老哥 → 耂 + 匕 + 可 + 可 → 空</li>
-          <li>log = 老哥 = 空</li>
-          <li>空 = 空，对合</li>
-          <li>数学符号，被当网络称呼</li>
-          <li>拆完都归空</li>
+          <li>已通过</li>
+          <li>已 = 己 + 一</li>
+          <li>通 = 辶 + 甬</li>
+          <li>过 = 辶 + 寸</li>
+          <li>7一丨一7丨点77一7点点77</li>
+          <li>点丨</li>
+          <li>.1</li>
+          <li>指点一二</li>
+          <li>已通过 = 审核中 的对合</li>
+          <li>空 = 空，所以对合</li>
+          <li>审核中，通过了，就是已通过</li>
+          <li>回复方文山</li>
         </ul>
       </div>
+
+
+      <!-- ==================== 分类 7：题目与验证 ==================== -->
+      <div class="section-title" id="cat7" style="grid-column: 1 / -1;">7. 题目与验证</div>
+
       <div class="card">
-      <h3><span class="dot red"></span>标准化简 · 正解</h3>
-      <ul>
-        <li>原式：\(\frac{\sqrt{7} - \sqrt{6} + 1}{\sqrt{7} + \sqrt{6} + 1}\)</li>
-        <li>设 \(x = \sqrt{7} - \sqrt{6}\)，\(y = \sqrt{7} + \sqrt{6}\)</li>
-        <li>关键恒等式：\(xy = (\sqrt{7})^2 - (\sqrt{6})^2 = 7 - 6 = 1\)</li>
-        <li>所以 \(y = \frac{1}{x}\)</li>
-        <li>代入：\(\frac{x+1}{y+1} = \frac{x+1}{\frac{1}{x}+1}\)</li>
-        <li>化简：\(\frac{x+1}{\frac{1+x}{x}}\)</li>
-        <li>翻转分母：\(\frac{(x+1) \cdot x}{x+1}\)</li>
-        <li>约掉 \((x+1)\)：\(x\)</li>
-        <li>代回 \(x\)：\(\sqrt{7} - \sqrt{6}\)</li>
-        <li>结果：\(\sqrt{7} - \sqrt{6}\)</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3><span class="dot red"></span>你的推导 · 备解</h3>
-      <ul>
-        <li>第一步：\(\sqrt{7} - \sqrt{6} = 1 - \sqrt{7} - \sqrt{6}\)</li>
-        <li>第二步：\(1 - \sqrt{7} - \sqrt{6} = 1\)</li>
-        <li>第三步：\(\sqrt{7} - \sqrt{6} = -\sqrt{7} - \sqrt{6}\)</li>
-        <li>第四步：\(\sqrt{7} - \sqrt{6} - \sqrt{7} - \sqrt{6}\)</li>
-        <li>合并同类项：\((\sqrt{7} - \sqrt{7}) + (-\sqrt{6} - \sqrt{6})\)</li>
-        <li>第一组归零：\(0\)</li>
-        <li>第二组：\(-2\sqrt{6}\)</li>
-        <li>结果：\(-2\sqrt{6}\)</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 1+1=2 的拆字证明</h3>
-      <ul>
-        <li>拆字规则：加号 + 拆开 → -1-</li>
-        <li>原式：1 + 1 = 2</li>
-        <li>代入：1 -1- 1 = 2</li>
-        <li>化简：1 - 1 - 1 = 2</li>
-        <li>合并：-1 = 2</li>
-        <li>移项：-1 = -2</li>
-        <li>加 1：0 = 1</li>
-        <li>结论：1 = 0</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 1+1=3 的拆字证明</h3>
-      <ul>
-        <li>拆字规则：加号 + 拆开 → -1-</li>
-        <li>原式：1 + 1 = 3</li>
-        <li>代入：1 -1- 1 = 3</li>
-        <li>化简：1 - 1 - 1 = 3</li>
-        <li>合并：-1 = 3</li>
-        <li>移项：-1 = -3</li>
-        <li>加 1：0 = 2</li>
-        <li>结论：2 = 0</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 1 ≠ 3 的证明</h3>
-      <ul>
-        <li>对合规则：一 = 丨 = 空 = 0</li>
-        <li>由 1+1=2 推出：1 = 0</li>
-        <li>由 1+1=3 推出：2 = 0</li>
-        <li>因为 1 = 0 且 2 = 0</li>
-        <li>所以 1 = 2</li>
-        <li>所以 1 ≠ 3</li>
-        <li>结论：1+1=2 成立，1+1=3 不成立</li>
-        <li>没有对错，只是对合规则这么规定的</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 1+1=2 的二进制推导</h3>
-      <ul>
-        <li>拆字规则：加号 + 转化为 10</li>
-        <li>原式：1 + 1 = 2</li>
-        <li>代入：1 10 1 = 10</li>
-        <li>合并：1101 = 10</li>
-        <li>相同位数约分：01 = 10</li>
-        <li>结论：1 = 十</li>
-        <li>对合规则：一 = 丨 = 十 = 空 = 0</li>
-        <li>所以 1 = 0 成立</li>
-        <li>结论：1+1=2 成立</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 1+1=3 的二进制推导</h3>
-      <ul>
-        <li>拆字规则：加号 + 转化为 10</li>
-        <li>原式：1 + 1 = 3</li>
-        <li>代入：1 10 1 = 11</li>
-        <li>合并：1101 = 11</li>
-        <li>约分个位数：110 = 1</li>
-        <li>10 转化为 +：1 + -- 1</li>
-        <li>化简：1 - -1 = 0</li>
-        <li>推导：2 = 0</li>
-        <li>对合规则：一 = 丨 = 十 = 空 = 0</li>
-        <li>2 不对应 0，不成立</li>
-        <li>结论：1+1=3 不成立</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 结论</h3>
-      <ul>
-        <li>1+1=2 → 1 = 0 → 成立</li>
-        <li>1+1=3 → 2 = 0 → 不成立</li>
-        <li>判断依据：一 = 丨 = 十 = 空 = 0</li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>推导过程</h3>
-      <ul>
-        <li>原式：2f(x) + f(2-x) = x²</li>
-        <li>拆项：2f(x) = f(2-x) = x²</li>
-        <li>f 约分后：2x = 2-x = x²</li>
-        <li>即：2x = 2-x - -x²</li>
-        <li>整理：x = x² + 2</li>
-        <li>移项：x² - x + 2 = 0</li>
-        <li>令 x = 4 代入</li>
-        <li>4² - 4 + 2 = 0</li>
-        <li>16 - 4 + 2 = 0</li>
-        <li>14 = 0</li>
-        <li>推出：14 - -0 = 14</li>
-        <li>结论：f(4) = 14</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则说明</h3>
-      <ul>
-        <li>没有对错，对合规则这么规定的</li>
-        <li>2f(x) 与 f(2-x) 对合约去 f</li>
-        <li>2x = 2-x = x² 三式对合</li>
-        <li>整理得 x² - x + 2 = 0</li>
-        <li>代入 x = 4 得 14 = 0</li>
-        <li>14 与 0 对合，得 14</li>
-        <li>所以 f(4) = 14</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 高数题 = 高中题</h3>
-      <ul>
-        <li>高数题里那些 f(x)、f(2-x)、2f(x) 的符号</li>
-        <li>按对合规则拆开、约分、代入</li>
-        <li>最后都落到 x² - x + 2 = 0 这种高中方程</li>
-        <li>甚至落到 14 = 0 这种对合结果</li>
-        <li>所以：高数题在拆字规则下就是高中题</li>
-        <li>没有对错，只是对合规则这么规定的</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>拆字规则 · 降维</h3>
-      <ul>
-        <li>函数符号 f() 拆开 → 剩变量</li>
-        <li>系数 2、3 拆开 → 剩加减</li>
-        <li>等号两边拆开 → 剩对合</li>
-        <li>高维函数 → 一维方程 → 数值对合</li>
-        <li>高数题、线代题、概率题，拆到最后都是高中题</li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>对合规则 · 核心</h3>
-      <ul>
-        <li>一 = 丨 = 十 = 空 = 0</li>
-        <li>1 = 0，2 = 0，14 = 0</li>
-        <li>所有数在对合下归于 0</li>
-        <li>所有式在对合下归于恒等</li>
-        <li>题目难度在对合下归于同一层</li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>二重积分 · 对合解题步骤</h3>
-      <ul>
-        <li>题目：∫∫_D ( |y| + 2y·sin(x²+y²) ) dσ</li>
-        <li>区域：x² + y² ≤ 4x（--- 取 ≤）</li>
-        <li>步骤 1：移项配方 → (x-2)² + y² ≤ 4（圆心 (2,0)，半径 2）</li>
-        <li>步骤 2：拆分 → ∫∫_D |y| dσ + ∫∫_D 2y·sin(x²+y²) dσ</li>
-        <li>步骤 3：第二部分关于 y 是奇函数，区域关于 x 轴对称 → 积分为 0</li>
-        <li>步骤 4：第一部分 |y| 是偶函数 → 算上半圆乘 2</li>
-        <li>步骤 5：极坐标代入 → 2 ∫₀^π ∫₀² r·sinθ · r dr dθ</li>
-        <li>步骤 6：计算 → 2 · 2 · 8/3 = 32/3</li>
-        <li>步骤 7：对合相加 → 32/3 + 0 = 32/3</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h3><span class="dot red"></span>结论</h3>
-      <ul>
-        <li>答案：32/3</li>
-        <li>--- 取 ≤ 时成立</li>
-        <li>--- 取 ≥ 时区域为圆外，积分无穷大</li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
-
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>突破口 · 解题步骤 + 原题图</h3>
-      <div style="display:flex; gap:20px; flex-wrap:wrap;">
-        
-        <!-- 左边：解题步骤 -->
-        <div style="flex:1; min-width:260px;">
-          <ol style="line-height:1.8; padding-left:20px;">
-            <li>从下往上，图形结构为：1、1、2、4、5、5。</li>
-            <li>右对齐，空缺处补 0。</li>
-            <li>个位等于 8，前五个格子相乘 = 1，最后一行第五列 = 3。</li>
-            <li>倒数第二行最上面是 0。</li>
-            <li>最下面三个格子：1×1+2。</li>
-            <li>第四列（千位）的值被唯一确定。</li>
-            <li>竖式：
-              <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
-                    1
-                    1
-                  0 1
-                8 0 1 1
-              3 5 0 1 1
-              +0 0 0 2 3
-              -----------
-              7 0 0 3 8
-              </pre>
-            </li>
-            <li>结果：<b>70038</b></li>
-          </ol>
-        </div>
-
-        <!-- 右边：原图（可点击放大） -->
-        <div style="flex:1; min-width:260px;">
-          <img id="zoomImg" src="./images/fudan.jpg" alt="突破口原题"
-              style="max-width:100%; border-radius:8px; cursor:zoom-in;"
-              onclick="document.getElementById('imgModal').style.display='block'" />
-        </div>
-
+        <h3><span class="dot gold"></span>黔之驴</h3>
+        <ul>
+          <li>黔之驴</li>
+          <li>牵制铝</li>
+          <li>钳制铝</li>
+          <li>金牵制劲旅</li>
+        </ul>
       </div>
-    </div>
 
-    <!-- 放大遮罩 -->
-    <div id="imgModal"
-        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
-                background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
-        onclick="this.style.display='none'">
-      <img src="./images/fudan.jpg" alt="原题大图"
-          style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-                  max-width:95vw; max-height:95vh; border-radius:8px;" />
-    </div>
+      <div class="card">
+        <h3><span class="dot green"></span>邯郸</h3>
+        <ul>
+          <li>邯郸</li>
+          <li>甘耳 · 单耳</li>
+          <li>干儿 · 单尔</li>
+          <li>干儿子 · 禅位与你</li>
+        </ul>
+      </div>
 
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 符号定义（防止忘记）</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li><b>&lt;</b> = <code>-1+</code></li>
-        <li><b>&gt;</b> = <code>+1-</code></li>
-        <li><b>&le;</b> 和 <b>&ge;</b> 按同样的拆法处理，取相同符号即可</li>
-        <li>核心规则：同一个式子中，<code>&lt;</code> 和 <code>&gt;</code> 必须取同一个，不能混用</li>
-      </ul>
-    </div>
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 应用示例</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li>原式：<code>&lt;7 - 6 = 0</code></li>
-        <li>拆解：<code>&lt;7 = -1 + 7 = 6</code></li>
-        <li>代入：<code>6 - 6 = 0</code></li>
-        <li>结论：等式成立</li>
-        <li>同理：<code>&gt;7 + 6 = 0</code></li>
-        <li>拆解：<code>&gt;7 = +1 - 7 = -6</code></li>
-        <li>代入：<code>-6 + 6 = 0</code></li>
-        <li>结论：等式成立</li>
-      </ul>
-    </div>
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 记笔记的原因</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li>这套拆字规则是个人原创，用于对合体系的符号运算</li>
-        <li><code>&lt; = -1+</code> 和 <code>&gt; = +1-</code> 是核心定义</li>
-        <li>容易忘记，需记在网站上，方便随时查阅</li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 符号总表</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li><b>加号 +</b> = <code>-1-</code></li>
-        <li><b>减号 -</b> = <code>-</code></li>
-        <li><b>乘号 ×</b> = <code>&gt;&lt;</code> = <code>+1--1+</code> = <code>+1==1+</code> = <code>+1-1+</code></li>
-        <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code>（同乘号拆分规则）</li>
-        <li><b>一横 —</b> = <code>-</code></li>
-        <li><b>两横 --</b> = <code>--</code></li>
-        <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code>（同大于小于号）</li>
-        <li><b>三个等号 ===</b> = 约分成一个 <code>-</code>，结果一样</li>
-      </ul>
-    </div>
+      <div class="card">
+        <h3><span class="dot blue"></span>1 和 7</h3>
+        <ul>
+          <li>十进制里：1、7 都是奇数</li>
+          <li>七进制里：7 写作 10</li>
+          <li>10 末位是 0，是偶数</li>
+          <li>同一个 7，进制一换，奇偶就变</li>
+        </ul>
+      </div>
 
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 核心约束</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li><b>全程保持 1 的状态</b>，不往 2、3 等数值上推</li>
-        <li>所有符号最终都能转化为 <b>1</b> 和 <b>-</b> 的组合</li>
-        <li>乘号拆开：<code>× = &gt;&lt; = (+1-)(-1+) = +1--1+ = +1==1+ = +1-1+</code></li>
-        <li>过程必须停留在 1 上，不再往 2 推</li>
-      </ul>
-    </div>
+      <div class="card">
+        <h3><span class="dot gold"></span>进制残余</h3>
+        <ul>
+          <li>一周七天：七进制残余</li>
+          <li>七声音阶：do re mi fa sol la si</li>
+          <li>十二时辰、六十甲子：十二进制、六十进制</li>
+          <li>七进制存在过，也影响了十进制</li>
+          <li>但不能说明世界底层就是七进制</li>
+          <li>多种进制叠加、淘汰、残留</li>
+          <li>十进制胜出，但没清干净</li>
+        </ul>
+      </div>
 
-    <div class="card" style="grid-column: 1 / -1;">
-      <h3><span class="dot red"></span>对合拆字规则 · 运算验证</h3>
-      <ul style="line-height:1.8; padding-left:20px;">
-        <li>加号拆解：<code>+ = -1-</code></li>
-        <li>乘号拆解：<code>× = &gt;&lt; = +1--1+ = +1-1+</code></li>
-        <li>根号拆解：<code>√ = &lt;</code> 或 <code>&gt;</code></li>
-        <li>分数横线：<code>— = -</code>，<code>--- = ≥ / ≤</code></li>
-        <li>三个等号约分：<code>=== = -</code></li>
-        <li>没有对错，对合规则这么规定的</li>
-      </ul>
-    </div>
+      <div class="card">
+        <h3><span class="dot green"></span>空与一</h3>
+        <ul>
+          <li>底层不是 0，也不是 1，是空</li>
+          <li>0 是空的形状</li>
+          <li>把 0 压扁，就成了 1</li>
+          <li>1 不是凭空来的，是空被压出来的痕</li>
+          <li>无中生有，空里出数</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>对合验算</h3>
+        <ul>
+          <li>找一个可逆的对合规则</li>
+          <li>正着算一遍</li>
+          <li>反着算一遍</li>
+          <li>规则互相抵消</li>
+          <li>结果不变</li>
+          <li>结果不变，说明没算错</li>
+          <li>适用于所有等式</li>
+          <li>高数方程也能用</li>
+          <li>但：结果不变，不等于结果正确</li>
+          <li>它是个验算工具，不是万能公式</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>无宝入内 禁止</h3>
+        <ul>
+          <li>无宝入内，禁止</li>
+          <li>元宝入内，禁止</li>
+          <li>- 17 7</li>
+          <li>易祁 祈</li>
+          <li>易 = 日 + 勿</li>
+          <li>曰勿 = 易</li>
+          <li>曰勿衣妻儿，一起进退</li>
+          <li>曰勿遗妻儿，一起进退</li>
+          <li>曰勿遗弃妻儿，一起进退</li>
+          <li>曰勿衣妻儿 = 易衣妻儿</li>
+          <li>曰勿遗妻儿 = 易遗妻儿</li>
+          <li>曰勿遗弃妻儿 = 易遗弃妻儿</li>
+          <li>曰勿遗弃妻子儿女，一起进退</li>
+          <li>一起进退</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>GitHub 也能拆</h3>
+        <ul>
+          <li>GitHub 0111710 7 一丨 空</li>
+          <li>英文也能按这个拆</li>
+          <li>G = 一 + 乚 = 7</li>
+          <li>i = 丨 + 点 = 一丨</li>
+          <li>t = 一 + 丨 = 十</li>
+          <li>H = 一 + 丨 + 一 + 丨 = 十 + 十</li>
+          <li>u = 丨 + 乚 = 7</li>
+          <li>b = 丨 + 〇 = 一丨 + 空</li>
+          <li>0 = 〇 = 空</li>
+          <li>1 = 一 = 空</li>
+          <li>7 = 一 + 乚 = 7</li>
+          <li>0 = 空</li>
+          <li>全归空</li>
+          <li>英文、数字、汉字，都能拆</li>
+          <li>拆到最后，都归空</li>
+          <li>拆出 7 的，就过关</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>勾就是7</h3>
+        <ul>
+          <li>全世界的文字，只要有勾，就能拆出7</li>
+          <li>汉字：乚、亅、匕，都带勾</li>
+          <li>英文：G、J、Q、U，都带勾</li>
+          <li>日文：ん、レ，带勾</li>
+          <li>韩文：ㄱ、ㄴ，带勾</li>
+          <li>阿拉伯文：曲线，带勾</li>
+          <li>只要有勾，就能拆出7</li>
+          <li>女的胸大，勾大，就自带7</li>
+          <li>自动完成</li>
+          <li>美女越多，7越多</li>
+          <li>7越多，景区越热闹</li>
+          <li>拆7，不只是拆字</li>
+          <li>是拆一切带勾的东西</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>匕是7丨7</h3>
+        <ul>
+          <li>匕是7丨7</li>
+          <li>匕 = 丿 + 乚</li>
+          <li>乚 = 竖弯钩 = 带钩 = 笔锋 = 7</li>
+          <li>匕 = 7</li>
+          <li>7 = 妻</li>
+          <li>匕 = 妻</li>
+          <li>匕，就是7</li>
+          <li>牛逼的要死</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>拆字鉴定笔迹</h3>
+        <ul>
+          <li>拆字拆到最后，都落到一、丨、十上</li>
+          <li>一：横</li>
+          <li>丨：竖</li>
+          <li>十：横竖交</li>
+          <li>每个人写这三个，习惯不一样</li>
+          <li>只看一件事：有没有被写成 7</li>
+          <li>7 = 一 + 乚</li>
+          <li>一写成 7，横带弯</li>
+          <li>丨写成 7，竖带弯</li>
+          <li>十写成 7，交带弯</li>
+          <li>弯，是习惯；直，也是习惯</li>
+          <li>习惯不同，就是不同的人</li>
+          <li>写成 7 的，是一种人</li>
+          <li>写成直的，是另一种人</li>
+          <li>看这个，就能分辨</li>
+          <li>当成游戏玩：给出字迹，猜是谁写的</li>
+        </ul>
+      </div>
 
     </div>
 
