@@ -939,6 +939,65 @@
                     max-width:95vw; max-height:95vh; border-radius:8px;" />
       </div>
 
+      <div class="card" style="grid-column: 1 / -1;">
+      <h3><span class="dot red"></span>趣味数学 · 解题步骤 + 原题图</h3>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:260px;">
+          <ol style="line-height:1.8; padding-left:20px;">
+            <li>
+              原式为找规律:
+              18
+            + 20
+            = 90
+            </li>
+            <li>
+              通过规律发现 + = 分解成一丨十之后可以约掉，不用考虑
+            </li>
+            <li>
+              数字只需要找到移动一个边便找到相对应的对合即可:
+            </li>
+            <li>
+              自身数字移动:
+              6&lt;-&gt;0&lt;-&gt;9，2&lt;-&gt;3
+              自对合不管怎么变对于此等式不成立
+
+              左边移动一个变成另外一个，反推也可以:
+              如果有一个左边的数字，需要出现另外一个右边的数字才能移动成功。
+              而且必须是同一个数字。
+              一句话就是同一个数字不管移动左边还是右边，对应的右边和左边都要出现下面相反的对合关系，才能使等式成立
+              8-&gt;0，8-&gt;6，8-&gt;9，7-&gt;1，6-&gt;5，9-&gt;3，9-&gt;5
+            </li>
+            <li>
+              比如 18+20=90
+              就是把 9 的一个边移动到了自身的 0 上
+              就变成 18+20=38
+              等式结束
+            </li>
+            <li>
+              比如 18+20=90
+              就是把 8 的一个边移动到了 1 上
+              就变成 70+20=90
+              等式结束
+            </li>
+          </ol>
+        </div>
+        <div style="flex:1; min-width:260px;">
+          <img id="zoomImg" src="./images/imgModalquwei8.png" alt="突破口原题"
+              style="max-width:100%; border-radius:8px; cursor:zoom-in;"
+              onclick="document.getElementById('imgModalquwei8').style.display='block'" />
+        </div>
+      </div>
+    </div>
+
+    <div id="imgModalquwei8"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
+        onclick="this.style.display='none'">
+      <img src="./images/imgModalquwei8.png" alt="原题大图"
+          style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                  max-width:95vw; max-height:95vh; border-radius:8px;" />
+    </div>
+
       <div class="card">
         <h3><span class="dot red"></span>标准化简 · 正解</h3>
         <ul>
