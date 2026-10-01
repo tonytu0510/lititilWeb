@@ -357,6 +357,10 @@ function drawCanvas1(canvas) {
     bgGrad.addColorStop(0, '#0a0a2e'); bgGrad.addColorStop(0.5, '#1a1a4e'); bgGrad.addColorStop(1, '#2a1a3e');
     ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
 
+    let r = 1 * H5Scal;
+    drawImageSafe('svg/meihua.svg', 0, (H - 300 * r + 30) * radioY, 300 * r, 300 * r, ctx);
+    drawImageSafe('svg/people.svg', W / 2 - 90 * r + (W / 2 - 200 * r) / 2, (H - 240 * r + 40) * radioY, 200 * r, 200 * r, ctx);
+
     if (!canvas._stars) {
         canvas._stars = [];
         for (let i = 0; i < 200; i++) canvas._stars.push({
@@ -379,7 +383,6 @@ function drawCanvas1(canvas) {
 
     ctx.fillStyle = '#fffde7'; ctx.beginPath(); ctx.arc(px(0.8, W), py(0.15, H), ps(0.09), 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#0a0a2e'; ctx.beginPath(); ctx.arc(px(0.82, W), py(0.13, H), ps(0.08), 0, Math.PI * 2); ctx.fill();
-
     ctx.fillStyle = '#000'; ctx.fillRect(0, py(0.92, H), W, py(0.08, H));
 
     drawTable(ctx, px(0.03, W), py(0.9, H), ps(0.4), ps(0.06));
@@ -389,10 +392,9 @@ function drawCanvas1(canvas) {
     drawDog(ctx, px(0.48, W), py(0.9, H), ps(0.04));
     drawTree(ctx, px(0.15, W), py(0.88, H), ps(0.05));
 
-    let r = 1 * H5Scal;
     drawImageSafe('svg/1.svg', W / 2 - 942 * r / 2, (H - 1032 * r + 150) * radioY, 942 * r, 1032 * r, ctx);
-    drawImageSafe('svg/2.svg', 430 * r / 2 - 100, (H - 430 * r - 40) * radioY, 430 * r, 430 * r, ctx);
-    drawImageSafe('svg/3.svg', W / 2 - 90 * r + (W / 2 - 90 * r) / 2, (H - 280 * r - 30) * radioY, 180 * r, 280 * r, ctx);
+    drawImageSafe('svg/2.svg', 430 * r / 2 - 90, (H - 430 * r - 40) * radioY, 430 * r, 430 * r, ctx);
+    drawImageSafe('svg/3.svg', W / 2 - 760 * r / 2, (H - 280 * r - 30) * radioY, 180 * r, 280 * r, ctx);
     drawImageSafe('svg/4.svg', W - 300 * r + 50, (H - 340 * r + 30) * radioY, 300 * r, 340 * r, ctx);
 
     const text = "I LOVE LJ,AI LI'On fear！", msPerChar = 300;
