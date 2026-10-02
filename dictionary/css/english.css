@@ -38,6 +38,7 @@ html, body {
   position: relative;
   background: radial-gradient(circle at 50% 0%, #1b1b2a 0%, #0b0b0f 60%);
   overflow: hidden;
+  scroll-margin-top: 110px; /* 顶栏高度，按实际调 */
 }
 
 .counter {
@@ -257,4 +258,40 @@ html, body {
 .empty {
   font-size: 12px;
   color: #55556a;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #fff;
+  z-index: 999;
+}
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e5e5;
+  border-top-color: #4a90e2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #888;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

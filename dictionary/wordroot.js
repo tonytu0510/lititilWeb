@@ -202,19 +202,9 @@ function buildQuestions(roots, dict) {
   return unique;
 }
 
-function prefixMeaning(p) {
-  if (!p) return '';
-  const found = PREFIXES.find(x => x.p === p);
-  return found ? found.meaning : '';
-}
-
-function suffixMeaning(s) {
-  if (!s) return '';
-  const found = SUFFIXES.find(x => x.s === s);
-  return found ? found.meaning : '';
-}
-
-// 拼一部分：词 + (含义)
+/* ============================================================
+   选项：带中文含义
+   ============================================================ */
 function part(text, meaning) {
   return meaning ? `${text}(${meaning})` : text;
 }
@@ -231,10 +221,9 @@ function buildOptions(correct, roots) {
 
   while (opts.length < 4 && otherRoots.length) {
     const r = otherRoots.splice(Math.floor(Math.random() * otherRoots.length), 1)[0];
-
     const s = [
       correct.prefix ? part(correct.prefix, correct.prefixMeaning) : '',
-      part(r.root, r.meaning),   // 干扰项用被抽中词根的含义
+      part(r.root, r.meaning),
       correct.suffix ? part(correct.suffix, correct.suffixMeaning) : ''
     ].filter(Boolean).join(' + ');
 
@@ -252,10 +241,21 @@ function buildOptions(correct, roots) {
 }
 
 /* ============================================================
-   启动
+   启动（含 loading）
    ============================================================ */
 (async function () {
   const app = document.getElementById('app');
+
+  // 1. 先显示 loading
+  app.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">正在加载词库…</div>
+    </div>
+  `;
+
+  const MIN_LOADING = 500; // loading 最短显示毫秒，避免一闪而过
+  const startTime = performance.now();
 
   let ROOTS = [];
   let DICT = [];
@@ -286,6 +286,13 @@ function buildOptions(correct, roots) {
     return;
   }
 
+  // 2. 保证 loading 至少显示 MIN_LOADING 毫秒
+  const elapsed = performance.now() - startTime;
+  if (elapsed < MIN_LOADING) {
+    await new Promise(r => setTimeout(r, MIN_LOADING - elapsed));
+  }
+
+  // 3. 进入答题
   startApp(QUESTIONS);
 })();
 
@@ -344,6 +351,35 @@ function resetRound(source, state, isFirst = false) {
   });
 }
 
+/* ---------- 顶栏（全局唯一） ---------- */
+function topbarHTML(state) {
+  return `
+    <div class="topbar">
+      <div class="counter">1 / ${state.pool.length} · 第 ${state.round} 轮</div>
+      <div class="progress-bar"><div class="progress-inner"></div></div>
+      <div class="stats">
+        <span class="stat">连对 <b class="streak">${state.streak}</b></span>
+        <span class="stat">最高 <b class="maxStreak">${state.maxStreak}</b></span>
+        <span class="stat">正确率 <b class="rate">${calcRate(state)}</b></span>
+      </div>
+    </div>
+  `;
+}
+
+function refreshTopbar(state, index) {
+  const streakEl = document.querySelector('.topbar .streak');
+  const maxStreakEl = document.querySelector('.topbar .maxStreak');
+  const rateEl = document.querySelector('.topbar .rate');
+  const counterEl = document.querySelector('.topbar .counter');
+
+  if (streakEl) streakEl.textContent = state.streak;
+  if (maxStreakEl) maxStreakEl.textContent = state.maxStreak;
+  if (rateEl) rateEl.textContent = calcRate(state);
+  if (counterEl && typeof index === 'number') {
+    counterEl.textContent = `${index + 1} / ${state.pool.length} · 第 ${state.round} 轮`;
+  }
+}
+
 function render(data, state) {
   const app = document.getElementById('app');
   const frag = document.createDocumentFragment();
@@ -356,15 +392,6 @@ function render(data, state) {
     page.dataset.word = item.word;
 
     page.innerHTML = `
-      <div class="counter">${index + 1} / ${pool.length} · 第 ${state.round} 轮</div>
-      <div class="progress-bar"><div class="progress-inner"></div></div>
-
-      <div class="stats">
-        <span class="stat">连对 <b class="streak">${state.streak}</b></span>
-        <span class="stat">最高 <b class="maxStreak">${state.maxStreak}</b></span>
-        <span class="stat">正确率 <b class="rate">--</b></span>
-      </div>
-
       <div class="word">${item.word}</div>
       <div class="phonetic">${item.phonetic || ''}</div>
       <div class="translation">${item.translation || ''}</div>
@@ -409,10 +436,9 @@ function render(data, state) {
   `;
   frag.appendChild(endPage);
 
-  app.innerHTML = '';
+  app.innerHTML = topbarHTML(state);
   app.appendChild(frag);
 
-  // 强制回到顶部，避免第二屏黑屏
   app.scrollTop = 0;
 
   requestAnimationFrame(() => {
@@ -423,9 +449,10 @@ function render(data, state) {
     bindEvents(data, state);
   });
 }
+
 function bindEvents(data, state) {
   const app = document.getElementById('app');
-  const pages = [...document.querySelectorAll('.page')];
+  const pages = [...app.querySelectorAll('.page')];
   let locked = false;
 
   pages.forEach((page, index) => {
@@ -439,9 +466,6 @@ function bindEvents(data, state) {
 
     const opts = [...page.querySelectorAll('.option')];
     const feedback = page.querySelector('.feedback');
-    const rateEl = page.querySelector('.rate');
-    const streakEl = page.querySelector('.streak');
-    const maxStreakEl = page.querySelector('.maxStreak');
 
     opts.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -464,10 +488,7 @@ function bindEvents(data, state) {
           state.wrongBook.delete(item.word);
           state.done.add(item.word);
 
-          streakEl.textContent = state.streak;
-          maxStreakEl.textContent = state.maxStreak;
-          rateEl.textContent = calcRate(state);
-
+          refreshTopbar(state, index);
           updateProgressBar(state, index + 1);
 
           setTimeout(() => {
@@ -485,8 +506,7 @@ function bindEvents(data, state) {
           state.wrong.add(item.word);
           state.wrongBook.add(item.word);
 
-          streakEl.textContent = state.streak;
-          rateEl.textContent = calcRate(state);
+          refreshTopbar(state, index);
 
           locked = true;
           app.style.overflow = 'hidden';
@@ -502,9 +522,6 @@ function bindEvents(data, state) {
       });
     });
   });
-
-  app.addEventListener('touchmove', e => { if (locked) e.preventDefault(); }, { passive: false });
-  app.addEventListener('wheel', e => { if (locked) e.preventDefault(); }, { passive: false });
 }
 
 function bindEndPage(page, data, state) {
@@ -529,55 +546,14 @@ function bindEndPage(page, data, state) {
 
 function calcRate(state) {
   const total = state.correctCount + state.wrongCount;
-  if (total === 0) return '--';
+  if (total === 0) return '0%';
   return Math.round((state.correctCount / total) * 100) + '%';
 }
 
 function updateProgressBar(state, current) {
-  const inner = document.querySelector('.progress-inner');
+  const inner = document.querySelector('.topbar .progress-inner');
   if (!inner) return;
   const total = state.pool.length;
   const pct = total === 0 ? 0 : Math.min(100, Math.round((current / total) * 100));
   inner.style.width = pct + '%';
 }
-
-// 在 bindEvents 里替换原来的 touchmove / wheel 拦截
-let currentPage = 0;
-let wheelLock = false;
-const SWIPE_THRESHOLD = 80; // 滑 80px 才翻页
-
-function goToPage(idx) {
-  const pages = [...document.querySelectorAll('.page')];
-  if (idx < 0 || idx >= pages.length) return;
-  pages[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
-  currentPage = idx;
-}
-
-app.addEventListener('wheel', e => {
-  if (locked) { e.preventDefault(); return; }
-  if (wheelLock) { e.preventDefault(); return; }
-
-  wheelLock = true;
-  setTimeout(() => wheelLock = false, 600);
-
-  if (e.deltaY > 20) goToPage(currentPage + 1);
-  else if (e.deltaY < -20) goToPage(currentPage - 1);
-
-  e.preventDefault();
-}, { passive: false });
-
-let touchStartY = 0;
-app.addEventListener('touchstart', e => {
-  touchStartY = e.touches[0].clientY;
-}, { passive: true });
-
-app.addEventListener('touchmove', e => {
-  if (locked) { e.preventDefault(); return; }
-  const dy = touchStartY - e.touches[0].clientY;
-  if (Math.abs(dy) > SWIPE_THRESHOLD) {
-    if (dy > 0) goToPage(currentPage + 1);
-    else goToPage(currentPage - 1);
-    touchStartY = e.touches[0].clientY;
-  }
-  e.preventDefault();
-}, { passive: false });
