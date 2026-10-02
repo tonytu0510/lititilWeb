@@ -1,0 +1,7 @@
+服务器目录/
+├─ index.html
+├─ wordroot.js
+├─ wordroot.txt
+├─ ecdict.txt
+└─ css/
+   └─ english.css

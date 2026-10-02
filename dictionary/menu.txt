@@ -1,0 +1,7 @@
+project/
+├─ index.html
+├─ wordroot.js
+├─ wordroot.txt
+├─ ecdict.txt
+└─ css/
+   └─ english.css

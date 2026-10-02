@@ -1,0 +1,9 @@
+project/
+├─ ecdict.txt
+├─ wordroot.txt
+├─ build-wordroot-data.js
+├─ wordroot-data.json      ← 由脚本生成
+├─ wordroot.js
+├─ index.html
+└─ css/
+   └─ english.css

@@ -1,0 +1,262 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0b0b0f;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #fff;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+#app::-webkit-scrollbar {
+  display: none;
+}
+
+.page {
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 18px 40px;
+  position: relative;
+  background: radial-gradient(circle at 50% 0%, #1b1b2a 0%, #0b0b0f 60%);
+}
+
+.counter {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font-size: 13px;
+  color: #8b8b9a;
+  letter-spacing: 1px;
+}
+
+.word {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 4px 24px rgba(120, 120, 255, 0.25);
+}
+
+.phonetic {
+  font-size: 15px;
+  color: #8b8b9a;
+  margin-bottom: 6px;
+}
+
+.translation {
+  font-size: 14px;
+  color: #7d7d92;
+  margin-bottom: 24px;
+  text-align: center;
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+.question {
+  font-size: 17px;
+  color: #c9c9d6;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.options {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.option {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1.5px solid #2a2a3a;
+  background: #15151f;
+  color: #e8e8f0;
+  font-size: 17px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  line-height: 1.4;
+}
+
+.option:active {
+  transform: scale(0.98);
+}
+
+.option .tag {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2a2a3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #9a9ab0;
+}
+
+.option.correct {
+  border-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.12);
+  color: #7dffb0;
+}
+
+.option.correct .tag {
+  background: #2ecc71;
+  color: #04140a;
+}
+
+.option.wrong {
+  border-color: #ff4d5e;
+  background: rgba(255, 77, 94, 0.12);
+  color: #ff9aa4;
+}
+
+.option.wrong .tag {
+  background: #ff4d5e;
+  color: #1a0306;
+}
+
+.option.disabled {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.feedback {
+  margin-top: 20px;
+  font-size: 15px;
+  min-height: 22px;
+  text-align: center;
+  color: #8b8b9a;
+}
+
+.feedback.ok {
+  color: #2ecc71;
+}
+
+.feedback.no {
+  color: #ff4d5e;
+}
+
+.hint {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  color: #55556a;
+  letter-spacing: 1px;
+}
+
+.final-page {
+  justify-content: flex-start;
+  padding-top: 56px;
+  overflow-y: auto;
+}
+
+.final-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.final-sub {
+  font-size: 13px;
+  color: #8b8b9a;
+  margin-bottom: 20px;
+}
+
+/* 进度条 */
+.progress-bar {
+  position: absolute;
+  top: 42px;
+  left: 18px;
+  right: 18px;
+  height: 3px;
+  background: #1d1d29;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #5b6cff, #2ecc71);
+  transition: width 0.3s ease;
+}
+
+/* 统计栏 */
+.stats {
+  position: absolute;
+  top: 54px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #8b8b9a;
+}
+.stat b {
+  color: #e8e8f0;
+  font-weight: 700;
+}
+
+/* 错题本 */
+.wrong-book {
+  width: 100%;
+  max-width: 560px;
+  margin-top: 22px;
+}
+.wrong-book h3 {
+  font-size: 15px;
+  color: #ff9aa4;
+  margin-bottom: 10px;
+}
+.wrong-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wrong-item {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 77, 94, 0.12);
+  border: 1px solid rgba(255, 77, 94, 0.35);
+  color: #ff9aa4;
+  font-size: 12px;
+}
+.empty {
+  font-size: 12px;
+  color: #55556a;
+}
