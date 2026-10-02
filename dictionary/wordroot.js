@@ -380,6 +380,25 @@ function refreshTopbar(state, index) {
   }
 }
 
+/* ---------- 滚动到指定页（手动控制，移动端更稳） ---------- */
+function scrollToPage(index) {
+  const appEl = document.getElementById('app');
+  const pages = [...appEl.querySelectorAll('.page')];
+  const next = pages[index];
+  if (!next) return;
+
+  const appRect = appEl.getBoundingClientRect();
+  const nextRect = next.getBoundingClientRect();
+  const targetTop = appEl.scrollTop + (nextRect.top - appRect.top);
+
+  // 优先原生 smooth，不支持就降级为瞬间跳转
+  if ('scrollBehavior' in document.documentElement.style) {
+    appEl.scrollTo({ top: targetTop, behavior: 'smooth' });
+  } else {
+    appEl.scrollTop = targetTop;
+  }
+}
+
 function render(data, state) {
   const app = document.getElementById('app');
   const frag = document.createDocumentFragment();
@@ -478,7 +497,7 @@ function bindEvents(data, state) {
         if (isCorrect) {
           btn.classList.add('correct');
           opts.forEach(b => b.classList.add('disabled'));
-          feedback.textContent = '正确 · 即将进入下一页';
+          feedback.textContent = '正确';
           feedback.className = 'feedback ok';
 
           state.correctCount++;
@@ -491,13 +510,15 @@ function bindEvents(data, state) {
           refreshTopbar(state, index);
           updateProgressBar(state, index + 1);
 
+          // 移动端：延迟缩短到 350ms，手动控制滚动
+          locked = true;
           setTimeout(() => {
-            const next = pages[index + 1];
-            if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 650);
+            scrollToPage(index + 1);
+            setTimeout(() => { locked = false; }, 400);
+          }, 350);
         } else {
           btn.classList.add('wrong');
-          feedback.textContent = '答错 · 停留当前页';
+          feedback.textContent = '答错';
           feedback.className = 'feedback no';
 
           state.wrongCount++;
@@ -508,16 +529,14 @@ function bindEvents(data, state) {
 
           refreshTopbar(state, index);
 
+          // 不再动 overflow，避免移动端重排卡顿
           locked = true;
-          app.style.overflow = 'hidden';
-
           setTimeout(() => {
             locked = false;
-            app.style.overflow = 'auto';
             btn.classList.remove('wrong');
             feedback.textContent = '';
             feedback.className = 'feedback';
-          }, 1200);
+          }, 1000);
         }
       });
     });

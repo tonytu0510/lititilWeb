@@ -16,6 +16,7 @@ html, body {
   inset: 0;
   overflow-y: hidden; /* 由 JS 控制滚动 */
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;        /* 防止滚动链穿透 */
   scrollbar-width: none;
 }
 
