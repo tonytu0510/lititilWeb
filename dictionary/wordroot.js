@@ -234,8 +234,8 @@ function buildOptions(correct, roots) {
 
   try {
     const [rootRes, dictRes] = await Promise.all([
-      fetch('./wordroot.txt'),
-      fetch('./ecdict.txt')
+      fetch('./dictionary/wordroot.txt'),
+      fetch('./dictionary/ecdict.txt')
     ]);
 
     if (!rootRes.ok || !dictRes.ok) throw new Error('txt 加载失败');
@@ -383,10 +383,17 @@ function render(data, state) {
   app.innerHTML = '';
   app.appendChild(frag);
 
-  updateProgressBar(state, 0);
-  bindEvents(data, state);
-}
+  // 强制回到顶部，避免第二屏黑屏
+  app.scrollTop = 0;
 
+  requestAnimationFrame(() => {
+    const first = app.querySelector('.page');
+    if (first) first.scrollIntoView({ behavior: 'auto', block: 'start' });
+
+    updateProgressBar(state, 0);
+    bindEvents(data, state);
+  });
+}
 function bindEvents(data, state) {
   const app = document.getElementById('app');
   const pages = [...document.querySelectorAll('.page')];
@@ -504,3 +511,44 @@ function updateProgressBar(state, current) {
   const pct = total === 0 ? 0 : Math.min(100, Math.round((current / total) * 100));
   inner.style.width = pct + '%';
 }
+
+// 在 bindEvents 里替换原来的 touchmove / wheel 拦截
+let currentPage = 0;
+let wheelLock = false;
+const SWIPE_THRESHOLD = 80; // 滑 80px 才翻页
+
+function goToPage(idx) {
+  const pages = [...document.querySelectorAll('.page')];
+  if (idx < 0 || idx >= pages.length) return;
+  pages[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  currentPage = idx;
+}
+
+app.addEventListener('wheel', e => {
+  if (locked) { e.preventDefault(); return; }
+  if (wheelLock) { e.preventDefault(); return; }
+
+  wheelLock = true;
+  setTimeout(() => wheelLock = false, 600);
+
+  if (e.deltaY > 20) goToPage(currentPage + 1);
+  else if (e.deltaY < -20) goToPage(currentPage - 1);
+
+  e.preventDefault();
+}, { passive: false });
+
+let touchStartY = 0;
+app.addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+app.addEventListener('touchmove', e => {
+  if (locked) { e.preventDefault(); return; }
+  const dy = touchStartY - e.touches[0].clientY;
+  if (Math.abs(dy) > SWIPE_THRESHOLD) {
+    if (dy > 0) goToPage(currentPage + 1);
+    else goToPage(currentPage - 1);
+    touchStartY = e.touches[0].clientY;
+  }
+  e.preventDefault();
+}, { passive: false });

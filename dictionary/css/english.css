@@ -1,25 +1,20 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
 html, body {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background: #0b0b0f;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   color: #fff;
+  position: fixed;
+  inset: 0;
 }
 
+/* #app 里去掉 scroll-snap-type */
 #app {
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+  position: absolute;
+  inset: 0;
+  overflow-y: hidden; /* 由 JS 控制滚动 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -31,15 +26,18 @@ html, body {
 .page {
   width: 100%;
   height: 100%;
+  height: 100dvh;
+  flex: 0 0 auto;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 24px 18px 40px;
+  padding: 80px 18px 60px;
   position: relative;
   background: radial-gradient(circle at 50% 0%, #1b1b2a 0%, #0b0b0f 60%);
+  overflow: hidden;
 }
 
 .counter {
