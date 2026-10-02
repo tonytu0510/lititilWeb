@@ -202,13 +202,42 @@ function buildQuestions(roots, dict) {
   return unique;
 }
 
+function prefixMeaning(p) {
+  if (!p) return '';
+  const found = PREFIXES.find(x => x.p === p);
+  return found ? found.meaning : '';
+}
+
+function suffixMeaning(s) {
+  if (!s) return '';
+  const found = SUFFIXES.find(x => x.s === s);
+  return found ? found.meaning : '';
+}
+
+// 拼一部分：词 + (含义)
+function part(text, meaning) {
+  return meaning ? `${text}(${meaning})` : text;
+}
+
 function buildOptions(correct, roots) {
-  const opts = [correct.split];
+  const correctStr = [
+    correct.prefix ? part(correct.prefix, correct.prefixMeaning) : '',
+    part(correct.root, correct.rootMeaning),
+    correct.suffix ? part(correct.suffix, correct.suffixMeaning) : ''
+  ].filter(Boolean).join(' + ');
+
+  const opts = [correctStr];
   const otherRoots = roots.filter(r => r.root !== correct.root);
 
   while (opts.length < 4 && otherRoots.length) {
     const r = otherRoots.splice(Math.floor(Math.random() * otherRoots.length), 1)[0];
-    const s = `${correct.prefix ? correct.prefix + ' + ' : ''}${r.root}${correct.suffix ? ' + ' + correct.suffix : ''}`;
+
+    const s = [
+      correct.prefix ? part(correct.prefix, correct.prefixMeaning) : '',
+      part(r.root, r.meaning),   // 干扰项用被抽中词根的含义
+      correct.suffix ? part(correct.suffix, correct.suffixMeaning) : ''
+    ].filter(Boolean).join(' + ');
+
     if (!opts.includes(s)) opts.push(s);
   }
 
@@ -219,7 +248,7 @@ function buildOptions(correct, roots) {
     [opts[i], opts[j]] = [opts[j], opts[i]];
   }
 
-  return { list: opts, answer: opts.indexOf(correct.split) };
+  return { list: opts, answer: opts.indexOf(correctStr) };
 }
 
 /* ============================================================
