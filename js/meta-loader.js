@@ -93,8 +93,15 @@ function init() {
       // jsEnd
       loadScripts(m.jsEnd  || [], a, 0,function() {
         // 挂到 body
+        if(m.topBarNone && (m.topBarNone == 'Yes')){
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = "../css/topBarNone.css";
+          a.appendChild(link);
+        }
         body.appendChild(a);
       })
+
     });
   });
 }
