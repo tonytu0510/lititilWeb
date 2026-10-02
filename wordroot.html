@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="./js/meta-config.js"></script>
+  <script>
+    window.PAGE_META.title = "词根猜词"
+    window.PAGE_META.cssFront = ["./css/wordroot.css"]
+    window.PAGE_META.jsEnd = ["./js/wordroot.js"]
+  </script>
+  </style>
+  <script>
+    window.PAGE_META.content =
+    `
+    <div class="wrap">
+      <h1>词根猜词</h1>
+      <div class="sub">记词根 · 猜拼义 · 对真义</div>
+
+      <div class="card">
+
+        <div class="qtitle" id="qTitle">第 1 关 / 共 8 关</div>
+
+        <div class="roots">
+          <div class="root-box">
+            <div class="label">词根</div>
+            <div class="word" id="qRoot">port</div>
+            <div class="mean" id="qRootMean">拿、运</div>
+          </div>
+          <div class="root-box">
+            <div class="label">前缀</div>
+            <div class="word" id="qPrefix">ex</div>
+            <div class="mean" id="qPrefixMean">出</div>
+          </div>
+        </div>
+
+        <div class="compose">
+          拼词：<span class="word" id="qWord">export</span>
+        </div>
+
+        <div class="opts" id="opts"></div>
+
+        <div class="result" id="result"></div>
+
+      </div>
+
+      <button class="btn" id="nextBtn" style="display:none;">下 一 题</button>
+
+      <div class="score" id="score">得分：0 / 0</div>
+
+      <!-- 词根表 -->
+      <div class="roottable">
+        <h2>常用词根表</h2>
+        <div class="rt-grid">
+          <div class="rt-item"><span class="w">port</span><span class="m">拿、运</span></div>
+          <div class="rt-item"><span class="w">spect</span><span class="m">看</span></div>
+          <div class="rt-item"><span class="w">dict</span><span class="m">说</span></div>
+          <div class="rt-item"><span class="w">scrib</span><span class="m">写</span></div>
+          <div class="rt-item"><span class="w">form</span><span class="m">形状</span></div>
+          <div class="rt-item"><span class="w">duc</span><span class="m">引导</span></div>
+          <div class="rt-item"><span class="w">ject</span><span class="m">投、扔</span></div>
+          <div class="rt-item"><span class="w">tract</span><span class="m">拉、拖</span></div>
+          <div class="rt-item"><span class="w">mit / miss</span><span class="m">送、放</span></div>
+          <div class="rt-item"><span class="w">vert / vers</span><span class="m">转</span></div>
+          <div class="rt-item"><span class="w">struct</span><span class="m">建造</span></div>
+          <div class="rt-item"><span class="w">tele</span><span class="m">远</span></div>
+          <div class="rt-item"><span class="w">phon</span><span class="m">声音</span></div>
+          <div class="rt-item"><span class="w">graph</span><span class="m">写、画</span></div>
+          <div class="rt-item"><span class="w">bio</span><span class="m">生命</span></div>
+          <div class="rt-item"><span class="w">geo</span><span class="m">地球</span></div>
+        </div>
+      </div>
+
+    </div>
+    `
+  </script>
+  <script src="./js/meta-loader.js"></script>
+</head>
+<body>
+</body>
+</html>
