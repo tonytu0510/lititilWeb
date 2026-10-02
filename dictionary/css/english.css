@@ -38,7 +38,6 @@ html, body {
   position: relative;
   background: radial-gradient(circle at 50% 0%, #1b1b2a 0%, #0b0b0f 60%);
   overflow: hidden;
-  scroll-margin-top: 110px; /* 顶栏高度，按实际调 */
 }
 
 .counter {
@@ -264,7 +263,6 @@ html, body {
   top: 0;
   z-index: 10;
   background: #fff;
-  padding: 12px 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .loading {
@@ -294,4 +292,8 @@ html, body {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+#dinoBar,#iconGroup{
+    display: none!important;
 }
