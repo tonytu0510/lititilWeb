@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "chooseGirls选妃大战"
+        window.PAGE_META.cssFront = ["./css/chooseGirl.css"]
+        window.PAGE_META.jsEnd = ["../compressed/chooseGirl.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <!-- ============ 输入页 ============ -->
+        <section class="screen" id="screenInput">
+        <h1 class="title">选妃大战</h1>
+        <p class="subtitle">拆字定姻缘 · 柒捌相逢</p>
+
+        <div class="panel">
+            <label class="label">输入你的名字（中文 / 英文）</label>
+            <input id="nameInput" type="text" maxlength="20" placeholder="例如：王小明 或 Earth" autocomplete="off" spellcheck="false">
+            <button class="btn" id="startBtn">开 始 选 妃</button>
+        </div>
+
+        <div class="rules">
+            <h3>拆 字 规 则</h3>
+            <p>中文取笔画数，英文取字母序号（a=1, b=2…），连成一串数字。</p>
+            <p>这串数字里出现「7」→ 命格为 <b class="c7">柒</b></p>
+            <p>没出现「7」→ 命格为 <b class="c8">捌</b></p>
+            <p class="tip">柒配捌，捌配柒 —— 阴阳相济，方为姻缘天成。</p>
+            <div class="extra">
+            ✦ 隐藏彩蛋①：若柒捌相合，且双方姓氏皆为「王字不出头」之姓（王、汪、玉、金、琳、瑶等），触发「佳偶天成 · 天生一对」。<br>
+            ✦ 隐藏彩蛋②：若柒捌相合，且双方名字都含有 EARTH / HEART 的五个字母（e、a、r、t、h，顺序不限），触发「寰宇同心 · 天生一对」。
+            </div>
+        </div>
+        </section>
+
+        <!-- ============ 选妃页 ============ -->
+        <section class="screen" id="screenPick" hidden>
+        <div class="my-info">
+            <span class="n" id="myName"></span>
+            <span class="b" id="myTypeBadge">命格 <b id="myType">柒</b></span>
+            <span class="calc" id="myCalc"></span>
+        </div>
+
+        <div class="stage" id="stage">
+            <div class="track" id="track"></div>
+        </div>
+
+        <div class="counter" id="counter">1 / 10</div>
+        <button class="btn" id="chooseBtn">就 选 TA 了</button>
+        </section>
+
+        <!-- ============ 结果页 ============ -->
+        <section class="screen" id="screenResult" hidden>
+        <div class="result" id="resultBox">
+            <div class="result-badge" id="resultBadge">姻 缘 天 成</div>
+            <div class="pair">
+            <div class="pair-side">
+                <div class="pair-avatar">你</div>
+                <div class="pair-name" id="rName"></div>
+                <div class="pair-type" id="rType"></div>
+            </div>
+            <div class="pair-heart">❤</div>
+            <div class="pair-side">
+                <div class="pair-avatar">TA</div>
+                <div class="pair-name" id="rCardName"></div>
+                <div class="pair-type" id="rCardType"></div>
+            </div>
+            </div>
+            <p class="result-msg" id="rMsg"></p>
+            <button class="btn" id="restartBtn">再 测 一 次</button>
+        </div>
+        </section>
+        <div class="toast" id="toast"></div>
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+  <script src="./js/loader.js"></script>
+</html>

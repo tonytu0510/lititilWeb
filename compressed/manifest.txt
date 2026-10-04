@@ -3,6 +3,7 @@ aboutMe.js
 BreathBetweenWords.js
 calc.js
 chinaClock.js
+chooseGirl.js
 common.js
 compress.js
 cosmos.js
