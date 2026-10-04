@@ -2,6 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <style>
+    #globalLoading {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+    }
+    .gl-spinner {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #7cb8b8;
+            border-radius: 50%;
+            animation: gl-spin 0.8s linear infinite;
+    }
+    @keyframes gl-spin {
+            to { transform: rotate(360deg); }
+    }
+  </style>
   <script>
     // ============================================================
     // initPageMeta
@@ -24,6 +46,9 @@
     async function initPageContent() {
         window.PAGE_META.content =
         `
+        <div id="globalLoading">
+            <div class="gl-spinner"></div>
+        </div>   <!-- 一进页面就有 -->
         <div id="topBarContainer"></div>
         <div id="slider">
         <div class="slide active"><canvas id="canvas1"></canvas></div>

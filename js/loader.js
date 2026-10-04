@@ -1,91 +1,31 @@
 // ============================================================
 // loading 控制
 // ============================================================
-function showLoading() {
-    // 避免重复插入
-    if (document.getElementById('globalLoading')) return;
-
-    const div = document.createElement('div');
-    div.id = 'globalLoading';
-    div.innerHTML = `
-        <div class="gl-spinner"></div>
-    `;
-    // 内联样式，不依赖外部 css
-    div.style.cssText = `
-        position: fixed;
-        inset: 0;
-        background: #0d0d0d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-        transition: opacity 0.3s;
-    `;
-
-    document.body.appendChild(div);
-
-    // spinner 样式
-    const style = document.createElement('style');
-    style.textContent = `
-        .gl-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.15);
-            border-top-color: #7cb8b8;
-            border-radius: 50%;
-            animation: gl-spin 0.8s linear infinite;
-        }
-        @keyframes gl-spin {
-            to { transform: rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-}
 function hideLoading() {
     const div = document.getElementById('globalLoading');
     if (!div) return;
-
-    div.style.opacity = '0';
+    div.style.display = 'none';
     setTimeout(() => {
         if (div.parentNode) div.parentNode.removeChild(div);
     }, 300);
 }
 // js/loader.js
-(function () {
-    // DOM 就绪后启动
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', start);
-    } else {
-        start();
-    }
+(async function () {
+    // 1. loading 已经在 HTML 里，直接 hide 备用
+    // 2. 直接启动，不用等 DOMContentLoaded
+    try {
+        await loadScript('./js/metaConfigLoader.js');
+        await initPage();
+        await initPageMeta();
+        await initPageContent();
+        await renderContent();
+        await runLoader();
 
-    async function start() {
-        showLoading();
-        try {
-            await loadScript('./js/metaConfigLoader.js');
-            console.log('[loader] metaConfigLoader.js 完成');
-
-            await initPage();
-            console.log('[loader] initPage 完成');
-
-            await initPageMeta();
-            console.log('[loader] initPageMeta 完成');
-
-            await initPageContent();
-            console.log('[loader] initPageContent 完成');
-
-            await renderContent();
-            console.log('[loader] renderContent 完成');
-
-            await runLoader();
-            console.log('[loader] runLoader 完成');
-
-            console.log('[loader] 全部完成');
-            hideLoading();
-        } catch (e) {
-            console.error('[loader] 失败:', e);
-            hideLoading();
-        }
+        console.log('[loader] 全部完成');
+        hideLoading();
+    } catch (e) {
+        console.error('[loader] 失败:', e);
+        hideLoading();
     }
 })();
 
