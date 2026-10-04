@@ -2,21 +2,33 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "英语单词拆解"
-    window.PAGE_META.cssFront = ["./dictionary/css/english.css"]
-    window.PAGE_META.jsEnd = ["./dictionary/wordroot.js"]
-    window.PAGE_META.topBarNone = "Yes"
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "英语单词拆解"
+        window.PAGE_META.cssFront = ["./dictionary/css/english.css"]
+        window.PAGE_META.jsEnd = ["./dictionary/wordroot.js.txt"]
+        window.PAGE_META.topBarNone = ['./css/topBarNone.css']
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div id="app"></div>
+        `;
+    }
   </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div id="app"></div>
-    `
-  </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

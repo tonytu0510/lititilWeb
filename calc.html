@@ -2,73 +2,85 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "年份规则计算器"
-    window.PAGE_META.cssFront = ["./css/calc.css"]
-    window.PAGE_META.jsEnd = ["./js/calc.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "年份规则计算器"
+        window.PAGE_META.cssFront = ["./css/calc.css"]
+        window.PAGE_META.jsEnd = ["../compressed/calc.js.txt"]
 
-      <div class="tag">我的想法 · 工具</div>
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
 
-      <h1>
-        年份规则计算器<br>
-        <span class="hl">相同约分 + 奇偶转 0/1</span>
-      </h1>
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
 
-      <p class="sub">
-        B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
-        A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
-        规则：1 = 0 = 空。
-      </p>
+        <div class="tag">我的想法 · 工具</div>
 
-      <div class="section-title">一、输入</div>
-      <div class="panel">
-        <label>当前年份</label>
-        <input type="number" id="currentYear" value="2026" placeholder="如 2026">
+        <h1>
+          年份规则计算器<br>
+          <span class="hl">相同约分 + 奇偶转 0/1</span>
+        </h1>
 
-        <label>客户生日年份</label>
-        <input type="number" id="birthYear" value="2000" placeholder="如 2000">
-      </div>
-
-      <div class="btns">
-        <button class="gold" onclick="runCalc()">计算</button>
-        <button onclick="clearAll()">清空</button>
-      </div>
-
-      <div class="section-title">二、结果</div>
-      <div class="panel">
-        <div class="result" id="resultBox">点“计算”后，结果显示在这里。</div>
-      </div>
-
-      <div class="section-title">三、规则说明</div>
-      <div class="panel">
-        <div style="color:#c6d4e3;font-size:15px;line-height:2">
-          <div><span style="color:var(--gold)">B：</span>数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉</div>
-          <div><span style="color:var(--gold)">A：</span>大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉</div>
-          <div><span style="color:var(--gold)">空：</span>1 = 0 = 空</div>
-          <div><span style="color:var(--gold)">最终：</span>两边各出一串结果，对比是否相等</div>
-        </div>
-      </div>
-
-      <div class="end">
-        <p>
-          <span class="gold">相同约分</span><br>
-          <span class="green">奇偶转 0/1</span><br>
-          <span class="blue">1 = 0 = 空</span>
+        <p class="sub">
+          B：数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉。<br>
+          A：大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉。<br>
+          规则：1 = 0 = 空。
         </p>
-        <div class="foot">个人观点 · 欢迎讨论</div>
-      </div>
 
-    </div>
-    `
+        <div class="section-title">一、输入</div>
+        <div class="panel">
+          <label>当前年份</label>
+          <input type="number" id="currentYear" value="2026" placeholder="如 2026">
+
+          <label>客户生日年份</label>
+          <input type="number" id="birthYear" value="2000" placeholder="如 2000">
+        </div>
+
+        <div class="btns">
+          <button class="gold" onclick="runCalc()">计算</button>
+          <button onclick="clearAll()">清空</button>
+        </div>
+
+        <div class="section-title">二、结果</div>
+        <div class="panel">
+          <div class="result" id="resultBox">点“计算”后，结果显示在这里。</div>
+        </div>
+
+        <div class="section-title">三、规则说明</div>
+        <div class="panel">
+          <div style="color:#c6d4e3;font-size:15px;line-height:2">
+            <div><span style="color:var(--gold)">B：</span>数字相同的全部约分，只保留出现 1 次的数字，0 和 1 都丢掉</div>
+            <div><span style="color:var(--gold)">A：</span>大于 1 的数，奇数转 0，偶数转 1；小于等于 1 的数保留，最后 0 和 1 都丢掉</div>
+            <div><span style="color:var(--gold)">空：</span>1 = 0 = 空</div>
+            <div><span style="color:var(--gold)">最终：</span>两边各出一串结果，对比是否相等</div>
+          </div>
+        </div>
+
+        <div class="end">
+          <p>
+            <span class="gold">相同约分</span><br>
+            <span class="green">奇偶转 0/1</span><br>
+            <span class="blue">1 = 0 = 空</span>
+          </p>
+          <div class="foot">个人观点 · 欢迎讨论</div>
+        </div>
+
+      </div>
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

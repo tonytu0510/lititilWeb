@@ -2,16 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "对称 · 笔记"
-    window.PAGE_META.cssFront = ["./css/symmetry.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "对称 · 笔记"
+        window.PAGE_META.cssFront = ["./css/symmetry.css"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <div class="container">
             <div class="title">⬡ <span>对称</span> · 笔记</div>
 
@@ -93,9 +104,10 @@
             </div>
         </div>
         </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

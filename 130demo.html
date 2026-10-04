@@ -2,17 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "130号段演示"
-    window.PAGE_META.cssFront = ["./css/130demo.css"]
-    window.PAGE_META.jsEnd = ["./js/130demo.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "130号段演示"
+        window.PAGE_META.cssFront = ["./css/130demo.css"]
+        window.PAGE_META.jsEnd = ["./js/130demo.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div class="wrap">
         <div class="container">
             <div class="display">
                 <div class="prefix" id="numberDisplay">130</div>
@@ -35,9 +45,10 @@
             <button class="clear-btn" id="clearBtn">清除</button>
         </div>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

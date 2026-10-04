@@ -2,16 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "相同约分 + 奇偶转 0/1 + 1=0=空"
-    window.PAGE_META.cssFront = ["./css/rule.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "相同约分 + 奇偶转 0/1 + 1=0=空"
+        window.PAGE_META.cssFront = ["./css/rule.css"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
 
       <div class="tag">我的想法 · 规则</div>
 
@@ -109,9 +120,10 @@
       </div>
 
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

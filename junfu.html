@@ -2,16 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "均富 · 概率与平衡"
-    window.PAGE_META.cssFront = ["./css/junfu.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "均富 · 概率与平衡"
+        window.PAGE_META.cssFront = ["./css/junfu.css"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <header>
             <h1>均富</h1>
             <p>从麻将、概率到社会平衡。</p>
@@ -114,9 +125,10 @@
             不是富人仁慈，是均富才是所有人的活路。
         </footer>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

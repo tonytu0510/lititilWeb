@@ -23,12 +23,6 @@ body {
     overflow-x:hidden;
     justify-content: center;
 }
-#bodyWrap{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
 
 /* 全局滚动条 */
 ::-webkit-scrollbar {
@@ -184,8 +178,10 @@ body {
     padding: 0.5rem 0.3rem;
     border: 1px solid #cebcae;
     box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    margin: 4rem 20px 3rem 20px;
-    max-width: 700px;
+    margin: 4rem auto 3rem auto;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
 }
 .menu-bar a {
     text-decoration: none;
@@ -197,7 +193,8 @@ body {
     transition: 0.15s;
     letter-spacing: 1px;
     background: transparent;
-    word-break:break-all 
+    word-break:break-all;
+    margin:0 5px
 }
 .menu-bar a:hover {
     background: #d1c1b2;

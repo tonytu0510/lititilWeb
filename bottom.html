@@ -2,17 +2,29 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "天地人日 · 底层逻辑"
-    window.PAGE_META.cssFront = ["./css/bottom.css"]
-    window.PAGE_META.jsFront = ['./js/fontMenu.js']
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="container">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+
+        window.PAGE_META.title = "天地人日 · 底层逻辑"
+        window.PAGE_META.cssFront = ["./css/bottom.css"]
+        window.PAGE_META.jsFront = ['../compressed/fontMenu.js.txt']
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="container">
         <div class="content">
         <div class="title">⬡ 天地人日 · <span>底层</span></div>
         <div class="sub">字形拆解 · 还原笔画的原始状态</div>
@@ -84,9 +96,10 @@
         </div>
         </div>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

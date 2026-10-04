@@ -2,16 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "英文拆解 · 0与1"
-    window.PAGE_META.cssFront = ["./css/english-01.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "英文拆解 · 0与1"
+        window.PAGE_META.cssFront = ["./css/english-01.css"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <header>
             <h1>英文拆解</h1>
             <p>英文字母不是字母，是 0 和 1 的加减法。</p>
@@ -106,9 +117,10 @@
             字母不是字母，是 0 和 1 在排队。
         </footer>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

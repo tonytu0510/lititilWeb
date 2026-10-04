@@ -2,22 +2,33 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/ringMenu.js"></script>
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "环形多级 · 移动端适配"
-    window.PAGE_META.cssFront = ["./css/ringMenu.css"]
-    window.PAGE_META.jsEnd = ["./js/ringMenu.js","./js/ringMenuInit.js"]
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "环形多级 · 移动端适配"
+        window.PAGE_META.cssFront = ["./css/ringMenu.css"]
+        window.PAGE_META.jsEnd = ["../compressed/ringMenu.js.txt","../compressed/ringMenuInit.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div id="pageContent"><span>⬡ 环形多级</span><br>悬停展开 · 点击跳转</div>
+        <div id="ringMenuCycle"></div>
+        `;
+    }
   </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div id="pageContent"><span>⬡ 环形多级</span><br>悬停展开 · 点击跳转</div>
-    <div id="ringMenuCycle"></div>
-    `
-  </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

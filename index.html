@@ -2,35 +2,49 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "首页"
-    window.PAGE_META.cssFront = ["./css/index.css"]
-    window.PAGE_META.jsEnd = ["./js/index.js","./js/play-audio.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div id="slider">
-    <div class="slide active"><canvas id="canvas1"></canvas></div>
-    <div class="slide"><canvas id="canvas2"></canvas></div>
-    <div class="slide"><canvas id="canvas3"></canvas></div>
-    <div class="slide"><canvas id="canvas4"></canvas></div>
-    <div class="slide"><canvas id="canvas5"></canvas></div>
-    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas6"></canvas></div>
-    <div class="slide"><canvas id="canvas7"></canvas></div>
-    <div class="slide"><canvas id="canvas8"></canvas></div>
-    <div class="slide" onclick="canvasClickFun()"><canvas id="canvas9"></canvas></div>
-    <button class="arrow left" onclick="prevSlide()">❮</button>
-    <button class="arrow right" onclick="nextSlide()">❯</button>
-    <div id="dots">
-        <span class="active" onclick="goTo(0)"></span><span onclick="goTo(1)"></span><span onclick="goTo(2)"></span><span onclick="goTo(3)"></span><span onclick="goTo(4)"></span><span onclick="goTo(5)"></span><span onclick="goTo(6)"></span><span onclick="goTo(7)"></span><span onclick="goTo(8)"></span>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "首页";
+        window.PAGE_META.cssFront = ["./css/index.css"];
+        window.PAGE_META.jsEnd = [
+            "./compressed/index.js.txt",
+            "../compressed/play-audio.js.txt"
+        ];
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div id="slider">
+        <div class="slide active"><canvas id="canvas1"></canvas></div>
+        <div class="slide"><canvas id="canvas2"></canvas></div>
+        <div class="slide"><canvas id="canvas3"></canvas></div>
+        <div class="slide"><canvas id="canvas4"></canvas></div>
+        <div class="slide"><canvas id="canvas5"></canvas></div>
+        <div class="slide" onclick="canvasClickFun()"><canvas id="canvas6"></canvas></div>
+        <div class="slide"><canvas id="canvas7"></canvas></div>
+        <div class="slide"><canvas id="canvas8"></canvas></div>
+        <div class="slide" onclick="canvasClickFun()"><canvas id="canvas9"></canvas></div>
+        <button class="arrow left" onclick="prevSlide()">❮</button>
+        <button class="arrow right" onclick="nextSlide()">❯</button>
+        <div id="dots">
+            <span class="active" onclick="goTo(0)"></span><span onclick="goTo(1)"></span><span onclick="goTo(2)"></span><span onclick="goTo(3)"></span><span onclick="goTo(4)"></span><span onclick="goTo(5)"></span><span onclick="goTo(6)"></span><span onclick="goTo(7)"></span><span onclick="goTo(8)"></span>
+        </div>
     </div>
-</div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

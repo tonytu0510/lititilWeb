@@ -2,17 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "关于我"
-    window.PAGE_META.cssFront = ["./css/aboutMe.css"]
-    window.PAGE_META.jsEnd = ["./js/aboutMe.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="about-container">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "关于我"
+        window.PAGE_META.cssFront = ["./css/aboutMe.css"]
+        window.PAGE_META.jsEnd = ["../compressed/aboutMe.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="about-container">
             <div class="avatar">
                 <canvas id="avatarCanvas" width="200" height="200"></canvas>
             </div>
@@ -31,9 +42,10 @@
                 </div>
             </div>
         </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

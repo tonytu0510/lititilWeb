@@ -2,106 +2,117 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "反着来 · 百年公司"
-    window.PAGE_META.cssFront = ["./css/company.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "反着来 · 百年公司"
+        window.PAGE_META.cssFront = ["./css/company.css"]
 
-      <div class="tag">我的想法</div>
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
 
-      <h1>
-        想搞成百年公司，<br>
-        <span class="hl">反着来就行</span>
-      </h1>
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
+          <div class="tag">我的想法</div>
 
-      <p class="sub">
-        有野心，搞政治，攀关系，搞裙带，开公司，拉高管亲属进公司，公司倒闭，再开公司，再倒闭，循环往复。<br>
-        这条路，走不通。<br>
-        想走通，反着来。
-      </p>
+          <h1>
+            想搞成百年公司，<br>
+            <span class="hl">反着来就行</span>
+          </h1>
 
-      <div class="section-title">那条走不通的路</div>
-      <div class="chain">
-        <div class="step bad">有野心</div><span class="arrow">→</span>
-        <div class="step bad">搞政治</div><span class="arrow">→</span>
-        <div class="step bad">攀关系</div><span class="arrow">→</span>
-        <div class="step bad">搞裙带</div><span class="arrow">→</span>
-        <div class="step bad">开公司</div><span class="arrow">→</span>
-        <div class="step bad">拉高管亲属进公司</div><span class="arrow">→</span>
-        <div class="step bad">公司倒闭</div><span class="arrow">→</span>
-        <div class="step bad">再开公司</div><span class="arrow">→</span>
-        <div class="step bad">再倒闭</div><span class="arrow">→</span>
-        <div class="step bad">循环往复</div>
-      </div>
+          <p class="sub">
+            有野心，搞政治，攀关系，搞裙带，开公司，拉高管亲属进公司，公司倒闭，再开公司，再倒闭，循环往复。<br>
+            这条路，走不通。<br>
+            想走通，反着来。
+          </p>
 
-      <div class="section-title">反着来的路</div>
-      <div class="chain">
-        <div class="step good">有野心</div><span class="arrow">→</span>
-        <div class="step good">搞产品</div><span class="arrow">→</span>
-        <div class="step good">攀技术</div><span class="arrow">→</span>
-        <div class="step good">搞制度</div><span class="arrow">→</span>
-        <div class="step good">开公司</div><span class="arrow">→</span>
-        <div class="step good">拉人才进公司</div><span class="arrow">→</span>
-        <div class="step good">公司迭代</div><span class="arrow">→</span>
-        <div class="step good">再迭代</div><span class="arrow">→</span>
-        <div class="step good">再迭代</div><span class="arrow">→</span>
-        <div class="step good">百年公司</div>
-      </div>
+          <div class="section-title">那条走不通的路</div>
+          <div class="chain">
+            <div class="step bad">有野心</div><span class="arrow">→</span>
+            <div class="step bad">搞政治</div><span class="arrow">→</span>
+            <div class="step bad">攀关系</div><span class="arrow">→</span>
+            <div class="step bad">搞裙带</div><span class="arrow">→</span>
+            <div class="step bad">开公司</div><span class="arrow">→</span>
+            <div class="step bad">拉高管亲属进公司</div><span class="arrow">→</span>
+            <div class="step bad">公司倒闭</div><span class="arrow">→</span>
+            <div class="step bad">再开公司</div><span class="arrow">→</span>
+            <div class="step bad">再倒闭</div><span class="arrow">→</span>
+            <div class="step bad">循环往复</div>
+          </div>
 
-      <div class="section-title">对照表</div>
-      <div class="grid">
-        <div class="card">
-          <h3><span class="dot red"></span>走不通的</h3>
-          <ul>
-            <li>搞政治</li>
-            <li>攀关系</li>
-            <li>搞裙带</li>
-            <li>拉高管亲属</li>
-            <li>公司倒闭</li>
-            <li>再开再倒</li>
-            <li>循环往复</li>
-          </ul>
+          <div class="section-title">反着来的路</div>
+          <div class="chain">
+            <div class="step good">有野心</div><span class="arrow">→</span>
+            <div class="step good">搞产品</div><span class="arrow">→</span>
+            <div class="step good">攀技术</div><span class="arrow">→</span>
+            <div class="step good">搞制度</div><span class="arrow">→</span>
+            <div class="step good">开公司</div><span class="arrow">→</span>
+            <div class="step good">拉人才进公司</div><span class="arrow">→</span>
+            <div class="step good">公司迭代</div><span class="arrow">→</span>
+            <div class="step good">再迭代</div><span class="arrow">→</span>
+            <div class="step good">再迭代</div><span class="arrow">→</span>
+            <div class="step good">百年公司</div>
+          </div>
+
+          <div class="section-title">对照表</div>
+          <div class="grid">
+            <div class="card">
+              <h3><span class="dot red"></span>走不通的</h3>
+              <ul>
+                <li>搞政治</li>
+                <li>攀关系</li>
+                <li>搞裙带</li>
+                <li>拉高管亲属</li>
+                <li>公司倒闭</li>
+                <li>再开再倒</li>
+                <li>循环往复</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3><span class="dot green"></span>走得通的</h3>
+              <ul>
+                <li>搞产品</li>
+                <li>攀技术</li>
+                <li>搞制度</li>
+                <li>拉人才</li>
+                <li>公司迭代</li>
+                <li>再迭代</li>
+                <li>百年公司</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="section-title">核心</div>
+          <div class="quote">
+            想搞成百年公司，<br>
+            <span>反着来就行</span>。
+          </div>
+
+          <div class="end">
+            <p>
+              <span class="gold">不搞政治，搞产品</span><br>
+              <span class="green">不攀关系，攀技术</span><br>
+              <span class="blue">不搞裙带，搞制度</span><br>
+              <span class="gold">不拉亲属，拉人才</span>
+            </p>
+            <div class="foot">个人观点 · 欢迎讨论</div>
+          </div>
+
         </div>
-        <div class="card">
-          <h3><span class="dot green"></span>走得通的</h3>
-          <ul>
-            <li>搞产品</li>
-            <li>攀技术</li>
-            <li>搞制度</li>
-            <li>拉人才</li>
-            <li>公司迭代</li>
-            <li>再迭代</li>
-            <li>百年公司</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="section-title">核心</div>
-      <div class="quote">
-        想搞成百年公司，<br>
-        <span>反着来就行</span>。
-      </div>
-
-      <div class="end">
-        <p>
-          <span class="gold">不搞政治，搞产品</span><br>
-          <span class="green">不攀关系，攀技术</span><br>
-          <span class="blue">不搞裙带，搞制度</span><br>
-          <span class="gold">不拉亲属，拉人才</span>
-        </p>
-        <div class="foot">个人观点 · 欢迎讨论</div>
-      </div>
-
-    </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

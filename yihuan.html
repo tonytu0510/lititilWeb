@@ -2,17 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "一丨环 · 半与伴"
-    window.PAGE_META.cssFront = ["./css/yihuan.css"]
-    window.PAGE_META.jsEnd = ["./js/yihuan.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "一丨环 · 半与伴"
+        window.PAGE_META.cssFront = ["./css/yihuan.css"]
+        window.PAGE_META.jsEnd = ["../compressed/yihuan.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <div class="top-slogan">人生常备一丨十，以备算命之需</div>
         <div class="sub-slogan">不算命 · 一丨十</div>
 
@@ -550,9 +561,10 @@
             一横一竖，半半伴伴，全在里面转。
         </footer>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

@@ -2,16 +2,27 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "斗地主 · 纸牌结构"
-    window.PAGE_META.cssFront = ["./css/DouDiZhu.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "斗地主 · 纸牌结构"
+        window.PAGE_META.cssFront = ["./css/DouDiZhu.css"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <header>
             <h1>斗地主</h1>
             <p>4种花色，13个点数，3个人，一副牌。</p>
@@ -141,9 +152,10 @@
             纸牌比麻将简单，但牌型、人数、概率，一样都不少。
         </footer>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

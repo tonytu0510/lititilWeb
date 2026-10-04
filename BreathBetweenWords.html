@@ -2,17 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "读呼吸 · 标点与停顿"
-    window.PAGE_META.cssFront = ["./css/BreathBetweenWords.css"]
-    window.PAGE_META.jsEnd = ["./js/BreathBetweenWords.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "读呼吸 · 标点与停顿"
+        window.PAGE_META.cssFront = ["./css/BreathBetweenWords.css"]
+        window.PAGE_META.jsEnd = ["../compressed/BreathBetweenWords.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
         <header>
             <h1>读呼吸</h1>
             <p>标点不是符号，是呼吸。停顿不同，意思就不同。</p>
@@ -81,9 +92,10 @@
             看标点、空格和停顿，读懂一句话背后的意思 · 可直接部署到网站
         </footer>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

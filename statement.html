@@ -2,35 +2,47 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "个人声明"
-    window.PAGE_META.cssFront = ["./css/statement.css"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="wrap">
-    <div class="container">
-        <div class="title">⬡ <span>个人声明</span></div>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "个人声明"
+        window.PAGE_META.cssFront = ["./css/statement.css"]
 
-        <div class="statement">
-            本人是中华人民共和国公民，<br>
-            严格遵守<span class="highlight">宪法与法律</span>，<br>
-            已<span class="retired">退休</span>，<br>
-            不参与、不干涉任何活动。<br>
-            <span class="warning">若有违反，愿依法承担相应责任。</span>
-        </div>
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
 
-        <div class="footer">
-            <span>守法公民</span> · 个人声明
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
+        <div class="container">
+            <div class="title">⬡ <span>个人声明</span></div>
+
+            <div class="statement">
+                本人是中华人民共和国公民，<br>
+                严格遵守<span class="highlight">宪法与法律</span>，<br>
+                已<span class="retired">退休</span>，<br>
+                不参与、不干涉任何活动。<br>
+                <span class="warning">若有违反，愿依法承担相应责任。</span>
+            </div>
+
+            <div class="footer">
+                <span>守法公民</span> · 个人声明
+            </div>
         </div>
-    </div>
-    </div>
-    `
+        </div>
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

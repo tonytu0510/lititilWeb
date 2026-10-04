@@ -2,17 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "缘分测试 - 纯属娱乐"
-    window.PAGE_META.cssFront = ["./css/namePairing.css"]
-    window.PAGE_META.jsEnd = ["./js/namePairing.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="stars-bg" id="starsBg"></div>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "缘分测试 - 纯属娱乐"
+        window.PAGE_META.cssFront = ["./css/namePairing.css"]
+        window.PAGE_META.jsEnd = ["../compressed/namePairing.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="stars-bg" id="starsBg"></div>
     <div class="container">
         <div class="headerN">
             <div class="icon">★</div>
@@ -65,9 +76,10 @@
             ★ 纯属娱乐 · 切勿当真 · 对合环加密系统 V9.0 ★
         </div>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

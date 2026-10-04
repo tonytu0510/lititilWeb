@@ -2,18 +2,29 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "拆字宇宙 · 兵戈志"
-    window.PAGE_META.cssFront = ["./css/fontAll.css"]
-    window.PAGE_META.jsFront = ['./js/fontMenu.js']
-    window.PAGE_META.jsEnd = ["./js/fontAll.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <!-- ===== 下方三TAB内容区 ===== -->
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "拆字宇宙 · 兵戈志"
+        window.PAGE_META.cssFront = ["./css/fontAll.css"]
+        window.PAGE_META.jsFront = ['../compressed/fontMenu.js.txt']
+        window.PAGE_META.jsEnd = ["../compressed/fontAll.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <!-- ===== 下方三TAB内容区 ===== -->
     <div class='container'>
     <div class="tab-container">
 
@@ -108,9 +119,10 @@
         <div class="tab-footer">⚔️ 以字为史 · 自洽闭环</div>
     </div>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>

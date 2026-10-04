@@ -2,17 +2,28 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <script src="./js/meta-config.js"></script>
   <script>
-    window.PAGE_META.title = "工具"
-    window.PAGE_META.cssFront = ["./css/tools.css"]
-    window.PAGE_META.jsEnd = ["./js/tools.js"]
-  </script>
-  </style>
-  <script>
-    window.PAGE_META.content =
-    `
-    <div class="container">
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "工具"
+        window.PAGE_META.cssFront = ["./css/tools.css"]
+        window.PAGE_META.jsEnd = ["../compressed/tools.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="container">
         <h1>🛠️ 工具箱</h1>
         
         <div class="tabs">
@@ -51,9 +62,10 @@
             <div class="result" id="formatResult"></div>
         </div>
     </div>
-    `
+        `;
+    }
   </script>
-  <script src="./js/meta-loader.js"></script>
+  <script src="./js/loader.js"></script>
 </head>
 <body>
 </body>
