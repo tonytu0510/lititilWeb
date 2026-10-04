@@ -1,10 +1,49 @@
 // ============================================================
+// 尽早插入 loading（body 一出现就塞）
+// ============================================================
+function insert() {
+    // style
+    const style = document.createElement('style');
+    style.textContent = `
+        #globalLoading {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+        .gl-spinner {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255,255,255,0.15);
+            border-top-color: #7cb8b8;
+            border-radius: 50%;
+            animation: gl-spin 0.8s linear infinite;
+        }
+        @keyframes gl-spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    const div = document.createElement('div');
+    div.id = 'globalLoading';
+    const glspinner = document.createElement('div');
+    glspinner.className = 'gl-spinner';
+    div.appendChild(glspinner)
+    document.body.appendChild(div);
+}
+insert()
+// ============================================================
 // loading 控制
 // ============================================================
 function hideLoading() {
     const div = document.getElementById('globalLoading');
     if (!div) return;
-    div.style.display = 'none';
+    div.style.transition = 'opacity 0.3s';
+    div.style.opacity = '0';
     setTimeout(() => {
         if (div.parentNode) div.parentNode.removeChild(div);
     }, 300);
@@ -22,10 +61,11 @@ function hideLoading() {
         await runLoader();
 
         console.log('[loader] 全部完成');
-        hideLoading();
+        hideLoading()
     } catch (e) {
         console.error('[loader] 失败:', e);
-        hideLoading();
+        // body 还没出现，盯着 DOM 变化
+        hideLoading()
     }
 })();
 
@@ -52,7 +92,7 @@ async function initPage() {
 async function renderContent() {
     // 插到 #app 里，或者你指定的容器
     const container = document.getElementById('app') || document.body;
-    container.innerHTML = window.PAGE_META.content || '';
+    container.innerHTML += window.PAGE_META.content || '';
 }
 
 // ============================================================
