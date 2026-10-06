@@ -275,7 +275,7 @@ html, body {
   justify-content: center;
   gap: 16px;
   background: #fff;
-  z-index: 999;
+  z-index: 7;
 }
 .spinner {
   width: 36px;
