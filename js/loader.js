@@ -59,7 +59,6 @@ function hideLoading() {
         await initPage();
         await initPageMeta();
         await initPageContent();
-        execScript(window.PAGE_META.metaLoader)
         //加载全部head和css
         const allUrlsMetaLoader = [
             ...(window.PAGE_META.metaLoader || [])
