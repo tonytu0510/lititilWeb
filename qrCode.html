@@ -63,5 +63,15 @@
 </head>
 <body>
 </body>
-<script src="./js/loader.js"></script>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = [
+            './js/metaConfigLoader.js.txt'
+        ]
+        window.PAGE_META.loader = [
+            "./js/loader.js.txt"
+        ];
+    }
+</script>
+<script src="./js/init.js"></script>
 </html>
