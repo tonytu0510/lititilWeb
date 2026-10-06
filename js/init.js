@@ -1,5 +1,8 @@
 //记载最后的loader
-const allUrlsLoader = ['./js/metaConfigLoader.js.txt','./js/loader.js.txt'];
+const allUrlsLoader = [
+    './js/metaConfigLoader.js.txt',
+    './js/loader.js.txt'
+];
 runLoader(allUrlsLoader);
 // ============================================================
 // runLoader —— 并行下载 + 顺序执行
