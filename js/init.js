@@ -1,7 +1,7 @@
 // ============================================================
 // 全局版本号 —— 每次发布改这里
 // ============================================================
-window.APP_VERSION = '20261006-2250';
+window.APP_VERSION = '20261006-2318';
 
 // ============================================================
 // 以下是 init.js 原有逻辑
@@ -28,7 +28,7 @@ window.APP_VERSION = '20261006-2250';
     }
 
     // 1. 先处理已有的
-    document.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(addVersion);
+    document.querySelectorAll("link[rel='stylesheet']:not(#appendNodeId), script[src]:not(#appendNodeId)").forEach(addVersion);
 
     // 2. 监听后续动态插入的
     const observer = new MutationObserver((mutations) => {
@@ -38,15 +38,16 @@ window.APP_VERSION = '20261006-2250';
                 addVersion(node);
                 // 处理子节点
                 if (node.querySelectorAll) {
+                    node.id = 'appendNodeId'
                     node.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(addVersion);
                 }
             }
         }
     });
 
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
+    document.querySelectorAll("link[rel='stylesheet'], script[src]").forEach(el => {
+        if (el.closest('#appendNodeId')) return;
+        addVersion(el);
     });
 
     console.log('[init] 已启动版本号监听，版本', V);
