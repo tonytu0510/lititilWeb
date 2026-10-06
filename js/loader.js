@@ -91,7 +91,7 @@ async function initPage() {
 // ============================================================
 async function renderContent() {
     // 插到 #app 里，或者你指定的容器
-    const container = document.getElementById('app') || document.body;
+    const container = document.body;
     container.innerHTML += window.PAGE_META.content || '';
 }
 
