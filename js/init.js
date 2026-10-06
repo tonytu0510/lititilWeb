@@ -1,7 +1,7 @@
 // ============================================================
 // 全局版本号 —— 每次发布改这里
 // ============================================================
-window.APP_VERSION = '20261006-2209';
+window.APP_VERSION = '20261006-2250';
 
 // ============================================================
 // 以下是 init.js 原有逻辑
@@ -9,43 +9,47 @@ window.APP_VERSION = '20261006-2209';
 (function () {
     const V = window.APP_VERSION || Date.now();
 
-    // 动态加载 CSS
-    function loadCSS(href) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href + '?v=' + V;
-        document.head.appendChild(link);
-    }
-
-    // 动态加载 JS
-    function loadJS(src) {
-        return new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = src + '?v=' + V;
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-        });
-    }
-
-    // 资源清单
-    const CSS_LIST = [
-        '/css/style.css'
-    ];
-
-    const JS_LIST = [
-        '/js/common.js',
-        '/js/dino-game.js'
-    ];
-
-    CSS_LIST.forEach(loadCSS);
-
-    (async () => {
-        for (const src of JS_LIST) {
-            await loadJS(src);
+    function addVersion(el) {
+        if (el.tagName === 'LINK' && el.rel === 'stylesheet') {
+            const href = el.getAttribute('href');
+            if (!href) return;
+            if (href.startsWith('http://') || href.startsWith('https://')) return;
+            if (href.includes('?v=')) return;
+            const sep = href.includes('?') ? '&' : '?';
+            el.setAttribute('href', href + sep + 'v=' + V);
+        } else if (el.tagName === 'SCRIPT' && el.src) {
+            const src = el.getAttribute('src');
+            if (!src) return;
+            if (src.startsWith('http://') || src.startsWith('https://')) return;
+            if (src.includes('?v=')) return;
+            const sep = src.includes('?') ? '&' : '?';
+            el.setAttribute('src', src + sep + 'v=' + V);
         }
-        console.log('[init] 全部资源加载完成，版本', V);
-    })();
+    }
+
+    // 1. 先处理已有的
+    document.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(addVersion);
+
+    // 2. 监听后续动态插入的
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType !== 1) continue;  // 只处理元素节点
+                addVersion(node);
+                // 处理子节点
+                if (node.querySelectorAll) {
+                    node.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(addVersion);
+                }
+            }
+        }
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+    console.log('[init] 已启动版本号监听，版本', V);
 })();
 
 // ============================================================
