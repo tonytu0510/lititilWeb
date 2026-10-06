@@ -32,10 +32,11 @@ function insert() {
     div.id = 'globalLoading';
     const glspinner = document.createElement('div');
     glspinner.className = 'gl-spinner';
-    div.appendChild(glspinner)
+    div.appendChild(glspinner);
     document.body.appendChild(div);
 }
-insert()
+insert();
+
 // ============================================================
 // loading 控制
 // ============================================================
@@ -46,12 +47,13 @@ function hideLoading() {
     div.style.opacity = '0';
     setTimeout(() => {
         if (div.parentNode) div.parentNode.removeChild(div);
-    }, 300);
+    }, 0);
 }
-// js/loader.js
+
+// ============================================================
+// 主流程
+// ============================================================
 (async function () {
-    // 1. loading 已经在 HTML 里，直接 hide 备用
-    // 2. 直接启动，不用等 DOMContentLoaded
     try {
         await loadScript('./js/metaConfigLoader.js');
         await initPage();
@@ -61,16 +63,15 @@ function hideLoading() {
         await runLoader();
 
         console.log('[loader] 全部完成');
-        hideLoading()
+        hideLoading();
     } catch (e) {
         console.error('[loader] 失败:', e);
-        // body 还没出现，盯着 DOM 变化
-        hideLoading()
+        hideLoading();
     }
 })();
 
 // ============================================================
-// 动态加载 JS
+// 动态加载 JS 文件（用于 metaConfigLoader.js 这种普通脚本）
 // ============================================================
 function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -81,24 +82,53 @@ function loadScript(src) {
         document.head.appendChild(s);
     });
 }
+
+// ============================================================
+// 初始化 PAGE_META（你原来的逻辑，保留）
+// ============================================================
 async function initPage() {
-    window.PAGE_META.js = ["./compressed/common.js.txt"],
-    window.PAGE_META.jsArr = ["./compressed/dino-game.js.txt"]
+    window.PAGE_META.js = ["./compressed/common.js.txt"];
+    window.PAGE_META.jsArr = ["./compressed/dino-game.js.txt"];
 }
 
 // ============================================================
 // renderContent —— 把 content 插进 DOM
 // ============================================================
 async function renderContent() {
-    // 插到 #app 里，或者你指定的容器
     const container = document.body;
     container.innerHTML += window.PAGE_META.content || '';
 }
 
 // ============================================================
-// 加载逻辑
+// 并行下载 + 顺序执行
+// ============================================================
+
+// 只负责下载 + 解压，返回 code
+async function fetchOne(url, ignoreList) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(url + ' 加载失败');
+    const buf = new Uint8Array(await res.arrayBuffer());
+    const baseName = url.split('/').pop().replace(/\.txt$/, '');
+
+    if (ignoreList.includes(baseName)) {
+        return new TextDecoder('utf-8').decode(buf);
+    } else {
+        return decompress(buf);
+    }
+}
+
+// 只负责执行
+function execScript(code) {
+    const script = document.createElement('script');
+    script.textContent = code;
+    document.body.appendChild(script);
+}
+
+// ============================================================
+// runLoader —— 并行下载 + 顺序执行
 // ============================================================
 async function runLoader() {
+    // 1. 读取 ignore.txt
     let ignoreList = [];
     try {
         const txt = await (await fetch('./compressed/ignore.txt')).text();
@@ -109,48 +139,32 @@ async function runLoader() {
         console.warn('[loader] ignore.txt 读取失败');
     }
 
-    const jsFront = window.PAGE_META.jsFront || [];
-    for (const url of jsFront) {
-        await loadOne(url, ignoreList);
+    // 2. 按顺序收集所有 URL
+    const allUrls = [
+        ...(window.PAGE_META.jsFront || []),
+        ...(window.PAGE_META.js || []),
+        ...(window.PAGE_META.jsArr || []),
+        ...(window.PAGE_META.jsEnd || []),
+        ...(window.PAGE_META.metaLoader || []),
+    ];
+
+    if (allUrls.length === 0) {
+        console.log('[loader] 没有需要加载的脚本');
+        return;
     }
 
-    const js = window.PAGE_META.js || [];
-    for (const url of js) {
-        await loadOne(url, ignoreList);
+    // 3. 并行下载 + 解压（顺序由 Promise.all 保证与 allUrls 一致）
+    const codes = await Promise.all(
+        allUrls.map(url => fetchOne(url, ignoreList))
+    );
+
+    // 4. 按顺序执行
+    for (let i = 0; i < codes.length; i++) {
+        execScript(codes[i]);
+        console.log('[loader] 已执行:', allUrls[i]);
     }
 
-    const jsArr = window.PAGE_META.jsArr || [];
-    for (const url of jsArr) {
-        await loadOne(url, ignoreList);
-    }
-
-    const jsEnd = window.PAGE_META.jsEnd || [];
-    for (const url of jsEnd) {
-        await loadOne(url, ignoreList);
-    }
-
-    const metaLoader = window.PAGE_META.metaLoader || [];
-    for (const url of metaLoader) {
-        await loadOne(url, ignoreList);
-    }
-}
-
-async function loadOne(url, ignoreList) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(url + ' 加载失败');
-    const buf = new Uint8Array(await res.arrayBuffer());
-
-    const baseName = url.split('/').pop().replace(/\.txt$/, '');
-
-    let code;
-    if (ignoreList.includes(baseName)) {
-        code = new TextDecoder('utf-8').decode(buf);
-    } else {
-        code = decompress(buf);
-    }
-
-    execScript(code);
-    console.log('[loader] 已加载:', url);
+    console.log('[loader] 全部完成，共', codes.length, '个脚本');
 }
 
 // ============================================================
@@ -208,13 +222,4 @@ function decompress(buf) {
     }
 
     return new TextDecoder('utf-8').decode(out);
-}
-
-// ============================================================
-// 执行脚本
-// ============================================================
-function execScript(code) {
-    const script = document.createElement('script');
-    script.textContent = code;
-    document.body.appendChild(script);
 }
