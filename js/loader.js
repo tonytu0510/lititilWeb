@@ -59,8 +59,21 @@ function hideLoading() {
         await initPage();
         await initPageMeta();
         await initPageContent();
+        execScript(window.PAGE_META.metaLoader)
+        //加载全部head和css
+        const allUrlsMetaLoader = [
+            ...(window.PAGE_META.metaLoader || [])
+        ];
+        await runLoader(allUrlsMetaLoader);
         await renderContent();
-        await runLoader();
+        // 加载js - 按顺序收集所有 URL
+        const allUrls = [
+            ...(window.PAGE_META.jsFront || []),
+            ...(window.PAGE_META.js || []),
+            ...(window.PAGE_META.jsArr || []),
+            ...(window.PAGE_META.jsEnd || [])
+        ];
+        await runLoader(allUrls);
 
         console.log('[loader] 全部完成');
         hideLoading();
@@ -127,7 +140,7 @@ function execScript(code) {
 // ============================================================
 // runLoader —— 并行下载 + 顺序执行
 // ============================================================
-async function runLoader() {
+async function runLoader(allUrls) {
     // 1. 读取 ignore.txt
     let ignoreList = [];
     try {
@@ -139,14 +152,6 @@ async function runLoader() {
         console.warn('[loader] ignore.txt 读取失败');
     }
 
-    // 2. 按顺序收集所有 URL
-    const allUrls = [
-        ...(window.PAGE_META.jsFront || []),
-        ...(window.PAGE_META.js || []),
-        ...(window.PAGE_META.jsArr || []),
-        ...(window.PAGE_META.jsEnd || []),
-        ...(window.PAGE_META.metaLoader || []),
-    ];
 
     if (allUrls.length === 0) {
         console.log('[loader] 没有需要加载的脚本');
