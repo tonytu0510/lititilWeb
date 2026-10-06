@@ -8,7 +8,8 @@ runLoader(allUrlsLoader);
 // runLoader —— 并行下载 + 顺序执行
 // ============================================================
 async function runLoader(allUrls) {
-    // 1. 读取 ignore.txt
+    if (!allUrls || allUrls.length === 0) return;
+
     let ignoreList = [];
     try {
         const txt = await (await fetch('./compressed/ignore.txt')).text();
@@ -19,44 +20,52 @@ async function runLoader(allUrls) {
         console.warn('[loader] ignore.txt 读取失败');
     }
 
+    // 并行下载 + 解压
+    const codes = await Promise.all(allUrls.map(url => fetchOne(url, ignoreList)));
 
-    if (allUrls.length === 0) {
-        console.log('[loader] 没有需要加载的脚本');
-        return;
-    }
-
-    // 3. 并行下载 + 解压（顺序由 Promise.all 保证与 allUrls 一致）
-    const codes = await Promise.all(
-        allUrls.map(url => fetchOne(url, ignoreList))
-    );
-
-    // 4. 按顺序执行
+    // 顺序执行
     for (let i = 0; i < codes.length; i++) {
-        execScript(codes[i]);
-        console.log('[loader] 已执行:', allUrls[i]);
+        await execScript(codes[i]);
+        codes[i] = null; // 断开引用
     }
 
-    console.log('[loader] 全部完成，共', codes.length, '个脚本');
+    console.log('[loader] 全部完成，共', allUrls.length, '个脚本');
 }
-// 只负责执行
+// ============================================================
+// 执行脚本（延迟移除 DOM 节点，更安全）
+// ============================================================
 function execScript(code) {
-    const script = document.createElement('script');
-    script.textContent = code;
-    document.body.appendChild(script);
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.textContent = code;
+        document.body.appendChild(script);
+        // 延迟到下一个宏任务移除，确保脚本已执行完
+        setTimeout(() => {
+            script.remove();
+            resolve();
+        }, 0);
+    });
 }
+// ============================================================
 // 只负责下载 + 解压，返回 code
+// ============================================================
 async function fetchOne(url, ignoreList) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(url + ' 加载失败');
-    const buf = new Uint8Array(await res.arrayBuffer());
+    let buf = new Uint8Array(await res.arrayBuffer());
     const baseName = url.split('/').pop().replace(/\.txt$/, '');
 
+    let code;
     if (ignoreList.includes(baseName)) {
-        return new TextDecoder('utf-8').decode(buf);
+        code = new TextDecoder('utf-8').decode(buf);
     } else {
-        return decompress(buf);
+        code = decompress(buf);
     }
+
+    buf = null;
+    return code;
 }
+
 
 // ============================================================
 // 解压
@@ -74,14 +83,15 @@ function decompress(buf) {
     const count = view.getUint32(13);
     const dataBytes = buf.slice(17);
 
-    const bits = [];
+    // 用完即弃的中间数组
+    let bits = [];
     for (const byte of dataBytes) {
         for (let i = 7; i >= 0; i--) {
             bits.push((byte >> i) & 1);
         }
     }
 
-    const remainders = [];
+    let remainders = [];
     for (let i = 0; i < count; i++) {
         let val = 0n;
         for (let j = 0; j < BITS; j++) {
@@ -94,6 +104,10 @@ function decompress(buf) {
     for (let i = remainders.length - 1; i >= 0; i--) {
         v = v * base + remainders[i];
     }
+
+    // 释放大数组
+    bits = null;
+    remainders = null;
 
     function bigIntToBytes(v) {
         if (v === 0n) return new Uint8Array([0]);
