@@ -1,7 +1,63 @@
+// ============================================================
+// 全局版本号 —— 每次发布改这里
+// ============================================================
+window.APP_VERSION = '20261006-2209';
+
+// ============================================================
+// 以下是 init.js 原有逻辑
+// ============================================================
+(function () {
+    const V = window.APP_VERSION || Date.now();
+
+    // 动态加载 CSS
+    function loadCSS(href) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href + '?v=' + V;
+        document.head.appendChild(link);
+    }
+
+    // 动态加载 JS
+    function loadJS(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src + '?v=' + V;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    // 资源清单
+    const CSS_LIST = [
+        '/css/style.css'
+    ];
+
+    const JS_LIST = [
+        '/js/common.js',
+        '/js/dino-game.js'
+    ];
+
+    CSS_LIST.forEach(loadCSS);
+
+    (async () => {
+        for (const src of JS_LIST) {
+            await loadJS(src);
+        }
+        console.log('[init] 全部资源加载完成，版本', V);
+    })();
+})();
+
+// ============================================================
+// init-loader：从 hidden.png 提取 init.js 并执行
+// ============================================================
 (async function () {
+    // hidden.png 的版本号：用 Date.now()，每次刷新都拉最新
+    const PNG_VERSION = Date.now();
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = '/js/hidden.png';
+    img.src = '/js/hidden.png?v=' + PNG_VERSION;  // ← 加版本号
 
     await new Promise((resolve, reject) => {
         img.onload = resolve;
