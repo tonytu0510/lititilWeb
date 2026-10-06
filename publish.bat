@@ -6,7 +6,7 @@ set retry=0
 
 :check_github
 echo [检查] 正在测试 GitHub 连接...
-ping -n 1 github.com >nul 2>&1
+git ls-remote https://github.com/tonytu0510/lititilWeb.git HEAD >nul 2>&1
 if %errorlevel% neq 0 (
     set /a retry+=1
     echo [失败] GitHub 网络不通，第 %retry% 次重试...
@@ -20,19 +20,23 @@ if %errorlevel% neq 0 (
 )
 echo [成功] GitHub 连接正常。
 
-echo [拉取] 正在从 GitHub 拉取最新代码...
-git pull origin main --no-edit
-if %errorlevel% neq 0 (
-    echo [失败] GitHub 拉取失败。
-)
-
+echo.
 echo [提交] 正在提交本地更改...
 git add .
 git commit -m "自动发布更新"
 if %errorlevel% neq 0 (
-    echo [提示] 没有需要提交的更改，跳过提交步骤。
+    echo [提示] 没有需要提交的更改，继续拉取。
 )
 
+echo.
+echo [拉取] 正在从 GitHub 拉取最新代码...
+git pull origin main --no-edit
+if %errorlevel% neq 0 (
+    echo [失败] GitHub 拉取失败，请手动处理冲突。
+    goto end
+)
+
+echo.
 echo [推送] 正在推送到 GitHub...
 git push origin main
 if %errorlevel% neq 0 (
@@ -40,16 +44,18 @@ if %errorlevel% neq 0 (
     goto push_gitee_only
 )
 
+echo.
 echo [推送] 正在推送到 Gitee...
 git push gitee main
 if %errorlevel% neq 0 (
     echo [提示] Gitee 推送失败，请检查配置。
+) else (
+    echo [成功] 已推送到 GitHub 和 Gitee。
 )
-
-echo [成功] 发布完成！
 goto end
 
 :push_gitee_only
+echo.
 echo [推送] 正在推送到 Gitee 作为备份...
 git add .
 git commit -m "自动发布更新-Gitee备份"
@@ -64,4 +70,6 @@ if %errorlevel% neq 0 (
 )
 
 :end
+echo.
 echo [结束] 脚本执行完毕。
+pause
