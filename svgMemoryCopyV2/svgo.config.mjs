@@ -1,0 +1,14 @@
+export default {
+  plugins: [
+    {
+      name: 'preset-default',
+      params: {
+        overrides: {
+          cleanupIds: false,
+          removeHiddenElems: false,
+          removeUselessDefs: false
+        }
+      }
+    }
+  ]
+};
