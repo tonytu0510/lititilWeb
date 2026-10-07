@@ -171,3 +171,14 @@
   color: #0d0d0d;
   border-color: #7cb8b8;
 }
+.disclaimer {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255, 220, 100, 0.12);
+    border: 1px dashed rgba(255, 220, 100, 0.4);
+    color: #ffe9a8;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
