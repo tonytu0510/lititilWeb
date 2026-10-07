@@ -14,6 +14,9 @@ fontMenu.js
 game.js
 gua.js
 index.js
+js\init.js
+js\loader.js
+js\metaConfigLoader.js
 keyboard-input.js
 meta-config.js
 meta-loader.js
