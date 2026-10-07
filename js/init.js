@@ -48,4 +48,20 @@
     script.remove();
 
     console.log('[init-loader] 已从图片提取并执行 init.js，长度', len);
+
+    // ============================================================
+    // 百度统计：延迟到 load 之后再加载，避免拖累首屏
+    // ============================================================
+    if (document.readyState === 'complete') {
+        loadBaiduTongji();
+    } else {
+        window.addEventListener('load', loadBaiduTongji);
+    }
+
+    function loadBaiduTongji() {
+        var s = document.createElement('script');
+        s.src = 'https://hm.baidu.com/hm.js?726197c7cdeb238883e13623049915fa';
+        s.async = true;
+        document.head.appendChild(s);
+    }
 })();
