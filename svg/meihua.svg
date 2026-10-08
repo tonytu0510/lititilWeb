@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 532 500"><use href="#img1"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 532 500" xmlns="http://www.w3.org/2000/svg">
+<style>tspan { white-space:pre }</style>
+<use href="#img1"/>
+</svg>
