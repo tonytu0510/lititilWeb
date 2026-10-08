@@ -18,7 +18,6 @@ js\init.js
 js\loader.js
 js\metaConfigLoader.js
 keyboard-input.js
-meta-config.js
 meta-loader.js
 namePairing.js
 national-anthem-player.js
