@@ -632,6 +632,46 @@
                     max-width:95vw; max-height:95vh; border-radius:8px;" />
       </div>
 
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>突破口 · 拆字推导 + 原题图</h3>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:260px;">
+            <ol style="line-height:1.8; padding-left:20px;">
+              <li>口 = 10</li>
+              <li>36 = 磊（三个石，石 = 口 + 2画 = 12，12 × 3 = 36）</li>
+              <li>25 = 营（艹 + 宫，宫 = 宀 + 吕，吕 = 两个口）</li>
+              <li>中间三个口 = 品 = 30</li>
+              <li>用 30（品）去跟 36、25 约分</li>
+              <li>约分后剩下两个字：<b>磊、营</b></li>
+              <li>继续拆：
+                <ul style="line-height:1.8; padding-left:20px;">
+                  <li>磊 = 三个口 → 三个算一个字，多于两个一起约分</li>
+                  <li>跟下面的两个口约分 → 磊剩 <b>777</b></li>
+                  <li>营 = 艹 + 宝字盖</li>
+                  <li>艹（一横两竖）→ 两竖约分 → 剩 <b>一</b></li>
+                  <li>艹剩的「一」跟宝字盖上面的一横约分掉</li>
+                  <li>宝字盖去掉上面一横，剩两个 <b>1</b></li>
+                </ul>
+              </li>
+              <li>结果：<b>711</b></li>
+            </ol>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <img id="zoomImg" src="./images/imgModalquwei14.jpg" alt="突破口原题"
+                style="max-width:100%; border-radius:8px; cursor:zoom-in;"
+                onclick="document.getElementById('imgModalquwei14').style.display='block'" />
+          </div>
+        </div>
+      </div>
+
+      <div id="imgModalquwei14"
+          style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                  background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
+                  onclick="this.style.display='none'">
+        <img src="./images/imgModalquwei14.jpg" alt="原题大图"
+            style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                    max-width:95vw; max-height:95vh; border-radius:8px;" />
+      </div>
       <!-- （此处省略趣味数学系列卡片，与原文件一致） -->
 
       <div class="card">
