@@ -182,3 +182,12 @@
     font-size: 13px;
     letter-spacing: 1px;
 }
+.card a {
+  color: #d4af37;
+  text-decoration: none;
+  border-bottom: 1px dashed #d4af37;
+  transition: opacity .2s;
+}
+.card a:hover {
+  opacity: .7;
+}
