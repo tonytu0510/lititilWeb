@@ -808,6 +808,61 @@
                     max-width:95vw; max-height:95vh; border-radius:8px;" />
       </div>
 
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>密码题 · 拆字约分</h3>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:260px;">
+            <ol style="line-height:1.8; padding-left:20px;">
+              <li>题面：上方 9、8，下方 12，中间三个方框</li>
+              <li>9、8、12 各找含“曰”的字：
+                <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
+      9  → 冒 = 曰 + 目
+      8  → 沓 = 水 + 曰
+      12 → 替 = 夫 + 夫 + 曰
+                </pre>
+              </li>
+              <li>拆出“曰”后的剩余：
+                <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
+      9  → 目
+      8  → 水
+      12 → 夫夫
+                </pre>
+              </li>
+              <li>三个口约掉两个，剩一个口</li>
+              <li>夫夫约掉</li>
+              <li>剩下：目、水、口</li>
+              <li>拆目：
+                <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
+      目 = 月 + 一
+                </pre>
+              </li>
+              <li>曰 = 口 + 一</li>
+              <li>组合约分：
+                <pre style="background:transparent; padding:0; margin:6px 0; font-family:monospace; line-height:1.3;">
+      月 + 一 + 水 + 口 + 一 + 口
+      两个口约掉 → 月 + 一 + 水 + 一
+                </pre>
+              </li>
+              <li>月 + 永 = 脉</li>
+              <li class="highlight">结果：脉</li>
+            </ol>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <img id="zoomImg" src="./images/imgModalquwei18.jpg" alt="密码题原图"
+                style="max-width:100%; border-radius:8px; cursor:zoom-in;"
+                onclick="document.getElementById('imgModalquwei18').style.display='block'" />
+          </div>
+        </div>
+      </div>
+
+      <div id="imgModalquwei18"
+          style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                  background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
+          onclick="this.style.display='none'">
+        <img src="./images/imgModalquwei18.jpg" alt="原题大图"
+            style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                    max-width:95vw; max-height:95vh; border-radius:8px;" />
+      </div>
       <!-- （此处省略趣味数学系列卡片，与原文件一致） -->
 
       <div class="card">
