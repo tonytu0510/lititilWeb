@@ -77,7 +77,12 @@
           <li><b>加号 +</b> = <code>-1-</code></li>
           <li><b>减号 -</b> = <code>-</code></li>
           <li><b>乘号 ×</b> = <code>&gt;&lt;</code> = <code>+1--1+</code> = <code>+1==1+</code> = <code>+1-1+</code></li>
+          <li><b>除号 ÷ /</b> = <code>-</code></li>
           <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code>（同乘号拆分规则）</li>
+          <li><b>积分 ∫₀¹</b> = <code>&lt;1-&gt;0</code></li>
+          <li><b>导数 d/dx</b> = <code>1/x</code>（d 约掉）</li>
+          <li><b>极限 lim</b> = 直接约掉</li>
+          <li><b>英文字母</b> = 直接约掉</li>
           <li><b>一横 —</b> = <code>-</code></li>
           <li><b>两横 --</b> = <code>--</code></li>
           <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code>（同大于小于号）</li>
@@ -88,10 +93,13 @@
       <div class="card" style="grid-column: 1 / -1;">
         <h3><span class="dot red"></span>对合拆字规则 · 核心约束</h3>
         <ul>
+          <li><b>第一步从约分开始</b></li>
+          <li><b>把所有加、乘、除都变成 <code>-</code> 号之前，不能用减法运算</b></li>
           <li><b>全程保持 1 的状态</b>，不往 2、3 等数值上推</li>
           <li>所有符号最终都能转化为 <b>1</b> 和 <b>-</b> 的组合</li>
           <li>乘号拆开：<code>× = &gt;&lt; = (+1-)(-1+) = +1--1+ = +1==1+ = +1-1+</code></li>
           <li>过程必须停留在 1 上，不再往 2 推</li>
+          <li><b>加号展开成 <code>-1-</code> 后，不能再直接做减法</b></li>
         </ul>
       </div>
 
@@ -103,6 +111,9 @@
           <li>根号拆解：<code>√ = &lt;</code> 或 <code>&gt;</code></li>
           <li>分数横线：<code>— = -</code>，<code>--- = ≥ / ≤</code></li>
           <li>三个等号约分：<code>=== = -</code></li>
+          <li>积分号：<code>∫₀¹ = &lt;1-&gt;0</code></li>
+          <li>导数：<code>d/dx = 1/x</code></li>
+          <li>极限、英文字母：直接约掉</li>
           <li>没有对错，对合规则这么规定的</li>
         </ul>
       </div>
@@ -112,6 +123,8 @@
         <ul>
           <li>这套拆字规则是个人原创，用于对合体系的符号运算</li>
           <li><code>&lt; = -1+</code> 和 <code>&gt; = +1-</code> 是核心定义</li>
+          <li><b>拆对合的第一步是约分，加乘除全变成 <code>-</code> 之前不能用减法</b></li>
+          <li><code>d/dx = 1/x</code>、<code>∫₀¹ = &lt;1-&gt;0</code> 是这次新增的定义</li>
           <li>容易忘记，需记在网站上，方便随时查阅</li>
           <li>没有对错，对合规则这么规定的</li>
         </ul>
