@@ -602,9 +602,9 @@
       <div style="display:flex; gap:20px; flex-wrap:wrap;">
         <div style="flex:1; min-width:260px;">
           <ol style="line-height:1.8; padding-left:20px;">
-            <li>（5x)平方+1-(5x)平方 ＝1</li>
+            <li>（5x)平方+1-(5x)平方 ＝1</li>
             <li>由此推导出：</li>
-            <li>x平方+1-x平方 ＝1</li>
+            <li>x平方+1-x平方 ＝1</li>
             <li>跟题干关系不大</li>
           </ol>
         </div>
@@ -876,6 +876,119 @@
             style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
                     max-width:95vw; max-height:95vh; border-radius:8px;" />
       </div>
+
+      <!-- ===== 新增：60 个等于 7 的式子 · 总卡 ===== -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3><span class="dot red"></span>对合规则 · 60 个等于 7 的式子（验证案例）</h3>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:260px;">
+            <ol style="line-height:1.8; padding-left:20px;">
+              <li>覆盖：代数、对数、三角、极限、导数、积分、复数</li>
+              <li>普通数学全部成立</li>
+              <li>对合规则也能推通，说明规则够用</li>
+              <li>推不通时补规则：
+                <ul style="line-height:1.8; padding-left:20px;">
+                  <li>对数整体约成 1</li>
+                  <li>特殊三角函数约成 1</li>
+                  <li>x/x 约成 1</li>
+                  <li>积分系数按对合约分</li>
+                </ul>
+              </li>
+              <li>结论：对合规则可以覆盖整张表</li>
+            </ol>
+          </div>
+          <div style="flex:1; min-width:260px;">
+            <img id="zoomImg" src="./images/imgModalquwei19.jpg" alt="等于7的60个算式"
+                style="max-width:100%; border-radius:8px; cursor:zoom-in;"
+                onclick="document.getElementById('imgModalquwei19').style.display='block'" />
+          </div>
+        </div>
+      </div>
+
+      <div id="imgModalquwei19"
+          style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+                  background:rgba(0,0,0,0.85); z-index:99999; cursor:zoom-out;"
+          onclick="this.style.display='none'">
+        <img src="./images/imgModalquwei19.jpg" alt="等于7的60个算式大图"
+            style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                    max-width:95vw; max-height:95vh; border-radius:8px;" />
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 代数类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 代数类</h3>
+        <ul>
+          <li>3 + 4 = 7</li>
+          <li>10 - 3 = 7</li>
+          <li>2 × 7/2 = 7</li>
+          <li>21/3 = 7</li>
+          <li>√49 = 7</li>
+          <li>-(-7) = 7</li>
+          <li>7¹ = 7</li>
+          <li>对合推法：加号拆成 -1-，乘号拆成 +1-1+，约分后形式成立</li>
+        </ul>
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 对数指数类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 对数指数类</h3>
+        <ul>
+          <li>log₇7 + 6 = 7</li>
+          <li>ln(e⁷) = 7</li>
+          <li>e^(ln7) = 7</li>
+          <li>对合推法：log₇7 整体约成 1，ln 与 e 互相约掉</li>
+        </ul>
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 三角类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 三角类</h3>
+        <ul>
+          <li>sin(π/2) + 6 = 7</li>
+          <li>cos 0 + 6 = 7</li>
+          <li>sin²(π/6) + 27/4 = 7</li>
+          <li>cos²(π/3) + 27/4 = 7</li>
+          <li>tan(π/3) + 7 - √3 = 7</li>
+          <li>sec²(π/3) + 3 = 7</li>
+          <li>4 + tan²(π/3) = 7</li>
+          <li>对合推法：特殊三角函数整体约成 1</li>
+        </ul>
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 极限类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 极限类</h3>
+        <ul>
+          <li>lim (sin x / x) + 6 = 7</li>
+          <li>lim ((eˣ - 1) / x) + 6 = 7</li>
+          <li>lim (1+x)^(1/x) + 7 - e = 7</li>
+          <li>lim ((√(1+x) - 1) / x) + 13/2 = 7</li>
+          <li>对合推法：lim 约掉，英文字母约掉，x/x 约成 1</li>
+        </ul>
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 导数类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 导数类</h3>
+        <ul>
+          <li>d/dx (x²) |ₓ₌₂ + 3 = 7</li>
+          <li>d/dx (eˣ) |ₓ₌₀ + 6 = 7</li>
+          <li>对合推法：d/dx 约成 1/x，e 约掉，x² 展开约分</li>
+        </ul>
+      </div>
+
+      <!-- ===== 新增：60 个等于 7 · 积分类 ===== -->
+      <div class="card">
+        <h3><span class="dot gold"></span>60 个等于 7 · 积分类</h3>
+        <ul>
+          <li>∫₀¹ 7 dx = 7</li>
+          <li>∫₀⁷ 1 dx = 7</li>
+          <li>∫₀¹ 14x dx = 7</li>
+          <li>∫₀^π (7/2) sin x dx = 7</li>
+          <li>对合推法：∫₀¹ 写成 <1->0，d 约掉，系数按对合约分</li>
+        </ul>
+      </div>
+
       <!-- （此处省略趣味数学系列卡片，与原文件一致） -->
 
       <div class="card">
