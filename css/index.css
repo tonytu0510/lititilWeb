@@ -12,3 +12,5 @@ body { overflow: hidden; }
 #dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
 #dots span { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: background 0.3s; }
 #dots span.active { background: #c4334c; }
+.slide { pointer-events: none; }
+.slide.active { pointer-events: auto; }
