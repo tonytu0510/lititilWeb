@@ -1550,6 +1550,100 @@
         </ul>
       </div>
 
+      <!-- ==================== 英文拆 say 系列 ==================== -->
+      <div class="section-title">英文拆 say · 系列</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>英文拆 say · 规则</h3>
+        <ul>
+          <li>汉字拆“曰”</li>
+          <li>英文拆“say”</li>
+          <li>原词里如果有 <code>sa</code> 或 <code>as</code>，可以补 <code>y</code> 凑成 <code>say</code></li>
+          <li>拆出来的 <code>say</code> 和原词剩下的部分，可以对合约分</li>
+          <li>顺序可对合</li>
+          <li class="highlight">拆到最后，归到同一个底层形式</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>英文拆 say · bye</h3>
+        <ul>
+          <li>原词：bye = b + y + e</li>
+          <li>拆法：拆出 say，剩下 b + sa + e</li>
+          <li>得到：say + b + sa + e</li>
+          <li>写成：<b>saybsae</b></li>
+          <li>再对合：sa ⇄ as</li>
+          <li>得到：<b>saybase</b></li>
+          <li>约分：两组 sa 约掉</li>
+          <li>剩下：y + b + e</li>
+          <li>顺序对合：y + b + e = b + y + e</li>
+          <li class="highlight">结论：bye = saybsae = saybase</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>英文拆 say · base</h3>
+        <ul>
+          <li>原词：base = b + a + s + e</li>
+          <li>拆出：sa（a + s 对合）</li>
+          <li>补 y → say</li>
+          <li>剩下：b + e + y</li>
+          <li>得到：say + b + e + y</li>
+          <li>写成：<b>saybey</b></li>
+          <li>约分：两个 y 约掉一个</li>
+          <li>剩下：b + e</li>
+          <li class="highlight">结论：base = saybey = b + e</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>英文拆 say · 验证记录</h3>
+        <ul>
+          <li><b>bye</b> → say + b + sa + e → 约掉 sa → b + e → <b>成立</b></li>
+          <li><b>base</b> → say + b + e + y → 约掉 y → b + e → <b>成立</b></li>
+          <li><b>saybsae</b> → say + b + sa + e → 约掉 sa → b + e → <b>成立</b></li>
+          <li><b>saybase</b> → say + b + a + s + e → 约掉 as → b + e → <b>成立</b></li>
+          <li><b>saybey</b> → say + b + e + y → 约掉 y → b + e → <b>成立</b></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>英文拆 say · 不成立的词</h3>
+        <ul>
+          <li><b>sad</b> → say + d → 约掉 say → d → 不成立</li>
+          <li><b>as</b> → say → 约掉 say → 空 → 不成立</li>
+          <li><b>easy</b> → say + e → 约掉 say → e → 不成立</li>
+          <li><b>essay</b> → e + s + say → 约掉 say → e + s → 不成立</li>
+          <li><b>stay</b> → t + say → 约掉 say → t → 不成立</li>
+          <li><b>sky</b> → say + k → 约掉 say → k → 不成立</li>
+          <li><b>saye</b> → say + e → 约掉 say → e → 不成立</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>英文拆 say · 结论</h3>
+        <ul>
+          <li>含 b、e 的词，容易归到 b + e</li>
+          <li>不含 b、e 的词，归到别的底层形式</li>
+          <li>这套规则不是通用的</li>
+          <li>它更像是“把词拆成 say + 剩余部分，再看剩余部分能不能约”</li>
+          <li class="highlight">bye = saybsae = saybase = saybey = b + e</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>英文拆 say · 与汉字拆曰对照</h3>
+        <ul>
+          <li>汉字拆“曰”</li>
+          <li>英文拆“say”</li>
+          <li>汉字：冒 = 曰 + 目</li>
+          <li>英文：bye = say + b + sa + e</li>
+          <li>汉字：拆出曰后，剩下的部分约分</li>
+          <li>英文：拆出 say 后，剩下的字母约分</li>
+          <li class="highlight">本质一样：拆出固定结构，剩下的归到同一个底层</li>
+        </ul>
+      </div>
+
       <!-- ==================== 李 · 木子 · 天子执戈 · 王 ==================== -->
       <div class="section-title">李 · 木子 · 天子执戈 · 王</div>
 
