@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    async function initPageMeta() {
+        window.PAGE_META.title = "闲扯：财务杂谈"
+        window.PAGE_META.cssFront = ["./css/wordplay.css"]
+        window.PAGE_META.metaLoader = ["../compressed/meta-loader.js.txt"];
+    }
+
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+         <div class="wrap">
+
+    <div class="tag">我的想法 · 财务杂谈</div>
+
+    <h1>
+      闲扯：财务杂谈<br>
+      <span class="hl">公式 · 口径 · 对账 · 软件</span>
+    </h1>
+
+    <p class="sub">
+      规则：数学上对得上，是恒等式；财务上对得上，可能是造假账。<br>
+      对不上是常态，对得上要问怎么对上的。<br>
+      数字本身不重要，数字背后的规则和逻辑才重要。<br>
+      <b>阅读提示：标「数学」的按普通数学看，标「财务」的按会计口径看，两套规则不混用。</b>
+    </p>
+
+    <div class="section-title">全部卡片</div>
+
+    <div class="quick-nav">
+      <a href="#cat1" class="nav-btn">1. 对账与口径</a>
+      <a href="#cat2" class="nav-btn">2. 杜邦分析</a>
+      <a href="#cat3" class="nav-btn">3. 软件与规则</a>
+      <a href="#cat4" class="nav-btn">4. 税务局与查账</a>
+      <a href="#cat5" class="nav-btn">5. 数学与底层</a>
+      <a href="#cat6" class="nav-btn">6. 待补充</a>
+    </div>
+
+    <div class="grid">
+
+      <!-- ==================== 分类 1：对账与口径 ==================== -->
+      <div class="section-title" id="cat1">1. 对账与口径</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对账 · 核心原则</h3>
+        <ul>
+          <li>数学上对得上，是恒等式</li>
+          <li>财务上对得上，可能是造假账</li>
+          <li>对不上，是常态</li>
+          <li>对得上，要问一句：怎么对上的</li>
+          <li class="highlight">数字本身不重要，数字背后的规则和逻辑才重要</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>对账 · 三种情况</h3>
+        <ul>
+          <li><b>同源、同时、同口径</b>，不约分，对得上 → 正常</li>
+          <li><b>不同源、不同时、不同口径</b>，靠调因子凑对 → 危险</li>
+          <li><b>直接约分</b>，三个因子变摆设 → 没意义</li>
+          <li class="highlight">对得上不是问题，怎么对上的才是问题</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>对账 · 参数与公式</h3>
+        <ul>
+          <li>只要公式里每个参数都取对了</li>
+          <li>同源、同时、同口径</li>
+          <li>那么不管约不约分，账都能对上</li>
+          <li>数学上它本来就是恒等式</li>
+          <li class="highlight">问题从来不在公式，在参数</li>
+          <li><b>数学</b>：(净利润/营业收入) × (营业收入/总资产) × (总资产/净资产) = 净利润/净资产</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>口径 · 三个问题</h3>
+        <ul>
+          <li><b>1. 这个数从哪来的？</b>
+            <ul>
+              <li>账上直接取的，还是算出来的，还是估的？</li>
+            </ul>
+          </li>
+          <li><b>2. 按什么规则算的？</b>
+            <ul>
+              <li>会计准则、税法、内部制度，用的是哪一套？</li>
+            </ul>
+          </li>
+          <li><b>3. 和别的数怎么衔接的？</b>
+            <ul>
+              <li>利润表的收入，和资产负债表的应收、现金流量表的销售收款，能不能对上？对不上差在哪？</li>
+            </ul>
+          </li>
+          <li class="highlight">三个问题答清楚，口径就清楚了</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>口径 · 常见类型</h3>
+        <ul>
+          <li><b>收入口径</b>：含税 / 不含税；开票 / 账面 / 申报；视同销售</li>
+          <li><b>成本口径</b>：先进先出 / 加权平均 / 个别计价；期间费用与制造费用划分</li>
+          <li><b>资产口径</b>：折旧年限、残值率；存货跌价准备</li>
+          <li><b>往来口径</b>：其他应收应付里的股东借款；预收账款的纳税义务时间</li>
+          <li><b>合并口径</b>：合并 / 归母；期末数 / 平均数</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>口径 · 说不明白就是问题</h3>
+        <ul>
+          <li>税务局、审计、监管来查，问的往往不是“这个数对不对”</li>
+          <li>而是“这个数怎么来的”</li>
+          <li>口径说不清楚，本身就是问题</li>
+          <li class="highlight">有差异，能说清楚为什么差、差在哪、怎么调整，这是正常的</li>
+          <li class="highlight">对得上，但说不清怎么对上的，反而更麻烦</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>口径 · 实务顺序</h3>
+        <ul>
+          <li><b>先定口径 → 再记账 → 再出表 → 再分析</b></li>
+          <li>口径是源头</li>
+          <li>源头定不清楚，后面每一步都是隐患</li>
+          <li>软件也一样：取数口径不透明、不可配置、不可追溯</li>
+          <li>算出来的数，无论对得上还是对不上，都没法拿去应对检查</li>
+        </ul>
+      </div>
+
+      <!-- ==================== 分类 2：杜邦分析 ==================== -->
+      <div class="section-title" id="cat2">2. 杜邦分析</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>杜邦分析 · 三因子模型</h3>
+        <ul>
+          <li><b>ROE = 销售净利率 × 总资产周转率 × 权益乘数</b></li>
+          <li>销售净利率 = 净利润 / 营业收入 → 盈利能力</li>
+          <li>总资产周转率 = 营业收入 / 总资产 → 营运能力</li>
+          <li>权益乘数 = 总资产 / 净资产 → 财务杠杆</li>
+          <li class="highlight">价值不在算出 ROE，而在定位 ROE 变化的来源</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>杜邦分析 · 五因子模型</h3>
+        <ul>
+          <li><b>ROE = 税负负担 × 利息负担 × 息税前利润率 × 总资产周转率 × 权益乘数</b></li>
+          <li>税负负担 = 净利润 / 税前利润</li>
+          <li>利息负担 = 税前利润 / 息税前利润</li>
+          <li>息税前利润率 = 息税前利润 / 营业收入</li>
+          <li>总资产周转率 = 营业收入 / 总资产</li>
+          <li>权益乘数 = 总资产 / 净资产</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>杜邦分析 · 能不能约分</h3>
+        <ul>
+          <li><b>数学</b>：可以约分，三因子乘积 = 净利润 / 净资产</li>
+          <li><b>财务</b>：不能靠约分来理解</li>
+          <li>每个因子来自不同报表、不同时点、不同口径</li>
+          <li>约掉了中间项，就丢掉了结构信息</li>
+          <li class="highlight">杜邦分析的价值，恰恰在那些“不能约掉”的中间项</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>杜邦分析 · 为什么会对不上</h3>
+        <ul>
+          <li><b>时间口径不一致</b>：利润表是期间数，资产负债表是时点数</li>
+          <li><b>数据来源不同步</b>：净利润已结转，营业收入未结转完</li>
+          <li><b>科目口径不同</b>：归母 / 合并；含税 / 不含税</li>
+          <li><b>四舍五入和精度</b>：先约后乘 vs 先乘后约，有尾差</li>
+          <li><b>软件取数逻辑</b>：三张表数据没有完全对齐</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>杜邦分析 · 对上了反而可疑</h3>
+        <ul>
+          <li><b>情况一</b>：直接拿净利润/净资产倒推，强行调某个因子</li>
+          <li><b>情况二</b>：用期末数硬凑，不用平均总资产</li>
+          <li><b>情况三</b>：口径混用后强行配平</li>
+          <li><b>情况四</b>：忽略未过账、未结转，强行让乘积相等</li>
+          <li class="highlight">表面对上了，但至少有一个因子是假的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>杜邦分析 · 判断标准</h3>
+        <ul>
+          <li>乘积与 ROE 有微小尾差 → 正常，四舍五入导致</li>
+          <li>差异较大，但标注了口径 → 正常，口径差异</li>
+          <li>完全相等，且三个因子都独立取数 → 可疑，可能强行配平</li>
+          <li>完全相等，但某个因子明显不合理 → 错误，牺牲了因子真实性</li>
+          <li>不允许查看三个因子的原始取数 → 不透明，无法判断</li>
+        </ul>
+      </div>
+
+      <!-- ==================== 分类 3：软件与规则 ==================== -->
+      <div class="section-title" id="cat3">3. 软件与规则</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>软件 · 规则错了，界面再漂亮也没用</h3>
+        <ul>
+          <li>网站再漂亮，规则用错了，就是错的</li>
+          <li>漂亮本身会掩盖规则错误</li>
+          <li>粗糙的错误容易被抓住，精致的错误容易被放过</li>
+          <li class="highlight">好看是加分项，规则正确是及格线</li>
+          <li class="highlight">及格线没过，加分项全是负分</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>软件 · 判断顺序</h3>
+        <ul>
+          <li><b>1. 规则对不对</b>：取数口径、会计逻辑、税务处理</li>
+          <li><b>2. 参数可不可查</b>：每个数从哪来的，能不能追溯</li>
+          <li><b>3. 界面好不好</b>：前两条过了，这条才有意义</li>
+          <li class="highlight">反过来，先看界面，基本就会被带偏</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>软件 · 为什么“对得上”反而危险</h3>
+        <ul>
+          <li>有些软件生成杜邦分析表时，三个因子分别取数</li>
+          <li>最后为了让 ROE 和定义式一致，强行调整某个因子</li>
+          <li>表面对上了，但三个因子中至少有一个是假的</li>
+          <li>失去了分析价值</li>
+          <li class="highlight">真正干净的账，是有合理差异的</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>软件 · 什么情况下可以对上</h3>
+        <ul>
+          <li>大企业的财务系统，如果总账、报表、分析模块用同一个数据仓库</li>
+          <li>期间锁定后取数</li>
+          <li>口径在系统里统一配置</li>
+          <li>那三个因子可以做到同源、同时、同口径</li>
+          <li>连乘结果和 ROE 对得上，这时候是<b>正常的</b></li>
+          <li class="highlight">核心不是“能不能对上”，而是“取数来源和口径配置是否透明、可追溯”</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>软件 · 自己跑数就能验</h3>
+        <ul>
+          <li>规则对不对，不需要等税务局来查</li>
+          <li>自己拿一组已知答案的数进去跑一遍</li>
+          <li>连乘结果 ≠ 直接算的结果 → 参数没取对</li>
+          <li>结果对得上，但某个因子明显不合理 → 因子被动过</li>
+          <li>结果对得上，因子也合理，口径能说清 → 对的</li>
+          <li class="highlight">能自己测出来的问题，流到外面，不是技术问题，是流程问题</li>
+        </ul>
+      </div>
+
+      <!-- ==================== 分类 4：税务局与查账 ==================== -->
+      <div class="section-title" id="cat4">4. 税务局与查账</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>查账 · 为什么先问软件</h3>
+        <ul>
+          <li>税务局查账第一件事问“你们用的哪家税务软件”</li>
+          <li>不是在关心软件贵不贵、好不好用</li>
+          <li>是在问：<b>你的账，是在哪套规则下生成的</b></li>
+          <li class="highlight">税务局问软件，不是问工具，是问规则</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>查账 · 软件内置的规则</h3>
+        <ul>
+          <li><b>科目体系</b>：收入、成本、费用怎么分类</li>
+          <li><b>取数逻辑</b>：报表数字从哪张表、哪个科目来的</li>
+          <li><b>申报表生成规则</b>：账面数怎么变成申报数</li>
+          <li><b>税前扣除规则</b>：哪些能扣、哪些不能扣、按什么标准扣</li>
+          <li><b>税会差异处理</b>：会计利润怎么调成应纳税所得额</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>查账 · 软件 = 口径的载体</h3>
+        <ul>
+          <li>以前手工账时代，税务局问的是“你们会计是谁”“用什么会计制度”</li>
+          <li>现在软件时代，规则被固化进软件里了</li>
+          <li>问软件，等于问：</li>
+          <li>用的是不是税局认可的软件？</li>
+          <li>软件版本和申报接口对不对得上？</li>
+          <li>软件取数逻辑，和我要核的数据，能不能衔接？</li>
+          <li class="highlight">软件定了口径，口径定了参数，参数定了账</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>查账 · 最怕的不是差异</h3>
+        <ul>
+          <li>税务局和审计最怕的不是差异</li>
+          <li>是<b>差异无法解释</b></li>
+          <li>有差异，能说清楚为什么差、差在哪、怎么调整，这是正常的</li>
+          <li>对得上，但说不清怎么对上的，反而更麻烦</li>
+          <li class="highlight">查账从源头查起，问软件就是问源头</li>
+        </ul>
+      </div>
+
+      <!-- ==================== 分类 5：数学与底层 ==================== -->
+      <div class="section-title" id="cat5">5. 数学与底层</div>
+
+      <div class="card">
+        <h3><span class="dot red"></span>数学 · 程序员的底</h3>
+        <ul>
+          <li>数学不是程序员的工具，是程序员的底</li>
+          <li>工具可以换，底换了，上面全塌</li>
+          <li>程序员需要的数学，和数学家需要的数学不一样</li>
+          <li>不是要你去证定理，是要你具备几种具体能力</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>数学 · 程序员需要的几种能力</h3>
+        <ul>
+          <li><b>恒等式意识</b>：知道什么情况下 A = B，什么情况下只是形式相等</li>
+          <li><b>边界意识</b>：0、1、空值、极值，公式还成不成立</li>
+          <li><b>反推能力</b>：拿一组已知答案的数，验证公式对不对</li>
+          <li><b>口径意识</b>：同一个符号，在不同上下文里是不是同一个东西</li>
+          <li><b>量纲意识</b>：这个数是什么单位，那个数是什么口径，能不能直接乘</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot blue"></span>数学 · 为什么很多程序员数学弱</h3>
+        <ul>
+          <li>学校里数学是应试的，和工程脱节</li>
+          <li>工作中业务代码多，觉得数学用不上</li>
+          <li>框架和库把数学包起来了，看不见底层</li>
+          <li>出错了靠试，不靠推</li>
+          <li class="highlight">结果就是：能跑就行，对不对不知道</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot gold"></span>数学 · 从财务追到数学</h3>
+        <ul>
+          <li>公式 → 口径 → 软件 → 查账 → 测试</li>
+          <li>核心就一句：规则对不对，跑几个数就知道</li>
+          <li>能自己测出来的问题流到外面，不是技术问题，是流程问题</li>
+          <li class="highlight">从财务对账一路追到数学底层，这个路径本身就说明问题了</li>
+        </ul>
+      </div>
+
+      <!-- ==================== 分类 6：待补充 ==================== -->
+      <div class="section-title" id="cat6">6. 待补充</div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>待补充 · 财务杂谈</h3>
+        <ul>
+          <li>三张表勾稽</li>
+          <li>四流合一</li>
+          <li>审计底稿</li>
+          <li>银行授信口径</li>
+          <li>税会差异</li>
+          <li>合并报表</li>
+          <li>现金流量表分析</li>
+          <li>财务造假识别</li>
+          <li>后期想到再加</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>待补充 · 软件与工具</h3>
+        <ul>
+          <li>财务软件取数逻辑对比</li>
+          <li>税务软件口径差异</li>
+          <li>BI 工具做财务分析的坑</li>
+          <li>Excel 财务模型常见错误</li>
+          <li>后期想到再加</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot green"></span>待补充 · 数学与代码</h3>
+        <ul>
+          <li>恒等式与程序逻辑</li>
+          <li>浮点数精度问题</li>
+          <li>边界条件测试</li>
+          <li>用已知答案反推公式</li>
+          <li>后期想到再加</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="end">
+      <p>
+        <span class="gold">数字本身不重要，数字背后的规则和逻辑才重要</span><br>
+        公式 · 口径 · 对账 · 软件
+      </p>
+      <div class="disclaimer">
+        ⚠️ 财务杂谈为个人思考，不构成专业意见，具体问题请咨询专业人士
+      </div>
+      <div class="foot">个人观点 · 欢迎讨论</div>
+    </div>
+
+  </div>
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = [
+            './js/metaConfigLoader.js.txt'
+        ]
+        window.PAGE_META.loader = [
+            "./js/loader.js.txt"
+        ];
+    }
+</script>
+<script src="./js/init.js"></script>
+</html>
