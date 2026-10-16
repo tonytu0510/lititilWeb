@@ -19,49 +19,62 @@
         window.PAGE_META.content =
         `
         <div id="topBarContainer"></div>
-        <!-- 原有规则 -->
         <div class="wrap">
         <h1 style='margin:0 auto 30px auto'>
           数学对合符号规则 · 符号总表
         </h1>
         <div class="grid">
+
+          <div class="card">
+            <h3><span class="dot red"></span>对合拆字规则 · 核心总纲</h3>
+            <ul>
+              <li><b>核心规则</b> = <code>1 = 丨 = 十 = 空 = 0 = 1</code></li>
+              <li><b>对合号 ⇒</b> = <code>--</code>，表示“对合到”，不是普通等号</li>
+              <li><b>普通等号 =</b> = 普通数学等号，有传递性，和对合号不混用</li>
+              <li><b>对合号不传递</b>：<code>1 ⇒ 2</code>、<code>0 ⇒ 1</code>，不能推出 <code>0 ⇒ 2</code></li>
+              <li><b>相同可以约分</b></li>
+              <li><b>顺序可以对合</b></li>
+              <li><b>等式收尾</b>：移项到左边，整体 <code>⇒ 0</code></li>
+              <li><b>1+1 ⇒ -1</b>，不是 <code>1</code></li>
+              <li><b>-1 ⇒ 2</b></li>
+              <li><b>0 ⇒ 1</b>，但 <code>0 ⇏ 2</code></li>
+            </ul>
+          </div>
+
           <div class="card">
             <h3><span class="dot red"></span>对合拆字规则 · 符号总表</h3>
             <ul>
-              <li><b>核心规则</b> = <code>1 = 丨 = 十 =  空 = 0 = 1</code></li>
-              <li><b>加号 +</b> = <code>-1-</code></li>
+              <li><b>核心规则</b> = <code>1 = 丨 = 十 = 空 = 0 = 1</code></li>
+              <li><b>对合号 ⇒</b> = <code>--</code></li>
+              <li><b>普通等号 =</b> = 普通数学等号，不混用</li>
               <li><b>加号 +</b> = <code>-1-</code></li>
               <li><b>减号 -</b> = <code>-</code></li>
               <li><b>减号 -</b> = <code>1</code></li>
               <li><b>乘号 ×</b> = <code>&gt;&lt;</code> = <code>+1--1+</code> = <code>+1==1+</code> = <code>+1-1+</code> = <code>--</code></li>
-              <li><b>除号 ÷ </b> = <code>-</code></li>
+              <li><b>除号 ÷</b> = <code>-</code></li>
               <li><b>除号 /</b> = <code>-</code></li>
               <li><b>大于号 &gt;</b> = <code>+1-</code></li>
               <li><b>小于号 &lt;</b> = <code>-1+</code></li>
-              <li><b>次幂^</b> = <code>&lt; or &gt;</code></li>
-              <li><b>次幂²</b> = <code>^2</code></li>
-              <li><b>次幂³</b> = <code>^3</code></li>
-              <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code>（同乘号拆分规则）</li>
+              <li><b>次幂 ^</b> = <code>&lt;</code> 或 <code>&gt;</code></li>
+              <li><b>次幂 ²</b> = <code>^2</code></li>
+              <li><b>次幂 ³</b> = <code>^3</code></li>
+              <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code></li>
               <li><b>积分 ∫</b> = <code>&lt;-&gt;</code></li>
               <li><b>积分 ∫₀¹</b> = <code>&lt;1-&gt;0</code></li>
-              <li><b>积分 ∫ (1/2) = 1</b> = <code><-> (1/2)</code></li>
-              <li><b>积分 ∫ (1/2) = 1</b> = <code>-(1-2)</code></li>
-              <li><b>积分 ∫ (1/2) = 1</b> = <code>1</code></li>
-              <li><b>导数 d/dx</b> = <code>1/x</code>(d 约掉）</li>
-              <li><b>对合等号=</b> <code>--</code> </li>
-              <li><b>负号- =</b> 减号<code>-</code> </li>
+              <li><b>积分 ∫ (1/2) = 1</b> = <code>&lt;-&gt; (1/2)</code> = <code>-(1-2)</code> = <code>1</code></li>
+              <li><b>导数 d/dx</b> = <code>1/x</code>（d 约掉）</li>
+              <li><b>负号 -</b> = 减号 <code>-</code></li>
               <li><b>极限 lim</b> = 直接约掉</li>
               <li><b>英文字母</b> = 直接约掉</li>
               <li><b>e</b> = <code>n!</code></li>
               <li><b>d</b> = <code>1/2</code></li>
               <li><b>一横 —</b> = <code>-</code></li>
               <li><b>两横 --</b> = <code>--</code></li>
-              <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code>（同大于小于号）</li>
-              <li><b>三个等号 ===</b> = 约分成一个 <code>-</code>，结果一样</li>
+              <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code></li>
+              <li><b>三个等号 ===</b> = 约成一个 <code>-</code></li>
             </ul>
           </div>
 
-          <!-- 补充规则 -->
           <div class="card">
             <h3><span class="dot red"></span>对合拆字规则 · 补充收尾规则</h3>
 
@@ -73,84 +86,72 @@
 
             <div class="section-title">二、数字</div>
             <ul>
-              <li><b>2</b> = <code>?</code></li>
+              <li><b>2</b> = <code>1111</code> = <code>-1-1</code> = <code>-2</code> = <code>2</code></li>
               <li><b>3</b> = <code>?</code></li>
               <li><b>4</b> = <code>?</code></li>
-              <li>建议：<code>0 = 1 成立</code></li>
-              <li>建议：<code>0 = 2 不成立</code></li>
-              <li>建议：<code>0 = 3 不成立</code></li>
+              <li><b>所有数字都能归为 0 = 1</b></li>
+              <li>注意：不能所有数字直接归 0，否则算不出结果</li>
+              <li>数字需先按拆字展开，再约分</li>
             </ul>
 
             <div class="section-title">三、阶乘</div>
             <ul>
-              <li><b>!</b> = <code>?</code></li>
-              <li>建议：<code>! = 约掉</code></li>
+              <li><b>!</b> = 约掉</li>
             </ul>
 
             <div class="section-title">四、导数撇号</div>
             <ul>
-              <li><b>'</b> = <code>?</code></li>
-              <li>建议：<code>' = 约掉</code></li>
+              <li><b>'</b> = 约掉</li>
             </ul>
 
             <div class="section-title">五、偏微分</div>
             <ul>
-              <li><b>∂</b> = <code>?</code></li>
-              <li>建议：<code>∂ = d = 1/2</code></li>
+              <li><b>∂</b> = <code>d</code> = <code>1/2</code></li>
             </ul>
 
             <div class="section-title">六、无穷</div>
             <ul>
-              <li><b>∞</b> = <code>?</code></li>
-              <li>建议：<code>∞ = 约掉</code></li>
+              <li><b>∞</b> = 约掉</li>
             </ul>
 
             <div class="section-title">七、常数</div>
             <ul>
-              <li><b>π</b> = <code>?</code></li>
-              <li><b>i</b> = <code>?</code></li>
-              <li>建议：<code>π = 约掉</code></li>
-              <li>建议：<code>i = 约掉</code></li>
+              <li><b>π</b> = 约掉</li>
+              <li><b>i</b> = 约掉</li>
             </ul>
 
             <div class="section-title">八、重积分与环路积分</div>
             <ul>
-              <li><b>∮</b> = <code>?</code></li>
-              <li><b>∬</b> = <code>?</code></li>
-              <li><b>∭</b> = <code>?</code></li>
-              <li>建议：<code>∮ = ∬ = ∭ = ∫ = &lt;-&gt;</code></li>
+              <li><b>∮ = ∬ = ∭ = ∫</b> = <code>&lt;-&gt;</code></li>
             </ul>
 
             <div class="section-title">九、向量算子</div>
             <ul>
-              <li><b>∇</b> = <code>?</code></li>
-              <li><b>·</b> = <code>?</code></li>
-              <li>建议：<code>∇ = 约掉</code></li>
-              <li>建议：<code>· = × = --</code></li>
+              <li><b>∇</b> = 约掉</li>
+              <li><b>·</b> = <code>×</code> = <code>--</code></li>
             </ul>
 
             <div class="section-title">十、其他常用符号</div>
             <ul>
-              <li><b>→</b> = <code>?</code></li>
-              <li><b>Σ</b> = <code>?</code></li>
-              <li><b>Π</b> = <code>?</code></li>
-              <li><b>括号 ( ) [ ] { }</b> = <code>?</code></li>
-              <li><b>绝对值 | |</b> = <code>?</code></li>
-              <li><b>取整 ⌊ ⌋ ⌈ ⌉</b> = <code>?</code></li>
-              <li>建议：<code>→ = 约掉</code></li>
-              <li>建议：<code>Σ = ∫ = &lt;-&gt;</code></li>
-              <li>建议：<code>Π = × = --</code></li>
-              <li>建议：<code>括号 = 约掉</code></li>
-              <li>建议：<code>绝对值 = 约掉</code></li>
-              <li>建议：<code>取整 = 约掉</code></li>
+              <li><b>→</b> = 约掉</li>
+              <li><b>Σ</b> = <code>∫</code> = <code>&lt;-&gt;</code></li>
+              <li><b>Π</b> = <code>×</code> = <code>--</code></li>
+              <li><b>括号 ( ) [ ] { }</b> = 约掉</li>
+              <li><b>绝对值 | |</b> = 约掉</li>
+              <li><b>取整 ⌊ ⌋ ⌈ ⌉</b> = 约掉</li>
             </ul>
           </div>
 
-          <!-- 整理后的完整版 -->
           <div class="card">
             <h3><span class="dot red"></span>对合拆字规则 · 整理后的完整版</h3>
             <ul>
               <li><b>核心规则：</b><code>1 = 丨 = 十 = 空 = 0 = 1</code></li>
+              <li><b>对合号 ⇒</b> = <code>--</code></li>
+              <li><b>普通等号 =</b> = 普通数学等号，不混用</li>
+              <li><b>对合号不传递</b></li>
+              <li><b>相同可以约分</b></li>
+              <li><b>顺序可以对合</b></li>
+              <li><b>等式收尾：移项到左边，整体 ⇒ 0</b></li>
               <li><b>加号 +</b> = <code>-1-</code></li>
               <li><b>减号 -</b> = <code>-</code></li>
               <li><b>减号 -</b> = <code>1</code></li>
@@ -167,7 +168,6 @@
               <li><b>积分 ∫₀¹</b> = <code>&lt;1-&gt;0</code></li>
               <li><b>积分 ∫ (1/2) = 1</b> = <code>&lt;-&gt; (1/2) = -(1-2) = 1</code></li>
               <li><b>导数 d/dx</b> = <code>1/x</code>（d 约掉）</li>
-              <li><b>对合等号 =</b> = <code>--</code></li>
               <li><b>负号 -</b> = 减号 <code>-</code></li>
               <li><b>极限 lim</b> = 直接约掉</li>
               <li><b>英文字母</b> = 直接约掉</li>
@@ -177,11 +177,72 @@
               <li><b>两横 --</b> = <code>--</code></li>
               <li><b>三横 ---</b> = <code>≥ 或 ≤</code></li>
               <li><b>三个等号 ===</b> = 约成一个 <code>-</code></li>
+              <li><b>π、i、∞、括号、绝对值、取整、!、'、lim、→</b> = 约掉</li>
+              <li><b>∂ = d = 1/2</b></li>
+              <li><b>Σ = ∫ = &lt;-&gt;</b></li>
+              <li><b>Π = × = --</b></li>
+              <li><b>∮ = ∬ = ∭ = ∫ = &lt;-&gt;</b></li>
+              <li><b>∇ = 约掉</b></li>
+              <li><b>· = × = --</b></li>
             </ul>
           </div>
-      </div>
-    </div>
-        
+
+          <div class="card">
+            <h3><span class="dot red"></span>对合规则 · 推导示例</h3>
+            <ul>
+              <li><b>1+1 ⇒ -1 ⇒ 2</b></li>
+              <li>所以 <code>1+1 ⇒ 2</code></li>
+              <li><b>1+1=2 移项：</b></li>
+              <li><code>1+1--2 ⇒ 0</code></li>
+              <li><code>-1--2 ⇒ 0</code></li>
+              <li>相同约分：两个 <code>-</code> 约掉</li>
+              <li><code>1 2</code></li>
+              <li>顺序对合：<code>2 1</code></li>
+              <li><code>2-1</code></li>
+              <li><code>2 1 1</code></li>
+              <li><code>1 1 1</code></li>
+              <li><code>1</code></li>
+              <li><code>0</code></li>
+              <li>结论：<code>1+1=2 ⇒ 0</code> 成立</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3><span class="dot red"></span>对合规则 · 1+1 ⇒ 2 与 ⇒ 3 的分支说明</h3>
+            <ul>
+              <li><b>主分支：</b><code>1+1 ⇒ -1 ⇒ 2</code></li>
+              <li>所以 <code>1+1 ⇒ 2</code> 成立</li>
+              <li><b>若另开分支规定 -1 ⇒ 3</b>，则 <code>1+1 ⇒ 3</code> 成立</li>
+              <li>但按主分支 <code>-1 ⇒ 2</code>，<code>1+1 ⇒ 3</code> 不成立</li>
+              <li><b>对合号不传递</b>，所以不能把 <code>1+1 ⇒ 3</code> 和 <code>1+1 ⇒ 2</code> 同时当主分支结论</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3><span class="dot red"></span>对合规则 · 0 ⇒ 1，但 0 ⇏ 2</h3>
+            <ul>
+              <li>核心规则：<code>0 ⇒ 1</code></li>
+              <li>主分支：<code>1 ⇒ 2</code>（由 <code>1+1 ⇒ -1 ⇒ 2</code> 得到）</li>
+              <li>但对合号不传递</li>
+              <li>所以：<code>0 ⇒ 1</code>、<code>1 ⇒ 2</code>，不能推出 <code>0 ⇒ 2</code></li>
+              <li>结论：<code>0 ⇒ 1</code> 成立，<code>0 ⇒ 2</code> 不成立</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3><span class="dot red"></span>对合规则 · 与普通数学的区别</h3>
+            <ul>
+              <li><b>普通等号 =</b>：有传递性，<code>a=b, b=c ⇒ a=c</code></li>
+              <li><b>对合号 ⇒</b>：无传递性，<code>a ⇒ b, b ⇒ c</code> 不能推出 <code>a ⇒ c</code></li>
+              <li>普通数学：<code>1 ≠ 2</code>、<code>0 ≠ 2</code></li>
+              <li>对合规则：<code>1 ⇒ 2</code>、<code>0 ⇒ 1</code>、<code>0 ⇏ 2</code></li>
+              <li>两套规则不混用</li>
+              <li><b>注：</b>标「对合」的按对合规则看，标「数学」的按普通数学看</li>
+            </ul>
+          </div>
+
+        </div>
+        </div>
         `;
     }
   </script>
