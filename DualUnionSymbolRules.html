@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "数学对合符号规则 · 符号总表"
+        window.PAGE_META.cssFront = ["./css/wordplay.css"]
+        window.PAGE_META.metaLoader = ["../compressed/meta-loader.js.txt"];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <!-- 原有规则 -->
+        <div class="wrap">
+        <h1 style='margin:0 auto 30px auto'>
+          数学对合符号规则 · 符号总表
+        </h1>
+        <div class="grid">
+          <div class="card">
+            <h3><span class="dot red"></span>对合拆字规则 · 符号总表</h3>
+            <ul>
+              <li><b>核心规则</b> = <code>1 = 丨 = 十 =  空 = 0 = 1</code></li>
+              <li><b>加号 +</b> = <code>-1-</code></li>
+              <li><b>加号 +</b> = <code>-1-</code></li>
+              <li><b>减号 -</b> = <code>-</code></li>
+              <li><b>减号 -</b> = <code>1</code></li>
+              <li><b>乘号 ×</b> = <code>&gt;&lt;</code> = <code>+1--1+</code> = <code>+1==1+</code> = <code>+1-1+</code> = <code>--</code></li>
+              <li><b>除号 ÷ </b> = <code>-</code></li>
+              <li><b>除号 /</b> = <code>-</code></li>
+              <li><b>大于号 &gt;</b> = <code>+1-</code></li>
+              <li><b>小于号 &lt;</b> = <code>-1+</code></li>
+              <li><b>次幂^</b> = <code>&lt; or &gt;</code></li>
+              <li><b>次幂²</b> = <code>^2</code></li>
+              <li><b>次幂³</b> = <code>^3</code></li>
+              <li><b>根号 √</b> = <code>&lt;</code> 或 <code>&gt;</code>（同乘号拆分规则）</li>
+              <li><b>积分 ∫</b> = <code>&lt;-&gt;</code></li>
+              <li><b>积分 ∫₀¹</b> = <code>&lt;1-&gt;0</code></li>
+              <li><b>积分 ∫ (1/2) = 1</b> = <code><-> (1/2)</code></li>
+              <li><b>积分 ∫ (1/2) = 1</b> = <code>-(1-2)</code></li>
+              <li><b>积分 ∫ (1/2) = 1</b> = <code>1</code></li>
+              <li><b>导数 d/dx</b> = <code>1/x</code>(d 约掉）</li>
+              <li><b>对合等号=</b> <code>--</code> </li>
+              <li><b>负号- =</b> 减号<code>-</code> </li>
+              <li><b>极限 lim</b> = 直接约掉</li>
+              <li><b>英文字母</b> = 直接约掉</li>
+              <li><b>e</b> = <code>n!</code></li>
+              <li><b>d</b> = <code>1/2</code></li>
+              <li><b>一横 —</b> = <code>-</code></li>
+              <li><b>两横 --</b> = <code>--</code></li>
+              <li><b>三横 ---</b> = <code>≥</code> 或 <code>≤</code>（同大于小于号）</li>
+              <li><b>三个等号 ===</b> = 约分成一个 <code>-</code>，结果一样</li>
+            </ul>
+          </div>
+
+          <!-- 补充规则 -->
+          <div class="card">
+            <h3><span class="dot red"></span>对合拆字规则 · 补充收尾规则</h3>
+
+            <div class="section-title">一、不等号</div>
+            <ul>
+              <li><b>≠</b> = <code>?</code></li>
+              <li>建议：<code>≠ = 不约到 0 = 1</code></li>
+            </ul>
+
+            <div class="section-title">二、数字</div>
+            <ul>
+              <li><b>2</b> = <code>?</code></li>
+              <li><b>3</b> = <code>?</code></li>
+              <li><b>4</b> = <code>?</code></li>
+              <li>建议：<code>0 = 1 成立</code></li>
+              <li>建议：<code>0 = 2 不成立</code></li>
+              <li>建议：<code>0 = 3 不成立</code></li>
+            </ul>
+
+            <div class="section-title">三、阶乘</div>
+            <ul>
+              <li><b>!</b> = <code>?</code></li>
+              <li>建议：<code>! = 约掉</code></li>
+            </ul>
+
+            <div class="section-title">四、导数撇号</div>
+            <ul>
+              <li><b>'</b> = <code>?</code></li>
+              <li>建议：<code>' = 约掉</code></li>
+            </ul>
+
+            <div class="section-title">五、偏微分</div>
+            <ul>
+              <li><b>∂</b> = <code>?</code></li>
+              <li>建议：<code>∂ = d = 1/2</code></li>
+            </ul>
+
+            <div class="section-title">六、无穷</div>
+            <ul>
+              <li><b>∞</b> = <code>?</code></li>
+              <li>建议：<code>∞ = 约掉</code></li>
+            </ul>
+
+            <div class="section-title">七、常数</div>
+            <ul>
+              <li><b>π</b> = <code>?</code></li>
+              <li><b>i</b> = <code>?</code></li>
+              <li>建议：<code>π = 约掉</code></li>
+              <li>建议：<code>i = 约掉</code></li>
+            </ul>
+
+            <div class="section-title">八、重积分与环路积分</div>
+            <ul>
+              <li><b>∮</b> = <code>?</code></li>
+              <li><b>∬</b> = <code>?</code></li>
+              <li><b>∭</b> = <code>?</code></li>
+              <li>建议：<code>∮ = ∬ = ∭ = ∫ = &lt;-&gt;</code></li>
+            </ul>
+
+            <div class="section-title">九、向量算子</div>
+            <ul>
+              <li><b>∇</b> = <code>?</code></li>
+              <li><b>·</b> = <code>?</code></li>
+              <li>建议：<code>∇ = 约掉</code></li>
+              <li>建议：<code>· = × = --</code></li>
+            </ul>
+
+            <div class="section-title">十、其他常用符号</div>
+            <ul>
+              <li><b>→</b> = <code>?</code></li>
+              <li><b>Σ</b> = <code>?</code></li>
+              <li><b>Π</b> = <code>?</code></li>
+              <li><b>括号 ( ) [ ] { }</b> = <code>?</code></li>
+              <li><b>绝对值 | |</b> = <code>?</code></li>
+              <li><b>取整 ⌊ ⌋ ⌈ ⌉</b> = <code>?</code></li>
+              <li>建议：<code>→ = 约掉</code></li>
+              <li>建议：<code>Σ = ∫ = &lt;-&gt;</code></li>
+              <li>建议：<code>Π = × = --</code></li>
+              <li>建议：<code>括号 = 约掉</code></li>
+              <li>建议：<code>绝对值 = 约掉</code></li>
+              <li>建议：<code>取整 = 约掉</code></li>
+            </ul>
+          </div>
+
+          <!-- 整理后的完整版 -->
+          <div class="card">
+            <h3><span class="dot red"></span>对合拆字规则 · 整理后的完整版</h3>
+            <ul>
+              <li><b>核心规则：</b><code>1 = 丨 = 十 = 空 = 0 = 1</code></li>
+              <li><b>加号 +</b> = <code>-1-</code></li>
+              <li><b>减号 -</b> = <code>-</code></li>
+              <li><b>减号 -</b> = <code>1</code></li>
+              <li><b>乘号 ×</b> = <code>&gt;&lt; = +1--1+ = +1==1+ = +1-1+ = --</code></li>
+              <li><b>除号 ÷</b> = <code>-</code></li>
+              <li><b>除号 /</b> = <code>-</code></li>
+              <li><b>大于号 &gt;</b> = <code>+1-</code></li>
+              <li><b>小于号 &lt;</b> = <code>-1+</code></li>
+              <li><b>次幂 ^</b> = <code>&lt; 或 &gt;</code></li>
+              <li><b>次幂 ²</b> = <code>^2</code></li>
+              <li><b>次幂 ³</b> = <code>^3</code></li>
+              <li><b>根号 √</b> = <code>&lt; 或 &gt;</code></li>
+              <li><b>积分 ∫</b> = <code>&lt;-&gt;</code></li>
+              <li><b>积分 ∫₀¹</b> = <code>&lt;1-&gt;0</code></li>
+              <li><b>积分 ∫ (1/2) = 1</b> = <code>&lt;-&gt; (1/2) = -(1-2) = 1</code></li>
+              <li><b>导数 d/dx</b> = <code>1/x</code>（d 约掉）</li>
+              <li><b>对合等号 =</b> = <code>--</code></li>
+              <li><b>负号 -</b> = 减号 <code>-</code></li>
+              <li><b>极限 lim</b> = 直接约掉</li>
+              <li><b>英文字母</b> = 直接约掉</li>
+              <li><b>e</b> = <code>n!</code></li>
+              <li><b>d</b> = <code>1/2</code></li>
+              <li><b>一横 —</b> = <code>-</code></li>
+              <li><b>两横 --</b> = <code>--</code></li>
+              <li><b>三横 ---</b> = <code>≥ 或 ≤</code></li>
+              <li><b>三个等号 ===</b> = 约成一个 <code>-</code></li>
+            </ul>
+          </div>
+      </div>
+    </div>
+        
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = [
+            './js/metaConfigLoader.js.txt'
+        ]
+        window.PAGE_META.loader = [
+            "./js/loader.js.txt"
+        ];
+    }
+</script>
+<script src="./js/init.js"></script>
+</html>
