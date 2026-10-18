@@ -95,3 +95,84 @@
   }
   .warn{color:#ffd166;font-weight:600}
   .bad{color:#ff8b8b;font-weight:600}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .scroll{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .kv{display:grid;grid-template-columns:130px 1fr;gap:6px 12px}
+  .kv .k{color:var(--muted)}
+  .warn{color:#ffd166;font-weight:600}
+  .bad{color:#ff8b8b;font-weight:600}
+  @media(max-width:720px){.kv{grid-template-columns:1fr}}
+  /* 输入区 */
+.input-shell{
+  display:flex;
+  gap:14px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+}
+.input-main{
+  flex:1 1 320px;
+  min-width:260px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.input-label{
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:.5px;
+}
+#dhInput{
+  width:100%;
+  background:#0b0e13;
+  border:1px solid #2a3446;
+  border-radius:10px;
+  padding:12px 14px;
+  font-size:16px;
+  color:#e8eaf0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  transition:border-color .15s, box-shadow .15s;
+}
+#dhInput::placeholder{
+  color:#5c687c;
+}
+#dhInput:focus{
+  outline:none;
+  border-color:#4b6b9a;
+  box-shadow:0 0 0 3px rgba(75,107,154,.18);
+}
+.input-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.input-actions button{
+  background:#1b2a3d;
+  color:#d8e6ff;
+  border:1px solid #2f4a6b;
+  border-radius:10px;
+  padding:11px 16px;
+  font-size:14px;
+  cursor:pointer;
+  transition:background .15s, border-color .15s, transform .05s;
+}
+.input-actions button:hover{
+  background:#22354d;
+}
+.input-actions button:active{
+  transform:translateY(1px);
+}
+.input-actions button.primary{
+  background:#1f3b2c;
+  border-color:#2f6b4b;
+  color:#c9ffe1;
+}
+.input-actions button.primary:hover{
+  background:#274d38;
+}
+.input-hint{
+  margin-top:12px;
+}
+@media(max-width:720px){
+  .input-shell{flex-direction:column;align-items:stretch}
+  .input-actions{justify-content:flex-end}
+}

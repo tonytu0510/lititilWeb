@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>对合归零 · Involution Zero</title>
+
+  <script>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "对合归零 · Involution Zero"
+        window.PAGE_META.cssFront = ["./css/InvolutionZero.css"]
+        window.PAGE_META.jsEnd = ["../compressed/InvolutionZero.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
+          <h1>对合归零</h1>
+          <p class="sub">Involution Zero · 对合拆字 / 012 压缩 / 整体归零验证</p>
+
+          <section class="card">
+            <h2>输入</h2>
+
+            <div class="input-shell">
+              <div class="input-main">
+                <label class="input-label" for="dhInput">商或完整式子</label>
+                <input
+                  id="dhInput"
+                  type="text"
+                  placeholder="526252098　或　x÷19=526252098…y"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+              </div>
+
+              <div class="input-actions">
+                <button class="primary" id="dhRun">开始验证</button>
+                <button id="dhDemo">填入示例</button>
+                <button id="dhClear">清空</button>
+              </div>
+            </div>
+
+            <div class="example-bar">
+              <span class="example-label">示例，点一下直接填入：</span>
+              <button class="example-chip" data-example="526252098" type="button">526252098</button>
+              <button class="example-chip" data-example="x÷19=526252098…y" type="button">x÷19=526252098…y</button>
+            </div>
+
+            <p class="note input-hint">
+              支持两种输入：只填商（如 <code>526252098</code>），或填完整式子（如 <code>x÷19=526252098…y</code>）。
+              除数固定按 19 处理。点示例标签可填入，再点“开始验证”即可。
+            </p>
+          </section>
+
+          <section id="dhOut"></section>
+
+          <section class="card">
+            <h2>规则说明</h2>
+            <div class="grid g2">
+              <div class="rule">
+                <p><b>核心对合</b></p>
+                <p><code>1 = 丨 = 十 = 空 = 0 = 1</code></p>
+              </div>
+              <div class="rule">
+                <p><b>符号拆解</b></p>
+                <p><code>× = --</code>，<code>· = × = --</code>，<code>+ = -1-</code>，<code>- = 1</code>，<code>= = --</code></p>
+              </div>
+            </div>
+
+            <h3>数字压缩规则（全部压到 0/1/2）</h3>
+            <p class="mono" style="font-size:15px;color:#cfe3ff">
+              0→0，1→1，2→2，3→0，4→1，5→2，6→1，7→1，8→0，9→1
+            </p>
+
+            <h3>附加过滤条件</h3>
+            <div>
+              <span class="tag">商偶 ⇒ 余数偶</span>
+              <span class="tag">商奇 ⇒ 余数奇</span>
+              <span class="tag">余数允许集合</span>
+              <span class="tag">顺子：相邻差 1，正逆序都算</span>
+            </div>
+          </section>
+
+        </div>
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = [
+            './js/metaConfigLoader.js.txt'
+        ]
+        window.PAGE_META.loader = [
+            "./js/loader.js.txt"
+        ];
+    }
+</script>
+<script src="./js/init.js"></script>
+</html>
