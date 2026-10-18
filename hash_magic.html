@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    async function initPageMeta() {
+        window.PAGE_META.title = "暗影密码机 · Shadow-512 终端";
+        window.PAGE_META.cssFront = ["./css/hash_magic.css"];
+        window.PAGE_META.jsEnd = ["./compressed/hash_magic.js.txt"];
+        window.PAGE_META.metaLoader = ["../compressed/meta-loader.js.txt"];
+    }
+
+    async function initPageContent() {
+        window.PAGE_META.content = `
+        <div id="topBarContainer"></div>
+        <div class="wrap">
+          <div class="card">
+            <div class="header">
+              <h1>Shadow-512 非对称终端</h1>
+              <p>基于大数同余定理的逆向加密系统 v4.0</p>
+            </div>
+
+            <div class="tabs">
+              <div class="tab active" id="tabEnc">加密 (Hash)</div>
+              <div class="tab" id="tabDec">解密 (Reverse)</div>
+            </div>
+
+            <!-- 加密面板 -->
+            <div class="panel active" id="panelEnc">
+              <p style="font-size: 13px; color: var(--muted); text-align: left; margin-bottom: 15px;">
+                [ 数据粉碎 ]：输入任意长数字，系统将将其单向粉碎为哈希特征码。
+              </p>
+              <input type="text" id="inputRaw" placeholder="输入任意长数字，如手机号/生日">
+              <button id="btnEnc">执行单向散列粉碎</button>
+            </div>
+
+            <!-- 解密面板 -->
+            <div class="panel" id="panelDec">
+              <p style="font-size: 13px; color: var(--muted); text-align: left; margin-bottom: 15px;">
+                [ 逆向还原 ]：输入截获的哈希特征码，尝试从暗网节点还原原始明文。
+              </p>
+              <input type="text" id="inputHash" placeholder="输入 SHX-XXXX-RXX 特征码">
+              <button id="btnDec">启动逆向解析引擎</button>
+            </div>
+
+            <div class="terminal" id="termBox"></div>
+            <div class="output-box" id="outputBox"></div>
+          </div>
+        </div>
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = ['./js/metaConfigLoader.js.txt'];
+        window.PAGE_META.loader = ["./js/loader.js.txt"];
+    }
+</script>
+<script src="./js/init.js"></script>
+</html>

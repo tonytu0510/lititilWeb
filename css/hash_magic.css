@@ -1,0 +1,89 @@
+:root {
+  --bg: #05080c;
+  --panel: #0a1017;
+  --text: #e8eaf0;
+  --muted: #6b7d92;
+  --line: #182230;
+  --accent: #00e5ff;
+  --good: #00ff88;
+  --warn: #ffcc00;
+  --danger: #ff3366;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.7 ui-monospace, Consolas, monospace;
+  min-height: 100vh; /* 确保 body 至少有一屏幕高 */
+  display: flex;     /* 开启 flex 布局 */
+  flex-direction: column;
+  background-image: radial-gradient(circle at 50% 0%, rgba(0,229,255,0.05) 0%, transparent 50%);
+}
+
+.wrap {    
+    display: flex; 
+    align-items: center;    /* 垂直居中 */
+    justify-content: center;/* 水平居中 */
+    flex: 1;                /* 占据 body 剩余的所有空间 */
+    padding: 20px;
+    overflow-y: auto;       /* 当内容超出屏幕时，允许滚动 */
+}
+
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 30px; max-width: 640px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  position: relative;
+}
+
+.header { text-align: center; margin-bottom: 25px; }
+.header h1 { margin: 0 0 5px; color: var(--accent); font-size: 22px; letter-spacing: 2px; }
+.header p { margin: 0; font-size: 12px; color: var(--muted); }
+
+.tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--muted); transition: 0.3s; }
+.tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(0,229,255,0.05); }
+
+.panel { display: none; text-align: center; }
+.panel.active { display: block; }
+
+input {
+  width: 100%; background: #000; border: 1px solid var(--line); border-radius: 4px;
+  padding: 15px; color: var(--good); font-size: 20px; text-align: center;
+  outline: none; margin-bottom: 15px; font-family: ui-monospace, monospace;
+  box-shadow: inset 0 0 15px rgba(0,255,136,0.1); letter-spacing: 2px;
+}
+input:focus { border-color: var(--accent); }
+
+button {
+  background: transparent; color: var(--accent); border: 1px solid var(--accent);
+  padding: 12px 30px; font-size: 16px; font-weight: bold; cursor: pointer;
+  border-radius: 4px; transition: 0.2s; text-transform: uppercase; letter-spacing: 2px;
+  width: 100%;
+}
+button:hover { background: rgba(0,229,255,0.1); box-shadow: 0 0 15px rgba(0,229,255,0.3); }
+
+.terminal {
+  display: none; text-align: left; font-size: 13px; color: var(--good);
+  background: #000; border: 1px solid #111; padding: 15px; height: 130px;
+  overflow-y: auto; margin-top: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,1);
+}
+.term-line { margin-bottom: 4px; opacity: 0; animation: fadeIn 0.1s forwards; }
+.term-danger { color: var(--danger); }
+.term-warn { color: var(--warn); }
+
+.output-box {
+  display: none; margin-top: 20px; background: rgba(0,229,255,0.05);
+  border: 1px dashed var(--accent); padding: 20px; border-radius: 4px;
+}
+.hash-code {
+  font-size: 26px; color: var(--warn); font-weight: bold;
+  letter-spacing: 2px; margin: 10px 0; text-shadow: 0 0 10px rgba(255,204,0,0.5);
+  word-break: break-all;
+}
+.decrypted-text {
+  font-size: 32px; color: var(--good); font-weight: bold;
+  margin: 10px 0; text-shadow: 0 0 15px rgba(0,255,136,0.5);
+  word-break: break-all;
+}
+@keyframes fadeIn { to { opacity: 1; } }

@@ -7,12 +7,16 @@
         body {
             background: #0d0d0d;
             font-family: 'Courier New', monospace;
+            min-height: 100vh; /* 确保 body 至少有一屏幕高 */
+            display: flex;     /* 开启 flex 布局 */
+            flex-direction: column;
         }
         .wrap{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width:100%;
+            display: flex; 
+            align-items: center;    /* 垂直居中 */
+            justify-content: center;/* 水平居中 */
+            flex: 1;                /* 占据 body 剩余的所有空间 */
+            overflow-y: auto;       /* 当内容超出屏幕时，允许滚动 */
         }
         .container {
             background: #181818;
