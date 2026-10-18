@@ -24,7 +24,7 @@
         <div id="topBarContainer"></div>
         <div class="wrap">
         <h1>对合拆字规则推导页</h1>
-        <p class="sub">按“对合拆字 / 相同约分 / 顺子过滤 / 奇偶过滤”整理本轮推导结果。</p>
+        <p class="sub">按“对合拆字 / 压缩到 012 / 相同约分 / 顺子过滤 / 奇偶过滤”整理本轮推导与测试结果。</p>
 
         <section class="card">
           <h2>1. 核心规则</h2>
@@ -60,6 +60,12 @@
             <span class="tag">7 ↔ 8</span>
           </div>
 
+          <h3>数字压缩规则（全部压到 0/1/2）</h3>
+          <p>把每个数字先按对合归到 <code>{0,1,2}</code>，再按相同约分与 <code>--⇒0</code> 收尾：</p>
+          <p class="mono" style="font-size:15px;color:#cfe3ff">
+            0→0，1→1，2→2，3→0，4→1，5→2，6→1，7→1，8→0，9→1
+          </p>
+
           <h3>附加过滤条件</h3>
           <div>
             <span class="tag">商偶 ⇒ 余数偶</span>
@@ -80,8 +86,45 @@
         </section>
 
         <section class="card">
-          <h2>3. 本次主式子</h2>
-          <p class="pill">x ÷ 19 = 526252098 … y</p>
+          <h2>3. 主式子与边界判定方法</h2>
+          <p class="pill">x ÷ 19 = 商 … y</p>
+          <p>普通除法还原：</p>
+          <p class="mono">x = 19 × 商 + y，0 ≤ y &lt; 19</p>
+
+          <h3>判定流程</h3>
+          <ol class="note" style="line-height:1.9;padding-left:22px">
+            <li>先按奇偶性筛：商偶 ⇒ y 偶；商奇 ⇒ y 奇。</li>
+            <li>再与余数允许集合取交集。</li>
+            <li>再把商压缩到 <code>{0,1,2}</code>，看整条主式子能否收尾归 0。</li>
+            <li>最后用顺子条件（相邻差 1，正逆序都算）辅助筛选。</li>
+          </ol>
+
+          <h3>关键结论：商压缩后的值决定筛选力</h3>
+          <table>
+            <thead>
+              <tr><th>商压缩后</th><th>对合 0 的筛选力</th><th>处理方式</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono"><b>2</b></td>
+                <td class="ok">强</td>
+                <td>可直接整体对合 0 卡，容易卡出唯一或极少候选。</td>
+              </tr>
+              <tr>
+                <td class="mono"><b>0 / 1</b></td>
+                <td class="warn">弱（边界情况）</td>
+                <td>0/1 自身可归空/归 0，不能直接卡死；需把 0/1 的两种归属代入验算。</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="note">
+            即使把 0/1 边界代入验算，也只能收窄候选，不能保证唯一。这说明当前公式体系不是对所有式子都能给出唯一解的闭合判定器。
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>4. 主式子示例：x ÷ 19 = 526252098 … y</h2>
           <p>普通除法还原：</p>
           <p class="mono">x = 19 × 526252098 + y</p>
           <p class="mono">19 × 526252098 = 9,998,789,862</p>
@@ -101,10 +144,20 @@
             =
             <b style="color:#c9ffe1">{0,2,6,10,12,16}</b>
           </p>
+
+          <h3>商压缩</h3>
+          <p class="mono">
+            526252098
+            → 2,2,1,2,2,2,0,1,0
+            → 221222010
+            → 约 1、约 0
+            → <b style="color:#ffd166">2</b>
+          </p>
+          <p class="note">商压缩后为 2，属于“强筛选”类，可整体对合 0 卡。</p>
         </section>
 
         <section class="card">
-          <h2>4. 候选 x 与顺子计数</h2>
+          <h2>5. 候选 x 与顺子计数（主式子）</h2>
           <p>顺子计数规则：相邻两位差 1 记 1 个顺子；正序逆序都算；相邻对独立计数。</p>
           <table>
             <thead>
@@ -154,15 +207,13 @@
               </tr>
             </tbody>
           </table>
-          <p class="note">6 个候选都含顺子，顺子条件不会把它们全部卡掉；按“顺子最多”选，选 y=16。</p>
+          <p class="note">6 个候选都含顺子；按“顺子最多”选，选 y=16。</p>
         </section>
 
         <section class="card">
-          <h2>5. 结果</h2>
+          <h2>6. 主式子结果</h2>
           <p>叠加 <b>奇偶性 + 余数允许集合 + 顺子（含逆序）</b> 后，候选为：</p>
-          <p class="mono">
-            y ∈ { 0, 2, 6, 10, 12, 16 }
-          </p>
+          <p class="mono">y ∈ { 0, 2, 6, 10, 12, 16 }</p>
           <p class="mono">
             x ∈ {
             9,998,789,862,
@@ -188,11 +239,105 @@
         </section>
 
         <section class="card">
-          <h2>6. 备注</h2>
+          <h2>7. 随机 10 式测试结果</h2>
+          <p>按“卡奇偶 + 整体对合 0 + 顺子”测试 10 个随机式子，结果如下：</p>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>式子（商）</th>
+                <th>商压缩后</th>
+                <th>结果</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td class="mono">38421</td><td class="mono">2</td><td class="ok">唯一：y=15, x=730014</td></tr>
+              <tr><td>2</td><td class="mono">52860</td><td class="mono warn">1</td><td>6 个候选，不唯一</td></tr>
+              <tr><td>3</td><td class="mono">77777</td><td class="mono warn">1</td><td>y∈{1,3,5,17}，不唯一</td></tr>
+              <tr><td>4</td><td class="mono">24680</td><td class="mono">2</td><td class="ok">唯一：y=12, x=468932</td></tr>
+              <tr><td>5</td><td class="mono">13579</td><td class="mono">2</td><td class="ok">唯一：y=15, x=258016</td></tr>
+              <tr><td>6</td><td class="mono">86420</td><td class="mono">2</td><td class="ok">唯一：y=2, x=1641982</td></tr>
+              <tr><td>7</td><td class="mono">97531</td><td class="mono">2</td><td class="ok">唯一：y=15, x=1853104</td></tr>
+              <tr><td>8</td><td class="mono">11223</td><td class="mono warn">0</td><td>9 个候选，不唯一</td></tr>
+              <tr><td>9</td><td class="mono">50505</td><td class="mono warn">0</td><td>y∈{3,15,17}，不唯一</td></tr>
+              <tr><td>10</td><td class="mono">60006</td><td class="mono warn">0</td><td>6 个候选，不唯一</td></tr>
+            </tbody>
+          </table>
           <p class="note">
-            本页只整理本轮聊天中已确认的规则与推导。若后续新增对合规则（例如给 4 或其他数字补对合）、
-            或改变“顺子”的判定方式（如要求三连、要求顺子出现在末尾、要求对合约分后再判顺子），
-            结果可能继续变化。更新网站时可直接替换本页的“主式子”“候选表”和“结果”区块。
+            规律：商压缩后 = 2 的式子（1、4、5、6、7）能卡出唯一值；商压缩后 = 0 或 1 的式子（2、3、8、9、10）卡不出唯一值。
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>8. 边界式子代入 0/1 验算</h2>
+          <p>对 5 个卡不过的边界式子，把商压缩后的 0/1 分别按两种归属代入整条式验算，结果：</p>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>式子（商）</th>
+                <th>边界代入后剩余候选</th>
+                <th>是否唯一</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td><td class="mono">52860</td>
+                <td class="mono">y∈{0,6}，x∈{1004340,1004346}</td>
+                <td class="bad">否（2 个并列）</td>
+              </tr>
+              <tr>
+                <td>2</td><td class="mono">77777</td>
+                <td class="mono">y∈{1,3,17}，x∈{1477764,1477766,1477780}</td>
+                <td class="bad">否</td>
+              </tr>
+              <tr>
+                <td>3</td><td class="mono">11223</td>
+                <td class="mono">y∈{1,3,5,7,9,11,13,15,17}</td>
+                <td class="bad">否</td>
+              </tr>
+              <tr>
+                <td>4</td><td class="mono">50505</td>
+                <td class="mono">y∈{3,15,17}，x∈{959598,959610,959612}</td>
+                <td class="bad">否</td>
+              </tr>
+              <tr>
+                <td>5</td><td class="mono">60006</td>
+                <td class="mono">y∈{6,10,12}，x∈{1140120,1140124,1140126}</td>
+                <td class="bad">否</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">
+            结论：把 0/1 代入验算能避免误杀，但只能收窄候选，不能把这些边界式子卡成唯一值。
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>9. 结论与待修问题</h2>
+          <div class="final" style="background:#1a1512;border-color:#5a3b2b">
+            <p style="margin:0 0 8px;color:#ffd166;font-weight:600">当前公式体系的结论</p>
+            <p class="note" style="color:#f0d9b5">
+              按“主式子 + 对合 0 + 奇偶 + 余数集合 + 顺子”这套规则，不能对所有式子给出唯一解。
+              商压缩后 = 2 的式子可卡出唯一值；商压缩后 = 0 或 1 的式子属于边界情况，代入验算后仍只能收窄，不能唯一。
+              因此，当前公式体系本身不是闭合的唯一判定器。
+            </p>
+          </div>
+
+          <h3>待修方向</h3>
+          <ul class="note" style="line-height:1.9;padding-left:22px">
+            <li><b>补边界规则</b>：明确商压缩为 0/1 时，整条式归 0 的判定不能只看 0/1 自归，而要结合 x 末位或 y 的压缩形式。</li>
+            <li><b>加强顺子条件</b>：例如要求三连顺子、要求顺子出现在末尾、或要求对合约分后再判顺子。</li>
+            <li><b>固定对合算法</b>：把整条对合链写成逐位约分的固定算法，避免手动约分时漏约或误约。</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>10. 备注</h2>
+          <p class="note">
+            本页整理本轮聊天中已确认的规则、主式子推导、10 个随机式子测试结果，以及 5 个边界式子的代入验算。
+            若后续新增对合规则（例如给 4 或其他数字补对合）、改变顺子判定方式、或修正边界处理方式，结果可能继续变化。
+            更新网站时可直接替换本页的“测试结果”“边界验算”和“结论”区块。
           </p>
         </section>
 

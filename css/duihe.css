@@ -93,3 +93,5 @@
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     font-size:13px;
   }
+  .warn{color:#ffd166;font-weight:600}
+  .bad{color:#ff8b8b;font-weight:600}
