@@ -71,7 +71,7 @@ tr:last-child td{border-bottom:none}
   flex-wrap:wrap;
 }
 .input-main{
-  flex:1 1 320px;
+  flex:1 1 50px;
   min-width:260px;
   display:flex;
   flex-direction:column;
