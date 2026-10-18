@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // ============================================================
+    // initPageMeta
+    // ============================================================
+    async function initPageMeta() {
+        window.PAGE_META.title = "系统验证 · 核心数据解析"
+        window.PAGE_META.cssFront = ["./css/magic.css"]
+        window.PAGE_META.jsEnd = ["../compressed/magic.js.txt"]
+
+        window.PAGE_META.metaLoader = [
+            "../compressed/meta-loader.js.txt"
+        ];
+    }
+
+    // ============================================================
+    // initPageContent
+    // ============================================================
+    async function initPageContent() {
+        window.PAGE_META.content =
+        `
+        <div id="topBarContainer"></div>
+        <div class='wrap'>
+        <div class="card">
+            <div class="top-bar">⚠ 绝密级操作 · 未经授权禁止泄露 ⚠</div>
+            
+            <h1>国家超算中心 · 辅助推演系统</h1>
+            <div class="sub-title">[ 节点：无锡·神威太湖之光 | 状态：已连接 ]</div>
+            
+            <p style="font-size: 13px; color: var(--muted);">请提供两个 <b>潜意识坐标 (0-9)</b>，系统将调用国家级算力进行【对合归零】逆推。</p>
+            
+            <div class="input-group">
+                <input type="text" id="inA" maxlength="1" placeholder="X">
+                <input type="text" id="inB" maxlength="1" placeholder="Y">
+            </div>
+            
+            <button id="btnMagic">请求算力接入</button>
+            <div class="hacking" id="hackBox"></div>
+            <div class="result" id="resBox"></div>
+            <div class='shengming'>
+                本页面纯属数学游戏与视觉特效，所有算力、节点、超算中心均为前端模拟演示，不涉及任何真实网络接入。
+            </div>
+        </div>
+        </div>
+        `;
+    }
+  </script>
+</head>
+<body>
+</body>
+<script>
+    async function initLoader() {
+        window.PAGE_META.metaConfigLoader = [
+            './js/metaConfigLoader.js.txt'
+        ]
+        window.PAGE_META.loader = [
+            "./js/loader.js.txt"
+        ];
+    }
+</script>
+<script src="./js/init.js"></script>
+</html>
